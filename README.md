@@ -16,12 +16,12 @@ Sau đó, di chuyển vào thư mục dự án:
 
 
 cd AdminDashboard
-###2. Cài đặt các thư viện cần thiết
+### 2. Cài đặt các thư viện cần thiết
 Dự án này sử dụng npm để quản lý các thư viện (dependencies). Chạy lệnh sau để cài đặt tất cả các thư viện cần thiết:
 
 
 npm install
-###3. Chạy dự án trong chế độ phát triển
+### 3. Chạy dự án trong chế độ phát triển
 Để chạy dự án trong chế độ phát triển (development), bạn sử dụng lệnh:
 
 
@@ -31,14 +31,14 @@ Lệnh này sẽ khởi chạy dự án và bạn có thể truy cập vào đ�
 http://localhost:5173
 Mở trình duyệt của bạn và truy cập vào đường dẫn trên để xem ứng dụng hoạt động.
 
-###4. Build dự án cho môi trường sản xuất
+### 4. Build dự án cho môi trường sản xuất
 Nếu bạn muốn build dự án cho môi trường sản xuất (production), sử dụng lệnh:
 
 
 npm run build
 Lệnh này sẽ tạo ra một phiên bản tối ưu của dự án trong thư mục dist.
 
-###5. Kiểm tra và định dạng mã nguồn
+### 5. Kiểm tra và định dạng mã nguồn
 Dự án này sử dụng ESLint và Prettier để đảm bảo chất lượng mã nguồn. Để chạy công cụ lint và kiểm tra mã, bạn có thể dùng lệnh:
 
 npm run lint
