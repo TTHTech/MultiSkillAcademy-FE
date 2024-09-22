@@ -6,35 +6,30 @@
 
 ## Hướng dẫn cài đặt
 
-### 1. Sao chép dự án
+# 1. Sao chép dự án
 
-Đầu tiên, bạn cần sao chép (clone) dự án này về máy tính của mình bằng cách sử dụng lệnh git:
+## Đầu tiên, bạn cần sao chép (clone) dự án này về máy tính của mình bằng cách sử dụng lệnh git:
 
 
-git clone https://github.com/TTHTech/ADMINDASHBOARD.git
+### git clone https://github.com/TTHTech/ADMINDASHBOARD.git
 Sau đó, di chuyển vào thư mục dự án:
 
 
-cd AdminDashboard
-### 2. Cài đặt các thư viện cần thiết
-Dự án này sử dụng npm để quản lý các thư viện (dependencies). Chạy lệnh sau để cài đặt tất cả các thư viện cần thiết:
+### cd AdminDashboard
+# 2. Cài đặt các thư viện cần thiết
+## Dự án này sử dụng npm để quản lý các thư viện (dependencies). Chạy lệnh sau để cài đặt tất cả các thư viện cần thiết:
 
 
-npm install
-### 3. Chạy dự án trong chế độ phát triển
+### npm install
+# 3. Chạy dự án trong chế độ phát triển
 Để chạy dự án trong chế độ phát triển (development), bạn sử dụng lệnh:
 
 
-npm run dev
-# Lệnh này sẽ khởi chạy dự án và bạn có thể truy cập vào địa chỉ:
+### npm run dev
+## Lệnh này sẽ khởi chạy dự án và bạn có thể truy cập vào địa chỉ:
 
-## http://localhost:5173
-Mở trình duyệt của bạn và truy cập vào đường dẫn trên để xem ứng dụng hoạt động.
+### http://localhost:5173
+## Mở trình duyệt của bạn và truy cập vào đường dẫn trên để xem ứng dụng hoạt động.
 
 
-
-npm run lint
-Nếu có vấn đề về định dạng, bạn có thể tự động sửa chúng bằng lệnh:
-
-npm run lint --fix
 Cảm ơn bạn đã sử dụng dự án!
