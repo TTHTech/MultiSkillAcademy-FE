@@ -32,4 +32,4 @@ Sau đó, di chuyển vào thư mục dự án:
 ## Mở trình duyệt của bạn và truy cập vào đường dẫn trên để xem ứng dụng hoạt động.
 
 
-Cảm ơn bạn đã sử dụng dự án!
+# Cảm ơn bạn đã sử dụng dự án!
