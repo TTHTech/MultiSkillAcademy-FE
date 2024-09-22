@@ -26,20 +26,12 @@ npm install
 
 
 npm run dev
-Lệnh này sẽ khởi chạy dự án và bạn có thể truy cập vào địa chỉ:
+# Lệnh này sẽ khởi chạy dự án và bạn có thể truy cập vào địa chỉ:
 
-http://localhost:5173
+## http://localhost:5173
 Mở trình duyệt của bạn và truy cập vào đường dẫn trên để xem ứng dụng hoạt động.
 
-### 4. Build dự án cho môi trường sản xuất
-Nếu bạn muốn build dự án cho môi trường sản xuất (production), sử dụng lệnh:
 
-
-npm run build
-Lệnh này sẽ tạo ra một phiên bản tối ưu của dự án trong thư mục dist.
-
-### 5. Kiểm tra và định dạng mã nguồn
-Dự án này sử dụng ESLint và Prettier để đảm bảo chất lượng mã nguồn. Để chạy công cụ lint và kiểm tra mã, bạn có thể dùng lệnh:
 
 npm run lint
 Nếu có vấn đề về định dạng, bạn có thể tự động sửa chúng bằng lệnh:
