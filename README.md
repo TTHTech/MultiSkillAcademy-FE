@@ -22,7 +22,7 @@ Sau đó, di chuyển vào thư mục dự án:
 
 ### npm install
 # 3. Chạy dự án trong chế độ phát triển
-Để chạy dự án trong chế độ phát triển (development), bạn sử dụng lệnh:
+## Để chạy dự án trong chế độ phát triển (development), bạn sử dụng lệnh:
 
 
 ### npm run dev
