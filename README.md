@@ -11,7 +11,7 @@
 Đầu tiên, bạn cần sao chép (clone) dự án này về máy tính của mình bằng cách sử dụng lệnh git:
 
 
-git clone https://github.com/<tên-github-của-bạn>/AdminDashboard.git
+git clone https://github.com/TTHTech/ADMINDASHBOARD.git
 Sau đó, di chuyển vào thư mục dự án:
 
 
