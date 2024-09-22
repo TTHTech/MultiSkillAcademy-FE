@@ -5,7 +5,7 @@ import Header from "../components/common/Header";
 import StatCard from "../components/common/StatCard";
 import UsersTable from "../components/student/StudentTable";
 import UserGrowthChart from "../components/student/StudentGrowthChart";
-import UserActivityHeatmap from "../components/student/StudentActivityHeatmap";
+import UserActivityHeatmap from "../components/instructor/InstructorActivityHeatmap";
 import UserDemographicsChart from "../components/student/StudentDemographicsChart";
 const userStats = {
   totalUsers: 152845,
