@@ -1,7 +1,6 @@
 import { Route, Routes } from "react-router-dom";
 
 import Sidebar from "./components/common/Sidebar";
-
 import OverviewPage from "./pages/OverviewPage";
 import CoursesPage from "./pages/CoursesPage";
 import StudentPage from "./pages/StudentPage";
@@ -10,6 +9,7 @@ import OrdersPage from "./pages/OrdersPage";
 import AnalyticsPage from "./pages/AnalyticsPage";
 import SettingsPage from "./pages/SettingsPage";
 import InstructorPage from "./pages/InstructorPage";
+import AddNewUserPage from "./pages/AddNewUserPage"; // Import AddNewUserPage
 
 function App() {
 	return (
@@ -30,6 +30,7 @@ function App() {
 				<Route path='/orders' element={<OrdersPage />} />
 				<Route path='/analytics' element={<AnalyticsPage />} />
 				<Route path='/settings' element={<SettingsPage />} />
+				<Route path='/add-user' element={<AddNewUserPage />} /> {/* Route mới cho Add New User */}
 			</Routes>
 		</div>
 	);

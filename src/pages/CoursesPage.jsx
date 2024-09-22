@@ -7,7 +7,7 @@ import { AlertTriangle, DollarSign, Package, TrendingUp } from "lucide-react";
 import CategoryDistributionChart from "../components/overview/CategoryDistributionChart";
 import SalesTrendChart from "../components/courses/SalesTrendChart";
 import ProductsTable from "../components/courses/CoursesTable";
-
+import AcceptedCoursesTable from "../components/courses/AcceptedCoursesTable";
 const ProductsPage = () => {
 	return (
 		<div className='flex-1 overflow-auto relative z-10'>
@@ -28,6 +28,7 @@ const ProductsPage = () => {
 				</motion.div>
 
 				<ProductsTable />
+                <AcceptedCoursesTable/>
 
 				{/* CHARTS */}
 				<div className='grid grid-col-1 lg:grid-cols-2 gap-8'>

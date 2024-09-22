@@ -1,94 +1,58 @@
 import { motion } from "framer-motion";
-import { Search } from "lucide-react";
 import { useState } from "react";
+import { Search } from "lucide-react";
 
-// Dữ liệu mẫu cho các khóa học
-const COURSE_DATA = [
-  { 
-    id: 1, 
-    name: "React Basics", 
-    instructorName: "John Doe", 
-    category: "Web Development", 
-    price: 59.99, 
-    status: "Pending",
-    description: "This is a basic course on React.", 
-    duration: "10 hours", 
-    language: "English",
-    imageUrl: "https://i.pinimg.com/originals/92/32/3b/92323bb410cc82cecf739c87c0d31187.jpg" 
-  },
-  { 
-    id: 2, 
-    name: "Advanced CSS", 
-    instructorName: "Jane Smith", 
-    category: "Design", 
-    price: 39.99, 
-    status: "Pending", 
-    description: "Advanced CSS for designers.", 
-    duration: "7 hours", 
-    language: "English",
-    imageUrl: "https://khoinguonsangtao.vn/wp-content/uploads/2022/08/anh-one-piece.jpg"
-  },
-  { 
-    id: 3, 
-    name: "Python for Beginners", 
-    instructorName: "Alice Brown", 
-    category: "Programming", 
-    price: 199.99, 
-    status: "Pending", 
-    description: "Python for absolute beginners.", 
-    duration: "15 hours", 
-    language: "English",
-    imageUrl: "https://khoinguonsangtao.vn/wp-content/uploads/2022/08/anh-one-piece.jpg"
-  },
-  // Thêm nhiều khóa học khác...
+// Dữ liệu mẫu cho các khóa học đã được chấp nhận
+const ACCEPTED_COURSE_DATA = [
+  { id: 1, name: "React Basics", instructorName: "John Doe", category: "Web Development", students: 150, earnings: 8999, price: 59.99, imageUrl: "https://i.pinimg.com/736x/ec/0e/87/ec0e87062299980da6d3aca200253ef7.jpg" },
+  { id: 2, name: "Advanced CSS", instructorName: "Jane Smith", category: "Design", students: 200, earnings: 11999, price: 39.99, imageUrl: "https://i.pinimg.com/736x/ec/0e/87/ec0e87062299980da6d3aca200253ef7.jpg" },
+  { id: 3, name: "Python for Beginners", instructorName: "Alice Brown", category: "Programming", students: 300, earnings: 17999, price: 199.99, imageUrl: "https://i.pinimg.com/736x/ec/0e/87/ec0e87062299980da6d3aca200253ef7.jpg" },
+  // Thêm các khóa học mẫu khác...
 ];
 
-// Số lượng khóa học hiển thị mỗi trang
-const ITEMS_PER_PAGE = 10;
+const ITEMS_PER_PAGE = 10; // Số khóa học hiển thị mỗi trang
 
-const CoursesTable = () => {
+const AcceptedCoursesTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [currentPage, setCurrentPage] = useState(1); // Lưu trữ trang hiện tại
-  const [editingCourse, setEditingCourse] = useState(null); // Lưu trữ khóa học đang xem
+  const [currentPage, setCurrentPage] = useState(1);
+  const [viewingCourse, setViewingCourse] = useState(null);
 
-  // Lọc khóa học theo từ khóa tìm kiếm
-  const filteredCourses = COURSE_DATA.filter(
+  // Lọc các khóa học theo từ khóa tìm kiếm
+  const filteredCourses = ACCEPTED_COURSE_DATA.filter(
     (course) =>
       course.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      course.instructorName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       course.category.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Tính toán tổng số trang
+  // Phân trang
   const totalPages = Math.ceil(filteredCourses.length / ITEMS_PER_PAGE);
-
-  // Lấy các khóa học hiển thị trên trang hiện tại
   const currentCourses = filteredCourses.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE
   );
 
-  const handleSearch = (e) => {
-    const term = e.target.value.toLowerCase();
-    setSearchTerm(term);
-    setCurrentPage(1); // Quay lại trang đầu khi tìm kiếm
-  };
-
-  const handleAccept = (courseId) => {
-    console.log(`Accepted course with ID: ${courseId}`);
-  };
-
-  const handleReject = (courseId) => {
-    console.log(`Rejected course with ID: ${courseId}`);
-  };
-
+  // Xử lý khi bấm nút "View"
   const handleView = (course) => {
-    setEditingCourse(course); // Hiển thị chi tiết khóa học
+    setViewingCourse(course);
   };
 
-  const handleSave = () => {
-    setEditingCourse(null); // Đóng form sau khi lưu
+  // Xử lý khi xóa khóa học
+  const handleDelete = (courseId) => {
+    const confirmed = window.confirm("Are you sure you want to delete this course?");
+    if (confirmed) {
+      // Xóa khóa học
+      console.log(`Deleted course with ID: ${courseId}`);
+      setViewingCourse(null); // Đóng form sau khi xóa
+    }
   };
 
+  // Xử lý đóng chi tiết khóa học
+  const handleClose = () => {
+    setViewingCourse(null);
+  };
+
+  // Xử lý phân trang
   const handlePageChange = (page) => {
     setCurrentPage(page);
   };
@@ -101,40 +65,42 @@ const CoursesTable = () => {
       transition={{ delay: 0.2 }}
     >
       <div className='flex justify-between items-center mb-6'>
-        <h2 className='text-xl font-semibold text-gray-100'>Courses Pending Approval</h2>
+        <h2 className='text-xl font-semibold text-gray-100'>Accepted Courses</h2>
+
+        {/* Thanh tìm kiếm */}
         <div className='relative'>
           <input
             type='text'
             placeholder='Search courses...'
             className='bg-gray-700 text-white placeholder-gray-400 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500'
-            onChange={handleSearch}
             value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
           />
           <Search className='absolute left-3 top-2.5 text-gray-400' size={18} />
         </div>
       </div>
 
-      {editingCourse ? (
-        // Form chi tiết khóa học
+      {viewingCourse ? (
+        // Hiển thị thông tin chi tiết khóa học khi bấm "View"
         <div className='bg-gray-700 p-4 rounded-lg'>
           {/* Ảnh khóa học */}
           <div className="flex justify-center mb-4">
             <img 
-              src={editingCourse.imageUrl} 
-              alt={editingCourse.name} 
+              src={viewingCourse.imageUrl} 
+              alt={viewingCourse.name} 
               className="w-100 h-100 object-cover rounded-lg" 
             />
           </div>
 
           <h3 className='text-lg font-semibold text-gray-100 mb-4'>Course Details</h3>
-
+          
           {/* Hiển thị thông tin chi tiết của khóa học */}
           <div className='mb-4'>
             <label className='text-gray-400'>Name:</label>
             <input
               type='text'
               name='name'
-              value={editingCourse.name}
+              value={viewingCourse.name}
               className='w-full p-2 bg-gray-600 text-white rounded-lg'
               readOnly
             />
@@ -145,7 +111,7 @@ const CoursesTable = () => {
             <input
               type='text'
               name='instructorName'
-              value={editingCourse.instructorName}
+              value={viewingCourse.instructorName}
               className='w-full p-2 bg-gray-600 text-white rounded-lg'
               readOnly
             />
@@ -156,50 +122,29 @@ const CoursesTable = () => {
             <input
               type='text'
               name='category'
-              value={editingCourse.category}
+              value={viewingCourse.category}
               className='w-full p-2 bg-gray-600 text-white rounded-lg'
               readOnly
             />
           </div>
 
           <div className='mb-4'>
-            <label className='text-gray-400'>Description:</label>
-            <textarea
-              name='description'
-              value={editingCourse.description}
-              className='w-full p-2 bg-gray-600 text-white rounded-lg'
-              readOnly
-            />
-          </div>
-
-          <div className='mb-4'>
-            <label className='text-gray-400'>Price:</label>
+            <label className='text-gray-400'>Students Enrolled:</label>
             <input
               type='text'
-              name='price'
-              value={`$${editingCourse.price}`}
+              name='students'
+              value={viewingCourse.students}
               className='w-full p-2 bg-gray-600 text-white rounded-lg'
               readOnly
             />
           </div>
 
           <div className='mb-4'>
-            <label className='text-gray-400'>Duration:</label>
+            <label className='text-gray-400'>Earnings:</label>
             <input
               type='text'
-              name='duration'
-              value={editingCourse.duration}
-              className='w-full p-2 bg-gray-600 text-white rounded-lg'
-              readOnly
-            />
-          </div>
-
-          <div className='mb-4'>
-            <label className='text-gray-400'>Language:</label>
-            <input
-              type='text'
-              name='language'
-              value={editingCourse.language}
+              name='earnings'
+              value={`$${viewingCourse.earnings}`}
               className='w-full p-2 bg-gray-600 text-white rounded-lg'
               readOnly
             />
@@ -207,20 +152,14 @@ const CoursesTable = () => {
 
           <div className='flex justify-end'>
             <button
-              className='bg-green-500 text-white px-4 py-2 rounded-lg mr-2'
-              onClick={() => handleAccept(editingCourse.id)}
-            >
-              Accept
-            </button>
-            <button
               className='bg-red-500 text-white px-4 py-2 rounded-lg mr-2'
-              onClick={() => handleReject(editingCourse.id)}
+              onClick={() => handleDelete(viewingCourse.id)}
             >
-              Reject
+              Delete
             </button>
             <button
               className='bg-gray-500 text-white px-4 py-2 rounded-lg'
-              onClick={handleSave}
+              onClick={handleClose}
             >
               Close
             </button>
@@ -235,8 +174,8 @@ const CoursesTable = () => {
                 <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>Name</th>
                 <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>Instructor</th>
                 <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>Category</th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>Price</th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>Status</th>
+                <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>Students</th>
+                <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>Earnings</th>
                 <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>Actions</th>
               </tr>
             </thead>
@@ -252,8 +191,8 @@ const CoursesTable = () => {
                   <td className='px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-100'>{course.name}</td>
                   <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-300'>{course.instructorName}</td>
                   <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-300'>{course.category}</td>
-                  <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-300'>${course.price.toFixed(2)}</td>
-                  <td className='px-6 py-4 whitespace-nowrap text-sm text-yellow-400'>{course.status}</td>
+                  <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-300'>{course.students}</td>
+                  <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-300'>${course.earnings}</td>
                   <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-300'>
                     <button
                       className='text-blue-400 hover:text-blue-300 mr-2'
@@ -285,4 +224,4 @@ const CoursesTable = () => {
   );
 };
 
-export default CoursesTable;
+export default AcceptedCoursesTable;

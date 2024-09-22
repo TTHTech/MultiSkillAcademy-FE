@@ -2,21 +2,23 @@ import { BarChart2, DollarSign, Menu, Settings, ShoppingCart, TrendingUp } from 
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { GraduationCap } from "lucide-react"; 
+import { GraduationCap, BookOpen, LogOut, Plus, Layers } from "lucide-react"; // Thêm icon "Plus" cho Add New User
 import { ChalkboardTeacher } from "phosphor-react";
-import { BookOpen } from "lucide-react";
-import { LogOut } from "lucide-react"; 
+
+// Cập nhật danh sách các mục trong Sidebar
 const SIDEBAR_ITEMS = [
 	{ name: "Overview", icon: BarChart2, color: "#6366f1", href: "/" },
-	{ name: "Courses", icon: BookOpen, color: "#8B5CF6", href: "/courses" }, 
+	{ name: "Courses", icon: BookOpen, color: "#8B5CF6", href: "/courses" },
 	{ name: "Student", icon: GraduationCap, color: "#EC4899", href: "/student" },
-	{ name: "Instructor", icon: ChalkboardTeacher, color: "#EC4899", href: "/instructor" }, // Thay icon tại đây
+	{ name: "Instructor", icon: ChalkboardTeacher, color: "#EC4899", href: "/instructor" },
+	{ name: "Add New User", icon: Plus, color: "#10B981", href: "/add-user" },
+	{ name: "Category", icon: Layers, color: "#F97316", href: "/category" }, // Mục Category
 	{ name: "Sales", icon: DollarSign, color: "#10B981", href: "/sales" },
 	{ name: "Orders", icon: ShoppingCart, color: "#F59E0B", href: "/orders" },
 	{ name: "Analytics", icon: TrendingUp, color: "#3B82F6", href: "/analytics" },
 	{ name: "Settings", icon: Settings, color: "#6EE7B7", href: "/settings" },
-	{ name: "Logout", icon: LogOut, color: "#EF4444", href: "/logout", onClick: "" },
-  ];
+	{ name: "Logout", icon: LogOut, color: "#EF4444", href: "/logout" },
+];
 
 const Sidebar = () => {
 	const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -27,6 +29,8 @@ const Sidebar = () => {
 				isSidebarOpen ? "w-64" : "w-20"
 			}`}
 			animate={{ width: isSidebarOpen ? 256 : 80 }}
+			// Thêm thuộc tính cuộn và giới hạn chiều cao
+			style={{ maxHeight: "100vh", overflowY: "auto" }}
 		>
 			<div className='h-full bg-gray-800 bg-opacity-50 backdrop-blur-md p-4 flex flex-col border-r border-gray-700'>
 				<motion.button
@@ -64,4 +68,5 @@ const Sidebar = () => {
 		</motion.div>
 	);
 };
+
 export default Sidebar;
