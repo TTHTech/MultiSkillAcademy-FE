@@ -1,12 +1,13 @@
 import { UserCheck, UserPlus, UsersIcon, UserX } from "lucide-react";
 import { motion } from "framer-motion";
 
-import Header from "../components/common/Header";
-import StatCard from "../components/common/StatCard";
-import UsersTable from "../components/student/StudentTable";
-import UserGrowthChart from "../components/student/StudentGrowthChart";
-import UserActivityHeatmap from "../components/instructor/InstructorActivityHeatmap";
-import UserDemographicsChart from "../components/student/StudentDemographicsChart";
+import Header from "../../components/admin/common/Header";
+import StatCard from "../../components/admin/common/StatCard";
+import UsersTable from "../../components/admin/instructor/InstructorTable";
+import UserGrowthChart from "../../components/admin/instructor/InstructorGrowthChart";
+import UserActivityHeatmap from "../../components/admin/instructor/InstructorActivityHeatmap";
+import UserDemographicsChart from "../../components/admin/instructor/InstructorDemographicsChart";
+
 const userStats = {
   totalUsers: 152845,
   newUsersToday: 243,
@@ -17,7 +18,7 @@ const userStats = {
 const UsersPage = () => {
   return (
     <div className="flex-1 overflow-auto relative z-10">
-      <Header title="Users" />
+      <Header title="Instructor" />
 
       <main className="max-w-7xl mx-auto py-6 px-4 lg:px-8">
         {/* STATS */}
@@ -28,19 +29,19 @@ const UsersPage = () => {
           transition={{ duration: 1 }}
         >
           <StatCard
-            name="Total Student"
+            name="Total Instructor"
             icon={UsersIcon}
             value={userStats.totalUsers.toLocaleString()}
             color="#6366F1"
           />
           <StatCard
-            name="New Student Today"
+            name="New Instructor Today"
             icon={UserPlus}
             value={userStats.newUsersToday}
             color="#10B981"
           />
           <StatCard
-            name="Active Student"
+            name="Active Instructor"
             icon={UserCheck}
             value={userStats.activeUsers.toLocaleString()}
             color="#F59E0B"

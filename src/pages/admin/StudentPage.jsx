@@ -1,14 +1,12 @@
 import { UserCheck, UserPlus, UsersIcon, UserX } from "lucide-react";
 import { motion } from "framer-motion";
 
-import Header from "../components/common/Header";
-import StatCard from "../components/common/StatCard";
-import UsersTable from "../components/instructor/InstructorTable";
-import UserGrowthChart from "../components/instructor/InstructorGrowthChart";
-import UserActivityHeatmap from "../components/instructor/InstructorActivityHeatmap";
-import UserDemographicsChart from "../components/instructor/InstructorDemographicsChart";
-
-
+import Header from "../../components/admin/common/Header";
+import StatCard from "../../components/admin/common/StatCard";
+import UsersTable from "../../components/admin/student/StudentTable";
+import UserGrowthChart from "../../components/admin/student/StudentGrowthChart";
+import UserActivityHeatmap from "../../components/admin/instructor/InstructorActivityHeatmap";
+import UserDemographicsChart from "../../components/admin/student/StudentDemographicsChart";
 const userStats = {
   totalUsers: 152845,
   newUsersToday: 243,
@@ -19,7 +17,7 @@ const userStats = {
 const UsersPage = () => {
   return (
     <div className="flex-1 overflow-auto relative z-10">
-      <Header title="Instructor" />
+      <Header title="Users" />
 
       <main className="max-w-7xl mx-auto py-6 px-4 lg:px-8">
         {/* STATS */}
@@ -30,19 +28,19 @@ const UsersPage = () => {
           transition={{ duration: 1 }}
         >
           <StatCard
-            name="Total Instructor"
+            name="Total Student"
             icon={UsersIcon}
             value={userStats.totalUsers.toLocaleString()}
             color="#6366F1"
           />
           <StatCard
-            name="New Instructor Today"
+            name="New Student Today"
             icon={UserPlus}
             value={userStats.newUsersToday}
             color="#10B981"
           />
           <StatCard
-            name="Active Instructor"
+            name="Active Student"
             icon={UserCheck}
             value={userStats.activeUsers.toLocaleString()}
             color="#F59E0B"
@@ -56,7 +54,7 @@ const UsersPage = () => {
         </motion.div>
 
         <UsersTable />
-   
+
         {/* USER CHARTS */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
           <UserGrowthChart />

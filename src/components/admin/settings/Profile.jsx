@@ -6,7 +6,7 @@ const Profile = () => {
   const [isEditing, setIsEditing] = useState(false); // State để điều khiển form chỉnh sửa
   const [userProfile, setUserProfile] = useState({
     name: "John Doe",
-    email: "john.doe@example.com", // Email không cho chỉnh sửa
+    email: "tthoai2401.learn@gmail.com", // Email không cho chỉnh sửa
     bio: "Loves technology and enjoys learning new things.",
     phoneNumber: "123-456-7890",
     address: "123 Main St, City, Country",
@@ -33,7 +33,7 @@ const Profile = () => {
     <SettingSection icon={User} title={"Profile"}>
       <div className='flex flex-col sm:flex-row items-center mb-6'>
         <img
-          src='https://randomuser.me/api/portraits/men/3.jpg'
+          src='https://th.bing.com/th/id/OIP.GpoI8vw-dqWKE6W59iApbAHaGS?w=217&h=184&c=7&r=0&o=5&pid=1.7'
           alt='Profile'
           className='rounded-full w-20 h-20 object-cover mr-4'
         />

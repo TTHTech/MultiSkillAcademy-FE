@@ -6,27 +6,27 @@ import { Search, Camera } from "lucide-react";
 const userData = [
 	{
 		id: 1,
-		name: "John Doe",
-		email: "john@example.com",
+		name: "Thanh Hoài",
+		email: "tthoai2401.learn@gmail.com",
 		role: "Customer",
 		status: "Active",
 		phoneNumber: "123-456-7890",
-		address: "123 Main St, City, Country",
+		address: "Quận 9, Thủ Đức",
 		bio: "Loves technology and enjoys learning new things.",
 		dateOfBirth: "1990-05-12",
-		profileImage: "https://randomuser.me/api/portraits/men/13.jpg" // Ảnh đại diện
+		profileImage: "https://th.bing.com/th/id/OIP.GpoI8vw-dqWKE6W59iApbAHaGS?w=217&h=184&c=7&r=0&o=5&pid=1.7" // Ảnh đại diện
 	},
 	{
 		id: 2,
-		name: "Jane Smith",
-		email: "jane@example.com",
+		name: "Phúc Công",
+		email: "tthoai2401.learn@gmail.com",
 		role: "Admin",
 		status: "Active",
 		phoneNumber: "234-567-8901",
-		address: "456 Oak St, City, Country",
+		address: "Quận 9, Thủ Đức",
 		bio: "Admin with a passion for user experience and security.",
 		dateOfBirth: "1988-08-22",
-		profileImage: "https://randomuser.me/api/portraits/women/3.jpg" // Ảnh đại diện
+		profileImage: "https://th.bing.com/th/id/OIP.GpoI8vw-dqWKE6W59iApbAHaGS?w=217&h=184&c=7&r=0&o=5&pid=1.7" // Ảnh đại diện
 	},
 	// Các người dùng khác...
 ];
