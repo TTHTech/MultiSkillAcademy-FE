@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Search, Camera } from "lucide-react";
 
 // Token JWT mặc định
-const token = "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0FETUlOIl0sInN1YiI6ImFkbWluMSIsImlhdCI6MTcyODM3OTM3NywiZXhwIjoxNzI4NDE1Mzc3fQ.VS36A-kD0AVciLkLE6O9GUAYCl4V8SJfNmCqJpvByXI";
+const token = "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0FETUlOIl0sInN1YiI6ImFkbWluMSIsImlhdCI6MTcyODQ2NTAyOSwiZXhwIjoxNzI4NTAxMDI5fQ.bYEMRBjDb39XwbSs0Y-zWfD_CAJUosg4PkmdBWa69LI";
 const ITEMS_PER_PAGE = 5;
 
 const UsersTable = () => {
@@ -17,32 +17,30 @@ const UsersTable = () => {
 
     // Gọi API để lấy danh sách người dùng
     useEffect(() => {
-		const fetchUsers = async () => {
-			try {
-				const response = await fetch("http://localhost:8080/api/admin/students", {
-					method: "GET",
-					headers: {
-						"Content-Type": "application/json",
-						Authorization: `Bearer ${token}`, // Token mặc định
-					},
-				});
-				if (!response.ok) {
-					throw new Error("Failed to fetch users");
-				}
-				const data = await response.json();
-				console.log(data); // Debug dữ liệu từ API
-				setUsers(data);
-				setFilteredUsers(data);
-				setLoading(false);
-			} catch (err) {
-				setError(err.message);
-				setLoading(false);
-			}
-		};
-	
-		fetchUsers();
-	}, []);
-	
+        const fetchUsers = async () => {
+            try {
+                const response = await fetch("http://localhost:8080/api/admin/students", {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`, // Token mặc định
+                    },
+                });
+                if (!response.ok) {
+                    throw new Error("Failed to fetch users");
+                }
+                const data = await response.json();
+                setUsers(data);
+                setFilteredUsers(data);
+                setLoading(false);
+            } catch (err) {
+                setError(err.message);
+                setLoading(false);
+            }
+        };
+
+        fetchUsers();
+    }, []);
 
     // Tính toán số trang
     const totalPages = Math.ceil(filteredUsers.length / ITEMS_PER_PAGE);
@@ -58,7 +56,7 @@ const UsersTable = () => {
         const term = e.target.value.toLowerCase();
         setSearchTerm(term);
         const filtered = users.filter(
-            (user) => 
+            (user) =>
                 `${user.firstName} ${user.lastName}`.toLowerCase().includes(term) ||
                 user.email.toLowerCase().includes(term)
         );
@@ -125,7 +123,8 @@ const UsersTable = () => {
     // Xử lý thay đổi dữ liệu trong form
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setEditingUser({ ...editingUser, [name]: value });
+        const formattedValue = name === "active" ? (value === "true") : value;
+        setEditingUser({ ...editingUser, [name]: formattedValue });
     };
 
     // Xử lý thay đổi ảnh đại diện
@@ -184,13 +183,13 @@ const UsersTable = () => {
 
                     {/* Ảnh đại diện */}
                     <div className="flex justify-center mb-4">
-                        <img 
-                            src={editingUser.profileImage} 
-                            alt={editingUser.firstName} 
-                            className="w-32 h-32 object-cover rounded-full" 
+                        <img
+                            src={editingUser.profileImage || "/default-avatar.png"}
+                            alt={editingUser.firstName}
+                            className="w-32 h-32 object-cover rounded-full"
                         />
                     </div>
-                    
+
                     {/* Nút thay đổi ảnh đại diện */}
                     <div className="flex justify-center mb-4">
                         <label className="flex items-center cursor-pointer">
@@ -276,7 +275,7 @@ const UsersTable = () => {
                         <input
                             type='date'
                             name='dateOfBirth'
-                            value={editingUser.dateOfBirth}
+                            value={editingUser.dateOfBirth || ""}
                             onChange={handleChange}
                             className='w-full p-2 bg-gray-600 text-white rounded-lg'
                         />
@@ -297,17 +296,17 @@ const UsersTable = () => {
                     </div>
 
                     <div className='mb-4'>
-						<label className='text-gray-400'>Status:</label>
-						<select
-							name='isActive'
-							value={editingUser.isActive ? "true" : "false"}
-							onChange={handleChange}
-							className='w-full p-2 bg-gray-600 text-white rounded-lg'
-						>
-							<option value='true'>Active</option>
-							<option value='false'>Inactive</option>
-						</select>
-					</div>
+                        <label className='text-gray-400'>Status:</label>
+                        <select
+                            name='active' // Sử dụng trường active
+                            value={editingUser.active ? "true" : "false"} // Sử dụng giá trị active
+                            onChange={handleChange}
+                            className='w-full p-2 bg-gray-600 text-white rounded-lg'
+                        >
+                            <option value='true'>Active</option>
+                            <option value='false'>Inactive</option>
+                        </select>
+                    </div>
 
                     <div className='flex justify-end'>
                         <button
@@ -392,17 +391,16 @@ const UsersTable = () => {
                                     </td>
 
                                     <td className='px-6 py-4 whitespace-nowrap'>
-										<span
-											className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-												user.isActive === true || user.isActive === 1
-													? "bg-green-800 text-green-100"
-													: "bg-red-800 text-red-100"
-											}`}
-										>
-											{user.isActive === true || user.isActive === 1 ? "Active" : "Inactive"}
-										</span>
-									</td>
-
+                                        <span
+                                            className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                                                user.active === true || user.active === 1
+                                                    ? "bg-green-800 text-green-100"
+                                                    : "bg-red-800 text-red-100"
+                                            }`}
+                                        >
+                                            {user.active === true || user.active === 1 ? "Active" : "Inactive"}
+                                        </span>
+                                    </td>
 
                                     <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-300'>
                                         <button
@@ -441,6 +439,6 @@ const UsersTable = () => {
             )}
         </motion.div>
     );
-};  
+};
 
 export default UsersTable;
