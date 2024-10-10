@@ -3,8 +3,14 @@ import { motion } from "framer-motion";
 import { Search, Camera } from "lucide-react";
 
 // Token JWT mặc định
-const token = "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0FETUlOIl0sInN1YiI6ImFkbWluMSIsImlhdCI6MTcyODQ2NTAyOSwiZXhwIjoxNzI4NTAxMDI5fQ.bYEMRBjDb39XwbSs0Y-zWfD_CAJUosg4PkmdBWa69LI";
+const token = "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0FETUlOIl0sInN1YiI6ImFkbWluMSIsImlhdCI6MTcyODU5MDMwMSwiZXhwIjoxNzI4NjI2MzAxfQ.Orim7gm1r7g9LaCwho9Ma2ni25uzNKJw3eWha_NQXi0";
 const ITEMS_PER_PAGE = 5;
+
+// Hàm tạo màu ngẫu nhiên cho avatar
+const getRandomColor = () => {
+    const colors = ["bg-red-500", "bg-blue-500", "bg-green-500", "bg-yellow-500", "bg-purple-500", "bg-pink-500"];
+    return colors[Math.floor(Math.random() * colors.length)];
+};
 
 const UsersTable = () => {
     const [searchTerm, setSearchTerm] = useState("");
@@ -95,31 +101,43 @@ const UsersTable = () => {
 
     // Xử lý lưu thông tin sau khi chỉnh sửa
     const handleSave = async () => {
-        try {
-            const response = await fetch(`http://localhost:8080/api/admin/students/${editingUser.id}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify(editingUser),
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to update user');
-            }
-
-            const updatedUsers = users.map((user) =>
-                user.id === editingUser.id ? editingUser : user
-            );
-            setUsers(updatedUsers);
-            setFilteredUsers(updatedUsers);
-            setEditingUser(null); // Đóng form sau khi lưu
-        } catch (error) {
-            console.error(error);
+        const formData = new FormData();
+        
+        // Thêm thông tin sinh viên dưới dạng chuỗi JSON
+        formData.append('student', JSON.stringify(editingUser)); // Chuyển đối tượng thành JSON string
+    
+        // Thêm ảnh đại diện nếu có ảnh mới
+        if (editingUser.profileImageFile) {
+            formData.append('profileImage', editingUser.profileImageFile);
         }
+    
+        const response = await fetch(`http://localhost:8080/api/admin/students/${editingUser.id}`, {
+            method: 'PUT',
+            headers: {
+                Authorization: `Bearer ${token}`, // Không cần đặt Content-Type vì FormData tự xử lý
+            },
+            body: formData,
+        });
+    
+        if (!response.ok) {
+            throw new Error('Failed to update user');
+        }
+    
+        const updatedUser = await response.json();
+        console.log("Updated user data:", updatedUser);
+    
+        // Cập nhật danh sách người dùng
+        const updatedUsers = users.map((user) =>
+            user.id === editingUser.id ? updatedUser : user
+        );
+        setUsers(updatedUsers);
+        setFilteredUsers(updatedUsers);
+        setEditingUser(null); // Đóng form sau khi lưu
     };
-
+    
+    
+    
+    
     // Xử lý thay đổi dữ liệu trong form
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -131,14 +149,18 @@ const UsersTable = () => {
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
-            // Đọc file và cập nhật ảnh đại diện
+            // Lưu file vào state để gửi lên server
+            setEditingUser({ ...editingUser, profileImageFile: file });
+        
+            // Đọc file để hiển thị trước
             const reader = new FileReader();
             reader.onloadend = () => {
-                setEditingUser({ ...editingUser, profileImage: reader.result });
+                setEditingUser({ ...editingUser, profileImage: reader.result }); // Hiển thị ảnh mới
             };
             reader.readAsDataURL(file);
         }
     };
+    
 
     // Xử lý chuyển trang
     const handlePageChange = (page) => {
@@ -184,7 +206,7 @@ const UsersTable = () => {
                     {/* Ảnh đại diện */}
                     <div className="flex justify-center mb-4">
                         <img
-                            src={editingUser.profileImage || "/default-avatar.png"}
+                            src={editingUser.profileImage || "https://th.bing.com/th/id/OIP.xqYunaXLEIiIBgbHGncjBQHaHa?rs=1&pid=ImgDetMain"}
                             alt={editingUser.firstName}
                             className="w-32 h-32 object-cover rounded-full"
                         />
@@ -364,14 +386,23 @@ const UsersTable = () => {
                                     animate={{ opacity: 1 }}
                                     transition={{ duration: 0.3 }}
                                 >
-                                    {/* Thêm ảnh đại diện */}
+                                    {/* Avatar logic: Hiển thị ảnh đại diện nếu có, nếu không thì hiển thị chữ cái đầu */}
                                     <td className='px-6 py-4 whitespace-nowrap'>
-                                        <img
-                                            src={user.profileImage?.imageUrl || "/default-avatar.png"}
-                                            alt={user.firstName}
-                                            className='w-10 h-10 rounded-full object-cover'
-                                        />
+                                      
+                                        {user.profileImage ? (
+                                            <img
+                                                src={user.profileImage || "https://th.bing.com/th/id/OIP.U0D5JdoPkQMi4jhiriSVsgHaHa?rs=1&pid=ImgDetMain"}
+                                                alt={user.firstName}
+                                                className='w-10 h-10 rounded-full object-cover'
+                                            />
+                                        ) : (
+                                            <div className={`w-10 h-10 flex items-center justify-center rounded-full ${getRandomColor()} text-white text-lg font-semibold`}>
+                                                {user.lastName ? user.lastName.charAt(0).toUpperCase() : "?"}
+                                            </div>
+                                        )}
                                     </td>
+
+
                                     <td className='px-6 py-4 whitespace-nowrap'>
                                         <div className='text-sm font-medium text-gray-100'>{user.firstName}</div>
                                     </td>
