@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Search, Camera } from "lucide-react";
 
 // Token JWT mặc định
-const token = "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0FETUlOIl0sInN1YiI6ImFkbWluMSIsImlhdCI6MTcyODU5MDMwMSwiZXhwIjoxNzI4NjI2MzAxfQ.Orim7gm1r7g9LaCwho9Ma2ni25uzNKJw3eWha_NQXi0";
+const token = "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0FETUlOIl0sInN1YiI6ImFkbWluMSIsImlhdCI6MTcyODYyNTc5MCwiZXhwIjoxNzI4NjYxNzkwfQ.D7eTCiNw5l54g6OCU4vjSTudgrTnaWPOsxE9o1RAWYw";
 const ITEMS_PER_PAGE = 5;
 
 // Hàm tạo màu ngẫu nhiên cho avatar
@@ -297,10 +297,10 @@ const UsersTable = () => {
                         <input
                             type='date'
                             name='dateOfBirth'
-                            value={editingUser.dateOfBirth || ""}
+                            value={editingUser.dateOfBirth ? new Date(editingUser.dateOfBirth).toISOString().split('T')[0] : ""}
                             onChange={handleChange}
                             className='w-full p-2 bg-gray-600 text-white rounded-lg'
-                        />
+                            />
                     </div>
 
                     <div className='mb-4'>
@@ -311,9 +311,8 @@ const UsersTable = () => {
                             onChange={handleChange}
                             className='w-full p-2 bg-gray-600 text-white rounded-lg'
                         >
-                            <option value='Customer'>Customer</option>
-                            <option value='Admin'>Admin</option>
-                            <option value='Moderator'>Moderator</option>
+                            <option value='Student'>Student</option>
+                            <option value='Instructor'>Instructor</option>
                         </select>
                     </div>
 
@@ -386,7 +385,7 @@ const UsersTable = () => {
                                     animate={{ opacity: 1 }}
                                     transition={{ duration: 0.3 }}
                                 >
-                                    {/* Avatar logic: Hiển thị ảnh đại diện nếu có, nếu không thì hiển thị chữ cái đầu */}
+                                    {/* Avatar logic: Hiển thị ảnh đại diện nếu có, nếu không thì hiển thị ảnh với chữ cái đầu */}
                                     <td className='px-6 py-4 whitespace-nowrap'>
                                       
                                         {user.profileImage ? (
