@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Search, Camera } from "lucide-react";
 
 // Token JWT mặc định
-const token = "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0FETUlOIl0sInN1YiI6ImFkbWluMSIsImlhdCI6MTcyODYyNTc5MCwiZXhwIjoxNzI4NjYxNzkwfQ.D7eTCiNw5l54g6OCU4vjSTudgrTnaWPOsxE9o1RAWYw";
+const token = "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0FETUlOIl0sInN1YiI6ImFkbWluMSIsImlhdCI6MTcyODc0Njc5OSwiZXhwIjoxNzI4NzgyNzk5fQ.SDMvhvXJYAKqO5ZJww6hTkwhdJwuwE3rv1dIrRvS5Fs";
 const ITEMS_PER_PAGE = 5;
 
 // Hàm tạo màu ngẫu nhiên cho avatar
@@ -104,35 +104,54 @@ const UsersTable = () => {
         const formData = new FormData();
         
         // Thêm thông tin sinh viên dưới dạng chuỗi JSON
-        formData.append('student', JSON.stringify(editingUser)); // Chuyển đối tượng thành JSON string
+        const studentData = {
+            firstName: editingUser.firstName,
+            lastName: editingUser.lastName,
+            email: editingUser.email,
+            phoneNumber: editingUser.phoneNumber,
+            address: editingUser.address,
+            bio: editingUser.bio,
+            dateOfBirth: editingUser.dateOfBirth,
+            role: editingUser.role,
+            active: editingUser.active,
+        };
+        
+        formData.append('student', JSON.stringify(studentData)); // Chuyển đối tượng thành JSON string
     
         // Thêm ảnh đại diện nếu có ảnh mới
         if (editingUser.profileImageFile) {
             formData.append('profileImage', editingUser.profileImageFile);
+            console.log('File được thêm vào FormData:', editingUser.profileImageFile);
+        } else {
+            console.log('Không có file ảnh nào được chọn');
         }
     
-        const response = await fetch(`http://localhost:8080/api/admin/students/${editingUser.id}`, {
-            method: 'PUT',
-            headers: {
-                Authorization: `Bearer ${token}`, // Không cần đặt Content-Type vì FormData tự xử lý
-            },
-            body: formData,
-        });
+        try {
+            const response = await fetch(`http://localhost:8080/api/admin/students/${editingUser.id}`, {
+                method: 'PUT',
+                headers: {
+                    Authorization: `Bearer ${token}`, // Không cần đặt Content-Type vì FormData tự xử lý
+                },
+                body: formData,
+            });
     
-        if (!response.ok) {
-            throw new Error('Failed to update user');
+            if (!response.ok) {
+                throw new Error('Failed to update user');
+            }
+    
+            const updatedUser = await response.json();
+            console.log("Updated user data:", updatedUser);
+    
+            // Cập nhật danh sách người dùng
+            const updatedUsers = users.map((user) =>
+                user.id === editingUser.id ? updatedUser : user
+            );
+            setUsers(updatedUsers);
+            setFilteredUsers(updatedUsers);
+            setEditingUser(null); // Đóng form sau khi lưu
+        } catch (error) {
+            console.error("Error updating user:", error);
         }
-    
-        const updatedUser = await response.json();
-        console.log("Updated user data:", updatedUser);
-    
-        // Cập nhật danh sách người dùng
-        const updatedUsers = users.map((user) =>
-            user.id === editingUser.id ? updatedUser : user
-        );
-        setUsers(updatedUsers);
-        setFilteredUsers(updatedUsers);
-        setEditingUser(null); // Đóng form sau khi lưu
     };
     
     
@@ -148,18 +167,21 @@ const UsersTable = () => {
     // Xử lý thay đổi ảnh đại diện
     const handleImageChange = (e) => {
         const file = e.target.files[0];
-        if (file) {
-            // Lưu file vào state để gửi lên server
-            setEditingUser({ ...editingUser, profileImageFile: file });
-        
-            // Đọc file để hiển thị trước
+        if (file && file.type.startsWith('image/')) { // Kiểm tra file là ảnh
             const reader = new FileReader();
             reader.onloadend = () => {
-                setEditingUser({ ...editingUser, profileImage: reader.result }); // Hiển thị ảnh mới
+                setEditingUser({ 
+                    ...editingUser, 
+                    profileImageFile: file, 
+                    profileImage: reader.result 
+                });
             };
             reader.readAsDataURL(file);
+        } else {
+            console.log("File được chọn không phải là ảnh.");
         }
     };
+    
     
 
     // Xử lý chuyển trang
@@ -416,8 +438,10 @@ const UsersTable = () => {
                                         <div className='text-sm text-gray-300'>{user.phoneNumber}</div>
                                     </td>
 
-                                    <td className='px-6 py-4 whitespace-nowrap'>
-                                        <div className='text-sm text-gray-300'>{user.address}</div>
+                                    <td className='px-6 py-4'>
+                                        <div className='text-sm text-gray-300 overflow-hidden text-ellipsis whitespace-nowrap max-w-[120px]'>
+                                            {user.address}
+                                        </div>
                                     </td>
 
                                     <td className='px-6 py-4 whitespace-nowrap'>
