@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Search, Camera } from "lucide-react";
 
 // Token JWT mặc định
-const token = "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0FETUlOIl0sInN1YiI6ImFkbWluMSIsImlhdCI6MTcyODc0Njc5OSwiZXhwIjoxNzI4NzgyNzk5fQ.SDMvhvXJYAKqO5ZJww6hTkwhdJwuwE3rv1dIrRvS5Fs";
+const token = "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0FETUlOIl0sInN1YiI6ImFkbWluMSIsImlhdCI6MTcyODc2Njk3NywiZXhwIjoxNzI4ODAyOTc3fQ.MkJTvM1v_K_gGxR_v5jV4bEfdyXe-cQO9jUyRQtzhoc";
 const ITEMS_PER_PAGE = 5;
 
 // Hàm tạo màu ngẫu nhiên cho avatar
