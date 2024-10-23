@@ -18,11 +18,17 @@ const UsersPage = () => {
   });
   const [error, setError] = useState(null); // Để xử lý lỗi
 
-  // Gán cứng token vào đây
-  const token = "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0FETUlOIl0sInN1YiI6ImFkbWluMSIsImlhdCI6MTcyODc3MTkyNywiZXhwIjoxNzI4ODA3OTI3fQ.rH9d4jnMdJ6cTGowQ2juyY2kPkujEdkdYUiAL0FQcrw";
-
   // Gọi API khi component được tải
   useEffect(() => {
+    // Lấy token từ localStorage
+    const token = localStorage.getItem("token");
+
+    // Kiểm tra nếu không có token
+    if (!token) {
+      setError("No token found, please login first.");
+      return;
+    }
+
     axios.get("http://localhost:8080/api/admin/students/stats", {
       headers: {
         Authorization: `Bearer ${token}`, // Gửi token trong header Authorization
@@ -46,7 +52,6 @@ const UsersPage = () => {
   if (error) {
     return <div>Error: {error}</div>; // Hiển thị lỗi nếu xảy ra
   }
-
   return (
     <div className="flex-1 overflow-auto relative z-10">
       <Header title="Users" />

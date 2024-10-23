@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Search, Camera } from "lucide-react";
 
-// Token JWT mặc định
-const token = "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0FETUlOIl0sInN1YiI6ImFkbWluMSIsImlhdCI6MTcyODc2Njk3NywiZXhwIjoxNzI4ODAyOTc3fQ.MkJTvM1v_K_gGxR_v5jV4bEfdyXe-cQO9jUyRQtzhoc";
+// Hằng số số lượng item trên mỗi trang
 const ITEMS_PER_PAGE = 5;
 
 // Hàm tạo màu ngẫu nhiên cho avatar
@@ -25,11 +24,19 @@ const InstructorsTable = () => {
     useEffect(() => {
         const fetchInstructors = async () => {
             try {
+                // Lấy token từ localStorage
+                const token = localStorage.getItem("token");
+
+                // Kiểm tra xem có token hay không
+                if (!token) {
+                    throw new Error("No token found, please login first.");
+                }
+
                 const response = await fetch("http://localhost:8080/api/admin/instructors", {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`, // Token mặc định
+                        Authorization: `Bearer ${token}`, // Sử dụng token từ localStorage
                     },
                 });
                 if (!response.ok) {
@@ -80,6 +87,7 @@ const InstructorsTable = () => {
         const confirmed = window.confirm("Are you sure you want to delete this instructor?");
         if (confirmed) {
             try {
+                const token = localStorage.getItem("token");
                 const response = await fetch(`http://localhost:8080/api/admin/instructors/${instructorId}`, {
                     method: 'DELETE',
                     headers: {
@@ -102,7 +110,7 @@ const InstructorsTable = () => {
     // Xử lý lưu thông tin sau khi chỉnh sửa
     const handleSave = async () => {
         const formData = new FormData();
-        
+
         // Thêm thông tin giảng viên dưới dạng chuỗi JSON
         const instructorData = {
             firstName: editingInstructor.firstName,
@@ -115,9 +123,9 @@ const InstructorsTable = () => {
             role: editingInstructor.role,
             active: editingInstructor.active,
         };
-        
+
         formData.append('instructor', JSON.stringify(instructorData)); // Chuyển đối tượng thành JSON string
-    
+
         // Thêm ảnh đại diện nếu có ảnh mới
         if (editingInstructor.profileImageFile) {
             formData.append('profileImage', editingInstructor.profileImageFile);
@@ -125,8 +133,9 @@ const InstructorsTable = () => {
         } else {
             console.log('Không có file ảnh nào được chọn');
         }
-    
+
         try {
+            const token = localStorage.getItem("token"); // Lấy token từ localStorage
             const response = await fetch(`http://localhost:8080/api/admin/instructors/${editingInstructor.id}`, {
                 method: 'PUT',
                 headers: {
@@ -134,14 +143,14 @@ const InstructorsTable = () => {
                 },
                 body: formData,
             });
-    
+
             if (!response.ok) {
                 throw new Error('Failed to update instructor');
             }
-    
+
             const updatedInstructor = await response.json();
             console.log("Updated instructor data:", updatedInstructor);
-    
+
             // Cập nhật danh sách giảng viên
             const updatedInstructors = instructors.map((instructor) =>
                 instructor.id === editingInstructor.id ? updatedInstructor : instructor
@@ -153,8 +162,7 @@ const InstructorsTable = () => {
             console.error("Error updating instructor:", error);
         }
     };
-    
-    
+
     // Xử lý thay đổi dữ liệu trong form
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -168,10 +176,10 @@ const InstructorsTable = () => {
         if (file && file.type.startsWith('image/')) { // Kiểm tra file là ảnh
             const reader = new FileReader();
             reader.onloadend = () => {
-                setEditingInstructor({ 
-                    ...editingInstructor, 
-                    profileImageFile: file, 
-                    profileImage: reader.result 
+                setEditingInstructor({
+                    ...editingInstructor,
+                    profileImageFile: file,
+                    profileImage: reader.result
                 });
             };
             reader.readAsDataURL(file);
@@ -179,7 +187,7 @@ const InstructorsTable = () => {
             console.log("File được chọn không phải là ảnh.");
         }
     };
-    
+
     // Xử lý chuyển trang
     const handlePageChange = (page) => {
         setCurrentPage(page);
@@ -194,6 +202,7 @@ const InstructorsTable = () => {
     if (error) {
         return <div>Error: {error}</div>;
     }
+
 
     return (
         <motion.div

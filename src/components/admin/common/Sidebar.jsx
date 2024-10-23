@@ -1,7 +1,7 @@
 import { BarChart2, Menu, Settings } from "lucide-react";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { GraduationCap, BookOpen, LogOut, Plus, Layers } from "lucide-react"; // Thêm icon "Plus" cho Add New User
 import { ChalkboardTeacher } from "phosphor-react";
 
@@ -14,11 +14,18 @@ const SIDEBAR_ITEMS = [
   { name: "Add New User", icon: Plus, color: "#10B981", href: "/admin/add-user" },
   { name: "Category", icon: Layers, color: "#F97316", href: "/admin/category" }, // Mục Category
   { name: "Settings", icon: Settings, color: "#6EE7B7", href: "/admin/settings" },
-  { name: "Logout", icon: LogOut, color: "#EF4444", href: "/admin/logout" },
+  { name: "Logout", icon: LogOut, color: "#EF4444", href: "/logout" }, // Cập nhật href cho logout để xử lý logic bên dưới
 ];
 
 const Sidebar = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const navigate = useNavigate();
+
+  // Hàm xử lý logout
+  const handleLogout = () => {
+    localStorage.removeItem("token"); // Xóa token khỏi localStorage
+    navigate("/login"); // Chuyển hướng người dùng về trang đăng nhập
+  };
 
   return (
     <motion.div
@@ -41,26 +48,50 @@ const Sidebar = () => {
 
         <nav className="mt-8 flex-grow">
           {SIDEBAR_ITEMS.map((item) => (
-            <Link key={item.href} to={item.href}>
-              <motion.div
-                className="flex items-center p-4 text-sm font-medium rounded-lg hover:bg-gray-700 transition-colors mb-2"
-              >
-                <item.icon size={20} style={{ color: item.color, minWidth: "20px" }} />
-                <AnimatePresence>
-                  {isSidebarOpen && (
-                    <motion.span
-                      className="ml-4 whitespace-nowrap"
-                      initial={{ opacity: 0, width: 0 }}
-                      animate={{ opacity: 1, width: "auto" }}
-                      exit={{ opacity: 0, width: 0 }}
-                      transition={{ duration: 0.2, delay: 0.3 }}
-                    >
-                      {item.name}
-                    </motion.span>
-                  )}
-                </AnimatePresence>
-              </motion.div>
-            </Link>
+            <div key={item.href}>
+              {item.name === "Logout" ? (
+                <motion.div
+                  className="flex items-center p-4 text-sm font-medium rounded-lg hover:bg-gray-700 transition-colors mb-2 cursor-pointer"
+                  onClick={handleLogout} // Gọi hàm handleLogout khi người dùng nhấn vào Logout
+                >
+                  <item.icon size={20} style={{ color: item.color, minWidth: "20px" }} />
+                  <AnimatePresence>
+                    {isSidebarOpen && (
+                      <motion.span
+                        className="ml-4 whitespace-nowrap"
+                        initial={{ opacity: 0, width: 0 }}
+                        animate={{ opacity: 1, width: "auto" }}
+                        exit={{ opacity: 0, width: 0 }}
+                        transition={{ duration: 0.2, delay: 0.3 }}
+                      >
+                        {item.name}
+                      </motion.span>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              ) : (
+                <Link to={item.href}>
+                  <motion.div
+                    className="flex items-center p-4 text-sm font-medium rounded-lg hover:bg-gray-700 transition-colors mb-2"
+                  >
+                    <item.icon size={20} style={{ color: item.color, minWidth: "20px" }} />
+                    <AnimatePresence>
+                      {isSidebarOpen && (
+                        <motion.span
+                          className="ml-4 whitespace-nowrap"
+                          initial={{ opacity: 0, width: 0 }}
+                          animate={{ opacity: 1, width: "auto" }}
+                          exit={{ opacity: 0, width: 0 }}
+                          transition={{ duration: 0.2, delay: 0.3 }}
+                        >
+                          {item.name}
+                        </motion.span>
+                      )}
+                    </AnimatePresence>
+                  </motion.div>
+                </Link>
+              )}
+            </div>
           ))}
         </nav>
       </div>

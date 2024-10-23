@@ -2,8 +2,6 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Search, Camera } from "lucide-react";
 
-// Token JWT mặc định
-const token = "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0FETUlOIl0sInN1YiI6ImFkbWluMSIsImlhdCI6MTcyODc3MTkyNywiZXhwIjoxNzI4ODA3OTI3fQ.rH9d4jnMdJ6cTGowQ2juyY2kPkujEdkdYUiAL0FQcrw";
 const ITEMS_PER_PAGE = 5;
 
 // Hàm tạo màu ngẫu nhiên cho avatar
@@ -25,11 +23,19 @@ const UsersTable = () => {
     useEffect(() => {
         const fetchUsers = async () => {
             try {
+                // Lấy token từ localStorage
+                const token = localStorage.getItem("token");
+
+                // Kiểm tra xem token có tồn tại không
+                if (!token) {
+                    throw new Error("No token found, please login first.");
+                }
+
                 const response = await fetch("http://localhost:8080/api/admin/students", {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`, // Token mặc định
+                        Authorization: `Bearer ${token}`, // Sử dụng token từ localStorage
                     },
                 });
                 if (!response.ok) {
@@ -80,11 +86,12 @@ const UsersTable = () => {
         const confirmed = window.confirm("Are you sure you want to delete this user?");
         if (confirmed) {
             try {
+                const token = localStorage.getItem("token"); // Lấy token từ localStorage
                 const response = await fetch(`http://localhost:8080/api/admin/students/${userId}`, {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json',
-                        Authorization: `Bearer ${token}`,
+                        Authorization: `Bearer ${token}`, // Sử dụng token từ localStorage
                     },
                 });
                 if (!response.ok) {
@@ -121,12 +128,10 @@ const UsersTable = () => {
         // Thêm ảnh đại diện nếu có ảnh mới
         if (editingUser.profileImageFile) {
             formData.append('profileImage', editingUser.profileImageFile);
-            console.log('File được thêm vào FormData:', editingUser.profileImageFile);
-        } else {
-            console.log('Không có file ảnh nào được chọn');
         }
     
         try {
+            const token = localStorage.getItem("token"); // Lấy token từ localStorage
             const response = await fetch(`http://localhost:8080/api/admin/students/${editingUser.id}`, {
                 method: 'PUT',
                 headers: {
@@ -140,8 +145,6 @@ const UsersTable = () => {
             }
     
             const updatedUser = await response.json();
-            console.log("Updated user data:", updatedUser);
-    
             // Cập nhật danh sách người dùng
             const updatedUsers = users.map((user) =>
                 user.id === editingUser.id ? updatedUser : user
@@ -153,10 +156,7 @@ const UsersTable = () => {
             console.error("Error updating user:", error);
         }
     };
-    
-    
-    
-    
+
     // Xử lý thay đổi dữ liệu trong form
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -181,8 +181,6 @@ const UsersTable = () => {
             console.log("File được chọn không phải là ảnh.");
         }
     };
-    
-    
 
     // Xử lý chuyển trang
     const handlePageChange = (page) => {
