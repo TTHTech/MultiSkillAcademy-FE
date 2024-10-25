@@ -1,61 +1,51 @@
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Search } from "lucide-react";
-import { useState } from "react";
-
-// Dữ liệu mẫu cho các khóa học
-const COURSE_DATA = [
-  { 
-    id: 1, 
-    name: "React Basics", 
-    instructorName: "John Doe", 
-    category: "Web Development", 
-    price: 59.99, 
-    status: "Pending",
-    description: "This is a basic course on React.", 
-    duration: "10 hours", 
-    language: "English",
-    imageUrl: "https://i.pinimg.com/originals/92/32/3b/92323bb410cc82cecf739c87c0d31187.jpg" 
-  },
-  { 
-    id: 2, 
-    name: "Advanced CSS", 
-    instructorName: "Jane Smith", 
-    category: "Design", 
-    price: 39.99, 
-    status: "Pending", 
-    description: "Advanced CSS for designers.", 
-    duration: "7 hours", 
-    language: "English",
-    imageUrl: "https://khoinguonsangtao.vn/wp-content/uploads/2022/08/anh-one-piece.jpg"
-  },
-  { 
-    id: 3, 
-    name: "Python for Beginners", 
-    instructorName: "Alice Brown", 
-    category: "Programming", 
-    price: 199.99, 
-    status: "Pending", 
-    description: "Python for absolute beginners.", 
-    duration: "15 hours", 
-    language: "English",
-    imageUrl: "https://khoinguonsangtao.vn/wp-content/uploads/2022/08/anh-one-piece.jpg"
-  },
-  // Thêm nhiều khóa học khác...
-];
 
 // Số lượng khóa học hiển thị mỗi trang
 const ITEMS_PER_PAGE = 10;
 
 const CoursesTable = () => {
+  const [courses, setCourses] = useState([]); // Lưu trữ danh sách khóa học lấy từ API
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1); // Lưu trữ trang hiện tại
   const [editingCourse, setEditingCourse] = useState(null); // Lưu trữ khóa học đang xem
+  const [loading, setLoading] = useState(true); // Trạng thái loading khi gọi API
+  const [error, setError] = useState(null); // Trạng thái lỗi khi gọi API
+
+  // Di chuyển hàm fetchCourses ra ngoài useEffect để tái sử dụng
+  const fetchCourses = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch("http://localhost:8080/api/admin/courses/unknown", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`, // Sử dụng token nếu cần
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch courses.");
+      }
+
+      const data = await response.json();
+      setCourses(data); // Lưu trữ dữ liệu khóa học vào state
+      setLoading(false);
+    } catch (error) {
+      setError(error.message);
+      setLoading(false);
+    }
+  };
+
+  // Gọi hàm fetchCourses trong useEffect để lấy dữ liệu khi component được render lần đầu
+  useEffect(() => {
+    fetchCourses();
+  }, []);
 
   // Lọc khóa học theo từ khóa tìm kiếm
-  const filteredCourses = COURSE_DATA.filter(
+  const filteredCourses = courses.filter(
     (course) =>
-      course.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      course.category.toLowerCase().includes(searchTerm.toLowerCase())
+      course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      course.categoryName.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Tính toán tổng số trang
@@ -73,9 +63,32 @@ const CoursesTable = () => {
     setCurrentPage(1); // Quay lại trang đầu khi tìm kiếm
   };
 
-  const handleAccept = (courseId) => {
-    console.log(`Accepted course with ID: ${courseId}`);
+  // Gọi API để chấp nhận khóa học và chuyển trạng thái thành 'Active'
+  const handleAccept = async (courseId) => {
+    try {
+      const response = await fetch(`http://localhost:8080/api/admin/courses/${courseId}/status`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem("token")}`, // Token xác thực nếu cần
+        },
+        // Gửi một object JSON hợp lệ
+        body: JSON.stringify({ status: "Active" }),  
+      });
+  
+      if (!response.ok) {
+        throw new Error("Failed to update course status.");
+      }
+  
+      alert("Course status updated to Active");
+      // Gọi lại hàm fetchCourses để làm mới danh sách
+    } catch (error) {
+      console.error("Error updating course status:", error);
+      alert("Failed to update course status");
+    }
   };
+  
+  
 
   const handleReject = (courseId) => {
     console.log(`Rejected course with ID: ${courseId}`);
@@ -93,6 +106,14 @@ const CoursesTable = () => {
     setCurrentPage(page);
   };
 
+  if (loading) {
+    return <div>Loading courses...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
   return (
     <motion.div
       className='bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-700 mb-8'
@@ -101,7 +122,7 @@ const CoursesTable = () => {
       transition={{ delay: 0.2 }}
     >
       <div className='flex justify-between items-center mb-6'>
-        <h2 className='text-xl font-semibold text-gray-100'>Courses Pending Approval</h2>
+        <h2 className='text-xl font-semibold text-gray-100'>Courses Unknown Approval</h2>
         <div className='relative'>
           <input
             type='text'
@@ -120,8 +141,8 @@ const CoursesTable = () => {
           {/* Ảnh khóa học */}
           <div className="flex justify-center mb-4">
             <img 
-              src={editingCourse.imageUrl} 
-              alt={editingCourse.name} 
+              src={editingCourse.images[0]} 
+              alt={editingCourse.title} 
               className="w-100 h-100 object-cover rounded-lg" 
             />
           </div>
@@ -134,7 +155,7 @@ const CoursesTable = () => {
             <input
               type='text'
               name='name'
-              value={editingCourse.name}
+              value={editingCourse.title}
               className='w-full p-2 bg-gray-600 text-white rounded-lg'
               readOnly
             />
@@ -156,7 +177,7 @@ const CoursesTable = () => {
             <input
               type='text'
               name='category'
-              value={editingCourse.category}
+              value={editingCourse.categoryName}
               className='w-full p-2 bg-gray-600 text-white rounded-lg'
               readOnly
             />
@@ -205,16 +226,27 @@ const CoursesTable = () => {
             />
           </div>
 
+          <div className='mb-4'>
+            <label className='text-gray-400'>Rating:</label>
+            <input
+              type='text'
+              name='rating'
+              value={editingCourse.rating}
+              className='w-full p-2 bg-gray-600 text-white rounded-lg'
+              readOnly
+            />
+          </div>
+
           <div className='flex justify-end'>
             <button
               className='bg-green-500 text-white px-4 py-2 rounded-lg mr-2'
-              onClick={() => handleAccept(editingCourse.id)}
+              onClick={() => handleAccept(editingCourse.courseId)}  // Gọi API cập nhật trạng thái
             >
               Accept
             </button>
             <button
               className='bg-red-500 text-white px-4 py-2 rounded-lg mr-2'
-              onClick={() => handleReject(editingCourse.id)}
+              onClick={() => handleReject(editingCourse.courseId)}
             >
               Reject
             </button>
@@ -244,14 +276,14 @@ const CoursesTable = () => {
             <tbody className='divide-y divide-gray-700'>
               {currentCourses.map((course) => (
                 <motion.tr
-                  key={course.id}
+                  key={course.courseId}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <td className='px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-100'>{course.name}</td>
+                  <td className='px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-100'>{course.title}</td>
                   <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-300'>{course.instructorName}</td>
-                  <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-300'>{course.category}</td>
+                  <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-300'>{course.categoryName}</td>
                   <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-300'>${course.price.toFixed(2)}</td>
                   <td className='px-6 py-4 whitespace-nowrap text-sm text-yellow-400'>{course.status}</td>
                   <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-300'>

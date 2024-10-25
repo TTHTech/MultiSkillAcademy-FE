@@ -10,44 +10,52 @@ import OrdersPage from "./pages/admin/OrdersPage";
 import AnalyticsPage from "./pages/admin/AnalyticsPage";
 import SettingsPage from "./pages/admin/SettingsPage";
 import InstructorPage from "./pages/admin/InstructorPage";
-import AddNewUserPage from "./pages/admin/AddNewUserPage"; // Import AddNewUserPage
-import LoginPage from "./pages/auth/LoginPage"; // Import LoginPage
+import AddNewUserPage from "./pages/admin/AddNewUserPage";
+import LoginPage from "./pages/auth/LoginPage";
+import RegisterPage from "./pages/auth/RegisterPage";
+import OtpVerificationPage from "./pages/auth/OtpVerificationPage";
+import StudentHomePage from "./pages/student/StudentHomePage"; 
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // Trạng thái đăng nhập
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [role, setRole] = useState("");  
   const navigate = useNavigate();
-  const location = useLocation(); // Lấy thông tin đường dẫn hiện tại
+  const location = useLocation(); 
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (!token) {
-      // Nếu không có token, chuyển hướng đến trang đăng nhập
+    const userRole = localStorage.getItem("role");
+
+    if (!token && location.pathname !== "/register" && location.pathname !== "/verify-otp") {
       navigate("/login");
-    } else {
-      // Nếu có token, cập nhật trạng thái đã đăng nhập
+    } else if (token) {
       setIsLoggedIn(true);
+      setRole(userRole);
     }
-  }, [navigate]);
+  }, [navigate, location.pathname]);
 
   return (
-    <div className="flex h-screen bg-gray-900 text-gray-100 overflow-hidden">
-      {/* BG */}
-      <div className="fixed inset-0 z-0">
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 opacity-80" />
-        <div className="absolute inset-0 backdrop-blur-sm" />
-      </div>
+    <div className="flex h-screen text-gray-100 overflow-hidden">
+      {/* Hiển thị lớp nền chỉ dành cho admin */}
+      {isLoggedIn && role === "ROLE_ADMIN" && (
+        <div className="fixed inset-0 z-0">
+          <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 opacity-80" />
+          <div className="absolute inset-0 backdrop-blur-sm" />
+        </div>
+      )}
 
-      {/* Kiểm tra đường dẫn, ẩn Sidebar nếu đang ở trang login hoặc logout */}
-      {isLoggedIn && location.pathname !== "/login" && location.pathname !== "/logout" && (
+      {/* Kiểm tra chỉ hiển thị Sidebar cho Admin, nhưng loại trừ các trang xác thực */}
+      {isLoggedIn && role === "ROLE_ADMIN" && !["/login", "/register", "/verify-otp"].includes(location.pathname) && (
         <Sidebar />
       )}
 
       <Routes>
-        {/* Route cho trang đăng nhập */}
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/verify-otp" element={<OtpVerificationPage />} />
 
-        {/* Chỉ hiển thị các route này nếu đã đăng nhập */}
-        {isLoggedIn && (
+        {/* Phân biệt các route dựa trên role */}
+        {isLoggedIn && role === "ROLE_ADMIN" && (
           <>
             <Route path="/admin" element={<OverviewPage />} />
             <Route path="/admin/courses" element={<CoursesPage />} />
@@ -58,6 +66,21 @@ function App() {
             <Route path="/admin/analytics" element={<AnalyticsPage />} />
             <Route path="/admin/settings" element={<SettingsPage />} />
             <Route path="/admin/add-user" element={<AddNewUserPage />} />
+          </>
+        )}
+
+        {/* Nếu role là student, điều hướng đến trang StudentHomePage */}
+        {isLoggedIn && role === "ROLE_STUDENT" && (
+          <>
+            <Route path="/student/home" element={<StudentHomePage />} />
+            <Route path="/student/courses" element={<CoursesPage />} />
+          </>
+        )}
+
+        {/* Nếu role là instructor, điều hướng đến trang InstructorPage */}
+        {isLoggedIn && role === "ROLE_INSTRUCTOR" && (
+          <>
+            <Route path="/instructor/courses" element={<InstructorPage />} />
           </>
         )}
       </Routes>
