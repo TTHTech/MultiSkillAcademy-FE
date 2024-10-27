@@ -1,22 +1,26 @@
 import { useState } from "react";
 import { Camera } from "lucide-react"; // Import icon Camera
 
-const CreateUserForm = ({ onCreateUser }) => {
+const CreateUserForm = () => {
   const [newUser, setNewUser] = useState({
-    name: "",
+    username: "", // Thêm trường username
+    firstName: "",
+    lastName: "",
     email: "",
     password: "",
-    confirmPassword: "",
-    role: "Customer",
+    confirmPassword: "", // Chỉ kiểm tra phía client
+    role: "ROLE_STUDENT", // Mặc định là Student, có thể thay đổi qua select
     phoneNumber: "",
     address: "",
     bio: "",
     dateOfBirth: "",
-    status: "Active",
+    active: "true", // Mặc định trạng thái là Active
     profileImage: "", // Lưu ảnh đại diện
   });
 
   const [passwordError, setPasswordError] = useState(""); // Để lưu lỗi liên quan đến mật khẩu
+  const [loading, setLoading] = useState(false);
+  const [responseMessage, setResponseMessage] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -30,11 +34,43 @@ const CreateUserForm = ({ onCreateUser }) => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setNewUser({ ...newUser, profileImage: reader.result });
-      };
-      reader.readAsDataURL(file);
+      setNewUser({ ...newUser, profileImage: file }); // Lưu file ảnh, không cần dùng base64
+    }
+  };
+
+  // Hàm gọi API để tạo người dùng mới
+  const onCreateUser = async (userData) => {
+    setLoading(true); // Bắt đầu trạng thái loading
+    const formData = new FormData();
+
+    // Thêm các thông tin về user vào FormData
+    formData.append("user", JSON.stringify(userData));
+
+    // Nếu có file ảnh, thêm vào formData
+    if (newUser.profileImage) {
+      formData.append("profileImage", newUser.profileImage);
+    }
+
+    try {
+      const response = await fetch("http://localhost:8080/api/admin/users?role=" + userData.role, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`, // Nếu có token
+        },
+        body: formData, // Dùng FormData cho multipart request
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setResponseMessage("User created successfully: " + data.firstName);
+      } else {
+        const errorData = await response.json();
+        setResponseMessage("Error: " + errorData.message);
+      }
+    } catch (error) {
+      setResponseMessage("Error: " + error.message);
+    } finally {
+      setLoading(false); // Kết thúc trạng thái loading
     }
   };
 
@@ -45,21 +81,38 @@ const CreateUserForm = ({ onCreateUser }) => {
       return;
     }
 
-    // Nếu không có lỗi, gọi hàm onCreateUser để xử lý
-    onCreateUser(newUser);
+    // Tạo dữ liệu user nhưng không bao gồm `confirmPassword`
+    const userData = {
+      username: newUser.username, // Thêm username
+      firstName: newUser.firstName,
+      lastName: newUser.lastName,
+      email: newUser.email,
+      password: newUser.password,
+      role: newUser.role,
+      phoneNumber: newUser.phoneNumber,
+      address: newUser.address,
+      bio: newUser.bio,
+      dateOfBirth: newUser.dateOfBirth,
+      active: newUser.active,
+    };
+
+    // Gọi API để tạo người dùng mới
+    onCreateUser(userData);
 
     // Reset form sau khi tạo
     setNewUser({
-      name: "",
+      username: "", // Reset username
+      firstName: "",
+      lastName: "",
       email: "",
       password: "",
       confirmPassword: "",
-      role: "Customer",
+      role: "ROLE_STUDENT", // Reset về mặc định
       phoneNumber: "",
       address: "",
       bio: "",
       dateOfBirth: "",
-      status: "Active",
+      active: "true", // Reset trạng thái Active
       profileImage: "", // Reset ảnh đại diện
     });
     setPasswordError(""); // Reset lỗi
@@ -73,7 +126,7 @@ const CreateUserForm = ({ onCreateUser }) => {
       {newUser.profileImage ? (
         <div className="flex justify-center mb-4">
           <img
-            src={newUser.profileImage}
+            src={URL.createObjectURL(newUser.profileImage)}
             alt="Profile"
             className="w-32 h-32 object-cover rounded-full"
           />
@@ -100,12 +153,35 @@ const CreateUserForm = ({ onCreateUser }) => {
         </label>
       </div>
 
+      {/* Các trường thông tin khác */}
       <div className="mb-4">
-        <label className="text-gray-400">Name:</label>
+        <label className="text-gray-400">Username:</label>
         <input
           type="text"
-          name="name"
-          value={newUser.name}
+          name="username"
+          value={newUser.username}
+          onChange={handleChange}
+          className="w-full p-2 bg-gray-600 text-white rounded-lg"
+        />
+      </div>
+
+      <div className="mb-4">
+        <label className="text-gray-400">First Name:</label>
+        <input
+          type="text"
+          name="firstName"
+          value={newUser.firstName}
+          onChange={handleChange}
+          className="w-full p-2 bg-gray-600 text-white rounded-lg"
+        />
+      </div>
+
+      <div className="mb-4">
+        <label className="text-gray-400">Last Name:</label>
+        <input
+          type="text"
+          name="lastName"
+          value={newUser.lastName}
           onChange={handleChange}
           className="w-full p-2 bg-gray-600 text-white rounded-lg"
         />
@@ -196,9 +272,8 @@ const CreateUserForm = ({ onCreateUser }) => {
           onChange={handleChange}
           className="w-full p-2 bg-gray-600 text-white rounded-lg"
         >
-          <option value="Customer">Customer</option>
-          <option value="Admin">Admin</option>
-          <option value="Moderator">Moderator</option>
+          <option value="ROLE_STUDENT">Student</option>
+          <option value="ROLE_INSTRUCTOR">Instructor</option>
         </select>
       </div>
 
@@ -206,10 +281,14 @@ const CreateUserForm = ({ onCreateUser }) => {
         <button
           className="bg-blue-500 text-white px-4 py-2 rounded-lg"
           onClick={handleCreateUser}
+          disabled={loading} // Disable button while loading
         >
-          Create Account
+          {loading ? "Creating..." : "Create Account"}
         </button>
       </div>
+
+      {/* Hiển thị thông báo phản hồi */}
+      {responseMessage && <p className="mt-4 text-white">{responseMessage}</p>}
     </div>
   );
 };

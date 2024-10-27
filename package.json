@@ -10,9 +10,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^6.6.0",
     "@heroicons/react": "^2.1.5",
     "admin-dashboard": "file:",
-    "framer-motion": "^11.3.19",
+    "axios": "^1.7.7",
+    "framer-motion": "^11.11.8",
+    "jwt-decode": "^4.0.0",
     "lucide-react": "^0.417.0",
     "phosphor-react": "^1.4.1",
     "react": "^18.3.1",
