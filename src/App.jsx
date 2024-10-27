@@ -14,8 +14,10 @@ import AddNewUserPage from "./pages/admin/AddNewUserPage";
 import LoginPage from "./pages/auth/LoginPage";
 import RegisterPage from "./pages/auth/RegisterPage";
 import OtpVerificationPage from "./pages/auth/OtpVerificationPage";
-import StudentHomePage from "./pages/student/StudentHomePage"; 
-
+import StudentHomePage from "./pages/student/home/StudentHomePage"; 
+import CartPage from "./pages/student/cart/CartPage";
+import MyCoursesPage from "./pages/student/courses/MyCoursesPage";
+import CourseDetailPage from "./pages/student/CoursesDetail/CourseDetailPage";
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [role, setRole] = useState("");  
@@ -73,7 +75,9 @@ function App() {
         {isLoggedIn && role === "ROLE_STUDENT" && (
           <>
             <Route path="/student/home" element={<StudentHomePage />} />
-            <Route path="/student/courses" element={<CoursesPage />} />
+            <Route path="/student/cart" element={<CartPage />} />
+            <Route path="/student/my-courses" element={<MyCoursesPage />} />
+            <Route path="/student/detail" element={<CourseDetailPage />} />
           </>
         )}
 
