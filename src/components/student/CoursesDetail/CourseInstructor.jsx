@@ -1,7 +1,17 @@
 // src/components/student/CoursesDetail/CourseInstructor.jsx
-import React from 'react';
+import React, { useState } from 'react';
 
 const CourseInstructor = ({ instructor }) => {
+  const [isExpanded, setIsExpanded] = useState(false); // State to toggle full description
+
+  // Function to toggle the description view
+  const toggleDescription = () => {
+    setIsExpanded(!isExpanded);
+  };
+
+  // Limit description to a certain number of characters
+  const truncatedDescription = instructor.description.slice(0, 150); // Adjust character limit as needed
+
   return (
     <div className="bg-white p-6 rounded shadow-lg mt-4">
       <h2 className="text-2xl font-bold mb-4 text-gray-900">Giảng viên</h2>
@@ -29,8 +39,18 @@ const CourseInstructor = ({ instructor }) => {
         <span>📚 {instructor.courses} khóa học</span>
       </div>
 
-      {/* Instructor Description */}
-      <p className="text-gray-700">{instructor.description}</p>
+      {/* Instructor Description with "Read More" Toggle */}
+      <p className="text-gray-700">
+        {isExpanded ? instructor.description : `${truncatedDescription}...`}
+        {instructor.description.length > 150 && (
+          <button 
+            onClick={toggleDescription} 
+            className="text-purple-600 ml-2 focus:outline-none font-semibold"
+          >
+            {isExpanded ? "Thu gọn" : "Xem thêm"}
+          </button>
+        )}
+      </p>
     </div>
   );
 };

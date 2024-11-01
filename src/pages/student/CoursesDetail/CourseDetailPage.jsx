@@ -18,7 +18,7 @@ const CourseDetailPage = () => {
     rating: 4.2,
     studentCount: 1549,
     lastUpdated: "03/2017",
-    price: "₫1.299.000",
+    price: "1.299.000",
     thumbnail: "https://th.bing.com/th/id/OIP.R3QTrncUS-nFrjb8e0lk2QHaEK?rs=1&pid=ImgDetMain",
     content: [
       {
