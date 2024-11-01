@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import '@fortawesome/fontawesome-free/css/all.min.css';
+import ProfileMenu from '../../../components/student/profile/ProfileMenu';
 
 const Navbar = () => {
   const [isMenuOpen, setMenuOpen] = useState(false);
@@ -83,7 +84,7 @@ const Navbar = () => {
 
         {/* Menu */}
         <div className="flex items-center space-x-6">
-          <a href="/student/detail" className="text-gray-600 hover:text-black">Udemy Business</a>
+          <a href="/student/detail" className="text-gray-600 hover:text-black">detail</a>
           <a href="/student/my-courses" className="text-gray-600 hover:text-black">Học tập</a>
 
           {/* Icons */}
@@ -97,13 +98,9 @@ const Navbar = () => {
             <a href="/" className="text-gray-600 hover:text-black">
               <i className="fas fa-heart text-xl"></i>
             </a>
-            <a href="/">
-              <img
-                src="https://www.businessoutreach.in/wp-content/uploads/2023/11/Business-and-Revenue-Model-of-Canva.webp"
-                alt="User Avatar"
-                className="w-12 h-12 rounded-full"
-              />
-            </a>
+
+            {/* Profile Menu Component */}
+            <ProfileMenu />  {/* Use ProfileMenu component here */}
           </div>
         </div>
       </div>
