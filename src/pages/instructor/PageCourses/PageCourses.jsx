@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Sidebar from "../../../components/instructor/Sidebar/Sidebar";
 import ListCard from "../../../components/instructor/Card/ListCoursesCard"
 import { FaArrowUp } from 'react-icons/fa';
@@ -14,7 +14,12 @@ const PageCourses = () => {
     useEffect(() => {
         const fetchCourses = async () => {
             try {
-                const response = await fetch('http://localhost:8080/api/instructor/1');
+                const response = await fetch('http://localhost:8080/api/instructor/1', {
+                    method: "GET",
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    },
+                });
                 const data = await response.json();
                 setCourses(data);
             } catch (error) {

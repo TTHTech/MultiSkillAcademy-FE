@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   FaSave,
   FaTimes,
@@ -11,11 +11,12 @@ import Sidebar from "../../../components/instructor/Sidebar/Sidebar";
 import ButtonBack from "../../../components/instructor/BackButton/BackButton";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import Swal from "sweetalert2";
+
 const App = () => {
   const [open, setOpen] = useState(true);
   const [images, setImages] = useState([]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  // const [instructor, setInstructor]= useState([])
   const [course, setCourse] = useState({
     courseId: "",
     title: "",
@@ -29,7 +30,15 @@ const App = () => {
   });
 
   const handleSaveCourse = () => {
-    if (!course.title || !course.price || !course.categoryName || !course.description || !course.level || !course.language || !course.duration) {
+    if (
+      !course.title ||
+      !course.price ||
+      !course.categoryName ||
+      !course.description ||
+      !course.level ||
+      !course.language ||
+      !course.duration
+    ) {
       alert("Please fill in all required fields.");
       return;
     }
@@ -42,7 +51,7 @@ const App = () => {
       const addCourse = {
         courseId: "INST001_" + Date.now(),
         categoryName: course.categoryName,
-        instructor: 1,  // Thay bằng instructor thực sự nếu cần
+        instructor: 1,
         title: course.title,
         description: course.description,
         price: course.price,
@@ -53,9 +62,9 @@ const App = () => {
         rating: 0,
         images: course.image,
       };
-  
+
       console.log("Course Data:", addCourse);
-  
+
       // Gửi yêu cầu POST để thêm khóa học
       const response = await fetch(
         "http://localhost:8080/api/instructor/add-course",
@@ -63,28 +72,34 @@ const App = () => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
           body: JSON.stringify(addCourse),
         }
       );
-  
+
       if (response.ok) {
         const data = await response.text();
         console.log("Response from API:", data);
-  
-        alert(data);
-        navigate("/courses");
-        window.location.reload();
+        const swalResult = await Swal.fire({
+          title: "Confirmation",
+          text: data,
+          icon: "success",
+          confirmButtonText: "Yes",
+        });
+        if (swalResult) {
+          navigate("/courses");
+          window.location.reload();
+        }
       } else {
         throw new Error("Failed to add course. Status: " + response.status);
       }
-  
     } catch (error) {
       console.error("Error while adding course:", error);
       alert("Failed to add course. Please try again.");
     }
   };
-  
+
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -125,6 +140,7 @@ const App = () => {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
             },
             body: JSON.stringify(addImage),
           }
@@ -133,10 +149,13 @@ const App = () => {
         if (!response.ok) {
           throw new Error("Failed to add Image. Status: " + response.status);
         }
+        await Swal.fire({
+          title: "Confirmation",
+          text: "Thêm ảnh thành công.",
+          icon: "success",
+          confirmButtonText: "Yes",
+        });
 
-        alert("Image added successfully!");
-
-        // Đồng bộ vào images và course.image
         setImages((prevImages) => {
           const newImages = [...prevImages, uploadedImageUrl];
           setCourse((prevCourse) => ({ ...prevCourse, image: newImages }));
@@ -176,6 +195,7 @@ const App = () => {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
             },
             body: JSON.stringify(editImage),
           }
@@ -184,13 +204,22 @@ const App = () => {
         if (!response.ok) {
           throw new Error("Failed to update image.");
         }
-
-        alert("Cập nhật hình ảnh thành công!");
+        await Swal.fire({
+          title: "Confirmation",
+          text: "Cập nhật hình ảnh thành công!",
+          icon: "success",
+          confirmButtonText: "Yes",
+        });
         setImages(updatedImages);
         setCourse((prevCourse) => ({ ...prevCourse, image: updatedImages }));
       } catch (error) {
         console.error("Lỗi:", error);
-        alert("Lỗi khi cập nhật hình ảnh");
+        await Swal.fire({
+          title: "Confirmation",
+          text: "Lỗi khi cập nhật hình ảnh",
+          icon: "error",
+          confirmButtonText: "Yes",
+        });
       }
     }
   };
@@ -208,6 +237,7 @@ const App = () => {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
           body: JSON.stringify({ imageURL: imageToDelete }),
         }
@@ -216,14 +246,23 @@ const App = () => {
       if (!response.ok) {
         throw new Error("Xóa hình ảnh thất bại.");
       }
-
-      alert("Xóa hình ảnh thành công!");
+      await Swal.fire({
+        title: "Confirmation",
+        text: "Xóa hình ảnh thành công!",
+        icon: "success",
+        confirmButtonText: "Yes",
+      });
       setImages(updatedImages);
       setCourse((prevCourse) => ({ ...prevCourse, image: updatedImages }));
       setCurrentImageIndex((prevIndex) => (prevIndex > 0 ? prevIndex - 1 : 0));
     } catch (error) {
       console.error("Lỗi:", error);
-      alert("Lỗi khi xóa hình ảnh.");
+      await Swal.fire({
+        title: "Confirmation",
+        text: "Lỗi khi xóa hình ảnh.",
+        icon: "error",
+        confirmButtonText: "Yes",
+      });
     }
   };
 

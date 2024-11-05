@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
   FaStar,
@@ -10,6 +10,7 @@ import {
   FaPaperPlane,
 } from "react-icons/fa";
 import axios from "axios";
+import Swal from "sweetalert2";
 
 const CourseCard = ({
   courseId,
@@ -62,14 +63,39 @@ const CourseCard = ({
 
   const handleChangeStatus = async (event) => {
     event.stopPropagation();
+    const swalResult = await Swal.fire({
+      title: "Confirmation",
+      text: "Bạn có chắc chắn muốn đổi trạng thái khóa học không?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Yes",
+      cancelButtonText: "No",
+    });
+    if (swalResult.isDismissed) {
+      return;
+    }
     try {
       const response = await axios.put(
-        `http://localhost:8080/api/instructor/changeStatus/${courseId}`
+        `http://localhost:8080/api/instructor/changeStatus/${courseId}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
       );
       if (response.data) {
         setCourseStatus(response.data.newStatus);
-        alert(response.data.message);
-        window.location.reload();
+        const swalResult = await Swal.fire({
+          title: "Confirmation",
+          text: "Chuyển đổi trạng thái khóa học thành công",
+          icon: "success",
+          showCancelButton: true,
+          confirmButtonText: "Yes",
+        });
+        if (swalResult) {
+          window.location.reload();
+        }
       }
     } catch (error) {
       console.error("Error changing status:", error);
@@ -78,28 +104,51 @@ const CourseCard = ({
   };
   const handleDeleteCourse = async (event) => {
     event.stopPropagation();
-    const coursesId = courseId; 
-    try {
-        const response = await fetch(`http://localhost:8080/api/instructor/delete-course/${coursesId}`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
-
-        if (response.ok) {
-            const data = await response.text(); 
-            console.log("Response from API:", data);
-            alert(data); 
-            window.location.reload();
-        } else {
-            throw new Error(`Failed to delete course. Status: ${response.status}`);
-        }
-    } catch (error) {
-        console.error("Error while deleting course:", error);
-        alert("Failed to delete course. Please try again.");
+    const swalResult = await Swal.fire({
+      title: "Confirmation",
+      text: "Bạn có chắc chắn muốn xóa khóa học này không ?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Yes",
+      cancelButtonText: "No",
+    });
+    if (swalResult.isDismissed) {
+      return;
     }
-};
+    const coursesId = courseId;
+    try {
+      const response = await fetch(
+        `http://localhost:8080/api/instructor/delete-course/${coursesId}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.text();
+        console.log("Response from API:", data);
+        const swalResult = await Swal.fire({
+          title: "Confirmation",
+          text: data,
+          icon: "success",
+          showCancelButton: true,
+          confirmButtonText: "Yes",
+        });
+        if (swalResult) {
+          window.location.reload();
+        }
+      } else {
+        throw new Error(`Failed to delete course. Status: ${response.status}`);
+      }
+    } catch (error) {
+      console.error("Error while deleting course:", error);
+      alert("Failed to delete course. Please try again.");
+    }
+  };
 
   const renderButtons = () => {
     const buttonClass =
@@ -199,7 +248,7 @@ const CourseCard = ({
               onClick={(event) => {
                 event.preventDefault();
                 event.stopPropagation();
-                handleDeleteCourse(event); 
+                handleDeleteCourse(event);
               }}
             >
               <FaTrash className="w-4 h-4 mr-1" />

@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Sidebar from "../../components/instructor/Sidebar/Sidebar";
 import QuestionTable from "../../components/instructor/QuestionsAndAnswers/TableQ&A";
+import Swal from "sweetalert2";
 
 const CoursesWithUsersQA = () => {
   const [open, setOpen] = useState(true);
@@ -10,7 +11,13 @@ const CoursesWithUsersQA = () => {
     const fetchCourses = async () => {
       try {
         const response = await fetch(
-          "http://localhost:8080/api/instructor/1"
+          "http://localhost:8080/api/instructor/1",
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`, 
+            },
+          }
         );
         const data = await response.json();
         setInstructor(1);
@@ -42,7 +49,13 @@ const CoursesWithUsersQA = () => {
     const fetchQuestions = async () => {
       try {
         const response = await fetch(
-          "http://localhost:8080/api/instructor/questions/1"
+          "http://localhost:8080/api/instructor/questions/1",
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`, 
+            },
+          }
         );
         const data = await response.json();
         setQuestions(data);
@@ -84,6 +97,7 @@ const CoursesWithUsersQA = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`, 
         },
         body: JSON.stringify(newAnswer),
       });
@@ -94,7 +108,12 @@ const CoursesWithUsersQA = () => {
             : question
         )
       );
-
+      await Swal.fire({
+        title: "Confirmation",
+        text: "Thêm câu trả lời thành công",
+        icon: "success",
+        confirmButtonText: "Yes",
+      });
       setReplyingTo(null);
       setReplyText("");
     } catch (error) {

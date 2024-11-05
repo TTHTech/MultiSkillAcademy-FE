@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
 import moment from "moment";
+import Swal from "sweetalert2";
 
 const QuestionTable = ({
   courses,
@@ -28,7 +29,18 @@ const QuestionTable = ({
     setExpandedQuestionId(expandedQuestionId === questionsId ? null : questionsId);
   };
 
-  const handleEvaluateChange = (questionsId, answersId, newEvaluate) => {
+  const handleEvaluateChange = async (questionsId, answersId, newEvaluate) => {
+    const swalResult = await Swal.fire({
+      title: "Confirmation",
+      text: "Bạn có chắc chắn chuyển đổi trạng thái của câu trả lời này ?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Yes",
+      cancelButtonText: "No",
+    });
+    if (swalResult.isDismissed) {
+      return;
+    }
     setQuestions((prevQuestions) =>
       prevQuestions.map((question) =>
         question.questionsId === questionsId
@@ -46,6 +58,8 @@ const QuestionTable = ({
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem("token")}`, 
+
       },
       body: JSON.stringify({ evaluate: newEvaluate }),
     })
@@ -57,17 +71,43 @@ const QuestionTable = ({
       })
       .then((data) => {
         console.log(data);
+        return Swal.fire({
+          title: "Confirmation",
+          text: "Sửa đổi trạng thái câu trả lời thành công",
+          icon: "success",
+          confirmButtonText: "Yes",
+        });
       })
       .catch((error) => {
         console.error('There was a problem with the fetch operation:', error);
+        return Swal.fire({
+          title: "Confirmation",
+          text: "Sửa đổi trạng thái câu trả lời không thành công",
+          icon: "error",
+          confirmButtonText: "Yes",
+        });
       });
   };
   
 
   const handleDeleteAnswer = async (questionsId, answersId) => {
+    const swalResult = await Swal.fire({
+      title: "Confirmation",
+      text: "Bạn có chắc chắn muốn xóa câu trả lời này ?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Yes",
+      cancelButtonText: "No",
+    });
+    if (swalResult.isDismissed) {
+      return;
+    }
     try {
       await fetch(`http://localhost:8080/api/instructor/deleteAnswer/${answersId}`, {
         method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`, // Thêm Authorization header với token
+        },    
       });
         setQuestions((prevQuestions) =>
         prevQuestions.map((question) =>
@@ -79,13 +119,29 @@ const QuestionTable = ({
             : question
         )
       );
-  
+      await Swal.fire({
+        title: "Confirmation",
+        text: "Xóa câu trả lời thành công",
+        icon: "success",
+        confirmButtonText: "Yes",
+      });
       console.log(`Deleted answer with ID: ${answersId}`);
     } catch (error) {
       console.error("Error deleting answer:", error);
     }
   };
   const handleDeleteQuestion = async (questionsId) => {
+    const swalResult = await Swal.fire({
+      title: "Confirmation",
+      text: "Bạn có chắc chắn muốn xóa câu hỏi này ?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Yes",
+      cancelButtonText: "No",
+    });
+    if (swalResult.isDismissed) {
+      return;
+    }
     try {
       await fetch(`http://localhost:8080/api/instructor/deleteQuestion/${questionsId}`, {
         method: 'DELETE',
@@ -93,7 +149,12 @@ const QuestionTable = ({
         setQuestions((prevQuestions) =>
         prevQuestions.filter((question) => question.questionsId !== questionsId)
       );
-  
+      await Swal.fire({
+        title: "Confirmation",
+        text: "Xóa câu hỏi thành công",
+        icon: "success",
+        confirmButtonText: "Yes",
+      });
       console.log(`Deleted question with ID: ${questionsId}`);
     } catch (error) {
       console.error("Error deleting question:", error);

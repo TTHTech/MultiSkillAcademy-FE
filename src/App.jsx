@@ -50,7 +50,15 @@ function App() {
 
   return (
     <>
-      <Routes></Routes>
+      <Routes>
+        <Route path="/user" element={<PageUser />} />
+        <Route path="/dashboard" element={<PageDashboard />} />
+        <Route path="/courses" element={<PageCourses />} />
+        <Route path="/courses/:id" element={<PagneCourseDetail />} />
+        <Route path="/courses/addCourses" element={<PageAdd />} />
+        <Route path="/questions" element={<PageQuestions />} />
+        <Route path="/students" element={<StudentList />} />
+      </Routes>
       <div className="flex h-screen text-gray-100 overflow-hidden">
         {/* Hiển thị lớp nền chỉ dành cho admin */}
         {isLoggedIn && role === "ROLE_ADMIN" && (
@@ -72,13 +80,6 @@ function App() {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/verify-otp" element={<OtpVerificationPage />} />
 
-          <Route path="/user" element={<PageUser />} />
-          <Route path="/dashboard" element={<PageDashboard />} />
-          <Route path="/courses" element={<PageCourses />} />
-          <Route path="/courses/:id" element={<PagneCourseDetail />} />
-          <Route path="/courses/addCourses" element={<PageAdd />} />
-          <Route path="/questions" element={<PageQuestions />} />
-          <Route path="/students" element={<StudentList />} />
           {/* Phân biệt các route dựa trên role */}
           {isLoggedIn && role === "ROLE_ADMIN" && (
             <>

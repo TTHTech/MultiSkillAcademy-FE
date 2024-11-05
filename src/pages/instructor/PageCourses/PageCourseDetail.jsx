@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   FaArrowLeft,
   FaArrowRight,
@@ -14,15 +14,23 @@ import Sidebar from "../../../components/instructor/Sidebar/Sidebar";
 import ButtonBack from "../../../components/instructor/BackButton/BackButton";
 import axios from "axios";
 import moment from "moment";
+import Swal from "sweetalert2";
 
 const PageCourseDetail = () => {
   const [open, setOpen] = useState(true);
   const { id } = useParams();
   useEffect(() => {
     const fetchCourseData = async () => {
+      console.log(localStorage.getItem("token"));
       try {
         const response = await fetch(
-          `http://localhost:8080/api/instructor/courses/${id}`
+          `http://localhost:8080/api/instructor/courses/${id}`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
         ); // Gọi API
         const data = await response.json();
         setCourse(data); // Gán dữ liệu từ API vào state course
@@ -112,6 +120,7 @@ const PageCourseDetail = () => {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
           body: JSON.stringify(UpdateCourse),
         }
@@ -121,8 +130,14 @@ const PageCourseDetail = () => {
         throw new Error("Failed to update course");
       }
       const result = await response.text();
-      const confirm = window.confirm(result);
-      if (confirm) {
+      const swalResult = await Swal.fire({
+        title: "Confirmation",
+        text: result,
+        icon: "success",
+        showCancelButton: true,
+        confirmButtonText: "Yes",
+      });
+      if (swalResult) {
         window.location.reload();
       }
       console.log(result);
@@ -166,6 +181,7 @@ const PageCourseDetail = () => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
           body: JSON.stringify(newSection),
         }
@@ -176,8 +192,13 @@ const PageCourseDetail = () => {
       }
 
       const result = await response.text();
-      const confirm = window.confirm(result);
-      if (confirm) {
+      const swalResult = await Swal.fire({
+        title: "Confirmation",
+        text: result,
+        icon: "success",
+        confirmButtonText: "Yes",
+      });
+      if (swalResult) {
         window.location.reload();
       }
       console.log(result);
@@ -223,6 +244,7 @@ const PageCourseDetail = () => {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
           body: JSON.stringify(updatedSection),
         }
@@ -233,8 +255,13 @@ const PageCourseDetail = () => {
       }
 
       const result = await response.text();
-      const confirm = window.confirm(result);
-      if (confirm) {
+      const swalResult = await Swal.fire({
+        title: "Confirmation",
+        text: result,
+        icon: "success",
+        confirmButtonText: "Yes",
+      });
+      if (swalResult) {
         window.location.reload();
       }
       console.log(result);
@@ -256,15 +283,19 @@ const PageCourseDetail = () => {
   };
 
   const handleDeleteSection = async (section_id) => {
-    const confirmDelete = window.confirm(
-      "Bạn có chắc chắn muốn xóa Section này không? \n" +
-        "Nếu xóa Section các bài học bên trong đều bị xóa theo và không thể khôi phục hãy chú ý!"
-    );
-    if (!confirmDelete) {
+    const swalResult = await Swal.fire({
+      title: "Confirmation",
+      text:
+        "Bạn có chắc chắn muốn xóa Section này không? \n" +
+        "Nếu xóa Section các bài học bên trong đều bị xóa theo và không thể khôi phục hãy chú ý!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes",
+      cancelButtonText: "No",
+    });
+    if (swalResult.isDismissed) {
       return;
     }
-
-    // const token = localStorage.getItem("jwtToken"); // Nếu cần xác thực, lấy token
 
     try {
       // Gọi API xóa Section
@@ -274,7 +305,7 @@ const PageCourseDetail = () => {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
-            // "Authorization": `Bearer ${token}`, // Nếu cần xác thực
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         }
       );
@@ -284,18 +315,16 @@ const PageCourseDetail = () => {
       }
 
       const result = await response.text();
-      const confirm = window.confirm(result);
-      if (confirm) {
+      const swalResult = await Swal.fire({
+        title: "Confirmation",
+        text: result,
+        icon: "success",
+        confirmButtonText: "Yes",
+      });
+      if (swalResult) {
         window.location.reload();
       }
       console.log(result);
-
-      // setCourse((prevCourse) => ({
-      //   ...prevCourse,
-      //   sections: prevCourse.sections.filter(
-      //     (section) => section.section_id !== section_id
-      //   ),
-      // }));
     } catch (error) {
       console.error("Error deleting section:", error);
       alert("Error deleting section: " + error.message);
@@ -322,10 +351,15 @@ const PageCourseDetail = () => {
   const handleSaveLecture = async (lecture_id, section_id, lecture_Order) => {
     const { title, video_url, document_url, content_type, duration } =
       editedLecture;
-    const confirmed = window.confirm(
-      "Bạn có chắc chắn muốn sửa bài học này không?"
-    );
-    if (!confirmed) {
+    const swalResult = await Swal.fire({
+      title: "Confirmation",
+      text: "Bạn có chắc chắn muốn sửa bài học này không?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Yes",
+      cancelButtonText: "No",
+    });
+    if (swalResult.isDismissed) {
       return;
     }
     if (!title) {
@@ -366,6 +400,7 @@ const PageCourseDetail = () => {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
           body: JSON.stringify(updatedLecture),
         }
@@ -376,8 +411,13 @@ const PageCourseDetail = () => {
       }
 
       const result = await response.text();
-      const confirm = window.confirm(result);
-      if (confirm) {
+      const swalResult = await Swal.fire({
+        title: "Confirmation",
+        text: result,
+        icon: "success",
+        confirmButtonText: "Yes",
+      });
+      if (swalResult) {
         window.location.reload();
       }
       setEditingLecture(null);
@@ -388,14 +428,19 @@ const PageCourseDetail = () => {
   };
 
   const handleDeleteLecture = async (section_id, lecture_id) => {
-    const confirmed = window.confirm(
-      "Bạn có chắc chắn muốn xóa bài học này không? \n" +
-        "Việc xóa bài học sẽ không thể khôi phục lại, bạn hãy chú ý!"
-    );
-    if (!confirmed) {
+    const swalResult = await Swal.fire({
+      title: "Confirmation",
+      text:
+        "Bạn có chắc chắn muốn xóa bài học này không? \n" +
+        "Việc xóa bài học sẽ không thể khôi phục lại, bạn hãy chú ý!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes",
+      cancelButtonText: "No",
+    });
+    if (swalResult.isDismissed) {
       return;
     }
-
     try {
       const response = await fetch(
         `http://localhost:8080/api/instructor/delete-lecture/${lecture_id}`,
@@ -403,6 +448,7 @@ const PageCourseDetail = () => {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         }
       );
@@ -410,24 +456,14 @@ const PageCourseDetail = () => {
       if (!response.ok) {
         throw new Error("Failed to delete lecture");
       }
-
-      // Cập nhật state sau khi xóa thành công
-      // setCourse((prevCourse) => ({
-      //   ...prevCourse,
-      //   sections: prevCourse.sections.map((section) =>
-      //     section.section_id === section_id
-      //       ? {
-      //           ...section,
-      //           lectures: section.lectures.filter(
-      //             (lecture) => lecture.lecture_id !== lecture_id
-      //           ),
-      //         }
-      //       : section
-      //   ),
-      // }));
       const result = await response.text();
-      const confirm = window.confirm(result);
-      if (confirm) {
+      const swalResult = await Swal.fire({
+        title: "Confirmation",
+        text: result,
+        icon: "success",
+        confirmButtonText: "Yes",
+      });
+      if (swalResult) {
         window.location.reload();
       }
     } catch (error) {
@@ -477,6 +513,7 @@ const PageCourseDetail = () => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
           body: JSON.stringify(newLectureData),
         }
@@ -484,21 +521,15 @@ const PageCourseDetail = () => {
 
       if (response.ok) {
         const result = await response.text();
-        const confirm = window.confirm(result);
-        if (confirm) {
+        const swalResult = await Swal.fire({
+          title: "Confirmation",
+          text: result,
+          icon: "success",
+          confirmButtonText: "Yes",
+        });
+        if (swalResult) {
           window.location.reload();
         }
-        // setCourse((prevCourse) => ({
-        //   ...prevCourse,
-        //   sections: prevCourse.sections.map((section) =>
-        //     section.section_id === section_id
-        //       ? {
-        //           ...section,
-        //           lectures: [...section.lectures, newLectureData],
-        //         }
-        //       : section
-        //   ),
-        // }));
         setNewLecture({
           title: "",
           video_url: "",
@@ -539,6 +570,7 @@ const PageCourseDetail = () => {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
             },
             body: JSON.stringify(addImage),
           }
@@ -549,21 +581,22 @@ const PageCourseDetail = () => {
         }
 
         const data = await response.text();
+        await Swal.fire({
+          title: "Confirmation",
+          text: "Image added successfully!",
+          icon: "success",
+          confirmButtonText: "Yes",
+        });
         console.log("Response from API:", data);
-        alert("Image added successfully!");
       } catch (error) {
         console.error("Error while adding course:", error);
         alert("Failed to add image. Please try again.");
       }
       if (uploadedImageUrl) {
-        // Cập nhật trường image trong course với URL thực từ Cloudinary
-        setImages((prevImages) => [...prevImages, uploadedImageUrl]); // Sử dụng hàm callback
+        setImages((prevImages) => [...prevImages, uploadedImageUrl]); 
       }
     }
   };
-  // useEffect(() => {
-  //   console.log(images);
-  // }, [images]);
 
   const handleDeleteImage = async () => {
     const imageToDelete = images[currentImageIndex];
@@ -580,15 +613,21 @@ const PageCourseDetail = () => {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
           body: JSON.stringify({
-            imageURL: imageToDelete, // sử dụng đúng trường tên cho URL
+            imageURL: imageToDelete,
           }),
         }
       );
 
       if (response.ok) {
-        alert("Xóa hình ảnh thành công!");
+        await Swal.fire({
+          title: "Confirmation",
+          text: "Xóa hình ảnh thành công!",
+          icon: "success",
+          confirmButtonText: "Yes",
+        });
       } else {
         throw new Error("Xóa hình ảnh thất bại");
       }
@@ -636,13 +675,19 @@ const PageCourseDetail = () => {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
             },
             body: JSON.stringify(editImage),
           }
         );
 
         if (response.ok) {
-          alert("Cập nhật hình ảnh thành công!");
+          await Swal.fire({
+            title: "Confirmation",
+            text: "Cập nhật hình ảnh thành công!",
+            icon: "success",
+            confirmButtonText: "Yes",
+          });
         } else {
           throw new Error("Cập nhật hình ảnh thất bại");
         }
@@ -927,10 +972,10 @@ const PageCourseDetail = () => {
                 Category: {course.category}
               </div>
               <div className="text-gray-600 text-sm mb-2">
-                Created At:  {moment(course.created_at).format("DD-MM-YYYY")}
+                Created At: {moment(course.created_at).format("DD-MM-YYYY")}
               </div>
               <div className="text-gray-600 text-sm mb-6">
-                Updated At:  {moment(course.updated_at).format("DD-MM-YYYY")} 
+                Updated At: {moment(course.updated_at).format("DD-MM-YYYY")}
               </div>
               <div className="flex justify-end">
                 <button
