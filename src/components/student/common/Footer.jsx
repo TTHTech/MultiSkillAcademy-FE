@@ -10,8 +10,7 @@ const Footer = () => {
           {/* Cột 1 */}
           <div>
             <ul className="space-y-2">
-              <li>Udemy Business</li>
-              <li>Giảng dạy trên Udemy</li>
+          
               <li>Tải ứng dụng</li>
               <li>Giới thiệu</li>
               <li>Hãy liên hệ với chúng tôi</li>
@@ -51,7 +50,7 @@ const Footer = () => {
         {/* Logo và bản quyền */}
         <div className="flex justify-between items-center mt-4">
           <img src="https://frontends.udemycdn.com/frontends-logged-in-homepages/staticx/udemy/images/v7/logo-udemy.svg" alt="Udemy Logo" className="h-6" />
-          <span className="text-gray-500 text-sm">© 2024 Udemy, Inc.</span>
+          <span className="text-gray-500 text-sm"></span>
         </div>
       </div>
     </footer>
