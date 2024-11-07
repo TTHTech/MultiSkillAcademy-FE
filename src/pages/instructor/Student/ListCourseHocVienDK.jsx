@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
-import CoursesList from "../../components/Card/StudentCourseList";
-import SidebarFilter from "../../components/Sidebar/SidebarFilterCourse";
+import CoursesList from "../../../components/instructor/Card/StudentCourseList";
+import SidebarFilter from "../../../components/instructor/Sidebar/SidebarFilterCourse";
 
 const CoursesPage = () => {
   const [courses, setCourses] = useState([]);
@@ -16,7 +16,7 @@ const CoursesPage = () => {
     const fetchCourses = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:8080/api/student/15"
+          "http://localhost:8080/api/student/24"
         );
         setCourses(response.data);
         setFilteredCourses(response.data);

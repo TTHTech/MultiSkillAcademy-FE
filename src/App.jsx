@@ -26,6 +26,8 @@ import PagneCourseDetail from "./pages/instructor/PageCourses/PageCourseDetail";
 import PageAdd from "./pages/instructor/PageCourses/PageCoursesAdd";
 import PageQuestions from "./pages/instructor/PageQuestions";
 import StudentList from "./pages/instructor/PageStudents";
+import HocKhoaHoc from "./pages/instructor/Student/GiaoDienHocKhoaHoc";
+import ListDanhSachKhoaHoc from "./pages/instructor/Student/ListCourseHocVienDK";
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [role, setRole] = useState("");
@@ -58,6 +60,9 @@ function App() {
         <Route path="/courses/addCourses" element={<PageAdd />} />
         <Route path="/questions" element={<PageQuestions />} />
         <Route path="/students" element={<StudentList />} />
+
+        <Route path="/hockhoahoc/:id" element={<HocKhoaHoc />} />
+        <Route path="/ListDanhSachKhoaHoc" element={<ListDanhSachKhoaHoc />} />
       </Routes>
       <div className="flex h-screen text-gray-100 overflow-hidden">
         {/* Hiển thị lớp nền chỉ dành cho admin */}

@@ -1,6 +1,3 @@
-import React from 'react';
-
-// Function to render stars based on rating
 const renderStars = (rating) => {
     const totalStars = 5;
     const stars = [];

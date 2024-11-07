@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 
@@ -11,7 +11,11 @@ const CourseViewer = () => {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:8080/api/instructor/courses/${id}`)
+      .get(`http://localhost:8080/api/instructor/courses/${id}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      })
       .then((response) => {
         setCourse(response.data);
       })
