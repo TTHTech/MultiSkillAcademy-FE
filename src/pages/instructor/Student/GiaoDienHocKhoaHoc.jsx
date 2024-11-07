@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
-
+import QuestionsAndAnswers from "./QuestionAndAnswers";
 const CourseViewer = () => {
   const [course, setCourse] = useState(null);
   const [selectedSection, setSelectedSection] = useState(null);
@@ -55,7 +55,8 @@ const CourseViewer = () => {
 
   return (
     <div className="flex h-screen">
-      <div className="w-1/4 bg-gray-100 p-4">
+      {/* Sidebar */}
+      <div className="w-1/4 bg-gray-100 p-4 overflow-y-auto">
         <div className="mb-6">
           <img
             src={course.images[0]}
@@ -97,12 +98,14 @@ const CourseViewer = () => {
         </div>
       </div>
 
-      <div className="w-full max-w-5xl mx-auto p-6 bg-white rounded-lg shadow-md">
+      {/* Main Content */}
+      <div className="w-3/4 max-w-5xl mx-auto p-6 bg-white rounded-lg shadow-md overflow-y-auto">
         {selectedLecture ? (
           <div>
             <h2 className="text-3xl font-semibold mb-4">
               {selectedLecture.title}
             </h2>
+
             {selectedLecture.content_type.toLowerCase() === "video" &&
               selectedLecture.video_url && (
                 <div className="relative h-0 pb-[56.25%] mb-4">
@@ -115,6 +118,7 @@ const CourseViewer = () => {
                   </video>
                 </div>
               )}
+
             {selectedLecture.content_type.toLowerCase() === "pdf" &&
               selectedLecture.document_url && (
                 <iframe
@@ -123,6 +127,7 @@ const CourseViewer = () => {
                   title={selectedLecture.title}
                 />
               )}
+
             <p className="text-gray-600 mt-4">
               Duration: {selectedLecture.duration} minutes
             </p>
@@ -142,6 +147,14 @@ const CourseViewer = () => {
                 {completionMessage}
               </div>
             )}
+
+            {/* Questions and Answers Section */}
+            <div className="mt-8">
+              <h3 className="text-2xl font-semibold mb-4">
+                Questions and Answers
+              </h3>
+              <QuestionsAndAnswers />
+            </div>
           </div>
         ) : (
           <div className="text-gray-600">
