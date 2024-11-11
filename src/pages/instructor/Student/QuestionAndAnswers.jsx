@@ -1,55 +1,37 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import moment from 'moment';
 
-const initialData = [
-  {
-    questionsId: '1',
-    courseId: '101',
-    userId: '22',
-    questionText: 'How does this topic work?',
-    createdAt: new Date().toISOString(),
-    answers: [
-      {
-        answersId: '1-1',
-        questionId: '1',
-        userId: '22',
-        answersText: 'This is my understanding.',
-        createdAt: new Date().toISOString(),
-        evaluate: 'Good',
-      },
-      {
-        answersId: '1-2',
-        questionId: '1',
-        userId: '33',
-        answersText: 'I think it could be improved.',
-        createdAt: new Date().toISOString(),
-        evaluate: 'Average',
-      },
-    ],
-  },
-  {
-    questionsId: '2',
-    courseId: '101',
-    userId: '33',
-    questionText: 'Can you explain more about this?',
-    createdAt: new Date().toISOString(),
-    answers: [
-      {
-        answersId: '2-1',
-        questionId: '2',
-        userId: '22',
-        answersText: 'Sure, here’s an answer.',
-        createdAt: new Date().toISOString(),
-        evaluate: 'Excellent',
-      },
-    ],
-  },
-];
-const userID = "22"; 
+const userID = "2"; 
 
 const QuestionsAndAnswers = () => {
-  const [questions, setQuestions] = useState(initialData);
+  const [questions, setQuestions] = useState([]);
   const [expandedQuestionId, setExpandedQuestionId] = useState(null);
+  const [showQuestionModal, setShowQuestionModal] = useState(false);
+  const [showAnswerModal, setShowAnswerModal] = useState(false);
+  const [newQuestionText, setNewQuestionText] = useState('');
+  const [newAnswerText, setNewAnswerText] = useState('');
+  const [currentQuestionId, setCurrentQuestionId] = useState(null);
+
+  useEffect(() => {
+    const fetchQuestions = async () => {
+      try {
+        const response = await fetch(
+          "http://localhost:8080/api/student/questions/CR001",
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+        const data = await response.json();
+        setQuestions(data);
+      } catch (error) {
+        console.error("Error fetching Questions: ", error);
+      }
+    };
+    fetchQuestions();
+  }, []);
 
   const handleDeleteQuestion = (questionId) => {
     setQuestions(questions.filter((q) => q.questionsId !== questionId));
@@ -64,31 +46,44 @@ const QuestionsAndAnswers = () => {
   };
 
   const handleAddQuestion = () => {
+    setShowQuestionModal(true); 
+  };
+
+  const confirmAddQuestion = () => {
     const newQuestion = {
       questionsId: Math.random().toString(),
       courseId: '101',
-      userId: '22',
-      questionText: 'New question text',
+      userId: userID,
+      questionText: newQuestionText,
       createdAt: new Date().toISOString(),
       answers: [],
     };
     setQuestions([...questions, newQuestion]);
+    setNewQuestionText('');
+    setShowQuestionModal(false);
   };
 
   const handleAddAnswer = (questionId) => {
+    setCurrentQuestionId(questionId);
+    setShowAnswerModal(true);
+  };
+
+  const confirmAddAnswer = () => {
     const newAnswer = {
       answersId: Math.random().toString(),
-      questionId,
-      userId: '22',
-      answersText: 'New answer text',
+      questionId: currentQuestionId,
+      userId: userID,
+      answersText: newAnswerText,
       createdAt: new Date().toISOString(),
       evaluate: 'Pending',
     };
     setQuestions(questions.map((q) =>
-      q.questionsId === questionId
+      q.questionsId === currentQuestionId
         ? { ...q, answers: [...q.answers, newAnswer] }
         : q
     ));
+    setNewAnswerText('');
+    setShowAnswerModal(false);
   };
 
   const toggleAnswers = (questionId) => {
@@ -135,7 +130,7 @@ const QuestionsAndAnswers = () => {
                       Answered on: {moment(answer.createdAt).format("DD/MM/YYYY")}
                     </p>
                     <div className="flex justify-between items-center mt-2">
-                      <p className={`font-semibold ${answer.evaluate === 'Good' ? 'text-green-500' : 'text-yellow-500'}`}>
+                      <p className={`font-semibold ${answer.evaluate === 'Correct' ? 'text-green-500' : 'text-red-500'}`}>
                         Evaluate: {answer.evaluate}
                       </p>
                       {answer.userId === userID && (
@@ -160,6 +155,60 @@ const QuestionsAndAnswers = () => {
           )}
         </div>
       ))}
+
+      {/* Modal for Adding Question */}
+      {showQuestionModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+            <h2 className="text-xl font-bold mb-4">Enter Question</h2>
+            <input
+              type="text"
+              value={newQuestionText}
+              onChange={(e) => setNewQuestionText(e.target.value)}
+              className="w-full border border-gray-300 p-2 rounded mb-4"
+            />
+            <button
+              onClick={confirmAddQuestion}
+              className="px-4 py-2 bg-blue-500 text-white rounded-lg mr-2"
+            >
+              Confirm
+            </button>
+            <button
+              onClick={() => setShowQuestionModal(false)}
+              className="px-4 py-2 bg-gray-500 text-white rounded-lg"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Modal for Adding Answer */}
+      {showAnswerModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+            <h2 className="text-xl font-bold mb-4">Enter Answer</h2>
+            <input
+              type="text"
+              value={newAnswerText}
+              onChange={(e) => setNewAnswerText(e.target.value)}
+              className="w-full border border-gray-300 p-2 rounded mb-4"
+            />
+            <button
+              onClick={confirmAddAnswer}
+              className="px-4 py-2 bg-green-500 text-white rounded-lg mr-2"
+            >
+              Confirm
+            </button>
+            <button
+              onClick={() => setShowAnswerModal(false)}
+              className="px-4 py-2 bg-gray-500 text-white rounded-lg"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

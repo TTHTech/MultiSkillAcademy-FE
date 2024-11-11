@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Sidebar from "../../components/instructor/Sidebar/Sidebar";
 import axios from "axios";
 import moment from "moment";
