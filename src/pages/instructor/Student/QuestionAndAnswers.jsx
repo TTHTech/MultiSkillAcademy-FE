@@ -69,6 +69,17 @@ const QuestionsAndAnswers = () => {
   };
 
   const handleDeleteAnswer = async (questionId, answerId) => {
+    const swalResult = await Swal.fire({
+      title: "Confirmation",
+      text: "Bạn có chắc chắn muốn xóa câu trả lời này ?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Yes",
+      cancelButtonText: "No",
+    });
+    if (swalResult.isDismissed) {
+      return;
+    }
     try {
       await fetch(
         `http://localhost:8080/api/student/delete-answers/${answerId}`,
@@ -79,6 +90,12 @@ const QuestionsAndAnswers = () => {
           },
         }
       );
+      await Swal.fire({
+        title: "Confirmation",
+        text: "Xóa câu trả lời thành công",
+        icon: "success",
+        confirmButtonText: "Yes",
+      });
       setQuestions(
         questions.map((q) =>
           q.questionsId === questionId
@@ -143,16 +160,17 @@ const QuestionsAndAnswers = () => {
 
   const confirmAddAnswer = async () => {
     const newAnswer = {
+      answersId:`A${Math.floor(Math.random() * 100000)}`,
       questionId: currentQuestionId,
       userId: userID,
       answersText: newAnswerText,
       createdAt: new Date().toISOString(),
-      evaluate: "Pending",
+      evaluate: "Unknown",
     };
 
     try {
       const response = await fetch(
-        `http://localhost:8080/api/student/add-answers`,
+        `http://localhost:8080/api/student/add-answer`,
         {
           method: "POST",
           headers: {
@@ -161,7 +179,13 @@ const QuestionsAndAnswers = () => {
           body: JSON.stringify(newAnswer),
         }
       );
-      const data = await response.json();
+      const data = await response.text();
+      await Swal.fire({
+        title: "Confirmation",
+        text: "Thêm câu trả lời thành công",
+        icon: "success",
+        confirmButtonText: "Yes",
+      });
       setQuestions(
         questions.map((q) =>
           q.questionsId === currentQuestionId
@@ -241,9 +265,11 @@ const QuestionsAndAnswers = () => {
                     <div className="flex justify-between items-center mt-2">
                       <p
                         className={`font-semibold ${
-                          answer.evaluate === "Correct"
-                            ? "text-green-500"
-                            : "text-red-500"
+                          answer.evaluate === "Unknown"
+                                      ? "text-gray-500"
+                                      : answer.evaluate === "Correct"
+                                      ? "text-green-500"
+                                      : "text-red-500"
                         }`}
                       >
                         Evaluate: {answer.evaluate}

@@ -29,20 +29,6 @@ const CoursesWithUsersQA = () => {
     fetchCourses();
   }, []);
   const[instructor, setInstructor] = useState([]);
-  const users = [
-    {
-      userId: 1,
-      username: "teacher1",
-      full_name: "John Doe",
-      profile_image: "https://via.placeholder.com/50",
-    },
-    {
-      userId: 2,
-      username: "student1",
-      full_name: "Jane Smith",
-      profile_image: "https://via.placeholder.com/50",
-    },
-  ];
 
   const [questions, setQuestions] = useState([]);
   useEffect(() => {
@@ -131,7 +117,6 @@ const CoursesWithUsersQA = () => {
         <QuestionTable
           courses={courses}
           questions={questions}
-          users={users}
           instructor={instructor}
           handleReplyClick={handleReplyClick}
           handleCancelReply={handleCancelReply}

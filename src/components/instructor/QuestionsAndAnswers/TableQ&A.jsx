@@ -1,13 +1,11 @@
 import React, { useState } from "react";
-import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
+import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/outline";
 import moment from "moment";
 import Swal from "sweetalert2";
 
 const QuestionTable = ({
   courses,
   questions,
-  users,
-  // instructor,
   setQuestions,
   handleReplyClick,
   handleCancelReply,
@@ -23,10 +21,10 @@ const QuestionTable = ({
   const toggleFilterOptions = () => {
     setIsFilterOptionsOpen(!isFilterOptionsOpen);
   };
-  const getUserById = (userId) => users.find((user) => user.userId === userId);
-
   const toggleAnswers = (questionsId) => {
-    setExpandedQuestionId(expandedQuestionId === questionsId ? null : questionsId);
+    setExpandedQuestionId(
+      expandedQuestionId === questionsId ? null : questionsId
+    );
   };
 
   const handleEvaluateChange = async (questionsId, answersId, newEvaluate) => {
@@ -47,27 +45,28 @@ const QuestionTable = ({
           ? {
               ...question,
               answers: question.answers.map((answer) =>
-                answer.answersId === answersId ? { ...answer, evaluate: newEvaluate } : answer
+                answer.answersId === answersId
+                  ? { ...answer, evaluate: newEvaluate }
+                  : answer
               ),
             }
           : question
       )
     );
-  
-    fetch(`http://localhost:8080/api/instructor/evaluateAnswer/${answersId}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem("token")}`, 
 
+    fetch(`http://localhost:8080/api/instructor/evaluateAnswer/${answersId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
       body: JSON.stringify({ evaluate: newEvaluate }),
     })
       .then((response) => {
         if (!response.ok) {
-          throw new Error('Network response was not ok');
+          throw new Error("Network response was not ok");
         }
-        return response.json();
+        return response.text();
       })
       .then((data) => {
         console.log(data);
@@ -79,7 +78,7 @@ const QuestionTable = ({
         });
       })
       .catch((error) => {
-        console.error('There was a problem with the fetch operation:', error);
+        console.error("There was a problem with the fetch operation:", error);
         return Swal.fire({
           title: "Confirmation",
           text: "Sửa đổi trạng thái câu trả lời không thành công",
@@ -88,7 +87,6 @@ const QuestionTable = ({
         });
       });
   };
-  
 
   const handleDeleteAnswer = async (questionsId, answersId) => {
     const swalResult = await Swal.fire({
@@ -103,18 +101,23 @@ const QuestionTable = ({
       return;
     }
     try {
-      await fetch(`http://localhost:8080/api/instructor/deleteAnswer/${answersId}`, {
-        method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`, // Thêm Authorization header với token
-        },    
-      });
-        setQuestions((prevQuestions) =>
+      await fetch(
+        `http://localhost:8080/api/instructor/deleteAnswer/${answersId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      setQuestions((prevQuestions) =>
         prevQuestions.map((question) =>
           question.questionsId === questionsId
             ? {
                 ...question,
-                answers: question.answers.filter((answer) => answer.answersId !== answersId),
+                answers: question.answers.filter(
+                  (answer) => answer.answersId !== answersId
+                ),
               }
             : question
         )
@@ -143,10 +146,16 @@ const QuestionTable = ({
       return;
     }
     try {
-      await fetch(`http://localhost:8080/api/instructor/deleteQuestion/${questionsId}`, {
-        method: 'DELETE',
-      });
-        setQuestions((prevQuestions) =>
+      await fetch(
+        `http://localhost:8080/api/instructor/deleteQuestion/${questionsId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      setQuestions((prevQuestions) =>
         prevQuestions.filter((question) => question.questionsId !== questionsId)
       );
       await Swal.fire({
@@ -162,10 +171,10 @@ const QuestionTable = ({
   };
 
   const filteredCourses = courses.filter((course) => {
-    let matchesSearch = course.title.toLowerCase().includes(searchTerm.toLowerCase());
-    return (
-      matchesSearch
-    );
+    let matchesSearch = course.title
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+    return matchesSearch;
   });
 
   return (
@@ -199,7 +208,6 @@ const QuestionTable = ({
           </div>
         </div>
       </div>
-
 
       {filteredCourses.map((course) => {
         const courseQuestions = questions.filter(
@@ -236,39 +244,47 @@ const QuestionTable = ({
               </thead>
               <tbody>
                 {courseQuestions.map((question) => {
-                  const user = getUserById(question.userId);
-                  const isExpanded = expandedQuestionId === question.questionsId;
+                  const isExpanded =
+                    expandedQuestionId === question.questionsId;
                   const isReplyingToThisQuestion =
-                    replyingTo && replyingTo.questionId === question.questionsId;
+                    replyingTo &&
+                    replyingTo.questionId === question.questionsId;
 
                   return (
                     <React.Fragment key={question.questionsId}>
                       <tr className="border-b hover:bg-gray-50">
                         <td className="px-6 py-4">{question.questionText}</td>
+                        <td className="px-6 py-4"></td>
                         <td className="px-6 py-4">
-                          {user ? user.full_name : "Unknown"}
+                          {moment(question.createdAt).format("DD/MM/YYYY")}
                         </td>
-                        <td className="px-6 py-4"> {moment(question.createdAt).format("DD/MM/YYYY")}</td>
                         <td className="px-6 py-4">{question.answers.length}</td>
                         <td className="px-6 py-4">
                           <div className="flex space-x-4">
                             <button
                               className="bg-blue-500 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-600 transition-all"
-                              onClick={() => toggleAnswers(question.questionsId)}
+                              onClick={() =>
+                                toggleAnswers(question.questionsId)
+                              }
                             >
                               {isExpanded ? "Hide Answers" : "Show Answers"}
                             </button>
                             <button
                               className="bg-green-500 text-white px-4 py-2 rounded-md text-sm hover:bg-green-600 transition-all"
                               onClick={() =>
-                                handleReplyClick(course.courseId, question.questionsId)
+                                handleReplyClick(
+                                  course.courseId,
+                                  question.questionsId
+                                )
                               }
                             >
                               Reply
                             </button>
                             <button
                               className="bg-red-500 text-white px-4 py-2 rounded-md text-sm hover:bg-red-600 transition-all"
-                              onClick={() => handleDeleteQuestion(question.questionsId)}
+                              onClick={() =>
+                                handleDeleteQuestion(question.questionsId)
+                              }
                             >
                               Delete
                             </button>
@@ -281,29 +297,37 @@ const QuestionTable = ({
                             <div className="bg-gray-100 p-4">
                               {question.answers.length > 0 ? (
                                 question.answers.map((answer) => {
-                                  const answerUser = getUserById(answer.userId);
-                                  const evaluateColor = answer.evaluate === "Unknown" ? "text-gray-500" : answer.evaluate === "Correct" ? "text-green-500" : "text-red-500";
+                                  const evaluateColor =
+                                    answer.evaluate === "Unknown"
+                                      ? "text-gray-500"
+                                      : answer.evaluate === "Correct"
+                                      ? "text-green-500"
+                                      : "text-red-500";
                                   return (
-                                    <div key={answer.answersId} className="mb-4 border-b pb-2">
+                                    <div
+                                      key={answer.answersId}
+                                      className="mb-4 pb-2"
+                                    >
                                       <div className="flex justify-between items-center mb-2">
-                                        <div className="flex items-center">
-                                          <img
-                                            src={answerUser?.profile_image}
-                                            alt={answerUser?.full_name}
-                                            className="w-6 h-6 rounded-full mr-2"
-                                          />
-                                          <p className="font-semibold text-gray-700">{answerUser?.full_name}</p>
-                                        </div>
+                                        <p className="text-sm text-gray-600 mb-1">
+                                          {answer.answersText}
+                                        </p>
                                         <button
                                           className="text-red-500 text-xs hover:text-red-700 transition-all"
-                                          onClick={() => handleDeleteAnswer(question.questionsId, answer.answersId)}
+                                          onClick={() =>
+                                            handleDeleteAnswer(
+                                              question.questionsId,
+                                              answer.answersId
+                                            )
+                                          }
                                         >
                                           Delete Answer
                                         </button>
                                       </div>
-                                      <p className="text-sm text-gray-600 mb-1">{answer.answersText}</p>
                                       <div className="flex items-center text-xs">
-                                        <p className={`font-semibold ${evaluateColor}`}>
+                                        <p
+                                          className={`font-semibold ${evaluateColor}`}
+                                        >
                                           Đánh giá: {answer.evaluate}
                                         </p>
                                         {answer.userId !== "U001" && (
@@ -311,7 +335,11 @@ const QuestionTable = ({
                                             <button
                                               className="text-green-500 hover:text-green-600 transition-all"
                                               onClick={() =>
-                                                handleEvaluateChange(question.questionsId, answer.answersId, "Correct")
+                                                handleEvaluateChange(
+                                                  question.questionsId,
+                                                  answer.answersId,
+                                                  "Correct"
+                                                )
                                               }
                                             >
                                               Đúng
@@ -319,7 +347,11 @@ const QuestionTable = ({
                                             <button
                                               className="text-red-500 hover:text-red-600 ml-2 transition-all"
                                               onClick={() =>
-                                                handleEvaluateChange(question.questionsId, answer.answersId, "Incorrect")
+                                                handleEvaluateChange(
+                                                  question.questionsId,
+                                                  answer.answersId,
+                                                  "Incorrect"
+                                                )
                                               }
                                             >
                                               Sai
@@ -327,13 +359,19 @@ const QuestionTable = ({
                                           </div>
                                         )}
                                       </div>
-                                      <p className="text-xs text-gray-500">Ngày trả lời:  {moment(answer.createdAt).format("DD/MM/YYYY")}</p>
+                                      <p className="text-xs text-gray-500">
+                                        Ngày trả lời:{" "}
+                                        {moment(answer.createdAt).format(
+                                          "DD/MM/YYYY"
+                                        )}
+                                      </p>
                                     </div>
-
                                   );
                                 })
                               ) : (
-                                <p className="text-center text-gray-500">Chưa có câu trả lời nào.</p>
+                                <p className="text-center text-gray-500">
+                                  Chưa có câu trả lời nào.
+                                </p>
                               )}
                             </div>
                           </td>
@@ -366,7 +404,6 @@ const QuestionTable = ({
                             </div>
                           </td>
                         </tr>
-
                       )}
                     </React.Fragment>
                   );
@@ -382,7 +419,6 @@ const QuestionTable = ({
             </table>
           </div>
         );
-
       })}
     </div>
   );
