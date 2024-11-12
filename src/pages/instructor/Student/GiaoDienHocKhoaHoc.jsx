@@ -11,7 +11,7 @@ const CourseViewer = () => {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:8080/api/instructor/courses/${id}`, {
+      .get(`http://localhost:8080/api/student/courses/${id}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },

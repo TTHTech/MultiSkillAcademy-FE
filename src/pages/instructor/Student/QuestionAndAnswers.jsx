@@ -195,6 +195,7 @@ const QuestionsAndAnswers = () => {
       );
       setNewAnswerText("");
       setShowAnswerModal(false);
+      window.location.reload();
     } catch (error) {
       console.error("Error adding answer: ", error);
     }
