@@ -7,9 +7,10 @@ import WelcomeSection from "../../../components/student/home/WelcomeSection";
 import FeaturedCourses from "../../../components/student/home/FeaturedCourses";
 import SuggestedCoursesSection from "../../../components/student/home/SuggestedCoursesSection";
 import RecommendedCoursesSection from "../../../components/student/home/RecommendedCoursesSection";
-import TopWebCoursesSection from "../../../components/student/home/TopWebCoursesSection"; // Import mới
+
 import RecommendedTopics from "../../../components/student/home/RecommendedTopics";
 import Footer from "../../../components/student/common/Footer";
+import TopPythonCoursesSection from "../../../components/student/home/TopPythonCoursesSection";
 
 const StudentHomePage = () => {
   return (
@@ -21,7 +22,7 @@ const StudentHomePage = () => {
       <FeaturedCourses />
       <SuggestedCoursesSection />
       <RecommendedCoursesSection />
-      <TopWebCoursesSection /> {/* Thêm component TopWebCoursesSection mới */}
+      <TopPythonCoursesSection /> {/* Thêm component TopWebCoursesSection mới */}
       <RecommendedTopics />
       <Footer />
     </div>

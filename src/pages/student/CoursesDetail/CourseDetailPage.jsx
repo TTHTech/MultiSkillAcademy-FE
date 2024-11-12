@@ -1,5 +1,7 @@
-// src/pages/CourseDetailPage.jsx
-import React from 'react';
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import axios from "axios";
+
 import NavBar from "../../../components/student/common/NavBar";
 import Footer from "../../../components/student/common/Footer";
 import CourseHeader from "../../../components/student/CoursesDetail/CourseHeader";
@@ -11,158 +13,87 @@ import CourseReviews from "../../../components/student/CoursesDetail/CourseRevie
 import CourseInstructor from "../../../components/student/CoursesDetail/CourseInstructor";
 
 const CourseDetailPage = () => {
-  const courseData = {
-    title: "C++ Cơ bản dành cho người mới học lập trình",
-    description: "Bắt đầu học lập trình bằng ngôn ngữ C++",
-    instructor: "Le Tran Dat",
-    rating: 4.2,
-    studentCount: 1549,
-    lastUpdated: "03/2017",
-    price: "1.299.000",
-    thumbnail: "https://th.bing.com/th/id/OIP.R3QTrncUS-nFrjb8e0lk2QHaEK?rs=1&pid=ImgDetMain",
-    content: [
-      {
-        title: "Giới thiệu khóa học",
-        lectures: [
-          { title: "Giới thiệu khóa học C++", duration: "04:48" },
-          { title: "Cài đặt công cụ lập trình", duration: "08:32" },
-        ],
-        duration: "17 phút",
-      },
-      {
-        title: "Biến và kiểu dữ liệu trong C++",
-        lectures: [
-          { title: "Giới thiệu về biến", duration: "04:10" },
-          { title: "Kiểu dữ liệu cơ bản", duration: "06:49" },
-          { title: "Kiểu dữ liệu phức hợp", duration: "07:03" },
-          { title: "Toán tử trong C++", duration: "08:32" },
-        ],
-        duration: "1 giờ 20 phút",
-      },
-      {
-        title: "Cấu trúc điều khiển",
-        lectures: [
-          { title: "Cấu trúc rẽ nhánh", duration: "05:17" },
-          { title: "Vòng lặp for", duration: "07:49" },
-          { title: "Vòng lặp while và do-while", duration: "06:50" },
-        ],
-        duration: "2 giờ",
-      },
-      {
-        title: "Hàm và thư viện trong C++",
-        lectures: [
-          { title: "Giới thiệu về hàm", duration: "08:20" },
-          { title: "Tham số và trả về", duration: "09:15" },
-          { title: "Sử dụng thư viện chuẩn", duration: "05:50" },
-        ],
-        duration: "1 giờ 30 phút",
-      },
-    ],
-    requirements: [
-      "Cần có một máy tính chạy Windows hoặc Mac hoặc Linux",
-      "Kiến thức cơ bản về toán học",
-      "Tư duy logic và giải quyết vấn đề",
-      "Kiến thức cơ bản về bất kỳ ngôn ngữ lập trình nào (không bắt buộc)",
-      "Khả năng kiên nhẫn và chú ý đến chi tiết",
-      "Có kết nối Internet để truy cập tài liệu khóa học",
-    ],
-    targetAudience: [
-      "Các bạn sinh viên muốn tìm hiểu về ngôn ngữ Java hoàn thành dự án trên trường đại học",
-      "Các bạn muốn tìm hiểu Java để phỏng vấn, đi làm thực tế",
-      "Cần bạn đã đi làm, nhưng dưới nửa năm kinh nghiệm, muốn tìm hiểu thêm về ngôn ngữ",
-      "Các bạn muốn luyện thi chứng chỉ SCJP",
-    ],
-    contentDetails: [
-      "Tác giả là cựu sinh viên lớp kĩ sư tài năng đại học Bách Khoa Hà Nội và founder VietJack, website giáo dục lớn nhất Việt Nam hiện tại.",
-      "Một khóa học hoàn toàn bằng tiếng Việt trên trang bán khóa học uy tín số 1 thế giới.",
-      "Học mãi mãi, không giới hạn thời gian và số lần học với gần 100 videos quay sẵn.",
-      "Tự tin đi phỏng vấn và trả lời các câu hỏi phỏng vấn tại các công ty tập đoàn.",
-      "Các project mẫu vượt xa độ khó phạm vi kiến thức trong trường đại học.",
-      "Được định hướng Java dưới yêu cầu doanh nghiệp, ngôn ngữ để xin việc và lương cao nhất.",
-      "Một khóa học được đánh giá 4.7/5 từ nhận xét của các bạn học viên.",
-      "Tự tin làm các project trên trường.",
-      "Phạm vi khóa học vượt xa các kiến thức trong trường đại học, gắn liền thực tế doanh nghiệp yêu cầu.",
-      "Định hướng học viên phát triển tiếp lên Java Web JSP theo yêu cầu doanh nghiệp.",
-    ],
-    instructorDetails: {
-      name: "Từ Thanh Hoài",
-      title: "Founder tại VietJack & Java Teacher",
-      image: "https://i1.sndcdn.com/artworks-ku6NqZLkrVuKrxIb-5yzisw-t500x500.jpg", // Replace with actual image URL
-      rating: 4.7,
-      reviews: 201,
-      students: 699,
-      courses: 1,
-      description: "Nguyễn Thanh Tuyên là một kỹ sư lập trình Java chuyên nghiệp, có hơn 5 năm trong lĩnh vực lập trình Java, là một kỹ sư quan trọng của nhiều dự án outsourcing quy mô về y tế, viễn thông, ERP cho các khách hàng Mỹ, Singapore. Anh là cựu sinh viên chương trình đào tạo kỹ sư tài năng của đại học Bách Khoa Hà Nội...",
-    },
-    reviews: [
-      { name: "Nguyễn Hữu P.", rating: 5, comment: "Rất dễ hiểu và chi tiết!" },
-      { name: "Lê Thị Mai", rating: 4, comment: "Khóa học tuyệt vời, giúp tôi nắm rõ căn bản." },
-      { name: "Phạm Minh H.", rating: 5, comment: "Giảng viên tận tâm và nhiệt tình. Đáng tiền!" },
-      { name: "Trần Văn Bình", rating: 3, comment: "Khóa học ổn nhưng có thể thêm ví dụ thực tế hơn." },
-      { name: "Hoàng Hải", rating: 4, comment: "Nội dung chất lượng, phù hợp cho người mới bắt đầu." },
-      { name: "Lý Quang T.", rating: 5, comment: "Khóa học rất tuyệt, dễ hiểu và bổ ích." },
-      { name: "Thùy Linh", rating: 4, comment: "Một khóa học tốt, nhưng có thể cải thiện phần thực hành." },
-      { name: "Đỗ Văn A.", rating: 3, comment: "Khóa học được, nhưng hơi khó hiểu ở một số chỗ." },
-      { name: "Vũ Trần", rating: 5, comment: "Giảng viên giảng dạy chi tiết và nhiệt tình." },
-      { name: "Mai Huyền", rating: 4, comment: "Khóa học giúp mình hiểu rõ về các khái niệm cơ bản." },
-      { name: "Nguyễn Anh Khoa", rating: 4, comment: "Khóa học ổn, cung cấp nhiều kiến thức hữu ích." },
-      { name: "Hà Linh", rating: 5, comment: "Rất hài lòng, giảng viên giảng dễ hiểu." },
-      { name: "Phương Nam", rating: 4, comment: "Khóa học tốt, tuy nhiên phần lý thuyết hơi dài." },
-      { name: "Minh Hoàng", rating: 5, comment: "Bài giảng rõ ràng và logic." },
-      { name: "Thái Vũ", rating: 3, comment: "Cần nhiều bài tập thực hành hơn để hiểu sâu." },
-      { name: "Đăng Minh", rating: 5, comment: "Tuyệt vời! Khóa học rất hữu ích." },
-      { name: "Lan Anh", rating: 4, comment: "Mình học được nhiều kiến thức từ khóa học này." },
-      { name: "Duy Phát", rating: 5, comment: "Giảng viên rất giỏi, mình thích phong cách dạy của anh." },
-      { name: "Thiên Phú", rating: 4, comment: "Khóa học khá hay, nhưng cần thêm bài tập." }
-    ]
+  const { courseId } = useParams(); // Lấy courseId từ URL
+  const [courseData, setCourseData] = useState(null); // State để lưu dữ liệu chi tiết khóa học
+  const [loading, setLoading] = useState(true); // State để xử lý trạng thái loading
 
-  };
+  useEffect(() => {
+    const fetchCourseDetails = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:8080/api/student/courses/${courseId}`
+        );
+        setCourseData(response.data); // Lưu dữ liệu khóa học vào state
+      } catch (error) {
+        console.error("Failed to fetch course details", error);
+      } finally {
+        setLoading(false); // Tắt trạng thái loading khi hoàn tất
+      }
+    };
+
+    fetchCourseDetails();
+  }, [courseId]);
+
+  if (loading) return <p>Loading...</p>;
+  if (!courseData) return <p>Không tìm thấy khóa học.</p>;
 
   return (
     <div className="w-full h-full min-h-screen bg-gray-100 overflow-y-auto">
-      <NavBar /> {/* NavBar at the top */}
-      
+      <NavBar /> {/* NavBar ở đầu trang */}
       <div className="container mx-auto px-8 py-8 lg:flex lg:gap-8 lg:pr-16">
         <div className="lg:w-3/4">
           <CourseHeader
             title={courseData.title}
             description={courseData.description}
-            instructor={courseData.instructor}
+            instructor={`${courseData.instructorFirstName} ${courseData.instructorLastName}`}
             rating={courseData.rating}
-            studentCount={courseData.studentCount}
-            lastUpdated={courseData.lastUpdated}
+            studentCount={courseData.studentCount || 0} // Số lượng sinh viên (nếu có)
+            lastUpdated={courseData.updatedAt} // Ngày cập nhật (nếu có)
           />
 
-          {/* Content Details Section */}
-          <CourseContentDetails contentDetails={courseData.contentDetails} />
-
-          {/* Main Content and Requirements */}
-          <CourseContent content={courseData.content} />
-          <CourseRequirements 
-            requirements={courseData.requirements} 
-            description={courseData.description} 
-            targetAudience={courseData.targetAudience} 
+          {/* Phần chi tiết nội dung khóa học */}
+          <CourseContentDetails
+            contentDetails={courseData.contentDetails || []}
           />
 
-          {/* Instructor Section */}
-          <CourseInstructor instructor={courseData.instructorDetails} />
+          {/* Nội dung chính và yêu cầu của khóa học */}
+          <CourseContent content={courseData.sections || []} />
+          <CourseRequirements
+            requirements={courseData.requirements || []}
+            description={courseData.description}
+            targetAudience={courseData.targetAudience || []}
+          />
 
-          {/* Reviews Section */}
-          <CourseReviews reviews={courseData.reviews} />
+          {/* Thông tin giảng viên */}
+          <CourseInstructor
+            instructor={{
+              name: `${courseData.instructorFirstName} ${courseData.instructorLastName}`,
+              title: courseData.instructorTitle || "Giảng viên",
+              image:
+                courseData.instructorProfileImage || "default-image-url.jpg",
+              rating: courseData.instructorRating || 0,
+              reviews: courseData.instructorReviews || 0,
+              students: courseData.instructorStudents || 0,
+              courses: courseData.instructorCourses || 1,
+              description: courseData.instructorDescription || "",
+            }}
+          />
+
+          {/* Đánh giá của học viên */}
+          <CourseReviews reviews={courseData.reviews || []} />
         </div>
 
-        {/* Sidebar with Course Media */}
+        {/* Phần Sidebar với thông tin về giá và hình ảnh của khóa học */}
         <div className="lg:flex lg:justify-center lg:w-1/4 lg:mr-4 lg:items-start">
           <CourseMedia
             price={courseData.price}
-            thumbnail={courseData.thumbnail}
+            thumbnail={courseData.imageUrls?.[0] || "default-image-url.jpg"}
             onAddToCart={() => alert("Thêm vào giỏ hàng")}
             onBuyNow={() => alert("Mua ngay")}
           />
         </div>
       </div>
-      
-      <Footer /> {/* Footer at the bottom */}
+      <Footer /> {/* Footer ở cuối trang */}
     </div>
   );
 };

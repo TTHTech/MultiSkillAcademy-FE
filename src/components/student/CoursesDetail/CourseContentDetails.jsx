@@ -1,17 +1,41 @@
-// src/components/student/CoursesDetail/CourseContentDetails.jsx
-import React from 'react';
+import React, { useState } from 'react';
 
 const CourseContentDetails = ({ contentDetails }) => {
+  const [expandedSections, setExpandedSections] = useState({});
+
+  const toggleSection = (index) => {
+    setExpandedSections((prev) => ({
+      ...prev,
+      [index]: !prev[index],
+    }));
+  };
+
   return (
     <div className="bg-white p-6 rounded shadow-lg mt-4">
-      {/* Darker and more prominent heading */}
       <h2 className="text-2xl font-bold text-gray-900 mb-4">Nội dung bài học</h2>
-      
-      <ul className="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-800">
-        {contentDetails.map((detail, index) => (
-          <li key={index} className="flex items-start">
-            <span className="mr-2 text-green-600 font-bold">✔</span>
-            <p className="text-gray-900">{detail}</p>
+
+      <ul className="space-y-6 text-gray-800">
+        {contentDetails.map((section, index) => (
+          <li key={index} className="flex flex-col items-start">
+            <h3
+              onClick={() => toggleSection(index)}
+              className="text-xl font-semibold text-gray-800 mb-2 cursor-pointer"
+            >
+              {section.title} ({section.lectures.length} bài giảng)
+              <span className="ml-2">
+                {expandedSections[index] ? '▲' : '▼'}
+              </span>
+            </h3>
+
+            {expandedSections[index] && (
+              <ul className="pl-4 list-disc space-y-1">
+                {section.lectures.map((lecture, lectureIndex) => (
+                  <li key={lectureIndex} className="text-gray-700">
+                    {lecture}
+                  </li>
+                ))}
+              </ul>
+            )}
           </li>
         ))}
       </ul>
