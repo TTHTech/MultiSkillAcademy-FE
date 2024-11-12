@@ -16,7 +16,7 @@ const CoursesPage = () => {
     const fetchCourses = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:8080/api/student/24"
+          "http://localhost:8080/api/student/enrollments/24"
         );
         setCourses(response.data);
         setFilteredCourses(response.data);
