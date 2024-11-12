@@ -158,7 +158,15 @@ const CourseViewer = () => {
           </div>
         ) : (
           <div className="text-gray-600">
-            Chọn bài giảng để hiển thị nội dung.
+            <h3 className="text-2xl font-semibold mb-1">
+              Chọn bài giảng để hiển thị nội dung.
+            </h3>
+            <div className="mt-8">
+              <h3 className="text-1xl font-semibold mb-1">
+                Questions and Answers
+              </h3>
+              <QuestionsAndAnswers />
+            </div>
           </div>
         )}
       </div>
