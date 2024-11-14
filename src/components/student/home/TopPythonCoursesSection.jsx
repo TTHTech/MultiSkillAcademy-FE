@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from "react";
-import { Link } from "react-router-dom"; // Import Link từ react-router-dom
+import { Link } from "react-router-dom";
 import axios from "axios";
 
 const SuggestedCoursesSection = () => {
@@ -55,7 +55,7 @@ const SuggestedCoursesSection = () => {
                 </p>
                 <div className="flex items-center text-yellow-500 mt-2">
                   <span>{course.rating}</span>
-                  <span className="ml-2 text-sm text-gray-600">({course.reviews || 999})</span>
+                  <span className="ml-2 text-sm text-gray-600">({course.reviews || 0})</span>
                 </div>
                 <p className="text-lg font-bold text-gray-900 mt-2">đ {course.price}</p>
               </div>
