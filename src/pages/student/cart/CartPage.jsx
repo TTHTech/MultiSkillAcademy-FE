@@ -16,6 +16,7 @@ const CartPage = () => {
         <h1 className="text-4xl font-bold text-gray-900 mb-4 pb-4">Giỏ hàng</h1>
         
         <div className="flex flex-col lg:flex-row justify-between">
+        
           <CartItems />
           <div className="lg:sticky lg:top-24 lg:w-1/3">
             <CartSummary />
