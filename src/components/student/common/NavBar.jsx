@@ -84,7 +84,7 @@ const Navbar = () => {
 
         {/* Menu */}
         <div className="flex items-center space-x-6">
-          <a href="/student/detail" className="text-gray-600 hover:text-black">detail</a>
+    
           <a href="/student/my-courses" className="text-gray-600 hover:text-black">Học tập</a>
 
           {/* Icons */}

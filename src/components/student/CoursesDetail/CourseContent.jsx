@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FaChevronDown, FaChevronUp, FaPlay } from 'react-icons/fa'; // Import FaPlay for lecture icon
+import { FaChevronDown, FaChevronUp, FaPlay } from 'react-icons/fa';
 
 const CourseContent = ({ content }) => {
   const [expandedSections, setExpandedSections] = useState({});
@@ -33,21 +33,17 @@ const CourseContent = ({ content }) => {
               </button>
             </div>
             <p className="text-gray-600 text-sm">
-              {section.lectures.length} bài giảng • {section.duration}
+              {section.lectures?.length || 0} bài giảng
             </p>
 
             {/* Show lectures if section is expanded */}
             {expandedSections[index] && (
-              <ul className="mt-2 space-y-1 text-gray-700">
-                {section.lectures.map((lecture, lectureIndex) => (
-                  <li key={lectureIndex} className="flex items-center justify-between">
+              <ul className="mt-2 space-y-1 text-gray-700 pl-6">
+                {section.lectures?.map((lecture, lectureIndex) => (
+                  <li key={lectureIndex} className="flex items-center">
                     {/* Play Icon and Lecture Title */}
-                    <div className="flex items-center">
-                      <FaPlay className="text-gray-500 mr-2" size={12} /> {/* Play icon */}
-                      <span>{lecture.title}</span>
-                    </div>
-                    {/* Duration */}
-                    <span className="text-gray-500 text-xs">{lecture.duration}</span>
+                    <FaPlay className="text-gray-500 mr-2" size={12} />
+                    <span>{lecture}</span> {/* Chỉ hiển thị tên bài giảng */}
                   </li>
                 ))}
               </ul>
