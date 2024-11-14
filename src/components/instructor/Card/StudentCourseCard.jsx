@@ -6,7 +6,7 @@ const renderStars = (rating) => {
         stars.push(
             <svg
                 key={i}
-                className={`w-4 h-4 fill-current ${i <= rating ? 'text-yellow-400' : 'text-gray-300'}`}
+                className={`w-5 h-5 fill-current ${i <= rating ? 'text-yellow-400' : 'text-gray-300'}`}
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
             >
@@ -18,34 +18,31 @@ const renderStars = (rating) => {
 };
 
 const CourseCard = ({ course }) => {
-    // Convert timestamp to a readable date
     const purchaseDate = new Date(course.enrolled_at).toLocaleDateString();
 
-    // Handle redirection when clicking the card
     const handleCardClick = () => {
         window.location.href = `http://localhost:5173/hockhoahoc/${course.courseId}`;
     };
 
     return (
         <div
-            className="max-w-xs rounded-lg overflow-hidden shadow-md bg-white m-4 cursor-pointer transform transition duration-300 hover:scale-105 hover:shadow-2xl"
+            className="max-w-xs rounded-lg overflow-hidden shadow-lg bg-white m-4 cursor-pointer transform transition duration-300 hover:scale-105 hover:shadow-2xl"
             onClick={handleCardClick}
         >
             <img
-                className="w-full h-40 object-cover"
+                className="w-full h-44 object-cover"
                 src={course.images[0]}
                 alt={course.title}
             />
 
             <div className="px-6 py-4">
-                <h2 className="font-bold text-xl mb-2 text-gray-800 truncate">
+                <h2 className="font-semibold text-xl mb-2 text-gray-800 truncate">
                     {course.title}
                 </h2>
 
-                {/* Rating */}
                 <div className="flex items-center mb-4">
                     {renderStars(course.rating)}
-                    <span className="ml-2 text-sm text-gray-600">
+                    <span className="ml-2 text-sm text-gray-500">
                         {course.rating}/5
                     </span>
                 </div>
@@ -62,11 +59,10 @@ const CourseCard = ({ course }) => {
                     Price: ${course.price.toFixed(2)}
                 </p>
 
-                <p className="text-gray-600 text-sm mb-2">
+                <p className="text-gray-500 text-xs mb-2">
                     Purchased on: {purchaseDate}
                 </p>
 
-                {/* Progress Bar */}
                 <div className="w-full bg-gray-200 rounded-full h-2.5 mb-2">
                     <div
                         className={`h-2.5 rounded-full ${course.progress <= 40
@@ -79,7 +75,7 @@ const CourseCard = ({ course }) => {
                     ></div>
                 </div>
 
-                <p className="text-gray-600 text-sm mb-2">
+                <p className="text-gray-500 text-sm mb-2">
                     Progress: {course.progress}%
                 </p>
 

@@ -32,14 +32,12 @@ const CoursesPage = () => {
     const applyFilters = () => {
       let filtered = courses;
 
-      // Lọc theo tên khóa học
       if (filters.searchTerm) {
         filtered = filtered.filter((course) =>
           course.title.toLowerCase().includes(filters.searchTerm.toLowerCase())
         );
       }
 
-      // Lọc theo mức độ hoàn thành
       if (filters.completionRange) {
         switch (filters.completionRange) {
           case "under25":
@@ -65,7 +63,6 @@ const CoursesPage = () => {
         }
       }
 
-      // Lọc theo ngày mua
       if (filters.purchaseDate) {
         filtered = filtered.filter((course) => {
           const enrolledAt = new Date(course.enrolled_at);
@@ -81,17 +78,17 @@ const CoursesPage = () => {
   }, [filters, courses]);
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      <div className="w-1/4 p-6 bg-white shadow-md border-r border-gray-200 sticky top-0 h-screen">
+    <div className="flex min-h-screen bg-gray-100">
+      <div className="w-1/4 p-6 bg-white shadow-lg border-r border-gray-200 sticky top-0 h-screen">
         <SidebarFilter filters={filters} setFilters={setFilters} />
       </div>
 
-      <div className="flex-1 p-6">
-        <h1 className="text-2xl font-bold mb-6 text-gray-800">
+      <div className="flex-1 p-8">
+        <h1 className="text-3xl font-extrabold mb-6 text-gray-900">
           Available Courses
         </h1>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           <CoursesList filteredCourses={filteredCourses} />
         </div>
       </div>
