@@ -3,6 +3,7 @@ import axios from "axios";
 import CoursesList from "../../../components/instructor/Card/StudentCourseList";
 import SidebarFilter from "../../../components/instructor/Sidebar/SidebarFilterCourse";
 
+const userId = Number(localStorage.getItem("userId"));
 const CoursesPage = () => {
   const [courses, setCourses] = useState([]);
   const [filteredCourses, setFilteredCourses] = useState([]);
@@ -16,7 +17,7 @@ const CoursesPage = () => {
     const fetchCourses = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:8080/api/student/enrollments/24"
+          `http://localhost:8080/api/student/enrollments/${userId}`
         );
         setCourses(response.data);
         setFilteredCourses(response.data);
