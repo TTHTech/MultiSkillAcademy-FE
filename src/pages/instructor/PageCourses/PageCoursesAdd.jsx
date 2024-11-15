@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Swal from "sweetalert2";
 
+const userId = Number(localStorage.getItem("userId"));
 const App = () => {
   const [open, setOpen] = useState(true);
   const [images, setImages] = useState([]);
@@ -49,9 +50,9 @@ const App = () => {
     try {
       // Chuẩn bị dữ liệu khóa học
       const addCourse = {
-        courseId: "INST001_" + Date.now(),
+        courseId: "CR0" + Date.now(),
         categoryName: course.categoryName,
-        instructor: 1,
+        instructor: userId,
         title: course.title,
         description: course.description,
         price: course.price,

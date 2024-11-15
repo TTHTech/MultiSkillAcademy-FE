@@ -1,4 +1,4 @@
-import { FaClock, FaDollarSign, FaStar, FaTrash } from "react-icons/fa";
+import { FaClock, FaDollarSign, FaStar, FaTrash, FaSearch } from "react-icons/fa";
 import axios from "axios";
 import Swal from "sweetalert2";
 
@@ -66,10 +66,16 @@ const WishlistCard = ({ course, onDelete }) => {
         </div>
 
         <button
-          className="w-full bg-red-500 text-white py-2 rounded-md font-medium hover:bg-red-600 transition-colors duration-200 flex items-center justify-center"
+          className="w-full bg-red-500 text-white py-2 rounded-md font-medium hover:bg-red-600 transition-colors duration-200 flex items-center justify-center mb-1"
           onClick={handleDelete}
         >
           <FaTrash className="mr-2" /> Xóa khỏi Wishlist
+        </button>
+        <button
+          className="w-full bg-blue-500 text-white py-2 rounded-md font-medium hover:bg-blue-600 transition-colors duration-200 flex items-center justify-center"
+          onClick={handleDelete}
+        >
+          <FaSearch className="mr-2" /> Xem chi tiết
         </button>
       </div>
     </div>

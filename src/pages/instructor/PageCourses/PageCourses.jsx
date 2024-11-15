@@ -4,6 +4,7 @@ import ListCard from "../../../components/instructor/Card/ListCoursesCard"
 import { FaArrowUp } from 'react-icons/fa';
 import { Link } from "react-router-dom";
 
+const userId = localStorage.getItem("userId");
 const PageCourses = () => {
     const [open, setOpen] = useState(true);
     const [showPending, setShowPending] = useState(true);
@@ -14,7 +15,7 @@ const PageCourses = () => {
     useEffect(() => {
         const fetchCourses = async () => {
             try {
-                const response = await fetch('http://localhost:8080/api/instructor/1', {
+                const response = await fetch(`http://localhost:8080/api/instructor/${userId}`, {
                     method: "GET",
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem("token")}`,
