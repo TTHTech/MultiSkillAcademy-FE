@@ -13,9 +13,9 @@ import CourseReviews from "../../../components/student/CoursesDetail/CourseRevie
 import CourseInstructor from "../../../components/student/CoursesDetail/CourseInstructor";
 
 const CourseDetailPage = () => {
-  const { courseId } = useParams(); // Lấy courseId từ URL
-  const [courseData, setCourseData] = useState(null); // State để lưu dữ liệu chi tiết khóa học
-  const [loading, setLoading] = useState(true); // State để xử lý trạng thái loading
+  const { courseId } = useParams();
+  const [courseData, setCourseData] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchCourseDetails = async () => {
@@ -23,23 +23,43 @@ const CourseDetailPage = () => {
         const response = await axios.get(
           `http://localhost:8080/api/student/courses/${courseId}`
         );
-        setCourseData(response.data); // Lưu dữ liệu khóa học vào state
+        setCourseData(response.data);
       } catch (error) {
         console.error("Failed to fetch course details", error);
       } finally {
-        setLoading(false); // Tắt trạng thái loading khi hoàn tất
+        setLoading(false);
       }
     };
 
     fetchCourseDetails();
   }, [courseId]);
 
+  // Hàm thêm khóa học vào giỏ hàng
+  const handleAddToCart = async () => {
+    try {
+      const token = localStorage.getItem("token"); // Lấy JWT token từ local storage
+      await axios.post(
+        `http://localhost:8080/api/student/cart/add/${courseId}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Thêm token vào header
+          },
+        }
+      );
+      alert("Khóa học đã được thêm vào giỏ hàng");
+    } catch (error) {
+      console.error("Failed to add course to cart", error);
+      alert("Có lỗi xảy ra khi thêm khóa học vào giỏ hàng");
+    }
+  };
+
   if (loading) return <p>Loading...</p>;
   if (!courseData) return <p>Không tìm thấy khóa học.</p>;
 
   return (
     <div className="w-full h-full min-h-screen bg-gray-100 overflow-y-auto">
-      <NavBar /> {/* NavBar ở đầu trang */}
+      <NavBar />
       <div className="container mx-auto px-8 py-8 lg:flex lg:gap-8 lg:pr-16">
         <div className="lg:w-3/4">
           <CourseHeader
@@ -47,30 +67,21 @@ const CourseDetailPage = () => {
             description={courseData.description}
             instructor={`${courseData.instructorFirstName} ${courseData.instructorLastName}`}
             rating={courseData.rating}
-            studentCount={courseData.studentCount || 0} // Số lượng sinh viên (nếu có)
-            lastUpdated={courseData.updatedAt} // Ngày cập nhật (nếu có)
+            studentCount={courseData.studentCount || 0}
+            lastUpdated={courseData.updatedAt}
           />
-
-          {/* Phần chi tiết nội dung khóa học */}
-          <CourseContentDetails
-            contentDetails={courseData.contentDetails || []}
-          />
-
-          {/* Nội dung chính và yêu cầu của khóa học */}
+          <CourseContentDetails contentDetails={courseData.contentDetails || []} />
           <CourseContent content={courseData.sections || []} />
           <CourseRequirements
             requirements={courseData.requirements || []}
             description={courseData.description}
             targetAudience={courseData.targetAudience || []}
           />
-
-          {/* Thông tin giảng viên */}
           <CourseInstructor
             instructor={{
               name: `${courseData.instructorFirstName} ${courseData.instructorLastName}`,
               title: courseData.instructorTitle || "Giảng viên",
-              image:
-                courseData.instructorProfileImage || "default-image-url.jpg",
+              image: courseData.instructorProfileImage || "default-image-url.jpg",
               rating: courseData.instructorRating || 0,
               reviews: courseData.instructorReviews || 0,
               students: courseData.instructorStudents || 0,
@@ -78,22 +89,18 @@ const CourseDetailPage = () => {
               description: courseData.instructorDescription || "",
             }}
           />
-
-          {/* Đánh giá của học viên */}
           <CourseReviews reviews={courseData.reviews || []} />
         </div>
-
-        {/* Phần Sidebar với thông tin về giá và hình ảnh của khóa học */}
         <div className="lg:flex lg:justify-center lg:w-1/4 lg:mr-4 lg:items-start">
           <CourseMedia
             price={courseData.price}
             thumbnail={courseData.imageUrls?.[0] || "default-image-url.jpg"}
-            onAddToCart={() => alert("Thêm vào giỏ hàng")}
+            onAddToCart={handleAddToCart} // Truyền hàm vào nút "Thêm vào Giỏ Hàng"
             onBuyNow={() => alert("Mua ngay")}
           />
         </div>
       </div>
-      <Footer /> {/* Footer ở cuối trang */}
+      <Footer />
     </div>
   );
 };
