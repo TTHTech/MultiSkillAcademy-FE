@@ -11,7 +11,7 @@ const CourseViewer = () => {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:8080/api/student/courses/${id}`, {
+      .get(`http://localhost:8080/api/student/study-courses/${id}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -153,8 +153,8 @@ const CourseViewer = () => {
               <h3 className="text-2xl font-semibold mb-4">
                 Questions and Answers
               </h3>
-              <QuestionsAndAnswers />
-            </div>
+              <QuestionsAndAnswers courseId={id} />
+              </div>
           </div>
         ) : (
           <div className="text-gray-600">
@@ -165,8 +165,8 @@ const CourseViewer = () => {
               <h3 className="text-1xl font-semibold mb-1">
                 Questions and Answers
               </h3>
-              <QuestionsAndAnswers />
-            </div>
+              <QuestionsAndAnswers courseId={id} />
+              </div>
           </div>
         )}
       </div>

@@ -2,9 +2,10 @@ import { useState, useEffect } from "react";
 import moment from "moment";
 import Swal from "sweetalert2";
 
-const userID = "2";
-const courseId = "CR001";
-const QuestionsAndAnswers = () => {
+
+
+const userID = localStorage.getItem("userId");
+const QuestionsAndAnswers = ({ courseId }) => {
   const [questions, setQuestions] = useState([]);
   const [expandedQuestionId, setExpandedQuestionId] = useState(null);
   const [showQuestionModal, setShowQuestionModal] = useState(false);
@@ -32,7 +33,7 @@ const QuestionsAndAnswers = () => {
       }
     };
     fetchQuestions();
-  }, []);
+  }, [courseId]);
 
   const handleDeleteQuestion = async (questionId) => {
     const swalResult = await Swal.fire({
