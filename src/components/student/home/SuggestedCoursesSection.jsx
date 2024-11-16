@@ -58,7 +58,7 @@ const SuggestedCoursesSection = () => {
                   <span>{course.rating}</span>
                   <span className="ml-2 text-sm text-gray-600">({course.reviews || 999})</span>
                 </div>
-
+                <div>
                   <span className="text-lg font-semibold">{course.rating}</span>
                   <i className="fas fa-star text-sm ml-1"></i> {/* Biểu tượng ngôi sao nhỏ hơn và thẳng hàng */}
                   <span className="ml-2 text-sm text-gray-600">({course.reviews || 999})</span>
