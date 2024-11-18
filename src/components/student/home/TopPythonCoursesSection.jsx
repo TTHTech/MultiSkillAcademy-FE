@@ -35,7 +35,7 @@ const SuggestedCoursesSection = () => {
 
   return (
     <section className="p-6">
-      <h2 className="text-2xl font-bold mb-4 text-gray-900">Lĩnh vực sẽ học tiếp theo</h2>
+      <h2 className="text-2xl font-bold mb-4 text-gray-900">Các khóa học PYTHON phổ biến</h2>
       <div className="relative">
         <button
           onClick={scrollLeft}
