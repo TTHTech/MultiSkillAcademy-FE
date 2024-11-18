@@ -2,6 +2,7 @@ import { FaClock, FaDollarSign, FaStar, FaTrash, FaSearch } from "react-icons/fa
 import axios from "axios";
 import Swal from "sweetalert2";
 
+const userId = Number(localStorage.getItem("userId"));
 const WishlistCard = ({ course, onDelete }) => {
   const handleDelete = async () => {
     const swalResult = await Swal.fire({
@@ -19,7 +20,7 @@ const WishlistCard = ({ course, onDelete }) => {
 
     try {
       await axios.delete(`http://localhost:8080/api/student/delete-course`, {
-        data: { courseId: course.courseId, userId: 16, createdAt: " " },
+        data: { courseId: course.courseId, userId: userId, createdAt: " " },
       });
 
       await Swal.fire({

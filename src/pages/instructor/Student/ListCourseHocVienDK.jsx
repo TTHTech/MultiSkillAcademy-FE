@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import CoursesList from "../../../components/instructor/Card/StudentCourseList";
 import SidebarFilter from "../../../components/instructor/Sidebar/SidebarFilterCourse";
+import NavBar from "../../../components/student/common/NavBar";
 
 const userId = Number(localStorage.getItem("userId"));
 const CoursesPage = () => {
@@ -79,6 +80,8 @@ const CoursesPage = () => {
   }, [filters, courses]);
 
   return (
+    <>
+    <NavBar />
     <div className="flex min-h-screen bg-gray-100">
       <div className="w-1/4 p-6 bg-white shadow-lg border-r border-gray-200 sticky top-0 h-screen">
         <SidebarFilter filters={filters} setFilters={setFilters} />
@@ -94,6 +97,7 @@ const CoursesPage = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 
