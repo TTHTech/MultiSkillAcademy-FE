@@ -117,6 +117,7 @@ const QuestionsAndAnswers = ({ courseId }) => {
   };
 
   const confirmAddQuestion = async () => {
+    if (!newQuestionText || newQuestionText.trim() === "") return;
     const newQuestion = {
       questionsId: `Q${Math.floor(Math.random() * 100000)}`,
       courseId: courseId,
@@ -160,6 +161,8 @@ const QuestionsAndAnswers = ({ courseId }) => {
   };
 
   const confirmAddAnswer = async () => {
+    if (!newAnswerText || newAnswerText.trim() === "") return;
+
     const newAnswer = {
       answersId:`A${Math.floor(Math.random() * 100000)}`,
       questionId: currentQuestionId,
@@ -211,7 +214,7 @@ const QuestionsAndAnswers = ({ courseId }) => {
   return (
     <div className="w-full max-w-4xl mx-auto p-6 bg-gray-50">
       <h1 className="text-3xl font-bold mb-6 text-center text-gray-800">
-        Quản lý câu hỏi khóa học
+        Hỏi đáp thắc mắt học tập
       </h1>
       <button
         onClick={handleAddQuestion}
