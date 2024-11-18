@@ -28,7 +28,7 @@ const CourseCard = ({
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
-    }, 5000);
+    }, 50000);
     return () => clearInterval(interval);
   }, [images.length]);
 

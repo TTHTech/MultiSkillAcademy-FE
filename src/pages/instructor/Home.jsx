@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import Sidebar from "../../components/instructor/Sidebar/Sidebar";
 import User from "../../components/instructor/User/User";
 const Home = () => {

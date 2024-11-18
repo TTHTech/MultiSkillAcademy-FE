@@ -3,6 +3,7 @@ import Sidebar from "../../components/instructor/Sidebar/Sidebar";
 import axios from "axios";
 import moment from "moment";
 
+const userId = Number(localStorage.getItem("userId"));
 const StudentList = () => {
   const [open, setOpen] = useState(true);
   const [students, setStudents] = useState([]);
@@ -35,6 +36,7 @@ const StudentList = () => {
         {
           headers: {
             "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${localStorage.getItem("token")}`, 
           },
         }
       );
@@ -49,7 +51,13 @@ const StudentList = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:8080/api/instructor/students/1")
+      .get(`http://localhost:8080/api/instructor/students/${userId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      )
       .then((response) => {
         setStudents(response.data);
       })

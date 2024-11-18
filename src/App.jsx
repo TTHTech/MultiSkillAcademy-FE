@@ -28,6 +28,7 @@ import PageQuestions from "./pages/instructor/PageQuestions";
 import StudentList from "./pages/instructor/PageStudents";
 import HocKhoaHoc from "./pages/instructor/Student/GiaoDienHocKhoaHoc";
 import ListDanhSachKhoaHoc from "./pages/instructor/Student/ListCourseHocVienDK";
+import Wishlist from "./pages/instructor/Student/PageWishlist";
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [role, setRole] = useState("");
@@ -60,10 +61,12 @@ function App() {
         <Route path="/courses/addCourses" element={<PageAdd />} />
         <Route path="/questions" element={<PageQuestions />} />
         <Route path="/students" element={<StudentList />} />
-
         <Route path="/hockhoahoc/:id" element={<HocKhoaHoc />} />
         <Route path="/ListDanhSachKhoaHoc" element={<ListDanhSachKhoaHoc />} />
+
+        <Route path="/wishlist" element={<Wishlist />} />
       </Routes>
+
       <div className="flex h-screen text-gray-100 overflow-hidden">
         {/* Hiển thị lớp nền chỉ dành cho admin */}
         {isLoggedIn && role === "ROLE_ADMIN" && (
@@ -73,12 +76,12 @@ function App() {
           </div>
         )}
 
-        {/* Kiểm tra chỉ hiển thị Sidebar cho Admin, nhưng loại trừ các trang xác thực */}
+        {/* Kiểm tra hiển thị Sidebar chỉ cho Admin và không hiển thị trên các trang đăng nhập/xác thực */}
         {isLoggedIn &&
           role === "ROLE_ADMIN" &&
-          !["/login", "/register", "/verify-otp"].includes(
-            location.pathname
-          ) && <Sidebar />}
+          !["/login", "/register", "/verify-otp"].includes(location.pathname) && (
+            <Sidebar />
+          )}
 
         <Routes>
           <Route path="/login" element={<LoginPage />} />
@@ -100,7 +103,7 @@ function App() {
             </>
           )}
 
-          {/* Nếu role là student, điều hướng đến trang StudentHomePage */}
+          {/* Các route cho sinh viên khi role là student */}
           {isLoggedIn && role === "ROLE_STUDENT" && (
             <>
               <Route path="/student/home" element={<StudentHomePage />} />
@@ -110,7 +113,7 @@ function App() {
             </>
           )}
 
-          {/* Nếu role là instructor, điều hướng đến trang InstructorPage */}
+          {/* Các route cho giảng viên khi role là instructor */}
           {isLoggedIn && role === "ROLE_INSTRUCTOR" && (
             <>
               <Route path="/instructor/courses" element={<InstructorPage />} />

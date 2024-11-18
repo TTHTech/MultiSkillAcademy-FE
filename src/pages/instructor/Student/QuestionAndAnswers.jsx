@@ -2,9 +2,10 @@ import { useState, useEffect } from "react";
 import moment from "moment";
 import Swal from "sweetalert2";
 
-const userID = "2";
-const courseId = "CR001";
-const QuestionsAndAnswers = () => {
+
+
+const userID = localStorage.getItem("userId");
+const QuestionsAndAnswers = ({ courseId }) => {
   const [questions, setQuestions] = useState([]);
   const [expandedQuestionId, setExpandedQuestionId] = useState(null);
   const [showQuestionModal, setShowQuestionModal] = useState(false);
@@ -32,7 +33,7 @@ const QuestionsAndAnswers = () => {
       }
     };
     fetchQuestions();
-  }, []);
+  }, [courseId]);
 
   const handleDeleteQuestion = async (questionId) => {
     const swalResult = await Swal.fire({
@@ -116,6 +117,7 @@ const QuestionsAndAnswers = () => {
   };
 
   const confirmAddQuestion = async () => {
+    if (!newQuestionText || newQuestionText.trim() === "") return;
     const newQuestion = {
       questionsId: `Q${Math.floor(Math.random() * 100000)}`,
       courseId: courseId,
@@ -159,6 +161,8 @@ const QuestionsAndAnswers = () => {
   };
 
   const confirmAddAnswer = async () => {
+    if (!newAnswerText || newAnswerText.trim() === "") return;
+
     const newAnswer = {
       answersId:`A${Math.floor(Math.random() * 100000)}`,
       questionId: currentQuestionId,
@@ -210,7 +214,7 @@ const QuestionsAndAnswers = () => {
   return (
     <div className="w-full max-w-4xl mx-auto p-6 bg-gray-50">
       <h1 className="text-3xl font-bold mb-6 text-center text-gray-800">
-        Quản lý câu hỏi khóa học
+        Hỏi đáp thắc mắt học tập
       </h1>
       <button
         onClick={handleAddQuestion}
