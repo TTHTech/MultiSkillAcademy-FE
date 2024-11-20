@@ -3,7 +3,7 @@ import axios from "axios";
 import CoursesList from "../../../components/instructor/Card/StudentCourseList";
 import SidebarFilter from "../../../components/instructor/Sidebar/SidebarFilterCourse";
 import NavBar from "../../../components/student/common/NavBar";
-
+import Footer from "../../../components/student/common/Footer";
 const userId = Number(localStorage.getItem("userId"));
 const CoursesPage = () => {
   const [courses, setCourses] = useState([]);
@@ -97,6 +97,7 @@ const CoursesPage = () => {
         </div>
       </div>
     </div>
+    <Footer/>
     </>
   );
 };

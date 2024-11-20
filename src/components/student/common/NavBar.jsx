@@ -1,11 +1,27 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import ProfileMenu from '../../../components/student/profile/ProfileMenu';
 
 const Navbar = () => {
   const [isMenuOpen, setMenuOpen] = useState(false);
+  const [categories, setCategories] = useState([]); // State lưu danh mục
   const timeoutRef = useRef(null);
+
+  useEffect(() => {
+    // Gọi API để lấy danh mục
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get('http://localhost:8080/api/student/categories'); // API endpoint
+        console.log('Danh mục:', response.data); // Debug xem API trả về gì
+        setCategories(response.data); // Cập nhật danh sách danh mục
+      } catch (error) {
+        console.error('Lỗi khi tải danh mục:', error);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   const handleMouseOver = () => {
     clearTimeout(timeoutRef.current); // Hủy bỏ thời gian chờ đóng menu nếu có
@@ -27,7 +43,7 @@ const Navbar = () => {
         <div 
           className="flex items-center space-x-4 relative"
           onMouseEnter={handleMouseOver}   // Hiển thị menu khi di chuột vào nút "Thể loại"
-          onMouseLeave={handleMouseOut}     // Bắt đầu thời gian chờ đóng menu khi rời khỏi nút "Thể loại"
+          onMouseLeave={handleMouseOut}    // Bắt đầu thời gian chờ đóng menu khi rời khỏi nút "Thể loại"
         >
           <Link to="/student/home"> {/* Bọc logo bằng Link để trở về trang chủ */}
             <img 
@@ -50,19 +66,19 @@ const Navbar = () => {
               onMouseLeave={handleMouseOut}    // Bắt đầu thời gian chờ đóng menu khi rời khỏi menu
             >
               <div className="grid grid-cols-1 gap-2 px-4">
-                <a href="/" className="text-gray-700 hover:text-black py-1 px-2 block">Phát triển</a>
-                <a href="/" className="text-gray-700 hover:text-black py-1 px-2 block">Kinh doanh</a>
-                <a href="/" className="text-gray-700 hover:text-black py-1 px-2 block">Tài chính & Kế toán</a>
-                <a href="/" className="text-gray-700 hover:text-black py-1 px-2 block">CNTT & Phần mềm</a>
-                <a href="/" className="text-gray-700 hover:text-black py-1 px-2 block">Năng suất văn phòng</a>
-                <a href="/" className="text-gray-700 hover:text-black py-1 px-2 block">Phát triển cá nhân</a>
-                <a href="/" className="text-gray-700 hover:text-black py-1 px-2 block">Thiết kế</a>
-                <a href="/" className="text-gray-700 hover:text-black py-1 px-2 block">Marketing</a>
-                <a href="/" className="text-gray-700 hover:text-black py-1 px-2 block">Phong cách sống</a>
-                <a href="/" className="text-gray-700 hover:text-black py-1 px-2 block">Nhiếp ảnh & Video</a>
-                <a href="/" className="text-gray-700 hover:text-black py-1 px-2 block">Sức khỏe & Thể dục</a>
-                <a href="/" className="text-gray-700 hover:text-black py-1 px-2 block">Âm nhạc</a>
-                <a href="/" className="text-gray-700 hover:text-black py-1 px-2 block">Giảng dạy & Học thuật</a>
+                {categories.length > 0 ? (
+                  categories.map((category, index) => (
+                    <a 
+                      key={index} 
+                      href={`/category/${category.categoryId}`} 
+                      className="text-gray-700 hover:text-black py-1 px-2 block"
+                    >
+                      {category}
+                    </a>
+                  ))
+                ) : (
+                  <div className="text-gray-500 px-4">Không có danh mục</div>
+                )}
               </div>
             </div>
           )}
@@ -108,12 +124,15 @@ const Navbar = () => {
       {/* Dàn đều các categories phía dưới (1 hàng) */}
       <div className="bg-white py-2 border-t border-b border-gray-300 backdrop-blur-md shadow-sm">
         <div className="container mx-auto px-4 flex justify-between space-x-4">
-          <a href="/" className="text-gray-700 hover:text-black">Phát triển</a>
-          <a href="/" className="text-gray-700 hover:text-black">Phát triển ứng dụng di động</a>
-          <a href="/" className="text-gray-700 hover:text-black">Ngôn ngữ lập trình</a>
-          <a href="/" className="text-gray-700 hover:text-black">Phát triển trò chơi</a>
-          <a href="/" className="text-gray-700 hover:text-black">Thiết kế & Phát triển cơ sở dữ liệu</a>
-          <a href="/" className="text-gray-700 hover:text-black">Kiểm tra phần mềm</a>
+          {categories.slice(0, 6).map((category, index) => (
+            <a 
+              key={index} 
+              href={`/category/${index}`} 
+              className="text-gray-700 hover:text-black"
+            >
+              {category}
+            </a>
+          ))}
         </div>
       </div>
     </nav>
