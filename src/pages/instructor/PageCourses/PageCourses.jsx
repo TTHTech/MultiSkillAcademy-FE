@@ -26,6 +26,7 @@ const PageCourses = () => {
                     },
                 });
                 const data = await response.json();
+                console.log(localStorage.getItem("token"))
                 setCourses(data);
             } catch (error) {
                 console.error("Error fetching courses:", error);
