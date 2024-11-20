@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 
-const SuggestedCoursesSection = () => {
+const TopPythonCoursesSection = () => {
   const [courses, setCourses] = useState([]);
   const scrollContainer = useRef(null);
 
@@ -34,43 +34,83 @@ const SuggestedCoursesSection = () => {
   };
 
   return (
-    <section className="p-6">
-      <h2 className="text-2xl font-bold mb-4 text-gray-900">Các khóa học PYTHON phổ biến</h2>
+    <section className="p-6 bg-gray-50">
+      <h2 className="text-2xl font-bold mb-6 text-gray-900 text-center">
+        Các khóa học PYTHON phổ biến
+      </h2>
       <div className="relative">
+        {/* Nút cuộn trái */}
         <button
           onClick={scrollLeft}
-          className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 p-2 bg-white shadow-md rounded-full"
+          className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 p-3 bg-white shadow-md rounded-full hover:bg-gray-200 transition-all"
         >
-          <i className="fas fa-chevron-left text-gray-800"></i>
+          <i className="fas fa-chevron-left text-gray-700"></i>
         </button>
 
+        {/* Container khóa học */}
         <div ref={scrollContainer} className="flex space-x-4 overflow-x-scroll no-scrollbar">
           {courses.map((course, index) => (
-            <Link to={`/course/${course.courseId}`} key={index} className="w-64 flex-shrink-0 border rounded-lg overflow-hidden shadow-lg bg-white">
-              <img src={course.imageUrls?.[0] || "default-image-url.jpg"} alt={course.title} className="w-full h-32 object-cover" />
+            <Link
+              to={`/course/${course.courseId}`}
+              key={index}
+              className="w-64 flex-shrink-0 border rounded-lg overflow-hidden shadow-lg bg-white hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+            >
+              {/* Ảnh khóa học */}
+              <img
+                src={course.imageUrls?.[0] || "default-image-url.jpg"}
+                alt={course.title}
+                className="w-full h-36 object-cover"
+              />
               <div className="p-4">
-                <h3 className="font-semibold text-lg text-gray-900">{course.title}</h3>
-                <p className="text-sm text-gray-800 font-medium">
+                {/* Tiêu đề khóa học */}
+                <h3 className="font-semibold text-lg text-gray-900 mb-1 line-clamp-2">
+                  {course.title}
+                </h3>
+                {/* Giảng viên */}
+                <p className="text-sm text-gray-800 font-medium mb-2">
                   {course.instructorFirstName} {course.instructorLastName}
                 </p>
-                <div className="flex items-center text-yellow-500 mt-2">
-                  <span className="text-lg font-semibold">{course.rating}</span>
-                  <i className="fas fa-star text-sm ml-1"></i> {/* Biểu tượng ngôi sao nhỏ hơn và thẳng hàng */}
-                  <span className="ml-2 text-sm text-gray-600">({course.reviews || 999})</span>
+                {/* Đánh giá */}
+                <div className="flex items-center mb-2">
+                  <span className="text-lg font-semibold text-gray-900 mr-1">
+                    {course.rating}
+                  </span>
+                  <div className="flex space-x-1">
+                    {[...Array(5)].map((_, i) => (
+                      <i
+                        key={i}
+                        className={`fas fa-star ${
+                          i < Math.round(course.rating)
+                            ? "text-yellow-500"
+                            : "text-gray-300"
+                        }`}
+                        style={{ fontSize: "14px" }} // Ngôi sao thon gọn
+                      ></i>
+                    ))}
+                  </div>
+                  <span className="ml-2 text-sm text-gray-600">
+                    ({course.reviews || 999})
+                  </span>
                 </div>
-
-                <p className="text-lg font-bold text-gray-900 mt-2">đ {course.price}</p>
+                {/* Giá */}
+                <p className="text-lg font-bold text-gray-900">
+                  đ {course.price.toLocaleString("vi-VN")}
+                </p>
               </div>
             </Link>
           ))}
         </div>
 
-        <button onClick={scrollRight} className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 p-2 bg-white shadow-md rounded-full">
-          <i className="fas fa-chevron-right text-gray-800"></i>
+        {/* Nút cuộn phải */}
+        <button
+          onClick={scrollRight}
+          className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 p-3 bg-white shadow-md rounded-full hover:bg-gray-200 transition-all"
+        >
+          <i className="fas fa-chevron-right text-gray-700"></i>
         </button>
       </div>
     </section>
   );
 };
 
-export default SuggestedCoursesSection;
+export default TopPythonCoursesSection;
