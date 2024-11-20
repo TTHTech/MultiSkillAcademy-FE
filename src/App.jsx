@@ -29,6 +29,7 @@ import StudentList from "./pages/instructor/PageStudents";
 import HocKhoaHoc from "./pages/instructor/Student/GiaoDienHocKhoaHoc";
 import ListDanhSachKhoaHoc from "./pages/instructor/Student/ListCourseHocVienDK";
 import Wishlist from "./pages/instructor/Student/PageWishlist";
+import Test from "./pages/instructor/Test/PageTest";
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [role, setRole] = useState("");
@@ -63,6 +64,7 @@ function App() {
         <Route path="/students" element={<StudentList />} />
         <Route path="/hockhoahoc/:id" element={<HocKhoaHoc />} />
         <Route path="/ListDanhSachKhoaHoc" element={<ListDanhSachKhoaHoc />} />
+        <Route path="/tests" element={<Test />} />
 
         <Route path="/wishlist" element={<Wishlist />} />
       </Routes>
