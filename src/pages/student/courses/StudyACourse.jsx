@@ -8,7 +8,6 @@ const CourseViewer = () => {
   const [course, setCourse] = useState(null);
   const [selectedSection, setSelectedSection] = useState(null);
   const [selectedLecture, setSelectedLecture] = useState(null);
-  const [completionMessage, setCompletionMessage] = useState("");
   const { id } = useParams();
 
   useEffect(() => {
@@ -30,75 +29,87 @@ const CourseViewer = () => {
     return <div>Loading...</div>;
   }
 
-  const handleNextLecture = () => {
-    if (selectedSection) {
-      const currentIndex = selectedSection.lectures.findIndex(
-        (lecture) => lecture.lecture_id === selectedLecture.lecture_id
-      );
+  const calculateCompletedLectures = (lectures) =>
+    lectures.filter((lecture) => lecture.completed).length;
 
-      if (currentIndex < selectedSection.lectures.length - 1) {
-        setSelectedLecture(selectedSection.lectures[currentIndex + 1]);
-      } else {
-        const sectionIndex = course.sections.findIndex(
-          (section) => section.section_id === selectedSection.section_id
-        );
+  const calculateTotalTime = (lectures) =>
+    lectures.reduce((total, lecture) => total + lecture.duration, 0);
 
-        if (sectionIndex < course.sections.length - 1) {
-          const nextSection = course.sections[sectionIndex + 1];
-          setSelectedSection(nextSection);
-          setSelectedLecture(nextSection.lectures[0]);
-          setCompletionMessage("");
-        } else {
-          setCompletionMessage("Bạn đã hoàn thành khóa học!");
-        }
-      }
-    }
+  const formatTime = (minutes) => {
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    return `${hours > 0 ? `${hours} giờ` : ""} ${mins} phút`.trim();
   };
 
   return (
     <>
-      <NavBar className = "mb-2"/>
+      <NavBar className="mb-2" />
       <div className="flex h-screen">
         {/* Sidebar */}
-        <div className="w-1/4 bg-gray-100 p-4 overflow-y-auto">
+        <div className="w-1/4 bg-gray-100 p-4 overflow-y-auto border-r">
           <div className="mb-6">
             <img
               src={course.images[0]}
               alt={course.title}
-              className="w-full h-40 object-cover mb-4"
+              className="w-full h-40 object-cover mb-4 rounded-lg"
             />
             <h1 className="text-2xl font-bold mb-2">{course.title}</h1>
             <p className="text-gray-600">{course.description}</p>
           </div>
 
           <div>
-            {course.sections.map((section) => (
-              <div key={section.section_id} className="mb-6">
-                <h2
-                  className="text-xl font-semibold text-gray-800 cursor-pointer mb-2 hover:text-blue-600 transition-colors duration-200"
-                  onClick={() => setSelectedSection(section)}
-                >
-                  {section.title}
-                </h2>
-                {selectedSection === section && (
-                  <ul className="ml-4 space-y-2">
-                    {section.lectures.map((lecture) => (
-                      <li
-                        key={lecture.lecture_id}
-                        className={`cursor-pointer p-3 rounded-lg transition-colors duration-200 ${
-                          selectedLecture === lecture
-                            ? "bg-blue-200 text-blue-800"
-                            : "bg-white text-gray-700 hover:bg-gray-100"
-                        }`}
-                        onClick={() => setSelectedLecture(lecture)}
-                      >
-                        {lecture.title}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            ))}
+            {course.sections.map((section, index) => {
+              const completedLectures = calculateCompletedLectures(
+                section.lectures
+              );
+              const totalLectures = section.lectures.length;
+              const totalTime = calculateTotalTime(section.lectures);
+
+              return (
+                <div key={section.section_id} className="mb-4">
+                  <h2
+                    className="text-xl font-semibold text-gray-800 cursor-pointer mb-2 hover:text-blue-600 transition-colors duration-200 flex justify-between items-center"
+                    onClick={() =>
+                      setSelectedSection(
+                        selectedSection === section ? null : section
+                      )
+                    }
+                  >
+                    <span>{section.title}</span>
+                    <span className="text-sm text-gray-500">
+                      {completedLectures}/{totalLectures} | {formatTime(totalTime)}
+                    </span>
+                  </h2>
+                  {selectedSection === section && (
+                    <ul className="ml-4 space-y-2">
+                      {section.lectures.map((lecture) => (
+                        <li
+                          key={lecture.lecture_id}
+                          className="flex items-center justify-between p-3 rounded-lg bg-gray-50 text-gray-700 hover:bg-gray-100"
+                          onClick={() => setSelectedLecture(lecture)}
+                        >
+                          <div className="flex items-center">
+                            <input
+                              type="checkbox"
+                              checked={lecture.completed}
+                              className="mr-2"
+                              readOnly
+                            />
+                            <span>{lecture.title}</span>
+                          </div>
+                          <span className="text-sm text-gray-500">
+                            {lecture.duration} phút
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                  {index < course.sections.length - 1 && (
+                    <hr className="my-4 border-gray-300" />
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
 
@@ -141,26 +152,11 @@ const CourseViewer = () => {
 
               <div className="mt-4 flex justify-end">
                 <button
-                  onClick={handleNextLecture}
+                  onClick={() => setSelectedLecture(null)}
                   className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors duration-200"
-                  disabled={!selectedSection}
                 >
-                  Next Lecture
+                  Back to Sections
                 </button>
-              </div>
-
-              {completionMessage && (
-                <div className="mt-4 text-green-600 font-semibold">
-                  {completionMessage}
-                </div>
-              )}
-
-              {/* Questions and Answers Section */}
-              <div className="mt-8">
-                <h3 className="text-2xl font-semibold mb-4">
-                  Questions and Answers
-                </h3>
-                <QuestionsAndAnswers courseId={id} />
               </div>
             </div>
           ) : (
@@ -168,12 +164,6 @@ const CourseViewer = () => {
               <h3 className="text-2xl font-semibold mb-1">
                 Chọn bài giảng để hiển thị nội dung.
               </h3>
-              <div className="mt-8">
-                <h3 className="text-1xl font-semibold mb-1">
-                  Questions and Answers
-                </h3>
-                <QuestionsAndAnswers courseId={id} />
-              </div>
             </div>
           )}
         </div>
