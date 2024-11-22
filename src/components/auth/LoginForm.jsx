@@ -30,7 +30,8 @@ const LoginForm = () => {
       if (role === "ROLE_STUDENT") {
         navigate("/student/home");
       } else if (role === "ROLE_INSTRUCTOR") {
-        navigate("/instructor-dashboard");
+
+        navigate('/instructor/user');
       } else if (role === "ROLE_ADMIN") {
         navigate("/admin");
       } else {

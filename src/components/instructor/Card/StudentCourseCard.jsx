@@ -21,7 +21,7 @@ const CourseCard = ({ course }) => {
     const purchaseDate = new Date(course.enrolled_at).toLocaleDateString();
 
     const handleCardClick = () => {
-        window.location.href = `http://localhost:5173/hockhoahoc/${course.courseId}`;
+        window.location.href = `http://localhost:5173/student/study/${course.courseId}`;
     };
 
     return (
@@ -79,14 +79,14 @@ const CourseCard = ({ course }) => {
                     Progress: {course.progress}%
                 </p>
 
-                <p
+                {/* <p
                     className={`text-sm font-semibold ${course.status === 'Active'
                         ? 'text-green-500'
                         : 'text-red-500'
                         }`}
                 >
                     {course.status}
-                </p>
+                </p> */}
             </div>
         </div>
     );

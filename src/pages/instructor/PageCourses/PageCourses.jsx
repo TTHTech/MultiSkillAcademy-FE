@@ -26,6 +26,7 @@ const PageCourses = () => {
                     },
                 });
                 const data = await response.json();
+                console.log(localStorage.getItem("token"))
                 setCourses(data);
             } catch (error) {
                 console.error("Error fetching courses:", error);
@@ -79,7 +80,7 @@ const PageCourses = () => {
 
             <div className="space-y-6">
                 <div>
-                    <Link to="/courses/addCourses">
+                    <Link to="/instructor/courses/addCourses">
                         <button className="font-poppins bg-gradient-to-b from-indigo-500 to-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:from-green-400 hover:to-blue-400 focus:outline-none transition-all duration-300">
                             <span>Thêm Courses</span>
                         </button>
