@@ -11,13 +11,13 @@ import { LuFileSignature } from "react-icons/lu";
 const Sidebar = ({ open, setOpen }) => {
   const location = useLocation();
   const menus = [
-    { name: "User", link: "/user", icon: AiOutlineUser },
-    { name: "Dashboard", link: "/dashboard", icon: MdOutlineDashboard },
-    { name: "Courses", link: "/courses", icon: ImBook },
-    { name: "Test", link: "/tests", icon: LuFileSignature },
-    { name: "Questions", link: "/questions", icon: BsFillQuestionSquareFill },
-    { name: "Students", link: "/students", icon: PiStudentFill },
-    { name: "Sign Out", link: "/signout", icon: FaSignOutAlt },
+    { name: "User", link: "/instructor/user", icon: AiOutlineUser },
+    { name: "Dashboard", link: "/instructor/dashboard", icon: MdOutlineDashboard },
+    { name: "Courses", link: "/instructor/courses", icon: ImBook },
+    { name: "Test", link: "/instructor/tests", icon: LuFileSignature },
+    { name: "Questions", link: "/instructor/questions", icon: BsFillQuestionSquareFill },
+    { name: "Students", link: "/instructor/students", icon: PiStudentFill },
+    { name: "Sign Out", link: "/login", icon: FaSignOutAlt },
   ];
 
   return (

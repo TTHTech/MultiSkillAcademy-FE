@@ -1,14 +1,13 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import CoursesList from "../../../components/instructor/Card/StudentCourseList";
-import SidebarFilter from "../../../components/instructor/Sidebar/SidebarFilterCourse";
 import NavBar from "../../../components/student/common/NavBar";
 import Footer from "../../../components/student/common/Footer";
 const userId = Number(localStorage.getItem("userId"));
 const CoursesPage = () => {
   const [courses, setCourses] = useState([]);
   const [filteredCourses, setFilteredCourses] = useState([]);
-  const [filters, setFilters] = useState({
+  const [filters] = useState({
     searchTerm: "",
     completionRange: "",
     purchaseDate: "",
@@ -83,9 +82,6 @@ const CoursesPage = () => {
     <>
     <NavBar />
     <div className="flex min-h-screen bg-gray-100">
-      <div className="w-1/4 p-6 bg-white shadow-lg border-r border-gray-200 sticky top-0 h-screen">
-        <SidebarFilter filters={filters} setFilters={setFilters} />
-      </div>
 
       <div className="flex-1 p-8">
         <h1 className="text-3xl font-extrabold mb-6 text-gray-900">
