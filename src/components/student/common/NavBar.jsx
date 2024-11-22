@@ -101,7 +101,7 @@ const Navbar = () => {
         {/* Menu */}
         <div className="flex items-center space-x-6">
     
-          <a href="/ListDanhSachKhoaHoc" className="text-gray-600 hover:text-black">Học tập</a>
+          <a href="/student/list-my-course" className="text-gray-600 hover:text-black">Học tập</a>
 
           {/* Icons */}
           <div className="flex items-center space-x-6">

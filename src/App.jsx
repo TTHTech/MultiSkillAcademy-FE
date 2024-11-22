@@ -26,9 +26,9 @@ import PagneCourseDetail from "./pages/instructor/PageCourses/PageCourseDetail";
 import PageAdd from "./pages/instructor/PageCourses/PageCoursesAdd";
 import PageQuestions from "./pages/instructor/PageQuestions";
 import StudentList from "./pages/instructor/PageStudents";
-import HocKhoaHoc from "./pages/instructor/Student/GiaoDienHocKhoaHoc";
-import ListDanhSachKhoaHoc from "./pages/instructor/Student/ListCourseHocVienDK";
-import Wishlist from "./pages/instructor/Student/PageWishlist";
+import HocKhoaHoc from "./pages/student/courses/StudyACourse";
+import ListDanhSachKhoaHoc from "./pages/student/courses/ListMyCourse";
+import Wishlist from "./pages/student/courses/PageWishlist";
 import Test from "./pages/instructor/Test/PageTest";
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -55,18 +55,20 @@ function App() {
   return (
     <>
       <Routes>
-        <Route path="/user" element={<PageUser />} />
-        <Route path="/dashboard" element={<PageDashboard />} />
-        <Route path="/courses" element={<PageCourses />} />
-        <Route path="/courses/:id" element={<PagneCourseDetail />} />
-        <Route path="/courses/addCourses" element={<PageAdd />} />
-        <Route path="/questions" element={<PageQuestions />} />
-        <Route path="/students" element={<StudentList />} />
-        <Route path="/hockhoahoc/:id" element={<HocKhoaHoc />} />
-        <Route path="/ListDanhSachKhoaHoc" element={<ListDanhSachKhoaHoc />} />
-        <Route path="/tests" element={<Test />} />
+        <Route path="/instructor/user" element={<PageUser />} />
+        <Route path="/instructor/dashboard" element={<PageDashboard />} />
+        <Route path="/instructor/courses" element={<PageCourses />} />
+        <Route path="/instructor/courses/:id" element={<PagneCourseDetail />} />
+        <Route path="/instructor/courses/addCourses" element={<PageAdd />} />
+        <Route path="/instructor/questions" element={<PageQuestions />} />
+        <Route path="/instructor/students" element={<StudentList />} />
+        <Route path="/instructor/tests" element={<Test />} />
 
-        <Route path="/wishlist" element={<Wishlist />} />
+
+
+        <Route path="/student/study/:id" element={<HocKhoaHoc />} />
+        <Route path="/student/list-my-course" element={<ListDanhSachKhoaHoc />} />
+        <Route path="/student/wishlist" element={<Wishlist />} />
       </Routes>
 
       <div className="flex h-screen text-gray-100 overflow-hidden">
@@ -81,9 +83,9 @@ function App() {
         {/* Kiểm tra hiển thị Sidebar chỉ cho Admin và không hiển thị trên các trang đăng nhập/xác thực */}
         {isLoggedIn &&
           role === "ROLE_ADMIN" &&
-          !["/login", "/register", "/verify-otp"].includes(location.pathname) && (
-            <Sidebar />
-          )}
+          !["/login", "/register", "/verify-otp"].includes(
+            location.pathname
+          ) && <Sidebar />}
 
         <Routes>
           <Route path="/login" element={<LoginPage />} />
@@ -118,7 +120,7 @@ function App() {
           {/* Các route cho giảng viên khi role là instructor */}
           {isLoggedIn && role === "ROLE_INSTRUCTOR" && (
             <>
-              <Route path="/instructor/courses" element={<InstructorPage />} />
+              {/* <Route path="/instructor/courses" element={<InstructorPage />} /> */}
             </>
           )}
         </Routes>
