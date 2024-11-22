@@ -47,7 +47,7 @@ const Navbar = () => {
         >
           <Link to="/student/home"> {/* Bọc logo bằng Link để trở về trang chủ */}
             <img 
-              src="https://www.businessoutreach.in/wp-content/uploads/2023/11/Business-and-Revenue-Model-of-Canva.webp" 
+              src="https://freelogopng.com/images/all_img/1656733807canva-icon-png.png" 
               alt="Logo" 
               className="w-16"
             />
