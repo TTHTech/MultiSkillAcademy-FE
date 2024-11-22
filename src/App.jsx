@@ -63,6 +63,12 @@ function App() {
         <Route path="/instructor/questions" element={<PageQuestions />} />
         <Route path="/instructor/students" element={<StudentList />} />
         <Route path="/instructor/tests" element={<Test />} />
+
+
+
+        <Route path="/student/study/:id" element={<HocKhoaHoc />} />
+        <Route path="/student/list-my-course" element={<ListDanhSachKhoaHoc />} />
+        <Route path="/student/wishlist" element={<Wishlist />} />
       </Routes>
 
       <div className="flex h-screen text-gray-100 overflow-hidden">
@@ -108,9 +114,6 @@ function App() {
               <Route path="/student/cart" element={<CartPage />} />
               <Route path="/student/my-courses" element={<MyCoursesPage />} />
               <Route path="/course/:courseId" element={<CourseDetailPage />} />
-              <Route path="/student/study/:id" element={<HocKhoaHoc />} />
-              <Route path="/student/list-my-course" element={<ListDanhSachKhoaHoc />} />
-              <Route path="/student/wishlist" element={<Wishlist />} />
             </>
           )}
 
