@@ -17,7 +17,7 @@ const TestList = () => {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:8080/api/instructor/${userId}`, {
+      .get(`https://educoresystem.onrender.com/api/instructor/${userId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -27,7 +27,7 @@ const TestList = () => {
 
         const courseIds = response.data.map((course) => course.courseId);
         const testPromises = courseIds.map((courseId) =>
-          axios.get(`http://localhost:8080/api/instructor/course/test/${courseId}`, {
+          axios.get(`https://educoresystem.onrender.com/api/instructor/course/test/${courseId}`, {
             headers: {
               Authorization: `Bearer ${token}`,
             },
@@ -74,7 +74,7 @@ const TestList = () => {
 
   const handleViewTestDetails = (testId) => {
     axios
-      .get(`http://localhost:8080/api/instructor/test/${testId}`, {
+      .get(`https://educoresystem.onrender.com/api/instructor/test/${testId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

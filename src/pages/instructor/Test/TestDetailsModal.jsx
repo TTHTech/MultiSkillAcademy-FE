@@ -31,7 +31,7 @@ const TestDetailsModal = ({ test, onClose }) => {
     }
     try {
       const response = await axios.post(
-        `http://localhost:8080/api/instructor/addQuestion`,
+        `https://educoresystem.onrender.com/api/instructor/addQuestion`,
         {
           text: newQuestionText,
           testId: testData.id,
@@ -77,7 +77,7 @@ const TestDetailsModal = ({ test, onClose }) => {
 
     try {
       const response = await axios.post(
-        `http://localhost:8080/api/instructor/addAnswers`,
+        `https://educoresystem.onrender.com/api/instructor/addAnswers`,
         {
           text: newAnswerText,
           questionId: questionId,
@@ -147,7 +147,7 @@ const TestDetailsModal = ({ test, onClose }) => {
     }
     try {
       const response = await axios.put(
-        `http://localhost:8080/api/instructor/updateTest/${testData.id}`,
+        `https://educoresystem.onrender.com/api/instructor/updateTest/${testData.id}`,
         {
           title: testData.title,
           description: testData.description,
@@ -207,7 +207,7 @@ const TestDetailsModal = ({ test, onClose }) => {
     }
   
     try {
-      await axios.delete(`http://localhost:8080/api/instructor/deleteTest/${test.id}`, {
+      await axios.delete(`https://educoresystem.onrender.com/api/instructor/deleteTest/${test.id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
   
@@ -248,7 +248,7 @@ const TestDetailsModal = ({ test, onClose }) => {
   
     try {
       await axios.delete(
-        `http://localhost:8080/api/instructor/deleteTestQuestion/${questionId}`,
+        `https://educoresystem.onrender.com/api/instructor/deleteTestQuestion/${questionId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -297,7 +297,7 @@ const TestDetailsModal = ({ test, onClose }) => {
   
     try {
       await axios.delete(
-        `http://localhost:8080/api/instructor/deleteTestAnswers/${answerId}`,
+        `https://educoresystem.onrender.com/api/instructor/deleteTestAnswers/${answerId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }

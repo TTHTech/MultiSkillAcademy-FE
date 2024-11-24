@@ -11,7 +11,7 @@ const PageWishlist = () => {
   useEffect(() => {
     setLoading(true); // Bắt đầu loading
     axios
-      .get(`http://localhost:8080/api/student/wishlist/${userId}`)
+      .get(`https://educoresystem.onrender.com/api/student/wishlist/${userId}`)
       .then((response) => {
         setWishlist(response.data);
       })

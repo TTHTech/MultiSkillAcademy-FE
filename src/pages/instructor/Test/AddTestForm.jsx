@@ -62,7 +62,7 @@ const AddTestForm = ({ onClose, onTestAdded, courses }) => {
             return;
           }
         try {
-          const response = await axios.post("http://localhost:8080/api/instructor/addTest", formData, {
+          const response = await axios.post("https://educoresystem.onrender.com/api/instructor/addTest", formData, {
             headers: {
               Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",

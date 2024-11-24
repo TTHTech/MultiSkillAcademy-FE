@@ -54,7 +54,7 @@ const QuestionTable = ({
       )
     );
 
-    fetch(`http://localhost:8080/api/instructor/evaluateAnswer/${answersId}`, {
+    fetch(`https://educoresystem.onrender.com/api/instructor/evaluateAnswer/${answersId}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -102,7 +102,7 @@ const QuestionTable = ({
     }
     try {
       await fetch(
-        `http://localhost:8080/api/instructor/deleteAnswer/${answersId}`,
+        `https://educoresystem.onrender.com/api/instructor/deleteAnswer/${answersId}`,
         {
           method: "DELETE",
           headers: {
@@ -147,7 +147,7 @@ const QuestionTable = ({
     }
     try {
       await fetch(
-        `http://localhost:8080/api/instructor/deleteQuestion/${questionsId}`,
+        `https://educoresystem.onrender.com/api/instructor/deleteQuestion/${questionsId}`,
         {
           method: "DELETE",
           headers: {
