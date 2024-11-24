@@ -66,7 +66,7 @@ const CoursesTable = () => {
   // Gọi API để chấp nhận khóa học và chuyển trạng thái thành 'Active'
   const handleAccept = async (courseId) => {
     try {
-      const response = await fetch(`http://localhost:8080/api/admin/courses/${courseId}/status`, {
+      const response = await fetch(`https://educoresystem.onrender.com/api/admin/courses/${courseId}/status`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
