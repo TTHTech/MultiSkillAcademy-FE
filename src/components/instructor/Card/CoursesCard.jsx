@@ -76,7 +76,7 @@ const CourseCard = ({
     }
     try {
       const response = await axios.put(
-        `http://localhost:8080/api/instructor/changeStatus/${courseId}`,
+        `https://educoresystem.onrender.com/api/instructor/changeStatus/${courseId}`,
         {},
         {
           headers: {
@@ -118,7 +118,7 @@ const CourseCard = ({
     const coursesId = courseId;
     try {
       const response = await fetch(
-        `http://localhost:8080/api/instructor/delete-course/${coursesId}`,
+        `https://educoresystem.onrender.com/api/instructor/delete-course/${coursesId}`,
         {
           method: "DELETE",
           headers: {

@@ -68,7 +68,7 @@ const App = () => {
 
       // Gửi yêu cầu POST để thêm khóa học
       const response = await fetch(
-        "http://localhost:8080/api/instructor/add-course",
+        "https://educoresystem.onrender.com/api/instructor/add-course",
         {
           method: "POST",
           headers: {
@@ -89,7 +89,7 @@ const App = () => {
           confirmButtonText: "Yes",
         });
         if (swalResult) {
-          navigate("/courses");
+          navigate("/instructor/courses");
           window.location.reload();
         }
       } else {
@@ -136,7 +136,7 @@ const App = () => {
         };
 
         const response = await fetch(
-          `http://localhost:8080/api/instructor/addImage`,
+          `https://educoresystem.onrender.com/api/instructor/addImage`,
           {
             method: "POST",
             headers: {
@@ -191,7 +191,7 @@ const App = () => {
         };
 
         const response = await fetch(
-          `http://localhost:8080/api/instructor/updateImage`,
+          `https://educoresystem.onrender.com/api/instructor/updateImage`,
           {
             method: "PUT",
             headers: {
@@ -233,7 +233,7 @@ const App = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:8080/api/instructor/deleteImage`,
+        `https://educoresystem.onrender.com/api/instructor/deleteImage`,
         {
           method: "DELETE",
           headers: {
