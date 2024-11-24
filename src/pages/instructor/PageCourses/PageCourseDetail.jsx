@@ -1381,7 +1381,7 @@ const PageCourseDetail = () => {
                         </label>
                         <input
                           id="LectureDuration"
-                          type="number"
+                          type="text"
                           name="duration"
                           value={editedLecture.duration}
                           onChange={(e) =>
