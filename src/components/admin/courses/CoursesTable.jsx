@@ -17,7 +17,7 @@ const CoursesTable = () => {
   const fetchCourses = async () => {
     setLoading(true);
     try {
-      const response = await fetch("http://localhost:8080/api/admin/courses/unknown", {
+      const response = await fetch("https://educoresystem.onrender.com/api/admin/courses/unknown", {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`, // Sử dụng token nếu cần
         },
