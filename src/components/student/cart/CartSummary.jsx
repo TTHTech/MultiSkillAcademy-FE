@@ -17,7 +17,7 @@ const CartSummary = () => {
         const token = localStorage.getItem("token"); // Or use another method for storing/retrieving the token
 
         // Make the GET request to fetch the total amount from the API
-        const response = await axios.get("http://localhost:8080/api/student/cart/total", {
+        const response = await axios.get("https://educoresystem.onrender.com/api/student/cart/total", {
           headers: {
             Authorization: `Bearer ${token}`,
           },

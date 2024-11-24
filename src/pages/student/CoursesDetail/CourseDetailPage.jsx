@@ -21,7 +21,7 @@ const CourseDetailPage = () => {
     const fetchCourseDetails = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8080/api/student/courses/${courseId}`
+          `https://educoresystem.onrender.com/api/student/courses/${courseId}`
         );
         setCourseData(response.data);
       } catch (error) {
@@ -39,7 +39,7 @@ const CourseDetailPage = () => {
     try {
       const token = localStorage.getItem("token"); // Lấy JWT token từ local storage
       await axios.post(
-        `http://localhost:8080/api/student/cart/add/${courseId}`,
+        `https://educoresystem.onrender.com/api/student/cart/add/${courseId}`,
         {},
         {
           headers: {

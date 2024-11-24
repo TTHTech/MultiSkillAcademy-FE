@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
-import QuestionsAndAnswers from "./QuestionAndAnswers";
+// import QuestionsAndAnswers from "./QuestionAndAnswers";
 import NavBar from "../../../components/student/common/NavBar";
 
 const CourseViewer = () => {
