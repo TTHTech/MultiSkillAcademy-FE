@@ -18,7 +18,7 @@ const ProfileMenu = () => {
           return;
         }
 
-        const response = await axios.get('http://localhost:8080/api/student/profile', {
+        const response = await axios.get('https://educoresystem.onrender.com/api/student/profile', {
           headers: {
             Authorization: `Bearer ${token}`, // Pass token in Authorization header
           },
