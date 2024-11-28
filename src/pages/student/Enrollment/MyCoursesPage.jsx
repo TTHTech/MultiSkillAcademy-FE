@@ -1,13 +1,16 @@
-import { useEffect, useState } from "react";
+// src/pages/student/courses/MyCoursesPage.jsx
+import React, { useEffect, useState } from "react";
 import axios from "axios";
-import CoursesList from "../../../components/student/Enrollment/StudentCourseList";
 import NavBar from "../../../components/student/common/NavBar";
 import Footer from "../../../components/student/common/Footer";
+import StudentCoursesList from "../../../components/student/Enrollment/StudentCourseList";
+
 const userId = Number(localStorage.getItem("userId"));
-const CoursesPage = () => {
+
+const MyCoursesPage = () => {
   const [courses, setCourses] = useState([]);
   const [filteredCourses, setFilteredCourses] = useState([]);
-  const [filters] = useState({
+  const [filters, setFilters] = useState({
     searchTerm: "",
     completionRange: "",
     purchaseDate: "",
@@ -79,23 +82,32 @@ const CoursesPage = () => {
   }, [filters, courses]);
 
   return (
-    <>
-    <NavBar />
-    <div className="flex min-h-screen bg-gray-100">
+    <div className="w-full h-full min-h-screen bg-white overflow-y-auto">
+      <NavBar /> {/* Thêm NavBar ở đầu trang */}
+      <div className="container mx-auto p-6 bg-white">
+        <h1 className="text-4xl font-bold text-gray-900 mb-4 pb-4">Khóa học của tôi</h1>
+        
+        {/* Thêm phần lọc khóa học */}
+        <div className="mb-6">
+          <input
+            type="text"
+            placeholder="Tìm kiếm khóa học"
+            value={filters.searchTerm}
+            onChange={(e) =>
+              setFilters((prev) => ({ ...prev, searchTerm: e.target.value }))
+            }
+            className="p-2 border rounded-md"
+          />
+        </div>
 
-      <div className="flex-1 p-8">
-        <h1 className="text-3xl font-extrabold mb-6 text-gray-900">
-          Available Courses
-        </h1>
-
+        {/* Hiển thị danh sách khóa học đã được lọc */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          <CoursesList filteredCourses={filteredCourses} />
+          <StudentCoursesList filteredCourses={filteredCourses} />
         </div>
       </div>
+      <Footer /> {/* Thêm Footer ở cuối trang */}
     </div>
-    <Footer/>
-    </>
   );
 };
 
-export default CoursesPage;
+export default MyCoursesPage;

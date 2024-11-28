@@ -16,7 +16,7 @@ import RegisterPage from "./pages/auth/RegisterPage";
 import OtpVerificationPage from "./pages/auth/OtpVerificationPage";
 import StudentHomePage from "./pages/student/home/StudentHomePage";
 import CartPage from "./pages/student/cart/CartPage";
-import MyCoursesPage from "./pages/student/courses/MyCoursesPage";
+import MyCoursesPage from "./pages/student/Enrollment/MyCoursesPage";
 import CourseDetailPage from "./pages/student/CoursesDetail/CourseDetailPage";
 
 import PageUser from "./pages/instructor/PageUser";
@@ -28,6 +28,7 @@ import PageQuestions from "./pages/instructor/PageQuestions";
 import StudentList from "./pages/instructor/PageStudents";
 import HocKhoaHoc from "./pages/student/courses/StudyACourse";
 import ListDanhSachKhoaHoc from "./pages/student/courses/ListMyCourse";
+
 import Wishlist from "./pages/student/courses/PageWishlist";
 import Test from "./pages/instructor/Test/PageTest";
 function App() {
@@ -67,7 +68,7 @@ function App() {
 
 
         <Route path="/student/study/:id" element={<HocKhoaHoc />} />
-        <Route path="/student/list-my-course" element={<ListDanhSachKhoaHoc />} />
+
         <Route path="/student/wishlist" element={<Wishlist />} />
       </Routes>
 
@@ -112,7 +113,7 @@ function App() {
             <>
               <Route path="/student/home" element={<StudentHomePage />} />
               <Route path="/student/cart" element={<CartPage />} />
-              <Route path="/student/my-courses" element={<MyCoursesPage />} />
+              <Route path="/student/list-my-course" element={<MyCoursesPage />} />
               <Route path="/course/:courseId" element={<CourseDetailPage />} />
             </>
           )}
