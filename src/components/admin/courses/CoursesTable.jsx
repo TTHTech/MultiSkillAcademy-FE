@@ -17,7 +17,7 @@ const CoursesTable = () => {
   const fetchCourses = async () => {
     setLoading(true);
     try {
-      const response = await fetch("https://educoresystem.onrender.com/api/admin/courses/unknown", {
+      const response = await fetch("http://localhost:8080/api/admin/courses/pending", {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`, // Sử dụng token nếu cần
         },
@@ -66,13 +66,12 @@ const CoursesTable = () => {
   // Gọi API để chấp nhận khóa học và chuyển trạng thái thành 'Active'
   const handleAccept = async (courseId) => {
     try {
-      const response = await fetch(`https://educoresystem.onrender.com/api/admin/courses/${courseId}/status`, {
+      const response = await fetch(`http://localhost:8080/api/admin/courses/${courseId}/status`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${localStorage.getItem("token")}`, // Token xác thực nếu cần
         },
-        // Gửi một object JSON hợp lệ
         body: JSON.stringify({ status: "Active" }),  
       });
   
@@ -81,14 +80,12 @@ const CoursesTable = () => {
       }
   
       alert("Course status updated to Active");
-      // Gọi lại hàm fetchCourses để làm mới danh sách
+      fetchCourses(); // Làm mới danh sách khóa học sau khi cập nhật
     } catch (error) {
       console.error("Error updating course status:", error);
       alert("Failed to update course status");
     }
   };
-  
-  
 
   const handleReject = (courseId) => {
     console.log(`Rejected course with ID: ${courseId}`);
@@ -141,7 +138,7 @@ const CoursesTable = () => {
           {/* Ảnh khóa học */}
           <div className="flex justify-center mb-4">
             <img 
-              src={editingCourse.images[0]} 
+              src={editingCourse.images ? editingCourse.images[0] : ""} 
               alt={editingCourse.title} 
               className="w-100 h-100 object-cover rounded-lg" 
             />
@@ -166,7 +163,7 @@ const CoursesTable = () => {
             <input
               type='text'
               name='instructorName'
-              value={editingCourse.instructorName}
+              value={`${editingCourse.instructorFirstName} ${editingCourse.instructorLastName}`}
               className='w-full p-2 bg-gray-600 text-white rounded-lg'
               readOnly
             />
@@ -237,82 +234,135 @@ const CoursesTable = () => {
             />
           </div>
 
-          <div className='flex justify-end'>
+          <div className='mb-4'>
+            <label className='text-gray-400'>Level:</label>
+            <input
+              type='text'
+              name='level'
+              value={editingCourse.level}
+              className='w-full p-2 bg-gray-600 text-white rounded-lg'
+              readOnly
+            />
+          </div>
+
+          <div className='mb-4'>
+      <label className='text-gray-400'>Target Audience:</label>
+      <ul className='w-full p-2 bg-gray-600 text-white rounded-lg'>
+        {editingCourse.targetAudience && editingCourse.targetAudience.map((audience, idx) => (
+          <li key={idx}>{audience}</li>
+        ))}
+      </ul>
+    </div>
+
+    <div className='mb-4'>
+      <label className='text-gray-400'>Course Content:</label>
+      <ul className='w-full p-2 bg-gray-600 text-white rounded-lg'>
+        {editingCourse.courseContent && editingCourse.courseContent.map((content, idx) => (
+          <li key={idx}>{content}</li>
+        ))}
+      </ul>
+    </div>
+
+    <div className='mb-4'>
+      <label className='text-gray-400'>Resources:</label>
+      <ul className='w-full p-2 bg-gray-600 text-white rounded-lg'>
+        {editingCourse.resourceDescription && editingCourse.resourceDescription.map((resource, idx) => (
+          <li key={idx}>{resource}</li>
+        ))}
+      </ul>
+    </div>
+
+    <div className='mb-4'>
+      <label className='text-gray-400'>Requirements:</label>
+      <ul className='w-full p-2 bg-gray-600 text-white rounded-lg'>
+        {editingCourse.requirements && editingCourse.requirements.map((requirement, idx) => (
+          <li key={idx}>{requirement}</li>
+        ))}
+      </ul>
+    </div>
+
+          <div className='mt-4'>
             <button
               className='bg-green-500 text-white px-4 py-2 rounded-lg mr-2'
-              onClick={() => handleAccept(editingCourse.courseId)}  // Gọi API cập nhật trạng thái
+              onClick={handleSave}
             >
-              Accept
-            </button>
-            <button
-              className='bg-red-500 text-white px-4 py-2 rounded-lg mr-2'
-              onClick={() => handleReject(editingCourse.courseId)}
-            >
-              Reject
+              Save
             </button>
             <button
               className='bg-gray-500 text-white px-4 py-2 rounded-lg'
-              onClick={handleSave}
+              onClick={() => setEditingCourse(null)}
             >
-              Close
+              Cancel
             </button>
           </div>
         </div>
       ) : (
-        // Bảng hiển thị danh sách khóa học
-        <div className='overflow-x-auto'>
-          <table className='min-w-full divide-y divide-gray-700'>
-            <thead>
-              <tr>
-                <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>Name</th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>Instructor</th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>Category</th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>Price</th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>Status</th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>Actions</th>
+        <table className="table-auto w-full text-left text-gray-100">
+          <thead>
+            <tr className="border-b bg-gray-700">
+              <th className="py-2 px-4">#</th>
+              <th className="py-2 px-4">Name</th>
+              <th className="py-2 px-4">Instructor</th>
+              <th className="py-2 px-4">Category</th>
+              <th className="py-2 px-4">Price</th>
+              <th className="py-2 px-4">Duration</th>
+              <th className="py-2 px-4">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {currentCourses.map((course, index) => (
+              <tr key={course.id} className="border-b bg-gray-800">
+                <td className="py-2 px-4">{index + 1}</td>
+                <td className="py-2 px-4">{course.title}</td>
+                <td className="py-2 px-4">{course.instructorName}</td>
+                <td className="py-2 px-4">{course.categoryName}</td>
+                <td className="py-2 px-4">${course.price}</td>
+                <td className="py-2 px-4">{course.duration}</td>
+                <td className="py-2 px-4">
+                  <button
+                    className="bg-green-500 text-white px-3 py-1 rounded-lg mr-2"
+                    onClick={() => handleAccept(course.id)}
+                  >
+                    Accept
+                    
+                  </button>
+                  
+                  <button
+                    className="bg-red-500 text-white px-3 py-1 rounded-lg mr-2"
+                    onClick={() => handleReject(course.id)}
+                    
+                  >
+                    Reject
+                  </button>
+                  <button
+                    className="bg-blue-500 text-white px-3 py-1 rounded-lg"
+                    onClick={() => handleView(course)}
+                  >
+                    View
+                  </button>
+                </td>
               </tr>
-            </thead>
-
-            <tbody className='divide-y divide-gray-700'>
-              {currentCourses.map((course) => (
-                <motion.tr
-                  key={course.courseId}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <td className='px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-100'>{course.title}</td>
-                  <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-300'>{course.instructorName}</td>
-                  <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-300'>{course.categoryName}</td>
-                  <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-300'>${course.price.toFixed(2)}</td>
-                  <td className='px-6 py-4 whitespace-nowrap text-sm text-yellow-400'>{course.status}</td>
-                  <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-300'>
-                    <button
-                      className='text-blue-400 hover:text-blue-300 mr-2'
-                      onClick={() => handleView(course)}
-                    >
-                      View
-                    </button>
-                  </td>
-                </motion.tr>
-              ))}
-            </tbody>
-          </table>
-
-          {/* Phân trang */}
-          <div className="flex justify-center mt-4">
-            {Array.from({ length: totalPages }, (_, index) => (
-              <button
-                key={index + 1}
-                onClick={() => handlePageChange(index + 1)}
-                className={`px-4 py-2 mx-1 rounded-lg ${currentPage === index + 1 ? "bg-blue-500 text-white" : "bg-gray-700 text-gray-300"}`}
-              >
-                {index + 1}
-              </button>
             ))}
-          </div>
-        </div>
+          </tbody>
+        </table>
       )}
+
+      {/* Pagination */}
+      <div className="flex justify-between mt-4">
+        <button
+          className="bg-gray-700 text-white px-4 py-2 rounded-lg"
+          onClick={() => handlePageChange(Math.max(currentPage - 1, 1))}
+        >
+          Prev
+        </button>
+        <span className="self-center text-gray-400">Page {currentPage} of {totalPages}</span>
+        <button
+          className="bg-gray-700 text-white px-4 py-2 rounded-lg"
+          onClick={() => handlePageChange(Math.min(currentPage + 1, totalPages))}
+        >
+          Next
+        </button>
+      </div>
     </motion.div>
   );
 };
