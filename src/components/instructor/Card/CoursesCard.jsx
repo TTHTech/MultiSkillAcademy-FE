@@ -263,7 +263,7 @@ const CourseCard = ({
 
   return (
     <Link
-      to={`/courses/${courseId}`}
+      to={`/instructor/courses/${courseId}`}
       className={`relative block border border-white-500 rounded-lg shadow-lg overflow-hidden transition-transform duration-300 hover:scale-105 hover:shadow-xl 
                 ${
                   courseStatus === "Active"

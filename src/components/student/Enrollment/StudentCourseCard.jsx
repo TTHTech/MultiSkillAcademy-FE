@@ -1,3 +1,5 @@
+import { useNavigate } from "react-router-dom";
+
 const renderStars = (rating) => {
     const totalStars = 5;
     const stars = [];
@@ -19,9 +21,9 @@ const renderStars = (rating) => {
 
 const CourseCard = ({ course }) => {
     const purchaseDate = new Date(course.enrolled_at).toLocaleDateString();
-
+    const navigate = useNavigate();
     const handleCardClick = () => {
-        window.location.href = `http://localhost:5173/student/study/${course.courseId}`;
+        navigate(`/student/study/${course.courseId}`)
     };
 
     return (
