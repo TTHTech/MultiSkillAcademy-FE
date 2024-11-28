@@ -9,7 +9,7 @@ const SuggestedCoursesSection = () => {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const response = await axios.get("https://educoresystem.onrender.com/api/student/courses/active");
+        const response = await axios.get("http://localhost:8080/api/student/courses/active");
         setCourses(response.data);
       } catch (error) {
         console.error("Failed to fetch courses", error);

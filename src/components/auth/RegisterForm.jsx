@@ -19,7 +19,7 @@ const RegisterForm = () => {
 
     try {
       const response = await axios.post(
-        "https://educoresystem.onrender.com/api/auth/register",
+        "http://localhost:8080/api/auth/register",
         {
           firstName,
           lastName,

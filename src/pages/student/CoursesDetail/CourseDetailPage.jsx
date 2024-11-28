@@ -20,9 +20,8 @@ const CourseDetailPage = () => {
   useEffect(() => {
     const fetchCourseDetails = async () => {
       try {
-        const response = await axios.get(
-          `https://educoresystem.onrender.com/api/student/courses/${courseId}`
-        );
+        const response = await axios.get(`http://localhost:8080/api/student/courses/${courseId}`);
+        console.log(response.data); // Kiểm tra dữ liệu
         setCourseData(response.data);
       } catch (error) {
         console.error("Failed to fetch course details", error);
@@ -30,16 +29,16 @@ const CourseDetailPage = () => {
         setLoading(false);
       }
     };
-
+  
     fetchCourseDetails();
   }, [courseId]);
-
+  
   // Hàm thêm khóa học vào giỏ hàng
   const handleAddToCart = async () => {
     try {
       const token = localStorage.getItem("token"); // Lấy JWT token từ local storage
       await axios.post(
-        `https://educoresystem.onrender.com/api/student/cart/add/${courseId}`,
+        `http://localhost:8080/api/student/cart/add/${courseId}`,
         {},
         {
           headers: {
@@ -70,7 +69,10 @@ const CourseDetailPage = () => {
             studentCount={courseData.studentCount || 0}
             lastUpdated={courseData.updatedAt}
           />
-          <CourseContentDetails contentDetails={courseData.contentDetails || []} />
+          
+          {/* Truyền courseContent vào CourseContentDetails */}
+          <CourseContentDetails contentDetails={courseData.courseContent || []} />
+          
           <CourseContent content={courseData.sections || []} />
           <CourseRequirements
             requirements={courseData.requirements || []}
@@ -95,8 +97,9 @@ const CourseDetailPage = () => {
           <CourseMedia
             price={courseData.price}
             thumbnail={courseData.imageUrls?.[0] || "default-image-url.jpg"}
-            onAddToCart={handleAddToCart} // Truyền hàm vào nút "Thêm vào Giỏ Hàng"
+            onAddToCart={handleAddToCart}
             onBuyNow={() => alert("Mua ngay")}
+            resourceDescription={courseData.resourceDescription || []} // Đảm bảo giá trị mặc định là mảng rỗng
           />
         </div>
       </div>

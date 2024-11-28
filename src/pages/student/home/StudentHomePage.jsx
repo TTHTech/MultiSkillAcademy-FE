@@ -16,8 +16,9 @@ const StudentHomePage = () => {
     <div className="w-full h-full min-h-screen bg-gray-50 overflow-y-auto">
       <TopBanner />
       <NavBar />
-      <HeroSection />
       <WelcomeSection />
+      <HeroSection />
+      
       <FeaturedCourses />
       <SuggestedCoursesSection />
       <RecommendedCoursesSection />

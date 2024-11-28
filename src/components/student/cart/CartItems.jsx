@@ -17,7 +17,7 @@ const CartItems = () => {
         const token = localStorage.getItem("token"); // Or use another method for storing/retrieving the token
 
         // Make the GET request to fetch cart items
-        const response = await axios.get("https://educoresystem.onrender.com/api/student/cart", {
+        const response = await axios.get("http://localhost:8080/api/student/cart", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
