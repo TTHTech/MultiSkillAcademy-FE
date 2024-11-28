@@ -13,7 +13,7 @@ const Navbar = () => {
     // Gọi API để lấy danh mục
     const fetchCategories = async () => {
       try {
-        const response = await axios.get('https://educoresystem.onrender.com/api/student/categories'); // API endpoint
+        const response = await axios.get('http://localhost:8080/api/student/categories'); // API endpoint
         console.log('Danh mục:', response.data); // Debug xem API trả về gì
         setCategories(response.data); // Cập nhật danh sách danh mục
       } catch (error) {
@@ -47,7 +47,7 @@ const Navbar = () => {
         >
           <Link to="/student/home"> {/* Bọc logo bằng Link để trở về trang chủ */}
             <img 
-              src="https://freelogopng.com/images/all_img/1656733807canva-icon-png.png" 
+              src="https://firebasestorage.googleapis.com/v0/b/appgallery-30bf7.appspot.com/o/images%2FIronix-fotor-2024112911327.png?alt=media&token=47065fe1-64a1-449c-8cb1-4f91b96484ec"
               alt="Logo" 
               className="w-16"
             />

@@ -115,7 +115,7 @@ const PageCourseDetail = () => {
     try {
       // Gọi API cập nhật Section
       const response = await fetch(
-        `https://educoresystem.onrender.com/api/instructor/update-course/${course.courseId}`,
+        `http://localhost:8080/api/instructor/update-course/${course.courseId}`,
         {
           method: "PUT",
           headers: {

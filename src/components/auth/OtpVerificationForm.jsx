@@ -24,7 +24,7 @@ const OtpVerificationForm = () => {
     const otpCode = otp.join(""); // Ghép 6 số lại thành một chuỗi
 
     try {
-      const response = await axios.post("https://educoresystem.onrender.com/api/auth/verify-otp-register", {
+      const response = await axios.post("http://localhost:8080/api/auth/verify-otp-register", {
         email: email,
         otp: otpCode,
       });
