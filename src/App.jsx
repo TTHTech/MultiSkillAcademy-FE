@@ -115,6 +115,7 @@ function App() {
               <Route path="/student/cart" element={<CartPage />} />
               <Route path="/student/list-my-course" element={<MyCoursesPage />} />
               <Route path="/course/:courseId" element={<CourseDetailPage />} />
+              <Route path="/student/wishlist" element={<Wishlist />} />
             </>
           )}
 
