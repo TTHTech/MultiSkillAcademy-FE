@@ -1,6 +1,6 @@
 import CourseCard from './StudentCourseCard'; 
 
-const CoursesList = ({ filteredCourses }) => {
+const StudentCoursesList = ({ filteredCourses }) => {
     return (
         <div className="flex flex-wrap justify-start bg-gray-100 py-6 w-full gap-6">
             {filteredCourses.length > 0 ? (
@@ -14,4 +14,4 @@ const CoursesList = ({ filteredCourses }) => {
     );
 };
 
-export default CoursesList;
+export default StudentCoursesList;
