@@ -68,7 +68,7 @@ const App = () => {
 
       // Gửi yêu cầu POST để thêm khóa học
       const response = await fetch(
-        "https://educoresystem.onrender.com/api/instructor/add-course",
+        "http://localhost:8080/api/instructor/add-course",
         {
           method: "POST",
           headers: {
@@ -136,7 +136,7 @@ const App = () => {
         };
 
         const response = await fetch(
-          `https://educoresystem.onrender.com/api/instructor/addImage`,
+          `http://localhost:8080/api/instructor/addImage`,
           {
             method: "POST",
             headers: {
@@ -191,7 +191,7 @@ const App = () => {
         };
 
         const response = await fetch(
-          `https://educoresystem.onrender.com/api/instructor/updateImage`,
+          `http://localhost:8080/api/instructor/updateImage`,
           {
             method: "PUT",
             headers: {
@@ -233,7 +233,7 @@ const App = () => {
 
     try {
       const response = await fetch(
-        `https://educoresystem.onrender.com/api/instructor/deleteImage`,
+        `http://localhost:8080/api/instructor/deleteImage`,
         {
           method: "DELETE",
           headers: {
