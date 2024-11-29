@@ -27,10 +27,12 @@ import PageAdd from "./pages/instructor/PageCourses/PageCoursesAdd";
 import PageQuestions from "./pages/instructor/PageQuestions";
 import StudentList from "./pages/instructor/PageStudents";
 import HocKhoaHoc from "./pages/student/courses/StudyACourse";
-import ListDanhSachKhoaHoc from "./pages/student/courses/ListMyCourse";
+
 
 import Wishlist from "./pages/student/courses/PageWishlist";
 import Test from "./pages/instructor/Test/PageTest";
+
+
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [role, setRole] = useState("");
@@ -116,6 +118,7 @@ function App() {
               <Route path="/student/list-my-course" element={<MyCoursesPage />} />
               <Route path="/course/:courseId" element={<CourseDetailPage />} />
               <Route path="/student/wishlist" element={<Wishlist />} />
+
             </>
           )}
 
