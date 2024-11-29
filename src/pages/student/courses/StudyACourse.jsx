@@ -1,34 +1,76 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import { useParams } from "react-router-dom";
 // import QuestionsAndAnswers from "./QuestionAndAnswers";
 import NavBar from "../../../components/student/common/NavBar";
+import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
 
 const CourseViewer = () => {
   const [course, setCourse] = useState(null);
   const [selectedSection, setSelectedSection] = useState(null);
   const [selectedLecture, setSelectedLecture] = useState(null);
   const { id } = useParams();
+  const userId = Number(localStorage.getItem("userId"));
+  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(true); 
 
   useEffect(() => {
-    axios
-      .get(`http://localhost:8080/api/student/study-courses/${id}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      })
-      .then((response) => {
-        setCourse(response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching course data:", error);
-      });
-  }, [id]);
+    const fetchCourseData = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:8080/api/student/study-courses/${id}/${userId}`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const data = await response.json();
+        setCourse(data);
+        
+      } catch (error) {
+        console.error("Error fetching course data: ", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+  
+    fetchCourseData();
+  }, [id, userId]);
 
-  if (!course) {
-    return <div>Loading...</div>;
+  const handleConfirmation = async () => {
+    const swalResult = await Swal.fire({
+      title: "Xác nhận",
+      text: "Bạn chưa đăng ký khóa học này. Bạn có muốn chuyển đến xem khóa học không ?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Có",
+      cancelButtonText: "Không",
+    });
+
+    if (swalResult.isConfirmed) {
+      navigate(`/course/${id}`); 
+    } else {
+      console.log("Người dùng hủy thao tác");
+    }
+  };
+  useEffect(() => {
+    if (!isLoading && course === null) {
+      handleConfirmation();
+    }
+  }, [isLoading, course, id]);
+
+  if (isLoading) {
+    return <p>Đang tải dữ liệu...</p>;
   }
 
+  if (!course) {
+    return null; 
+  }
   const calculateCompletedLectures = (lectures) =>
     lectures.filter((lecture) => lecture.completed).length;
 
