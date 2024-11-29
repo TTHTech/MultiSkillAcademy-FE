@@ -302,10 +302,10 @@ const AcceptedCoursesTable = () => {
             <tr className="border-b bg-gray-700">
               <th className="py-2 px-4">#</th>
               <th className="py-2 px-4">Name</th>
-              <th className="py-2 px-4">Instructor</th>
+              <th className="py-2 px-4">Duration</th>
               <th className="py-2 px-4">Category</th>
               <th className="py-2 px-4">Price</th>
-              <th className="py-2 px-4">Duration</th>
+              <th className="py-2 px-4">Status</th>
               <th className="py-2 px-4">Actions</th>
             </tr>
           </thead>
@@ -314,10 +314,10 @@ const AcceptedCoursesTable = () => {
               <tr key={course.id} className="border-b bg-gray-800">
                 <td className="py-2 px-4">{index + 1}</td>
                 <td className="py-2 px-4">{course.title}</td>
-                <td className="py-2 px-4">{course.instructorName}</td>
+                <td className="py-2 px-4">{course.duration}</td>
                 <td className="py-2 px-4">{course.categoryName}</td>
                 <td className="py-2 px-4">${course.price}</td>
-                <td className="py-2 px-4">{course.duration}</td>
+                <td className="py-2 px-4">{course.status}</td>
                 <td className="py-2 px-4">
                   <button
                     className="bg-green-500 text-white px-3 py-1 rounded-lg mr-2"

@@ -65,28 +65,38 @@ const CoursesTable = () => {
 
   // Gọi API để chấp nhận khóa học và chuyển trạng thái thành 'Active'
   const handleAccept = async (courseId) => {
+    console.log("Course ID:", courseId);  // Debugging: Check the course ID
     try {
       const response = await fetch(`http://localhost:8080/api/admin/courses/${courseId}/status`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem("token")}`, // Token xác thực nếu cần
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
-        body: JSON.stringify({ status: "Active" }),  
+        body: JSON.stringify({ status: "Active" }),
       });
   
       if (!response.ok) {
+        // Check for specific status codes to handle errors better
+        if (response.status === 403) {
+          throw new Error("You do not have permission to update the course status.");
+        }
+        if (response.status === 404) {
+          throw new Error("Course not found.");
+        }
         throw new Error("Failed to update course status.");
       }
   
       alert("Course status updated to Active");
-      fetchCourses(); // Làm mới danh sách khóa học sau khi cập nhật
+      fetchCourses();  // Refresh the course list after update
     } catch (error) {
       console.error("Error updating course status:", error);
-      alert("Failed to update course status");
+      alert(`Error: ${error.message}`);
     }
   };
-
+  
+  
+  
   const handleReject = (courseId) => {
     console.log(`Rejected course with ID: ${courseId}`);
   };
@@ -302,30 +312,29 @@ const CoursesTable = () => {
             <tr className="border-b bg-gray-700">
               <th className="py-2 px-4">#</th>
               <th className="py-2 px-4">Name</th>
-              <th className="py-2 px-4">Instructor</th>
+              <th className="py-2 px-4">Duration</th>
               <th className="py-2 px-4">Category</th>
               <th className="py-2 px-4">Price</th>
-              <th className="py-2 px-4">Duration</th>
+              <th className="py-2 px-4">Status</th>
               <th className="py-2 px-4">Actions</th>
             </tr>
           </thead>
           <tbody>
-            {currentCourses.map((course, index) => (
-              <tr key={course.id} className="border-b bg-gray-800">
-                <td className="py-2 px-4">{index + 1}</td>
-                <td className="py-2 px-4">{course.title}</td>
-                <td className="py-2 px-4">{course.instructorName}</td>
-                <td className="py-2 px-4">{course.categoryName}</td>
-                <td className="py-2 px-4">${course.price}</td>
-                <td className="py-2 px-4">{course.duration}</td>
-                <td className="py-2 px-4">
-                  <button
-                    className="bg-green-500 text-white px-3 py-1 rounded-lg mr-2"
-                    onClick={() => handleAccept(course.id)}
-                  >
-                    Accept
-                    
-                  </button>
+          {currentCourses.map((course, index) => (
+            <tr key={course.id} className="border-b bg-gray-800">
+              <td className="py-2 px-4">{index + 1}</td>
+              <td className="py-2 px-4">{course.title}</td>
+               <td className="py-2 px-4">{course.duration}</td>
+              <td className="py-2 px-4">{course.categoryName}</td>
+              <td className="py-2 px-4">${course.price}</td>
+              <td className="py-2 px-4">{course.status}</td>
+              <td className="py-2 px-4">
+                <button
+                  className="bg-green-500 text-white px-3 py-1 rounded-lg mr-2"
+                  onClick={() => handleAccept(course.id)}  // Ensure course.id is correctly passed here
+                >
+                  Accept
+                </button>
                   
                   <button
                     className="bg-red-500 text-white px-3 py-1 rounded-lg mr-2"

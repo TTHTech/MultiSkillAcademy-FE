@@ -15,16 +15,23 @@ import CourseInstructor from "../../../components/student/CoursesDetail/CourseIn
 const CourseDetailPage = () => {
   const { courseId } = useParams();
   const [courseData, setCourseData] = useState(null);
+  const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchCourseDetails = async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/api/student/courses/${courseId}`);
-        console.log(response.data); // Kiểm tra dữ liệu
-        setCourseData(response.data);
+        // Lấy thông tin khóa học
+        const courseResponse = await axios.get(`http://localhost:8080/api/student/courses/${courseId}`);
+        setCourseData(courseResponse.data);
+  
+        // Lấy reviews của khóa học
+        const reviewsResponse = await axios.get(`http://localhost:8080/api/student/reviews/${courseId}`);
+        
+        console.log("Reviews Response: ", reviewsResponse.data); // Thêm log để kiểm tra dữ liệu trả về
+        setReviews(reviewsResponse.data);
       } catch (error) {
-        console.error("Failed to fetch course details", error);
+        console.error("Failed to fetch course details or reviews", error);
       } finally {
         setLoading(false);
       }
@@ -33,16 +40,16 @@ const CourseDetailPage = () => {
     fetchCourseDetails();
   }, [courseId]);
   
-  // Hàm thêm khóa học vào giỏ hàng
+
   const handleAddToCart = async () => {
     try {
-      const token = localStorage.getItem("token"); // Lấy JWT token từ local storage
+      const token = localStorage.getItem("token");
       await axios.post(
         `http://localhost:8080/api/student/cart/add/${courseId}`,
         {},
         {
           headers: {
-            Authorization: `Bearer ${token}`, // Thêm token vào header
+            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -69,10 +76,8 @@ const CourseDetailPage = () => {
             studentCount={courseData.studentCount || 0}
             lastUpdated={courseData.updatedAt}
           />
-          
-          {/* Truyền courseContent vào CourseContentDetails */}
+
           <CourseContentDetails contentDetails={courseData.courseContent || []} />
-          
           <CourseContent content={courseData.sections || []} />
           <CourseRequirements
             requirements={courseData.requirements || []}
@@ -91,7 +96,7 @@ const CourseDetailPage = () => {
               description: courseData.instructorDescription || "",
             }}
           />
-          <CourseReviews reviews={courseData.reviews || []} />
+          <CourseReviews reviews={reviews || []} />
         </div>
         <div className="lg:flex lg:justify-center lg:w-1/4 lg:mr-4 lg:items-start">
           <CourseMedia
@@ -99,7 +104,7 @@ const CourseDetailPage = () => {
             thumbnail={courseData.imageUrls?.[0] || "default-image-url.jpg"}
             onAddToCart={handleAddToCart}
             onBuyNow={() => alert("Mua ngay")}
-            resourceDescription={courseData.resourceDescription || []} // Đảm bảo giá trị mặc định là mảng rỗng
+            resourceDescription={courseData.resourceDescription || []}
           />
         </div>
       </div>
