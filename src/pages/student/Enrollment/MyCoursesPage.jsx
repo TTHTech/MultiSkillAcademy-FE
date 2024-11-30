@@ -82,9 +82,9 @@ const MyCoursesPage = () => {
   }, [filters, courses]);
 
   return (
-    <div className="w-full h-full min-h-screen bg-white overflow-y-auto">
+    <div className="w-full h-full min-h-screen bg-gray-100 overflow-y-auto">
       <NavBar /> {/* Thêm NavBar ở đầu trang */}
-      <div className="container mx-auto p-6 bg-white">
+      <div className="container mx-auto p-6 bg-gray-100 ">
         <h1 className="text-4xl font-bold text-gray-900 mb-4 pb-4">Khóa học của tôi</h1>
         
         {/* Thêm phần lọc khóa học */}
@@ -101,7 +101,8 @@ const MyCoursesPage = () => {
         </div>
 
         {/* Hiển thị danh sách khóa học đã được lọc */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="flex flex-wrap justify-start gap-6">
+          {/* Đảm bảo mỗi phần tử khóa học chiếm 1/4 chiều rộng của màn hình */}
           <StudentCoursesList filteredCourses={filteredCourses} />
         </div>
       </div>

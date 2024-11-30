@@ -1,11 +1,13 @@
-import CourseCard from './StudentCourseCard'; 
+import CourseCard from './StudentCourseCard';
 
 const StudentCoursesList = ({ filteredCourses }) => {
     return (
-        <div className="flex flex-wrap justify-start bg-gray-100 py-6 w-full gap-6 bg-white">
+        <div className="grid grid-cols-4 gap-4 bg-gray-100 py-6 w-full">
             {filteredCourses.length > 0 ? (
                 filteredCourses.map((course) => (
-                    <CourseCard key={course.courseId} course={course} />
+                    <div key={course.courseId}>
+                        <CourseCard course={course} />
+                    </div>
                 ))
             ) : (
                 <p className="text-center text-gray-600">No courses found</p>
