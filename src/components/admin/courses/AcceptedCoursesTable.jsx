@@ -246,40 +246,40 @@ const AcceptedCoursesTable = () => {
           </div>
 
           <div className='mb-4'>
-          <label className='text-gray-400'>Target Audience:</label>
-          <ul className='w-full p-2 bg-gray-600 text-white rounded-lg'>
-            {editingCourse.targetAudience && editingCourse.targetAudience.map((audience, idx) => (
-              <li key={idx}>{audience}</li>
-            ))}
-          </ul>
-        </div>
-    
-        <div className='mb-4'>
-          <label className='text-gray-400'>Course Content:</label>
-          <ul className='w-full p-2 bg-gray-600 text-white rounded-lg'>
-            {editingCourse.courseContent && editingCourse.courseContent.map((content, idx) => (
-              <li key={idx}>{content}</li>
-            ))}
-          </ul>
-        </div>
-    
-        <div className='mb-4'>
-          <label className='text-gray-400'>Resources:</label>
-          <ul className='w-full p-2 bg-gray-600 text-white rounded-lg'>
-            {editingCourse.resourceDescription && editingCourse.resourceDescription.map((resource, idx) => (
-              <li key={idx}>{resource}</li>
-            ))}
-          </ul>
-        </div>
-    
-        <div className='mb-4'>
-          <label className='text-gray-400'>Requirements:</label>
-          <ul className='w-full p-2 bg-gray-600 text-white rounded-lg'>
-            {editingCourse.requirements && editingCourse.requirements.map((requirement, idx) => (
-              <li key={idx}>{requirement}</li>
-            ))}
-          </ul>
-        </div>
+            <label className='text-gray-400'>Target Audience:</label>
+            <ul className='w-full p-2 bg-gray-600 text-white rounded-lg'>
+              {editingCourse.targetAudience && editingCourse.targetAudience.map((audience, idx) => (
+                <li key={idx}>{audience}</li>
+              ))}
+            </ul>
+          </div>
+
+          <div className='mb-4'>
+            <label className='text-gray-400'>Course Content:</label>
+            <ul className='w-full p-2 bg-gray-600 text-white rounded-lg'>
+              {editingCourse.courseContent && editingCourse.courseContent.map((content, idx) => (
+                <li key={idx}>{content}</li>
+              ))}
+            </ul>
+          </div>
+
+          <div className='mb-4'>
+            <label className='text-gray-400'>Resources:</label>
+            <ul className='w-full p-2 bg-gray-600 text-white rounded-lg'>
+              {editingCourse.resourceDescription && editingCourse.resourceDescription.map((resource, idx) => (
+                <li key={idx}>{resource}</li>
+              ))}
+            </ul>
+          </div>
+
+          <div className='mb-4'>
+            <label className='text-gray-400'>Requirements:</label>
+            <ul className='w-full p-2 bg-gray-600 text-white rounded-lg'>
+              {editingCourse.requirements && editingCourse.requirements.map((requirement, idx) => (
+                <li key={idx}>{requirement}</li>
+              ))}
+            </ul>
+          </div>
 
           <div className='mt-4'>
             <button
@@ -325,7 +325,6 @@ const AcceptedCoursesTable = () => {
                 <td className="py-2 px-4">${course.price}</td>
                 <td className="py-2 px-4 text-yellow-500">{course.status}</td>
                 <td className="py-2 px-4">
-                  
                   <button
                     className="bg-blue-500 text-white px-3 py-1 rounded-lg"
                     onClick={() => handleView(course)}

@@ -113,7 +113,7 @@ const CoursesTable = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:8080/api/admin/courses/${courseId}/status`,
+        `https://educoresystem-1.onrender.com/api/admin/courses/${courseId}/status`,
         {
           method: "PUT",
           headers: {
@@ -180,11 +180,11 @@ const CoursesTable = () => {
         <div className="bg-gray-700 p-4 rounded-lg">
           {/* Ảnh khóa học */}
           <div className="flex justify-center mb-4">
-          <img
-          src={editingCourse.images ? editingCourse.images[0] : ""}
-          alt={editingCourse.title}
-          className="w-100 h-100 object-cover rounded-lg"
-        />
+            <img
+              src={editingCourse.images ? editingCourse.images[0] : ""}
+              alt={editingCourse.title}
+              className="w-100 h-100 object-cover rounded-lg"
+            />
           </div>
 
           <h3 className="text-lg font-semibold text-gray-100 mb-4">
@@ -331,35 +331,34 @@ const CoursesTable = () => {
           </div>
 
           <button
-          className="bg-green-500 text-white px-4 py-2 rounded-lg mr-2"
-          onClick={() => {
-            if (!editingCourse || !editingCourse.courseId) {  // Kiểm tra "courseId"
-              console.error("Course ID is undefined");
-              return;
-            }
-            handleAccept(editingCourse.courseId);  // Sử dụng "courseId"
-          }}
-        >
-          Accept
-        </button>
-        
-        <button
-          className="bg-red-500 text-white px-4 py-2 rounded-lg mr-2"
-          onClick={() => {
-            if (!editingCourse || !editingCourse.courseId) {  // Kiểm tra "courseId"
-              console.error("Course ID is undefined");
-              return;
-            }
-            handleReject(editingCourse.courseId);  // Sử dụng "courseId"
-          }}
-        >
-          Reject
-        </button>
-        
+            className="bg-green-500 text-white px-4 py-2 rounded-lg mr-2"
+            onClick={() => {
+              if (!editingCourse || !editingCourse.courseId) {
+                console.error("Course ID is undefined");
+                return;
+              }
+              handleAccept(editingCourse.courseId);
+            }}
+          >
+            Accept
+          </button>
+
+          <button
+            className="bg-red-500 text-white px-4 py-2 rounded-lg mr-2"
+            onClick={() => {
+              if (!editingCourse || !editingCourse.courseId) {
+                console.error("Course ID is undefined");
+                return;
+              }
+              handleReject(editingCourse.courseId);
+            }}
+          >
+            Reject
+          </button>
 
           <button
             className="bg-gray-500 text-white px-4 py-2 rounded-lg"
-            onClick={() => setEditingCourse(null)} // Đặt lại khóa học đang chỉnh sửa
+            onClick={() => setEditingCourse(null)}
           >
             Cancel
           </button>
