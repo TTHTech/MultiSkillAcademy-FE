@@ -143,7 +143,7 @@ const CreateUserForm = () => {
       <div className="flex justify-center mb-4">
         <label className="flex items-center cursor-pointer">
           <Camera className="text-gray-300 mr-2" />
-          <span className="text-gray-300">Upload Profile Image</span>
+          <span className="text-white">Upload Profile Image</span>
           <input
             type="file"
             accept="image/*"
@@ -155,7 +155,7 @@ const CreateUserForm = () => {
 
       {/* Các trường thông tin khác */}
       <div className="mb-4">
-        <label className="text-gray-400">Username:</label>
+        <label className="text-white">Username:</label>
         <input
           type="text"
           name="username"
@@ -166,7 +166,7 @@ const CreateUserForm = () => {
       </div>
 
       <div className="mb-4">
-        <label className="text-gray-400">First Name:</label>
+        <label className="text-white">First Name:</label>
         <input
           type="text"
           name="firstName"
@@ -177,7 +177,7 @@ const CreateUserForm = () => {
       </div>
 
       <div className="mb-4">
-        <label className="text-gray-400">Last Name:</label>
+        <label className="text-white">Last Name:</label>
         <input
           type="text"
           name="lastName"
@@ -188,7 +188,7 @@ const CreateUserForm = () => {
       </div>
 
       <div className="mb-4">
-        <label className="text-gray-400">Email:</label>
+        <label className="text-white">Email:</label>
         <input
           type="email"
           name="email"
@@ -199,7 +199,7 @@ const CreateUserForm = () => {
       </div>
 
       <div className="mb-4">
-        <label className="text-gray-400">Password:</label>
+        <label className="text-white">Password:</label>
         <input
           type="password"
           name="password"
@@ -210,7 +210,7 @@ const CreateUserForm = () => {
       </div>
 
       <div className="mb-4">
-        <label className="text-gray-400">Confirm Password:</label>
+        <label className="text-white">Confirm Password:</label>
         <input
           type="password"
           name="confirmPassword"
@@ -222,7 +222,7 @@ const CreateUserForm = () => {
       </div>
 
       <div className="mb-4">
-        <label className="text-gray-400">Phone Number:</label>
+        <label className="text-white">Phone Number:</label>
         <input
           type="text"
           name="phoneNumber"
@@ -233,7 +233,7 @@ const CreateUserForm = () => {
       </div>
 
       <div className="mb-4">
-        <label className="text-gray-400">Address:</label>
+        <label className="text-white">Address:</label>
         <input
           type="text"
           name="address"
@@ -244,7 +244,7 @@ const CreateUserForm = () => {
       </div>
 
       <div className="mb-4">
-        <label className="text-gray-400">Bio:</label>
+        <label className="text-white">Bio:</label>
         <textarea
           name="bio"
           value={newUser.bio}
@@ -254,7 +254,7 @@ const CreateUserForm = () => {
       </div>
 
       <div className="mb-4">
-        <label className="text-gray-400">Date of Birth:</label>
+        <label className="text-white">Date of Birth:</label>
         <input
           type="date"
           name="dateOfBirth"
@@ -265,7 +265,7 @@ const CreateUserForm = () => {
       </div>
 
       <div className="mb-4">
-        <label className="text-gray-400">Role:</label>
+        <label className="text-white">Role:</label>
         <select
           name="role"
           value={newUser.role}

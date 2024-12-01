@@ -27,7 +27,7 @@ import PageAdd from "./pages/instructor/PageCourses/PageCoursesAdd";
 import PageQuestions from "./pages/instructor/PageQuestions";
 import StudentList from "./pages/instructor/PageStudents";
 import HocKhoaHoc from "./pages/student/courses/StudyACourse";
-
+import CategoryPage from "./pages/admin/CategoryPage";
 
 import Wishlist from "./pages/student/courses/PageWishlist";
 import Test from "./pages/instructor/Test/PageTest";
@@ -104,6 +104,7 @@ function App() {
               <Route path="/admin/instructor" element={<InstructorPage />} />
               <Route path="/admin/sales" element={<SalesPage />} />
               <Route path="/admin/orders" element={<OrdersPage />} />
+              <Route path="/admin/category" element={<CategoryPage />} />
               <Route path="/admin/analytics" element={<AnalyticsPage />} />
               <Route path="/admin/settings" element={<SettingsPage />} />
               <Route path="/admin/add-user" element={<AddNewUserPage />} />

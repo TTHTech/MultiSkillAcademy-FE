@@ -283,10 +283,16 @@ const AcceptedCoursesTable = () => {
 
           <div className='mt-4'>
             <button
-              className='bg-green-500 text-white px-4 py-2 rounded-lg mr-2'
+              className='bg-yellow-500 text-white px-4 py-2 rounded-lg mr-2'
               onClick={handleSave}
             >
-              Save
+              update
+            </button>
+            <button
+              className='bg-red-500 text-white px-4 py-2 rounded-lg mr-2'
+              onClick={handleSave}
+            >
+              delete
             </button>
             <button
               className='bg-gray-500 text-white px-4 py-2 rounded-lg'
@@ -317,20 +323,9 @@ const AcceptedCoursesTable = () => {
                 <td className="py-2 px-4">{course.duration}</td>
                 <td className="py-2 px-4">{course.categoryName}</td>
                 <td className="py-2 px-4">${course.price}</td>
-                <td className="py-2 px-4">{course.status}</td>
+                <td className="py-2 px-4 text-yellow-500">{course.status}</td>
                 <td className="py-2 px-4">
-                  <button
-                    className="bg-green-500 text-white px-3 py-1 rounded-lg mr-2"
-                    onClick={() => handleAccept(course.id)}
-                  >
-                    Accept
-                  </button>
-                  <button
-                    className="bg-red-500 text-white px-3 py-1 rounded-lg mr-2"
-                    onClick={() => handleReject(course.id)}
-                  >
-                    Reject
-                  </button>
+                  
                   <button
                     className="bg-blue-500 text-white px-3 py-1 rounded-lg"
                     onClick={() => handleView(course)}
@@ -347,14 +342,14 @@ const AcceptedCoursesTable = () => {
       {/* Pagination */}
       <div className="flex justify-between mt-4">
         <button
-          className="bg-gray-700 text-white px-4 py-2 rounded-lg"
+          className="bg-yellow-500 text-white px-4 py-2 rounded-lg"
           onClick={() => handlePageChange(Math.max(currentPage - 1, 1))}
         >
           Prev
         </button>
         <span className="self-center text-gray-400">Page {currentPage} of {totalPages}</span>
         <button
-          className="bg-gray-700 text-white px-4 py-2 rounded-lg"
+          className="bg-red-500 text-white px-4 py-2 rounded-lg"
           onClick={() => handlePageChange(Math.min(currentPage + 1, totalPages))}
         >
           Next

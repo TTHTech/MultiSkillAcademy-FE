@@ -377,28 +377,28 @@ const InstructorsTable = () => {
                     <table className='min-w-full divide-y divide-gray-700'>
                         <thead>
                             <tr>
-                                <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>
+                                <th className='px-6 py-3 text-left text-xs font-medium text-white  uppercase tracking-wider'>
                                     Avatar
                                 </th>
-                                <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>
+                                <th className='px-6 py-3 text-left text-xs font-medium text-white  uppercase tracking-wider'>
                                     First Name
                                 </th>
-                                <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>
+                                <th className='px-6 py-3 text-left text-xs font-medium text-white  uppercase tracking-wider'>
                                     Last Name
                                 </th>
-                                <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>
+                                <th className='px-6 py-3 text-left text-xs font-medium text-white  uppercase tracking-wider'>
                                     Email
                                 </th>
-                                <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>
+                                <th className='px-6 py-3 text-left text-xs font-medium text-white  uppercase tracking-wider'>
                                     Phone
                                 </th>
-                                <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>
+                                <th className='px-6 py-3 text-left text-xs font-medium text-white  uppercase tracking-wider'>
                                     Address
                                 </th>
-                                <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>
+                                <th className='px-6 py-3 text-left text-xs font-medium text-white  uppercase tracking-wider'>
                                     Status
                                 </th>
-                                <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>
+                                <th className='px-6 py-3 text-left text-xs font-medium text-white  uppercase tracking-wider'>
                                     Actions
                                 </th>
                             </tr>
@@ -428,21 +428,21 @@ const InstructorsTable = () => {
                                     </td>
 
                                     <td className='px-6 py-4 whitespace-nowrap'>
-                                        <div className='text-sm font-medium text-gray-100'>{instructor.firstName}</div>
+                                        <div className='text-sm font-medium text-white'>{instructor.firstName}</div>
                                     </td>
                                     <td className='px-6 py-4 whitespace-nowrap'>
-                                        <div className='text-sm font-medium text-gray-100'>{instructor.lastName}</div>
+                                        <div className='text-sm font-medium text-white'>{instructor.lastName}</div>
                                     </td>
                                     <td className='px-6 py-4 whitespace-nowrap'>
-                                        <div className='text-sm text-gray-300'>{instructor.email}</div>
+                                        <div className='text-sm text-white'>{instructor.email}</div>
                                     </td>
 
                                     <td className='px-6 py-4 whitespace-nowrap'>
-                                        <div className='text-sm text-gray-300'>{instructor.phoneNumber}</div>
+                                        <div className='text-sm text-white'>{instructor.phoneNumber}</div>
                                     </td>
 
                                     <td className='px-6 py-4'>
-                                        <div className='text-sm text-gray-300 overflow-hidden text-ellipsis whitespace-nowrap max-w-[120px]'>
+                                        <div className='text-sm text-white overflow-hidden text-ellipsis whitespace-nowrap max-w-[120px]'>
                                             {instructor.address}
                                         </div>
                                     </td>
@@ -451,8 +451,8 @@ const InstructorsTable = () => {
                                         <span
                                             className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                                                 instructor.active === true || instructor.active === 1
-                                                    ? "bg-green-800 text-green-100"
-                                                    : "bg-red-800 text-red-100"
+                                                    ? "bg-yellow-500 text-black"
+                                                    : "bg-red-500 text-white"
                                             }`}
                                         >
                                             {instructor.active === true || instructor.active === 1 ? "Active" : "Inactive"}
@@ -467,7 +467,7 @@ const InstructorsTable = () => {
                                             Edit
                                         </button>
                                         <button
-                                            className='text-red-400 hover:text-red-300'
+                                            className='text-red-500 hover:text-red-300'
                                             onClick={() => handleDelete(instructor.id)}
                                         >
                                             Delete
@@ -485,7 +485,7 @@ const InstructorsTable = () => {
                                 key={index + 1}
                                 onClick={() => handlePageChange(index + 1)}
                                 className={`px-4 py-2 mx-1 rounded-lg ${
-                                    currentPage === index + 1 ? "bg-blue-500 text-white" : "bg-gray-700 text-gray-300"
+                                    currentPage === index + 1 ? "bg-yellow-500 text-white" : "bg-gray-700 text-gray-300"
                                 }`}
                             >
                                 {index + 1}
