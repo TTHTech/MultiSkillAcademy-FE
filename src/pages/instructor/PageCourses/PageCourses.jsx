@@ -19,7 +19,7 @@ const PageCourses = () => {
     useEffect(() => {
         const fetchCourses = async () => {
             try {
-                const response = await fetch(`http://localhost:8080/api/instructor/${userId}`, {
+                const response = await fetch(`https://educoresystem-1.onrender.com/api/instructor/${userId}`, {
                     method: "GET",
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem("token")}`,

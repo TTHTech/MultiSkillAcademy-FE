@@ -18,7 +18,7 @@ const CoursesTable = () => {
     setLoading(true);
     try {
       const response = await fetch(
-        "http://localhost:8080/api/admin/courses/pending",
+        "https://educoresystem-1.onrender.com/api/admin/courses/pending",
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -76,7 +76,7 @@ const CoursesTable = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:8080/api/admin/courses/${courseId}/status`,
+        `https://educoresystem-1.onrender.com/api/admin/courses/${courseId}/status`,
         {
           method: "PUT",
           headers: {
@@ -113,7 +113,7 @@ const CoursesTable = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:8080/api/admin/courses/${courseId}/status`,
+        `https://educoresystem-1.onrender.com/api/admin/courses/${courseId}/status`,
         {
           method: "PUT",
           headers: {

@@ -12,7 +12,7 @@ const CoursesWithUsersQA = () => {
     const fetchCourses = async () => {
       try {
         const response = await fetch(
-          `http://localhost:8080/api/instructor/${userId}`,
+          `https://educoresystem-1.onrender.com/api/instructor/${userId}`,
           {
             method: "GET",
             headers: {
@@ -36,7 +36,7 @@ const CoursesWithUsersQA = () => {
     const fetchQuestions = async () => {
       try {
         const response = await fetch(
-          `http://localhost:8080/api/instructor/questions/${userId}`,
+          `https://educoresystem-1.onrender.com/api/instructor/questions/${userId}`,
           {
             method: "GET",
             headers: {
@@ -80,7 +80,7 @@ const CoursesWithUsersQA = () => {
     console.log("Câu trả lời vừa nhập:", newAnswer);
 
     try {
-      await fetch("http://localhost:8080/api/instructor/addAnswer", {
+      await fetch("https://educoresystem-1.onrender.com/api/instructor/addAnswer", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
