@@ -74,6 +74,14 @@ const CategoryTable = () => {
     setNewCategory({ name: "", description: "" });
   };
 
+  const handleUpdateCategorySubmit = () => {
+    const updatedCategories = categories.map((category) =>
+      category.id === editingCategory.id ? editingCategory : category
+    );
+    setCategories(updatedCategories);
+    setEditingCategory(null); // Đóng form chỉnh sửa
+  };
+
   const handleDeleteCategory = (categoryId) => {
     const confirmation = window.confirm("Are you sure you want to delete this category?");
     if (confirmation) {
@@ -106,13 +114,13 @@ const CategoryTable = () => {
             className="bg-gray-600 text-white px-4 py-2 rounded-lg ml-4"
             onClick={() => setShowAddCategoryForm(true)}
           >
-            Add
+            <span className="text-xl">+</span>
           </button>
         </div>
       </div>
 
       {editingCategory ? (
-        // Form chi tiết category, chỉ hiển thị thông tin category, không hiển thị khóa học
+        // Form chi tiết category, có thể chỉnh sửa
         <div className="bg-gray-700 p-4 rounded-lg">
           <h3 className="text-lg font-semibold text-gray-100 mb-4">Category Details</h3>
 
@@ -123,7 +131,12 @@ const CategoryTable = () => {
               name="name"
               value={editingCategory.name}
               className="w-full p-2 bg-gray-600 text-white rounded-lg"
-              readOnly
+              onChange={(e) =>
+                setEditingCategory((prev) => ({
+                  ...prev,
+                  name: e.target.value,
+                }))
+              }
             />
           </div>
 
@@ -133,16 +146,29 @@ const CategoryTable = () => {
               name="description"
               value={editingCategory.description}
               className="w-full p-2 bg-gray-600 text-white rounded-lg"
-              readOnly
+              onChange={(e) =>
+                setEditingCategory((prev) => ({
+                  ...prev,
+                  description: e.target.value,
+                }))
+              }
             />
           </div>
 
-          <button
-            className="bg-gray-500 text-white px-4 py-2 rounded-lg mt-4"
-            onClick={() => setEditingCategory(null)} // Đặt lại category đang chỉnh sửa
-          >
-            Cancel
-          </button>
+          <div className="flex justify-between">
+            <button
+              className="bg-blue-500 text-white px-4 py-2 rounded-lg"
+              onClick={handleUpdateCategorySubmit}
+            >
+              Update
+            </button>
+            <button
+              className="bg-gray-500 text-white px-4 py-2 rounded-lg"
+              onClick={() => setEditingCategory(null)} // Đặt lại category đang chỉnh sửa
+            >
+              Cancel
+            </button>
+          </div>
         </div>
       ) : (
         <table className="table-auto w-full text-left text-gray-100">
