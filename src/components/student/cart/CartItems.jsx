@@ -17,7 +17,7 @@ const CartItems = () => {
         const token = localStorage.getItem("token"); // Or use another method for storing/retrieving the token
 
         // Make the GET request to fetch cart items
-        const response = await axios.get("http://localhost:8080/api/student/cart", {
+        const response = await axios.get("https://educoresystem-1.onrender.com/api/student/cart", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -51,7 +51,7 @@ const CartItems = () => {
       const token = localStorage.getItem("token");
 
       // Make the DELETE request to remove the course from the cart
-      await axios.delete(`http://localhost:8080/api/student/cart/remove/${courseId}`, {
+      await axios.delete(`https://educoresystem-1.onrender.com/api/student/cart/remove/${courseId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

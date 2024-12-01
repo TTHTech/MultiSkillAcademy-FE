@@ -49,7 +49,7 @@ const LoginForm = () => {
   };
 
   const handleOAuthLogin = (provider) => {
-    window.location.href = `http://localhost:8080/oauth2/authorize/${provider}`;
+    window.location.href = `https://educoresystem-1.onrender.com/oauth2/authorize/${provider}`;
   };
 
   return (
