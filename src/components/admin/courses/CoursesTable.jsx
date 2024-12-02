@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Search } from "lucide-react";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 // Số lượng khóa học hiển thị mỗi trang
 const ITEMS_PER_PAGE = 10;
@@ -73,7 +75,7 @@ const CoursesTable = () => {
       console.error("Course ID is undefined");
       return;
     }
-
+  
     try {
       const response = await fetch(
         `http://localhost:8080/api/admin/courses/${courseId}/status`,
@@ -86,34 +88,39 @@ const CoursesTable = () => {
           body: JSON.stringify({ status: "Active" }),
         }
       );
-
+  
       if (!response.ok) {
         throw new Error("Failed to update course status.");
       }
-
-      // Cập nhật trạng thái khóa học trong state sau khi thành công
-      setCourses(
-        courses.map((course) =>
+  
+      toast.success("Course accepted successfully!");
+  
+      // Cập nhật lại danh sách ngay lập tức
+      setCourses((prevCourses) =>
+        prevCourses.map((course) =>
           course.courseId === courseId
             ? { ...course, status: "Active" }
             : course
         )
       );
+  
+      // Đóng modal
+      setEditingCourse(null);
     } catch (error) {
       console.error("Error updating course status:", error);
-      alert(`Error: ${error.message}`);
+      toast.error(`Error: ${error.message}`);
     }
   };
-
+  
   const handleReject = async (courseId) => {
     if (!courseId) {
       console.error("Course ID is undefined");
       return;
     }
-
+  
     try {
       const response = await fetch(
-        `https://educoresystem-1.onrender.com/api/admin/courses/${courseId}/status`,
+        `http://localhost:8080/api/admin/courses/${courseId}/status`,
         {
           method: "PUT",
           headers: {
@@ -123,18 +130,31 @@ const CoursesTable = () => {
           body: JSON.stringify({ status: "Declined" }),
         }
       );
-
+  
       if (!response.ok) {
         throw new Error("Failed to update course status.");
       }
-
-      // Loại bỏ khóa học đã bị từ chối
-      setCourses(courses.filter((course) => course.courseId !== courseId));
+  
+      toast.success("Course rejected successfully!");
+  
+      // Cập nhật lại danh sách ngay lập tức
+      setCourses((prevCourses) =>
+        prevCourses.map((course) =>
+          course.courseId === courseId
+            ? { ...course, status: "Declined" }
+            : course
+        )
+      );
+  
+      // Đóng modal
+      setEditingCourse(null);
     } catch (error) {
       console.error("Error updating course status:", error);
-      alert(`Error: ${error.message}`);
+      toast.error(`Error: ${error.message}`);
     }
   };
+  
+
 
   const handleView = (course) => {
     setEditingCourse(course); // Hiển thị chi tiết khóa học

@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Search, Loader } from "lucide-react";
 import axios from "axios";
-
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 // Số lượng category hiển thị mỗi trang
 const ITEMS_PER_PAGE = 10;
 
@@ -77,15 +78,23 @@ const CategoryTable = () => {
     };
 
     const handleAddCategorySubmit = async () => {
+        // Kiểm tra dữ liệu
+        if (!newCategory.name.trim() || !newCategory.description.trim()) {
+            toast.error("Name and description are required!");
+            return;
+        }
+    
         setLoadingMessage("Adding category...");
         setIsLoading(true);
+    
         try {
             const token = localStorage.getItem("token");
             if (!token) {
                 console.error("No token found");
+                toast.error("Authentication failed. Please log in again.");
                 return;
             }
-
+    
             const response = await axios.post(
                 "http://localhost:8080/api/admin/categories",
                 newCategory,
@@ -95,38 +104,47 @@ const CategoryTable = () => {
                     },
                 }
             );
-
+    
             // Thêm category mới vào đầu danh sách
-            setCategories([response.data, ...categories]); 
+            setCategories([response.data, ...categories]);
             setShowAddCategoryForm(false);
             setNewCategory({ name: "", description: "", status: "Active" });
-            setShowSuccessMessage("Category added successfully!");
+            toast.success("Category added successfully!");
         } catch (error) {
             console.error("Error adding category:", error);
-            setShowSuccessMessage("Error adding category!");
+    
+            if (error.response && error.response.status === 400) {
+                toast.error("Invalid input. Please check your data.");
+            } else {
+                toast.error("Error adding category. Please try again.");
+            }
         } finally {
             setIsLoading(false);
-            setTimeout(() => {
-                setShowSuccessMessage(false);
-            }, 3000);
         }
     };
+    
 
     const handleUpdateCategorySubmit = async () => {
+        if (!editingCategory?.name?.trim() || !editingCategory?.description?.trim()) {
+            toast.error("Name and description are required!");
+            return;
+        }
+    
         setLoadingMessage("Updating category...");
         setIsLoading(true);
+    
         try {
             const token = localStorage.getItem("token");
             if (!token) {
                 console.error("No token found");
                 return;
             }
-
+    
             if (!editingCategory?.categoryId) {
                 console.error("Category ID is missing!");
                 return;
             }
-
+    
             const response = await axios.put(
                 `http://localhost:8080/api/admin/categories/update/${editingCategory.categoryId}`,
                 editingCategory,
@@ -136,22 +154,20 @@ const CategoryTable = () => {
                     },
                 }
             );
-
+    
             setCategories(categories.map((category) =>
                 category.categoryId === editingCategory.categoryId ? response.data : category
             ));
             setEditingCategory(null);
-            setShowSuccessMessage("Category updated successfully!");
+            toast.success("Category updated successfully!");
         } catch (error) {
             console.error("Error updating category:", error);
-            setShowSuccessMessage("Error updating category!");
+            toast.error("Error updating category!");
         } finally {
             setIsLoading(false);
-            setTimeout(() => {
-                setShowSuccessMessage(false);
-            }, 3000);
         }
     };
+    
 
     const handleDeleteCategory = async (categoryId) => {
         setLoadingMessage("Deleting category...");
@@ -173,15 +189,12 @@ const CategoryTable = () => {
 
                 setCategories(categories.filter((category) => category.categoryId !== categoryId));
                 if (editingCategory?.categoryId === categoryId) setEditingCategory(null);
-                setShowSuccessMessage("Category deleted successfully!");
+                toast.success("Category deleted successfully!");
             } catch (error) {
                 console.error("Error deleting category:", error);
-                setShowSuccessMessage("Error deleting category!");
+                toast.error("Error deleting category. Please try again.");
             } finally {
                 setIsLoading(false);
-                setTimeout(() => {
-                    setShowSuccessMessage(false);
-                }, 3000);
             }
         }
     };
@@ -355,59 +368,68 @@ const CategoryTable = () => {
     
                     {/* Add Category Form */}
                     {showAddCategoryForm && (
-                        <div className="bg-gray-700 p-6 rounded-lg mt-6">
-                            <h3 className="text-xl font-semibold text-gray-100 mb-4">Add Category</h3>
-    
-                            <div className="mb-4">
-                                <label className="text-gray-400">Name:</label>
-                                <input
-                                    type="text"
-                                    name="name"
-                                    value={newCategory.name}
-                                    className="w-full p-2 bg-gray-600 text-white rounded-lg"
-                                    onChange={handleAddCategoryChange}
-                                />
-                            </div>
-    
-                            <div className="mb-4">
-                                <label className="text-gray-400">Description:</label>
-                                <textarea
-                                    name="description"
-                                    value={newCategory.description}
-                                    className="w-full p-2 bg-gray-600 text-white rounded-lg"
-                                    onChange={handleAddCategoryChange}
-                                />
-                            </div>
-    
-                            <div className="mb-4">
-                                <label className="text-gray-400">Status:</label>
-                                <select
-                                    name="status"
-                                    value={newCategory.status}
-                                    className="w-full p-2 bg-gray-600 text-white rounded-lg"
-                                    onChange={handleAddCategoryChange}
-                                >
-                                    <option value="Active">Active</option>
-                                    <option value="Inactive">Inactive</option>
-                                </select>
-                            </div>
-    
-                            <div className="flex justify-between">
+                        <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 z-50">
+                            <div className="bg-gray-700 p-6 rounded-lg w-96 shadow-lg relative">
                                 <button
-                                    className="bg-green-500 text-white px-4 py-2 rounded-lg"
-                                    onClick={handleAddCategorySubmit}
-                                >
-                                    Add Category
-                                </button>
-                                <button
-                                    className="bg-gray-500 text-white px-4 py-2 rounded-lg"
+                                    className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded-lg"
                                     onClick={() => setShowAddCategoryForm(false)}
                                 >
-                                    Cancel
+                                    X
                                 </button>
+                                <h3 className="text-xl font-semibold text-gray-100 mb-4">Add Category</h3>
+                    
+                                <div className="mb-4">
+                                    <label className="text-gray-400">Name:</label>
+                                    <input
+                                        type="text"
+                                        name="name"
+                                        value={newCategory.name}
+                                        className="w-full p-2 bg-gray-600 text-white rounded-lg"
+                                        onChange={handleAddCategoryChange}
+                                    />
+                                </div>
+                    
+                                <div className="mb-4">
+                                    <label className="text-gray-400">Description:</label>
+                                    <textarea
+                                        name="description"
+                                        value={newCategory.description}
+                                        className="w-full p-2 bg-gray-600 text-white rounded-lg"
+                                        onChange={handleAddCategoryChange}
+                                    />
+                                </div>
+                    
+                                <div className="mb-4">
+                                    <label className="text-gray-400">Status:</label>
+                                    <select
+                                        name="status"
+                                        value={newCategory.status}
+                                        className="w-full p-2 bg-gray-600 text-white rounded-lg"
+                                        onChange={handleAddCategoryChange}
+                                    >
+                                        <option value="Active">Active</option>
+                                        <option value="Inactive">Inactive</option>
+                                    </select>
+                                </div>
+                    
+                                <div className="flex justify-between">
+                                    <button
+                                        className="bg-green-500 text-white px-4 py-2 rounded-lg"
+                                        onClick={handleAddCategorySubmit}
+                                    >
+                                        Add Category
+                                    </button>
+                                    <button
+                                        className="bg-gray-500 text-white px-4 py-2 rounded-lg"
+                                        onClick={() => setShowAddCategoryForm(false)}
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     )}
+                    
                 </motion.div>
             )}
         </div>
