@@ -4,13 +4,13 @@ import { useEffect, useState } from "react";
 
 const API_URL = "http://localhost:8080/api/admin/stats";  // Thay đổi URL API của bạn nếu cần
 
-const CategoryDistributionChart = () => {
-  const [categoryData, setCategoryData] = useState([]);
+const CoursesRevenueChart = () => {
+  const [courseData, setCourseData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch category distribution from API
-  const fetchCategoryData = async () => {
+  // Fetch course revenue percentage from API
+  const fetchCourseData = async () => {
     setLoading(true);
     try {
       const response = await fetch(API_URL, {
@@ -20,19 +20,19 @@ const CategoryDistributionChart = () => {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to fetch category distribution.");
+        throw new Error("Failed to fetch course revenue data.");
       }
 
       const data = await response.json();
-      console.log("Fetched category data:", data);
+      console.log("Fetched course revenue data:", data);
 
-      // Prepare category data for PieChart
-      const transformedData = Object.entries(data.categoryDistribution).map(([name, value]) => ({
+      // Prepare course revenue data for PieChart
+      const transformedData = Object.entries(data.courseRevenuePercentage).map(([name, value]) => ({
         name,
         value,
       }));
 
-      setCategoryData(transformedData);
+      setCourseData(transformedData);
       setLoading(false);
     } catch (error) {
       setError(error.message);
@@ -41,10 +41,10 @@ const CategoryDistributionChart = () => {
   };
 
   useEffect(() => {
-    fetchCategoryData();
+    fetchCourseData();
   }, []);
 
-  const COLORS = ["#6366F1", "#8B5CF6", "#EC4899", "#10B981", "#F59E0B"];
+  const COLORS = ["#6366F1", "#8B5CF6", "#EC4899", "#10B981", "#F59E0B", "#FF6347", "#FFD700", "#32CD32", "#8B0000", "#00BFFF"];
 
   return (
     <motion.div
@@ -53,7 +53,7 @@ const CategoryDistributionChart = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.3 }}
     >
-      <h2 className="text-lg font-medium mb-4 text-gray-100">Category Distribution</h2>
+      <h2 className="text-lg font-medium mb-4 text-gray-100">Course Revenue Distribution</h2>
 
       <div className="h-80">
         {/* Loading and Error handling */}
@@ -63,7 +63,7 @@ const CategoryDistributionChart = () => {
         <ResponsiveContainer width={"100%"} height={"100%"}>
           <PieChart>
             <Pie
-              data={categoryData}
+              data={courseData}
               cx={"50%"}
               cy={"50%"}
               labelLine={false}
@@ -72,7 +72,7 @@ const CategoryDistributionChart = () => {
               dataKey="value"
               label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
             >
-              {categoryData.map((entry, index) => (
+              {courseData.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
               ))}
             </Pie>
@@ -91,4 +91,4 @@ const CategoryDistributionChart = () => {
   );
 };
 
-export default CategoryDistributionChart;
+export default CoursesRevenueChart;

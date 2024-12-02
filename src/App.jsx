@@ -1,6 +1,7 @@
 import { Route, Routes, useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
-
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import Sidebar from "./components/admin/common/Sidebar";
 import OverviewPage from "./pages/admin/OverviewPage";
 import CoursesPage from "./pages/admin/CoursesPage";
@@ -57,6 +58,16 @@ function App() {
 
   return (
     <>
+        {/* Toast Notifications */}
+        <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        closeOnClick
+        pauseOnHover
+        draggable
+        theme="colored"
+      />
       <Routes>
         <Route path="/instructor/user" element={<PageUser />} />
         <Route path="/instructor/dashboard" element={<PageDashboard />} />
