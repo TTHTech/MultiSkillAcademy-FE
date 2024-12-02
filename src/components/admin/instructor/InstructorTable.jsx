@@ -32,7 +32,7 @@ const InstructorsTable = () => {
                     throw new Error("No token found, please login first.");
                 }
 
-                const response = await fetch("http://localhost:8080/api/admin/instructors", {
+                const response = await fetch("https://educoresystem-1.onrender.com/api/admin/instructors", {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
@@ -88,7 +88,7 @@ const InstructorsTable = () => {
         if (confirmed) {
             try {
                 const token = localStorage.getItem("token");
-                const response = await fetch(`http://localhost:8080/api/admin/instructors/${instructorId}`, {
+                const response = await fetch(`https://educoresystem-1.onrender.com/api/admin/instructors/${instructorId}`, {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json',
@@ -136,7 +136,7 @@ const InstructorsTable = () => {
 
         try {
             const token = localStorage.getItem("token"); // Lấy token từ localStorage
-            const response = await fetch(`http://localhost:8080/api/admin/instructors/${editingInstructor.id}`, {
+            const response = await fetch(`https://educoresystem-1.onrender.com/api/admin/instructors/${editingInstructor.id}`, {
                 method: 'PUT',
                 headers: {
                     Authorization: `Bearer ${token}`, // Không cần đặt Content-Type vì FormData tự xử lý

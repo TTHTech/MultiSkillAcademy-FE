@@ -9,7 +9,7 @@ const TopPythonCoursesSection = () => {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const response = await axios.get("http://localhost:8080/api/student/courses/python");
+        const response = await axios.get("https://educoresystem-1.onrender.com/api/student/courses/python");
         setCourses(response.data);
       } catch (error) {
         console.error("Failed to fetch courses", error);
