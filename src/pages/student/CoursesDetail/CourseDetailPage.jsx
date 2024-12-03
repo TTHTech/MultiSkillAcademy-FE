@@ -22,11 +22,11 @@ const CourseDetailPage = () => {
     const fetchCourseDetails = async () => {
       try {
         // Lấy thông tin khóa học
-        const courseResponse = await axios.get(`https://educoresystem-1.onrender.com/api/student/courses/${courseId}`);
+        const courseResponse = await axios.get(`http://localhost:8080/api/student/courses/${courseId}`);
         setCourseData(courseResponse.data);
   
         // Lấy reviews của khóa học
-        const reviewsResponse = await axios.get(`https://educoresystem-1.onrender.com/api/student/reviews/${courseId}`);
+        const reviewsResponse = await axios.get(`http://localhost:8080/api/student/reviews/${courseId}`);
         
         console.log("Reviews Response: ", reviewsResponse.data); // Thêm log để kiểm tra dữ liệu trả về
         setReviews(reviewsResponse.data);
@@ -45,7 +45,7 @@ const CourseDetailPage = () => {
     try {
       const token = localStorage.getItem("token");
       await axios.post(
-        `https://educoresystem-1.onrender.com/api/student/cart/add/${courseId}`,
+        `http://localhost:8080/api/student/cart/add/${courseId}`,
         {},
         {
           headers: {
