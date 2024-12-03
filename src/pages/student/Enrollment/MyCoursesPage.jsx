@@ -20,7 +20,7 @@ const MyCoursesPage = () => {
     const fetchCourses = async () => {
       try {
         const response = await axios.get(
-          `https://educoresystem-1.onrender.com/api/student/enrollments/${userId}`
+          `http://localhost:8080/api/student/enrollments/${userId}`
         );
         setCourses(response.data);
         setFilteredCourses(response.data);
