@@ -13,7 +13,7 @@ const Navbar = () => {
     // Gọi API để lấy danh mục
     const fetchCategories = async () => {
       try {
-        const response = await axios.get('https://educoresystem-1.onrender.com/api/student/categories'); // API endpoint
+        const response = await axios.get('http://localhost:8080/api/student/categories'); // API endpoint
         console.log('Danh mục:', response.data); // Debug xem API trả về gì
         setCategories(response.data); // Cập nhật danh sách danh mục
       } catch (error) {

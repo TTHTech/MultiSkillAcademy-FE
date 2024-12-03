@@ -29,7 +29,7 @@ const UsersPage = () => {
       return;
     }
 
-    axios.get("https://educoresystem-1.onrender.com/api/admin/students/stats", {
+    axios.get("http://localhost:8080/api/admin/students/stats", {
       headers: {
         Authorization: `Bearer ${token}`, // Gửi token trong header Authorization
       }
