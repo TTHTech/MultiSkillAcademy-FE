@@ -13,23 +13,16 @@ const LoginForm = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  
+
 const handleSubmit = async (e) => {
   e.preventDefault();
 
-<<<<<<< HEAD
   try {
     const response = await axios.post("http://localhost:8080/api/auth/login", {
       username,
       password,
     });
-=======
-    try {
-      const response = await axios.post("https://educoresystem-1.onrender.com/api/auth/login", {
-        username,
-        password,
-      });
->>>>>>> 63300ee704132211cc0a5c7e3d26217ed3fbcf7e
+
 
     const { token, userId, email: userEmail, role } = response.data;
 
@@ -69,7 +62,7 @@ const handleSubmit = async (e) => {
 
 
   const handleOAuthLogin = (provider) => {
-    window.location.href = `https://educoresystem-1.onrender.com/oauth2/authorize/${provider}`;
+    window.location.href = `http://localhost:8080/oauth2/authorize/${provider}`;
   };
 
   return (

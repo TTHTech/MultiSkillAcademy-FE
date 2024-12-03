@@ -17,7 +17,7 @@ const AcceptedCoursesTable = () => {
   const fetchCourses = async () => {
     setLoading(true);
     try {
-      const response = await fetch("https://educoresystem-1.onrender.com/api/admin/courses/active", {
+      const response = await fetch("http://localhost:8080/api/admin/courses/active", {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`, // Sử dụng token nếu cần
         },
@@ -66,7 +66,7 @@ const AcceptedCoursesTable = () => {
   // Gọi API để chấp nhận khóa học và chuyển trạng thái thành 'Active'
   const handleAccept = async (courseId) => {
     try {
-      const response = await fetch(`https://educoresystem-1.onrender.com/api/admin/courses/${courseId}/status`, {
+      const response = await fetch(`http://localhost:8080/api/admin/courses/${courseId}/status`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

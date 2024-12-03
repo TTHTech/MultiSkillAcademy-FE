@@ -32,7 +32,7 @@ const InstructorsTable = () => {
                     throw new Error("No token found, please login first.");
                 }
 
-                const response = await fetch("https://educoresystem-1.onrender.com/api/admin/instructors", {
+                const response = await fetch("http://localhost:8080/api/admin/instructors", {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
@@ -88,7 +88,7 @@ const InstructorsTable = () => {
         if (confirmed) {
             try {
                 const token = localStorage.getItem("token");
-                const response = await fetch(`https://educoresystem-1.onrender.com/api/admin/instructors/${instructorId}`, {
+                const response = await fetch(`http://localhost:8080/api/admin/instructors/${instructorId}`, {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json',
