@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-// import QuestionsAndAnswers from "./QuestionAndAnswers";
+import QuestionsAndAnswers from "./QuestionAndAnswers";
 import NavBar from "../../../components/student/common/NavBar";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
@@ -206,6 +206,7 @@ const CourseViewer = () => {
               <h3 className="text-2xl font-semibold mb-1">
                 Chọn bài giảng để hiển thị nội dung.
               </h3>
+              <QuestionsAndAnswers/>
             </div>
           )}
         </div>

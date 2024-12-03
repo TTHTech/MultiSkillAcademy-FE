@@ -56,6 +56,8 @@ const CourseCard = ({
         );
       case "Unsent":
         return <span className="text-orange-500 font-semibold">Unsent</span>;
+      case "Declined":
+        return <span className="text-purple-500 font-semibold">Declined</span>;
       default:
         return <span className="text-gray-500 font-semibold">Unknown</span>;
     }
@@ -256,6 +258,35 @@ const CourseCard = ({
             </button>
           </div>
         );
+      case "Declined":
+        return (
+          <div className="flex space-x-2 mt-2">
+            <button
+              className={`${buttonClass} bg-purple-500 hover:bg-purple-600`}
+              aria-label="Send course"
+              onClick={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                handleChangeStatus(event);
+              }}
+            >
+              <FaPaperPlane className="w-4 h-4 mr-1" />
+              Send
+            </button>
+            <button
+              className={`${buttonClass} bg-red-500 hover:bg-red-600`}
+              aria-label="Delete course"
+              onClick={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                handleDeleteCourse(event);
+              }}
+            >
+              <FaTrash className="w-4 h-4 mr-1" />
+              Delete
+            </button>
+          </div>
+        );
       default:
         return null;
     }
@@ -265,17 +296,19 @@ const CourseCard = ({
     <Link
       to={`/instructor/courses/${courseId}`}
       className={`relative block border border-white-500 rounded-lg shadow-lg overflow-hidden transition-transform duration-300 hover:scale-105 hover:shadow-xl 
-                ${
-                  courseStatus === "Active"
-                    ? "bg-green-100"
-                    : courseStatus === "Inactive"
-                    ? "bg-red-100"
-                    : courseStatus === "Processing"
-                    ? "bg-yellow-100"
-                    : courseStatus === "Unsent"
-                    ? "bg-orange-100"
-                    : "bg-gray-100"
-                }`}
+            ${
+              courseStatus === "Active"
+                ? "bg-green-100"
+                : courseStatus === "Inactive"
+                ? "bg-red-100"
+                : courseStatus === "Processing"
+                ? "bg-yellow-100"
+                : courseStatus === "Unsent"
+                ? "bg-orange-100"
+                : courseStatus === "Declined"
+                ? "bg-purple-100"
+                : "bg-gray-100"
+            }`}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
@@ -311,17 +344,19 @@ const CourseCard = ({
       {showDetails && (
         <div
           className={`absolute inset-0 border border-gray-300 shadow-xl p-6 flex flex-col justify-between z-20 opacity-95 transition-opacity duration-300 ease-in-out rounded-lg 
-                        ${
-                          courseStatus === "Active"
-                            ? "bg-green-200"
-                            : courseStatus === "Inactive"
-                            ? "bg-red-200"
-                            : courseStatus === "Processing"
-                            ? "bg-yellow-200"
-                            : courseStatus === "Unsent"
-                            ? "bg-orange-200"
-                            : "bg-gray-200"
-                        }`}
+                    ${
+                      courseStatus === "Active"
+                        ? "bg-green-200"
+                        : courseStatus === "Inactive"
+                        ? "bg-red-200"
+                        : courseStatus === "Processing"
+                        ? "bg-yellow-200"
+                        : courseStatus === "Unsent"
+                        ? "bg-orange-200"
+                        : courseStatus === "Declined"
+                        ? "bg-purple-200"
+                        : "bg-gray-200"
+                    }`}
         >
           <div>
             <h3 className="text-2xl font-bold text-gray-800 mb-2">
