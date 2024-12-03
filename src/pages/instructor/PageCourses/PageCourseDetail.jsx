@@ -15,7 +15,7 @@ import ButtonBack from "../../../components/instructor/BackButton/BackButton";
 import axios from "axios";
 import moment from "moment";
 import Swal from "sweetalert2";
-
+import CourseDetails from "./EditableList";
 const PageCourseDetail = () => {
   const [open, setOpen] = useState(true);
   const { id } = useParams();
@@ -24,7 +24,7 @@ const PageCourseDetail = () => {
       console.log(localStorage.getItem("token"));
       try {
         const response = await fetch(
-          `https://educoresystem-1.onrender.com/api/instructor/courses/${id}`,
+          `http://localhost:8080/api/instructor/courses/${id}`,
           {
             method: "GET",
             headers: {
@@ -115,7 +115,7 @@ const PageCourseDetail = () => {
     try {
       // Gọi API cập nhật Section
       const response = await fetch(
-        `https://educoresystem-1.onrender.com/api/instructor/update-course/${course.courseId}`,
+        `http://localhost:8080/api/instructor/update-course/${course.courseId}`,
         {
           method: "PUT",
           headers: {
@@ -176,7 +176,7 @@ const PageCourseDetail = () => {
     try {
       // Gọi API thêm Section
       const response = await fetch(
-        "https://educoresystem-1.onrender.com/api/instructor/add-section",
+        "http://localhost:8080/api/instructor/add-section",
         {
           method: "POST",
           headers: {
@@ -239,7 +239,7 @@ const PageCourseDetail = () => {
     try {
       // Gọi API cập nhật Section
       const response = await fetch(
-        `https://educoresystem-1.onrender.com/api/instructor/update-section/${section_id}`,
+        `http://localhost:8080/api/instructor/update-section/${section_id}`,
         {
           method: "PUT",
           headers: {
@@ -300,7 +300,7 @@ const PageCourseDetail = () => {
     try {
       // Gọi API xóa Section
       const response = await fetch(
-        `https://educoresystem-1.onrender.com/api/instructor/delete-section/${section_id}`,
+        `http://localhost:8080/api/instructor/delete-section/${section_id}`,
         {
           method: "DELETE",
           headers: {
@@ -395,7 +395,7 @@ const PageCourseDetail = () => {
 
     try {
       const response = await fetch(
-        `https://educoresystem-1.onrender.com/api/instructor/update-lecture/${lecture_id}`,
+        `http://localhost:8080/api/instructor/update-lecture/${lecture_id}`,
         {
           method: "PUT",
           headers: {
@@ -443,7 +443,7 @@ const PageCourseDetail = () => {
     }
     try {
       const response = await fetch(
-        `https://educoresystem-1.onrender.com/api/instructor/delete-lecture/${lecture_id}`,
+        `http://localhost:8080/api/instructor/delete-lecture/${lecture_id}`,
         {
           method: "DELETE",
           headers: {
@@ -508,7 +508,7 @@ const PageCourseDetail = () => {
 
     try {
       const response = await fetch(
-        "https://educoresystem-1.onrender.com/api/instructor/add-lecture",
+        "http://localhost:8080/api/instructor/add-lecture",
         {
           method: "POST",
           headers: {
@@ -565,7 +565,7 @@ const PageCourseDetail = () => {
           name: "Image " + course.courseId,
         };
         const response = await fetch(
-          `https://educoresystem-1.onrender.com/api/instructor/addImage/${course.courseId}`,
+          `http://localhost:8080/api/instructor/addImage/${course.courseId}`,
           {
             method: "POST",
             headers: {
@@ -608,7 +608,7 @@ const PageCourseDetail = () => {
 
     try {
       const response = await fetch(
-        `https://educoresystem-1.onrender.com/api/instructor/deleteImage/${course.courseId}`,
+        `http://localhost:8080/api/instructor/deleteImage/${course.courseId}`,
         {
           method: "DELETE",
           headers: {
@@ -670,7 +670,7 @@ const PageCourseDetail = () => {
       };
       try {
         const response = await fetch(
-          `https://educoresystem-1.onrender.com/api/instructor/updateImage/${course.courseId}`,
+          `http://localhost:8080/api/instructor/updateImage/${course.courseId}`,
           {
             method: "PUT",
             headers: {
@@ -988,7 +988,7 @@ const PageCourseDetail = () => {
             </div>
           )}
         </div>
-
+<CourseDetails/>
         <div className="bg-white shadow-md rounded-lg p-6">
           <h2 className="text-2xl font-semibold text-gray-800 mb-4">
             Sections & Lectures

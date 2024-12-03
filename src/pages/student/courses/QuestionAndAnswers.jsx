@@ -18,7 +18,7 @@ const QuestionsAndAnswers = ({ courseId }) => {
     const fetchQuestions = async () => {
       try {
         const response = await fetch(
-          `https://educoresystem.onrender.com/api/student/questions/${courseId}`,
+          `http://localhost:8080/api/student/questions/${courseId}`,
           {
             method: "GET",
             headers: {
@@ -49,7 +49,7 @@ const QuestionsAndAnswers = ({ courseId }) => {
     }
     try {
       await fetch(
-        `https://educoresystem.onrender.com/api/student/delete-questions/${questionId}`,
+        `http://localhost:8080/api/student/delete-questions/${questionId}`,
         {
           method: "DELETE",
           headers: {
@@ -83,7 +83,7 @@ const QuestionsAndAnswers = ({ courseId }) => {
     }
     try {
       await fetch(
-        `https://educoresystem.onrender.com/api/student/delete-answers/${answerId}`,
+        `http://localhost:8080/api/student/delete-answers/${answerId}`,
         {
           method: "DELETE",
           headers: {
@@ -129,7 +129,7 @@ const QuestionsAndAnswers = ({ courseId }) => {
 
     try {
       const response = await fetch(
-        "https://educoresystem.onrender.com/api/student/add-question",
+        "http://localhost:8080/api/student/add-question",
         {
           method: "POST",
           headers: {
@@ -174,7 +174,7 @@ const QuestionsAndAnswers = ({ courseId }) => {
 
     try {
       const response = await fetch(
-        `https://educoresystem.onrender.com/api/student/add-answer`,
+        `http://localhost:8080/api/student/add-answer`,
         {
           method: "POST",
           headers: {

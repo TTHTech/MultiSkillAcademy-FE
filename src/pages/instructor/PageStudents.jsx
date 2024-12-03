@@ -31,7 +31,7 @@ const StudentList = () => {
 
     try {
       await axios.post(
-        "https://educoresystem-1.onrender.com/api/instructor/send-email",
+        "http://localhost:8080/api/instructor/send-email",
         formData,
         {
           headers: {
@@ -51,7 +51,7 @@ const StudentList = () => {
 
   useEffect(() => {
     axios
-      .get(`https://educoresystem-1.onrender.com/api/instructor/students/${userId}`,
+      .get(`http://localhost:8080/api/instructor/students/${userId}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,

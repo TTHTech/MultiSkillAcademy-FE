@@ -136,7 +136,7 @@ const InstructorsTable = () => {
 
         try {
             const token = localStorage.getItem("token"); // Lấy token từ localStorage
-            const response = await fetch(`https://educoresystem-1.onrender.com/api/admin/instructors/${editingInstructor.id}`, {
+            const response = await fetch(`http://localhost:8080/api/admin/instructors/${editingInstructor.id}`, {
                 method: 'PUT',
                 headers: {
                     Authorization: `Bearer ${token}`, // Không cần đặt Content-Type vì FormData tự xử lý
