@@ -8,7 +8,7 @@ const InstructorProfile = () => {
   const [loading, setLoading] = useState(true);
   const userId = Number(localStorage.getItem("userId"));
 
-  const updateUrl = `http://localhost:8080/api/instructor/edit-user/${userId}`;
+  const updateUrl = `https://educoresystem-1.onrender.com/api/instructor/edit-user/${userId}`;
 
   // Lấy dữ liệu giảng viên từ API
   useEffect(() => {
@@ -18,7 +18,7 @@ const InstructorProfile = () => {
         if (!token) throw new Error("No token found, please login first.");
 
         const response = await fetch(
-          `http://localhost:8080/api/instructor/user/${userId}`,
+          `https://educoresystem-1.onrender.com/api/instructor/user/${userId}`,
           {
             method: "GET",
             headers: {

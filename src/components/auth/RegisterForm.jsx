@@ -1,6 +1,8 @@
 import { useState } from "react";
 import axios from "axios";
 import { FaGoogle, FaFacebookF } from "react-icons/fa";
+import { toast } from "react-toastify"; // Import toast thông báo
+import "react-toastify/dist/ReactToastify.css"; // CSS cho Toast
 
 // URL ảnh nền
 const COVER_IMAGE = "https://img2.thuthuatphanmem.vn/uploads/2018/12/30/anh-background-dep-nhat_110341130.jpg";
@@ -14,8 +16,15 @@ const RegisterForm = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
 
+  // Hàm xử lý khi submit form đăng ký
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Kiểm tra dữ liệu người dùng nhập vào (Optional: Kiểm tra sự hợp lệ của email, mật khẩu)
+    if (!email || !password || !firstName || !lastName || !username) {
+      toast.error("Please fill in all fields.");
+      return;
+    }
 
     try {
       const response = await axios.post(
@@ -31,13 +40,16 @@ const RegisterForm = () => {
 
       if (response.status === 200) {
         localStorage.setItem("emailForOtp", email);
-        window.location.href = "/verify-otp";
+        toast.success("Registration successful! Please verify your email.");
+        window.location.href = "/verify-otp"; // Chuyển hướng đến trang OTP
       }
     } catch (error) {
       if (error.response && error.response.status === 409) {
         setError("User already exists or invalid input.");
+        toast.error("User already exists or invalid input.");
       } else {
         setError("An error occurred. Please try again later.");
+        toast.error("An error occurred. Please try again later.");
       }
     }
   };

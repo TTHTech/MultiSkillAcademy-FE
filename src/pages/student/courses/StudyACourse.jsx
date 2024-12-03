@@ -18,7 +18,7 @@ const CourseViewer = () => {
     const fetchCourseData = async () => {
       try {
         const response = await fetch(
-          `http://localhost:8080/api/student/study-courses/${id}/${userId}`,
+          `https://educoresystem-1.onrender.com/api/student/study-courses/${id}/${userId}`,
           {
             method: "GET",
             headers: {
