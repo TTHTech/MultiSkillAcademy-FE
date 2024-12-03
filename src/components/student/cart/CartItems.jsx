@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { toast } from "react-toastify"; // Import toast
+import "react-toastify/dist/ReactToastify.css"; // Import CSS của react-toastify
 
 const CartItems = () => {
   // State to store cart items
@@ -14,7 +16,7 @@ const CartItems = () => {
     const fetchCartItems = async () => {
       try {
         // Get the token from localStorage (or wherever it's stored)
-        const token = localStorage.getItem("token"); // Or use another method for storing/retrieving the token
+        const token = localStorage.getItem("token");
 
         // Make the GET request to fetch cart items
         const response = await axios.get("http://localhost:8080/api/student/cart", {
@@ -23,19 +25,18 @@ const CartItems = () => {
           },
         });
 
-        // Log the response data to check its structure
-        console.log(response.data);
-
         // Check if data is in the expected format (array of items)
         if (Array.isArray(response.data)) {
           setCartItems(response.data); // Set the cart items into state
         } else {
           setError("Dữ liệu không hợp lệ");
+          toast.error("Dữ liệu không hợp lệ"); // Thông báo lỗi
         }
       } catch (err) {
         // Handle errors
         console.error(err);
         setError("Có lỗi xảy ra khi tải dữ liệu.");
+        toast.error("Có lỗi xảy ra khi tải dữ liệu."); // Thông báo lỗi khi không thể tải dữ liệu
       } finally {
         setLoading(false);
       }
@@ -59,9 +60,13 @@ const CartItems = () => {
 
       // Remove the course from the state
       setCartItems(cartItems.filter(item => item.courseId !== courseId));
+      
+      // Thông báo thành công
+      toast.success("Khóa học đã được xóa khỏi giỏ hàng!");
     } catch (err) {
       console.error(err);
       setError("Có lỗi xảy ra khi xóa khóa học.");
+      toast.error("Có lỗi xảy ra khi xóa khóa học."); // Thông báo lỗi khi không thể xóa khóa học
     }
   };
 
@@ -74,7 +79,6 @@ const CartItems = () => {
   if (error) {
     return <p>{error}</p>;
   }
-
   // Render cart items
   return (
     <div className="lg:w-2/3 space-y-4">

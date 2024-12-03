@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
+import { toast } from "react-toastify"; // Import toast
+import "react-toastify/dist/ReactToastify.css"; // Import CSS của react-toastify
 
 import NavBar from "../../../components/student/common/NavBar";
 import Footer from "../../../components/student/common/Footer";
@@ -39,7 +41,6 @@ const CourseDetailPage = () => {
   
     fetchCourseDetails();
   }, [courseId]);
-  
 
   const handleAddToCart = async () => {
     try {
@@ -53,10 +54,10 @@ const CourseDetailPage = () => {
           },
         }
       );
-      alert("Khóa học đã được thêm vào giỏ hàng");
+      toast.success("Khóa học đã được thêm vào giỏ hàng!");
     } catch (error) {
       console.error("Failed to add course to cart", error);
-      alert("Có lỗi xảy ra khi thêm khóa học vào giỏ hàng");
+      toast.error("Có lỗi xảy ra khi thêm khóa học vào giỏ hàng.");
     }
   };
 
