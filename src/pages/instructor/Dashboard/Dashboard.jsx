@@ -131,8 +131,8 @@ const Dashboard = () => {
         <ReviewsStats data={reviewData} />
       </div>
       <div className="mt-4">
-        <SalesStats data={salesData} />
       </div>
+      <SalesStats data={salesData} />
     </div>
   );
 };
