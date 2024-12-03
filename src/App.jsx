@@ -33,6 +33,7 @@ import Wishlist from "./pages/student/courses/PageWishlist";
 import Test from "./pages/instructor/Test/PageTest";
 import ForgotPasswordPage from "./pages/auth/ForgotPassPage";
 import ResetPassPage from "./pages/auth/ResetPassPage";
+import SuccessPage from "./pages/student/cart/SuccessPage";
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [role, setRole] = useState("");
@@ -77,7 +78,7 @@ function App() {
         <Route path="/instructor/questions" element={<PageQuestions />} />
         <Route path="/instructor/students" element={<StudentList />} />
         <Route path="/instructor/tests" element={<Test />} />
-
+        <Route path="/success" element={<SuccessPage />} />
 
 
         <Route path="/student/study/:id" element={<HocKhoaHoc />} />

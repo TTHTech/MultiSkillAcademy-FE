@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { toast } from "react-toastify"; // Import toast for notifications
 
 const CartSummary = () => {
   // State to store the total amount
   const [totalAmount, setTotalAmount] = useState(null);
+  // State to store the coupon code
+  const [coupon, setCoupon] = useState("");
   // State to handle loading state
   const [loading, setLoading] = useState(true);
   // State to handle any error
@@ -13,34 +16,57 @@ const CartSummary = () => {
     // Function to fetch total price from API
     const fetchTotalAmount = async () => {
       try {
-        // Get the token from localStorage (or wherever it's stored)
-        const token = localStorage.getItem("token"); // Or use another method for storing/retrieving the token
+        const token = localStorage.getItem("token");
 
-        // Make the GET request to fetch the total amount from the API
         const response = await axios.get("http://localhost:8080/api/student/cart/total", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
 
-        // Set the total amount in the state
-        setTotalAmount(response.data); // Assuming the response contains the total price as a number
+        setTotalAmount(response.data); // Assuming response data contains the total amount
       } catch (err) {
-        // Handle any errors during the API request
         setError("Có lỗi xảy ra khi tải dữ liệu.");
       } finally {
-        setLoading(false); // Set loading to false once the request is finished
+        setLoading(false);
       }
     };
 
-    // Call the function to fetch the total amount
     fetchTotalAmount();
-  }, []); // This ensures it runs only once when the component mounts
+  }, []);
 
+  // Function to handle payment process
+  const handlePayment = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      // Call API to create VNPay payment URL
+      const response = await axios.get(
+        `http://localhost:8080/api/student/vn-pay?totalAmount=${totalAmount}&couponCode=${coupon}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      // Check if the payment URL was successfully generated
+      if (response.data.code === "00") {
+        const paymentUrl = response.data.paymentUrl;
+        // Redirect to VNPay payment page
+        window.location.href = paymentUrl;
+      } else {
+        toast.error("Không thể tạo link thanh toán.");
+      }
+    } catch (err) {
+      toast.error("Có lỗi xảy ra khi tạo thanh toán.");
+    }
+  };
+
+  // Loading state
   if (loading) {
     return <p>Loading...</p>;
   }
 
+  // Error state
   if (error) {
     return <p>{error}</p>;
   }
@@ -52,16 +78,25 @@ const CartSummary = () => {
         {totalAmount !== null ? `₫ ${totalAmount.toLocaleString()}` : "₫ 0"}
       </p>
 
-      <button className="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-lg mb-4">
+      {/* Payment Button */}
+      <button
+        className="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-lg mb-4"
+        onClick={handlePayment}
+      >
         Thanh toán
       </button>
 
+      {/* Coupon Input */}
       <div className="mt-2">
-        <label htmlFor="coupon" className="block text-gray-700 mb-2">Khuyến mãi</label>
+        <label htmlFor="coupon" className="block text-gray-700 mb-2">
+          Khuyến mãi
+        </label>
         <div className="flex">
           <input
             type="text"
             id="coupon"
+            value={coupon}
+            onChange={(e) => setCoupon(e.target.value)} // Update coupon state
             placeholder="Nhập coupon"
             className="flex-grow px-3 py-2 border rounded-l-lg focus:outline-none"
           />
