@@ -29,11 +29,10 @@ import PageQuestions from "./pages/instructor/PageQuestions";
 import StudentList from "./pages/instructor/PageStudents";
 import HocKhoaHoc from "./pages/student/courses/StudyACourse";
 import CategoryPage from "./pages/admin/CategoryPage";
-
 import Wishlist from "./pages/student/courses/PageWishlist";
 import Test from "./pages/instructor/Test/PageTest";
-
-
+import ForgotPasswordPage from "./pages/auth/ForgotPassPage";
+import ResetPassPage from "./pages/auth/ResetPassPage";
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [role, setRole] = useState("");
@@ -47,7 +46,8 @@ function App() {
     if (
       !token &&
       location.pathname !== "/register" &&
-      location.pathname !== "/verify-otp"
+      location.pathname !== "/verify-otp" &&
+      location.pathname !== "/forgot-password"
     ) {
       navigate("/login");
     } else if (token) {
@@ -105,6 +105,8 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/verify-otp" element={<OtpVerificationPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPassPage />} />
 
           {/* Phân biệt các route dựa trên role */}
           {isLoggedIn && role === "ROLE_ADMIN" && (
