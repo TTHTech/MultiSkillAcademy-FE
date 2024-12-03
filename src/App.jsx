@@ -78,7 +78,7 @@ function App() {
         <Route path="/instructor/questions" element={<PageQuestions />} />
         <Route path="/instructor/students" element={<StudentList />} />
         <Route path="/instructor/tests" element={<Test />} />
-        <Route path="/success" element={<SuccessPage />} />
+       
 
 
         <Route path="/student/study/:id" element={<HocKhoaHoc />} />
@@ -133,6 +133,7 @@ function App() {
               <Route path="/student/list-my-course" element={<MyCoursesPage />} />
               <Route path="/course/:courseId" element={<CourseDetailPage />} />
               <Route path="/student/wishlist" element={<Wishlist />} />
+              <Route path="/student/success" element={<SuccessPage />} />
 
             </>
           )}
