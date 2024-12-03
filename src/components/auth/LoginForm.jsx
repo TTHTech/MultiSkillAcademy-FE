@@ -2,7 +2,8 @@ import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { FaGoogle, FaFacebookF } from "react-icons/fa";
-
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 const COVER_IMAGE = "https://phunugioi.com/wp-content/uploads/2020/02/mau-background-dep.jpg";
 const BACKGROUND_IMAGE = "https://toigingiuvedep.vn/wp-content/uploads/2021/02/background-may-dep-cho-khai-giang.jpg"; // Đường dẫn ảnh (đặt ảnh trong thư mục public nếu dùng React)
 
@@ -12,41 +13,52 @@ const LoginForm = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    try {
-      const response = await axios.post("http://localhost:8080/api/auth/login", {
-        username,
-        password,
-      });
+  try {
+    const response = await axios.post("http://localhost:8080/api/auth/login", {
+      username,
+      password,
+    });
 
-      const { token, userId, email: userEmail, role } = response.data;
-      localStorage.setItem("token", token);
-      localStorage.setItem("userId", userId);
-      localStorage.setItem("email", userEmail);
-      localStorage.setItem("role", role);
+    const { token, userId, email: userEmail, role } = response.data;
 
-      if (role === "ROLE_STUDENT") {
-        navigate("/student/home");
-      } else if (role === "ROLE_INSTRUCTOR") {
+    // Lưu thông tin vào localStorage
+    localStorage.setItem("token", token);
+    localStorage.setItem("userId", userId);
+    localStorage.setItem("email", userEmail);
+    localStorage.setItem("role", role);
 
-        navigate('/instructor/user');
-      } else if (role === "ROLE_ADMIN") {
-        navigate("/admin");
-      } else {
-        setError("Unknown role.");
-      }
-    } catch (error) {
-      if (error.response && error.response.status === 401) {
-        setError("Invalid username or password.");
-      } else if (error.response && error.response.status === 403) {
-        setError("Account not verified. Please verify your OTP.");
-      } else {
-        setError("An error occurred. Please try again later.");
-      }
+    // Thông báo thành công
+    toast.success("Login successful!");
+
+    // Điều hướng dựa trên vai trò người dùng
+    if (role === "ROLE_STUDENT") {
+      navigate("/student/home");
+    } else if (role === "ROLE_INSTRUCTOR") {
+      navigate("/instructor/user");
+    } else if (role === "ROLE_ADMIN") {
+      navigate("/admin");
+    } else {
+      setError("Unknown role.");
+      toast.error("Unknown role.");
     }
-  };
+  } catch (error) {
+    if (error.response && error.response.status === 401) {
+      setError("Invalid username or password.");
+      toast.error("Invalid username or password.");
+    } else if (error.response && error.response.status === 403) {
+      setError("Account not verified. Please verify your OTP.");
+      toast.error("Account not verified. Please verify your OTP.");
+    } else {
+      setError("An error occurred. Please try again later.");
+      toast.error("An error occurred. Please try again later.");
+    }
+  }
+};
+
 
   const handleOAuthLogin = (provider) => {
     window.location.href = `http://localhost:8080/oauth2/authorize/${provider}`;

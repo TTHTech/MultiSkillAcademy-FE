@@ -1,10 +1,13 @@
 import { useState } from "react";
 import axios from "axios";
+import { toast } from "react-toastify"; // Import toast
+import "react-toastify/dist/ReactToastify.css"; // Import Toast CSS
 
 const OtpVerificationForm = () => {
   const [otp, setOtp] = useState(new Array(6).fill("")); // Mảng để lưu 6 số OTP
   const [error, setError] = useState(null);
 
+  // Hàm xử lý thay đổi trong các ô nhập OTP
   const handleChange = (element, index) => {
     if (isNaN(element.value)) return; // Chỉ cho phép nhập số
 
@@ -18,6 +21,7 @@ const OtpVerificationForm = () => {
     }
   };
 
+  // Hàm xử lý khi gửi OTP
   const handleOtpSubmit = async (e) => {
     e.preventDefault();
     const email = localStorage.getItem("emailForOtp"); // Lấy email từ localStorage đã lưu khi đăng ký
@@ -30,11 +34,15 @@ const OtpVerificationForm = () => {
       });
 
       if (response.status === 200) {
-        // OTP hợp lệ, chuyển đến trang đăng nhập
-        window.location.href = "/login";
+        toast.success("OTP verified successfully! Redirecting to login...");
+        setTimeout(() => {
+          window.location.href = "/login";
+        }, 1500); 
       }
     } catch (error) {
+   
       setError("Invalid OTP. Please try again.");
+      toast.error("Invalid OTP. Please try again.");
     }
   };
 
