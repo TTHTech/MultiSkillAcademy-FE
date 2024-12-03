@@ -59,8 +59,8 @@ function App() {
 
   return (
     <>
-        {/* Toast Notifications */}
-        <ToastContainer
+      {/* Toast Notifications */}
+      <ToastContainer
         position="top-right"
         autoClose={3000}
         hideProgressBar={false}
@@ -70,23 +70,12 @@ function App() {
         theme="colored"
       />
       <Routes>
-        <Route path="/instructor/user" element={<PageUser />} />
-        <Route path="/instructor/dashboard" element={<PageDashboard />} />
-        <Route path="/instructor/courses" element={<PageCourses />} />
-        <Route path="/instructor/courses/:id" element={<PagneCourseDetail />} />
-        <Route path="/instructor/courses/addCourses" element={<PageAdd />} />
-        <Route path="/instructor/questions" element={<PageQuestions />} />
-        <Route path="/instructor/students" element={<StudentList />} />
-        <Route path="/instructor/tests" element={<Test />} />
-       
-
-
         <Route path="/student/study/:id" element={<HocKhoaHoc />} />
 
         <Route path="/student/wishlist" element={<Wishlist />} />
       </Routes>
 
-      <div className="flex h-screen text-gray-100 overflow-hidden">
+      <div className="flex h-screen">
         {/* Hiển thị lớp nền chỉ dành cho admin */}
         {isLoggedIn && role === "ROLE_ADMIN" && (
           <div className="fixed inset-0 z-0">
@@ -130,11 +119,12 @@ function App() {
             <>
               <Route path="/student/home" element={<StudentHomePage />} />
               <Route path="/student/cart" element={<CartPage />} />
-              <Route path="/student/list-my-course" element={<MyCoursesPage />} />
+              <Route
+                path="/student/list-my-course"
+                element={<MyCoursesPage />}
+              />
               <Route path="/course/:courseId" element={<CourseDetailPage />} />
               <Route path="/student/wishlist" element={<Wishlist />} />
-              <Route path="/student/success" element={<SuccessPage />} />
-
             </>
           )}
 
@@ -142,6 +132,21 @@ function App() {
           {isLoggedIn && role === "ROLE_INSTRUCTOR" && (
             <>
               {/* <Route path="/instructor/courses" element={<InstructorPage />} /> */}
+              <Route path="/instructor/user" element={<PageUser />} />
+              <Route path="/instructor/dashboard" element={<PageDashboard />} />
+              <Route path="/instructor/courses" element={<PageCourses />} />
+              <Route
+                path="/instructor/courses/:id"
+                element={<PagneCourseDetail />}
+              />
+              <Route
+                path="/instructor/courses/addCourses"
+                element={<PageAdd />}
+              />
+              <Route path="/instructor/questions" element={<PageQuestions />} />
+              <Route path="/instructor/students" element={<StudentList />} />
+              <Route path="/instructor/tests" element={<Test />} />
+              <Route path="/success" element={<SuccessPage />} />
             </>
           )}
         </Routes>
