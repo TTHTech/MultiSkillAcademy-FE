@@ -24,7 +24,7 @@ const PageCourseDetail = () => {
       console.log(localStorage.getItem("token"));
       try {
         const response = await fetch(
-          `http://localhost:8080/api/instructor/courses/${id}`,
+          `https://educoresystem-1.onrender.com/api/instructor/courses/${id}`,
           {
             method: "GET",
             headers: {
@@ -115,7 +115,7 @@ const PageCourseDetail = () => {
     try {
       // Gọi API cập nhật Section
       const response = await fetch(
-        `http://localhost:8080/api/instructor/update-course/${course.courseId}`,
+        `https://educoresystem-1.onrender.com/api/instructor/update-course/${course.courseId}`,
         {
           method: "PUT",
           headers: {
@@ -176,7 +176,7 @@ const PageCourseDetail = () => {
     try {
       // Gọi API thêm Section
       const response = await fetch(
-        "http://localhost:8080/api/instructor/add-section",
+        "https://educoresystem-1.onrender.com/api/instructor/add-section",
         {
           method: "POST",
           headers: {
@@ -239,7 +239,7 @@ const PageCourseDetail = () => {
     try {
       // Gọi API cập nhật Section
       const response = await fetch(
-        `http://localhost:8080/api/instructor/update-section/${section_id}`,
+        `https://educoresystem-1.onrender.com/api/instructor/update-section/${section_id}`,
         {
           method: "PUT",
           headers: {
@@ -300,7 +300,7 @@ const PageCourseDetail = () => {
     try {
       // Gọi API xóa Section
       const response = await fetch(
-        `http://localhost:8080/api/instructor/delete-section/${section_id}`,
+        `https://educoresystem-1.onrender.com/api/instructor/delete-section/${section_id}`,
         {
           method: "DELETE",
           headers: {
@@ -395,7 +395,7 @@ const PageCourseDetail = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:8080/api/instructor/update-lecture/${lecture_id}`,
+        `https://educoresystem-1.onrender.com/api/instructor/update-lecture/${lecture_id}`,
         {
           method: "PUT",
           headers: {
@@ -443,7 +443,7 @@ const PageCourseDetail = () => {
     }
     try {
       const response = await fetch(
-        `http://localhost:8080/api/instructor/delete-lecture/${lecture_id}`,
+        `https://educoresystem-1.onrender.com/api/instructor/delete-lecture/${lecture_id}`,
         {
           method: "DELETE",
           headers: {
@@ -508,7 +508,7 @@ const PageCourseDetail = () => {
 
     try {
       const response = await fetch(
-        "http://localhost:8080/api/instructor/add-lecture",
+        "https://educoresystem-1.onrender.com/api/instructor/add-lecture",
         {
           method: "POST",
           headers: {
@@ -565,7 +565,7 @@ const PageCourseDetail = () => {
           name: "Image " + course.courseId,
         };
         const response = await fetch(
-          `http://localhost:8080/api/instructor/addImage/${course.courseId}`,
+          `https://educoresystem-1.onrender.com/api/instructor/addImage/${course.courseId}`,
           {
             method: "POST",
             headers: {
@@ -608,7 +608,7 @@ const PageCourseDetail = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:8080/api/instructor/deleteImage/${course.courseId}`,
+        `https://educoresystem-1.onrender.com/api/instructor/deleteImage/${course.courseId}`,
         {
           method: "DELETE",
           headers: {
@@ -670,7 +670,7 @@ const PageCourseDetail = () => {
       };
       try {
         const response = await fetch(
-          `http://localhost:8080/api/instructor/updateImage/${course.courseId}`,
+          `https://educoresystem-1.onrender.com/api/instructor/updateImage/${course.courseId}`,
           {
             method: "PUT",
             headers: {

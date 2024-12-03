@@ -19,7 +19,7 @@ const WishlistCard = ({ course, onDelete }) => {
     }
 
     try {
-      await axios.delete(`http://localhost:8080/api/student/delete-course`, {
+      await axios.delete(`https://educoresystem-1.onrender.com/api/student/delete-course`, {
         data: { courseId: course.courseId, userId: userId, createdAt: " " },
       });
 
