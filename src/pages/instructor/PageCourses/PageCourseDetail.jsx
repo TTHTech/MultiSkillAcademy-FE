@@ -15,7 +15,7 @@ import ButtonBack from "../../../components/instructor/BackButton/BackButton";
 import axios from "axios";
 import moment from "moment";
 import Swal from "sweetalert2";
-
+import CourseDetails from "./EditableList";
 const PageCourseDetail = () => {
   const [open, setOpen] = useState(true);
   const { id } = useParams();
@@ -988,7 +988,7 @@ const PageCourseDetail = () => {
             </div>
           )}
         </div>
-
+<CourseDetails/>
         <div className="bg-white shadow-md rounded-lg p-6">
           <h2 className="text-2xl font-semibold text-gray-800 mb-4">
             Sections & Lectures
