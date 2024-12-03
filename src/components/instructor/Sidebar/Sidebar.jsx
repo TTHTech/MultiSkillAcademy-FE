@@ -11,8 +11,8 @@ import { LuFileSignature } from "react-icons/lu";
 const Sidebar = ({ open, setOpen }) => {
   const location = useLocation();
   const menus = [
-    { name: "User", link: "/instructor/user", icon: AiOutlineUser },
-    { name: "Dashboard", link: "/instructor/dashboard", icon: MdOutlineDashboard },
+    { name: "Profile", link: "/instructor/user", icon: AiOutlineUser },
+    // { name: "Dashboard", link: "/instructor/dashboard", icon: MdOutlineDashboard },
     { name: "Courses", link: "/instructor/courses", icon: ImBook },
     { name: "Test", link: "/instructor/tests", icon: LuFileSignature },
     { name: "Questions", link: "/instructor/questions", icon: BsFillQuestionSquareFill },

@@ -13,6 +13,7 @@ const PageCourses = () => {
     const [pendingPage, setPendingPage] = useState(1);
     const [approvedPage, setApprovedPage] = useState(1);
     const [unsentPage, setUnsentPage] = useState(1);
+    const [declinedPage, setDeclinedPage] = useState(1);  // New state for declined courses
 
     const coursesPerPage = 8;
 
@@ -26,7 +27,6 @@ const PageCourses = () => {
                     },
                 });
                 const data = await response.json();
-                console.log(localStorage.getItem("token"))
                 setCourses(data);
             } catch (error) {
                 console.error("Error fetching courses:", error);
@@ -37,9 +37,10 @@ const PageCourses = () => {
 
     const filterCourses = (status) => {
         return courses.filter((course) => {
-            if (status === "pending") return !course.status || course.status === "Unknown";
+            if (status === "pending") return !course.status || course.status === "Pending";
             if (status === "approved") return ["Active", "Processing", "Inactive"].includes(course.status);
             if (status === "unsent") return course.status === "Unsent";
+            if (status === "declined") return course.status === "Declined";  // Filter for declined courses
             return false;
         });
     };
@@ -54,24 +55,28 @@ const PageCourses = () => {
         { key: "pending", label: "Courses Chưa Duyệt" },
         { key: "approved", label: "Courses Đã Duyệt" },
         { key: "unsent", label: "Courses Chưa Gửi" },
+        { key: "declined", label: "Courses Bị Từ Chối" }, // New tab for declined courses
     ];
 
     const courseLists = {
         pending: filterCourses("pending"),
         approved: filterCourses("approved"),
         unsent: filterCourses("unsent"),
+        declined: filterCourses("declined"),  // Declined courses filter
     };
 
     const pages = {
         pending: pendingPage,
         approved: approvedPage,
         unsent: unsentPage,
+        declined: declinedPage,  // Declined courses page state
     };
 
     const setPages = {
         pending: setPendingPage,
         approved: setApprovedPage,
         unsent: setUnsentPage,
+        declined: setDeclinedPage,  // Declined courses page setter
     };
 
     return (
