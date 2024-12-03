@@ -31,17 +31,17 @@ const VNPayCallback = () => {
           const data = await response.json();
 
           if (response.ok && data.code === "00") {
-            // Thanh toán thành công
-            navigate("/success"); // Chuyển hướng đến trang thành công
+    
+            navigate("/success"); 
           } else {
-            // Thanh toán thất bại
+       
             alert(`Thanh toán thất bại: ${data.message || "Vui lòng thử lại."}`);
-            navigate("/failure"); // Có thể chuyển hướng đến trang thất bại nếu cần
+            navigate("/failure"); 
           }
         } catch (error) {
-          // Xử lý lỗi khi gọi API
+  
           alert("Có lỗi xảy ra khi xác nhận thanh toán. Vui lòng thử lại.");
-          navigate("/failure"); // Chuyển hướng đến trang thất bại
+          navigate("/failure");
         }
       };
 
