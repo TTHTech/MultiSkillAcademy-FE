@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Camera } from "lucide-react";
+import Swal from "sweetalert2";
 
 const InstructorProfile = () => {
   const [instructor, setInstructor] = useState(null);
@@ -7,6 +8,7 @@ const InstructorProfile = () => {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
   const userId = Number(localStorage.getItem("userId"));
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
 
   const updateUrl = `http://localhost:8080/api/instructor/edit-user/${userId}`;
 
@@ -79,6 +81,13 @@ const InstructorProfile = () => {
       if (!response.ok) throw new Error("Failed to update instructor");
 
       const updatedInstructor = await response.json();
+      await Swal.fire({
+        title: "Confirmation",
+        text: "Chỉnh sửa thông tin giảng viên thành công",
+        icon: "success",
+        confirmButtonText: "Yes",
+      });
+
       setInstructor(updatedInstructor);
       setIsEditing(false); // Đóng chế độ chỉnh sửa
     } catch (err) {
@@ -89,6 +98,59 @@ const InstructorProfile = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setInstructor({ ...instructor, [name]: value });
+  };
+  const handleChangePassword = async () => {
+    const currentPassword = document.querySelector(
+      'input[name="currentPassword"]'
+    ).value;
+    const newPassword = document.querySelector(
+      'input[name="newPassword"]'
+    ).value;
+    const confirmNewPassword = document.querySelector(
+      'input[name="confirmNewPassword"]'
+    ).value;
+
+    if (newPassword !== confirmNewPassword) {
+      await Swal.fire({
+        title: "Confirmation",
+        text: "Mật khảu mới không trùng nhau!",
+        icon: "question",
+        confirmButtonText: "Yes",
+      });
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `http://localhost:8080/api/instructor/change-password/${userId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ currentPassword, newPassword }),
+        }
+      );
+
+      if (!response.ok) throw new Error("Failed to change password");
+
+      await Swal.fire({
+        title: "Confirmation",
+        text: "Đổi mật khẩu thành công",
+        icon: "success",
+        confirmButtonText: "Yes",
+      });
+      setIsChangingPassword(false);
+    } catch (err) {
+      await Swal.fire({
+        title: "Confirmation",
+        text: err.message,
+        icon: "error",
+        confirmButtonText: "Yes",
+      });
+    }
   };
 
   const handleImageChange = (e) => {
@@ -111,7 +173,77 @@ const InstructorProfile = () => {
 
   return (
     <div className="rounded-lg p-6">
-      {isEditing ? (
+      {isChangingPassword ? (
+        <div className="p-6 bg-white rounded-lg shadow-lg max-w-md mx-auto">
+          <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">
+            Change Password
+          </h2>
+          <div className="space-y-6">
+            <div>
+              <label
+                htmlFor="currentPassword"
+                className="text-gray-700 font-medium"
+              >
+                Current Password
+              </label>
+              <input
+                type="password"
+                name="currentPassword"
+                id="currentPassword"
+                placeholder="Enter your current password"
+                className="w-full p-4 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300 ease-in-out"
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="newPassword"
+                className="text-gray-700 font-medium"
+              >
+                New Password
+              </label>
+              <input
+                type="password"
+                name="newPassword"
+                id="newPassword"
+                placeholder="Enter a new password"
+                className="w-full p-4 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300 ease-in-out"
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="confirmNewPassword"
+                className="text-gray-700 font-medium"
+              >
+                Confirm New Password
+              </label>
+              <input
+                type="password"
+                name="confirmNewPassword"
+                id="confirmNewPassword"
+                placeholder="Confirm your new password"
+                className="w-full p-4 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300 ease-in-out"
+              />
+            </div>
+          </div>
+
+          <div className="mt-8 flex justify-end space-x-6">
+            <button
+              onClick={handleChangePassword}
+              className="px-8 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 transition duration-300 ease-in-out"
+            >
+              Save
+            </button>
+            <button
+              onClick={() => setIsChangingPassword(false)}
+              className="px-8 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-400 transition duration-300 ease-in-out"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      ) : isEditing ? (
         <div className="p-6 bg-white rounded-lg shadow-lg">
           <h2 className="text-2xl font-semibold text-gray-900 mb-6">
             Edit Profile
@@ -257,12 +389,20 @@ const InstructorProfile = () => {
                 {instructor.active ? "Active" : "Inactive"}
               </p>
             </div>
-            <button
-              onClick={() => setIsEditing(true)}
-              className="mt-6 bg-blue-500 text-white px-6 py-2 rounded-lg shadow hover:bg-blue-600"
-            >
-              Edit
-            </button>
+            <div className="mt-6 flex justify-end space-x-4">
+              <button
+                onClick={() => setIsEditing(true)}
+                className="bg-blue-500 text-white px-6 py-2 rounded-lg shadow hover:bg-blue-600"
+              >
+                Edit Profile
+              </button>
+              <button
+                onClick={() => setIsChangingPassword(true)}
+                className="bg-green-500 text-white px-6 py-2 rounded-lg shadow hover:bg-green-600"
+              >
+                Change Password
+              </button>
+            </div>
           </div>
         </div>
       )}

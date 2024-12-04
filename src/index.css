@@ -2,5 +2,5 @@
 @tailwind components;
 @tailwind utilities;
 body {
-    @apply font-open-sans bg-gradient-to-b from-gray-100 to-blue-100;
+    @apply font-open-sans bg-gradient-to-b from-gray-100 to-gray-100;
   }

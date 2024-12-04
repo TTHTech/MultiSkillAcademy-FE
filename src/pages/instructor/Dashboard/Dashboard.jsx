@@ -98,7 +98,7 @@ const Dashboard = () => {
           <ImBook className="text-primary dark:text-white" size={22} />
         </CardDataStats>
 
-        <CardDataStats title="Total Money" total={`$${salesData.totalSales}`}>
+        <CardDataStats title="Total Money" total={`$${salesData.totalSales.toLocaleString()}`}>
           <FaDollarSign className="text-primary dark:text-white" size={22} />
         </CardDataStats>
 

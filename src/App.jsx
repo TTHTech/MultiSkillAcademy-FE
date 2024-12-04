@@ -34,6 +34,8 @@ import Test from "./pages/instructor/Test/PageTest";
 import ForgotPasswordPage from "./pages/auth/ForgotPassPage";
 import ResetPassPage from "./pages/auth/ResetPassPage";
 import SuccessPage from "./pages/student/cart/SuccessPage";
+import PageReview from "./pages/instructor/PageReview";
+import PageSales from "./pages/instructor/PageSales";
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [role, setRole] = useState("");
@@ -143,8 +145,11 @@ function App() {
                 path="/instructor/courses/addCourses"
                 element={<PageAdd />}
               />
+              <Route path="/instructor/review" element={<PageReview />} />
+
               <Route path="/instructor/questions" element={<PageQuestions />} />
               <Route path="/instructor/students" element={<StudentList />} />
+              <Route path="/instructor/sales" element={<PageSales />} />
               <Route path="/instructor/tests" element={<Test />} />
               <Route path="/success" element={<SuccessPage />} />
             </>
