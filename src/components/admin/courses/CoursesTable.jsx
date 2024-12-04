@@ -3,6 +3,8 @@ import { motion } from "framer-motion";
 import { Search } from "lucide-react";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/swiper-bundle.css"; // Đường dẫn chính xác hơn
 
 // Số lượng khóa học hiển thị mỗi trang
 const ITEMS_PER_PAGE = 10;
@@ -80,7 +82,7 @@ const CoursesTable = () => {
       console.error("Course ID is undefined");
       return;
     }
-  
+
     try {
       const response = await fetch(
         `http://localhost:8080/api/admin/courses/${courseId}/status`,
@@ -93,13 +95,13 @@ const CoursesTable = () => {
           body: JSON.stringify({ status: "Active" }),
         }
       );
-  
+
       if (!response.ok) {
         throw new Error("Failed to update course status.");
       }
-  
+
       toast.success("Course accepted successfully!");
-  
+
       // Cập nhật lại danh sách ngay lập tức
       setCourses((prevCourses) =>
         prevCourses.map((course) =>
@@ -108,7 +110,7 @@ const CoursesTable = () => {
             : course
         )
       );
-  
+
       // Đóng modal
       setEditingCourse(null);
     } catch (error) {
@@ -116,13 +118,13 @@ const CoursesTable = () => {
       toast.error(`Error: ${error.message}`);
     }
   };
-  
+
   const handleReject = async (courseId) => {
     if (!courseId) {
       console.error("Course ID is undefined");
       return;
     }
-  
+
     try {
       const response = await fetch(
         `http://localhost:8080/api/admin/courses/${courseId}/status`,
@@ -135,13 +137,13 @@ const CoursesTable = () => {
           body: JSON.stringify({ status: "Declined" }),
         }
       );
-  
+
       if (!response.ok) {
         throw new Error("Failed to update course status.");
       }
-  
+
       toast.success("Course rejected successfully!");
-  
+
       // Cập nhật lại danh sách ngay lập tức
       setCourses((prevCourses) =>
         prevCourses.map((course) =>
@@ -150,7 +152,7 @@ const CoursesTable = () => {
             : course
         )
       );
-  
+
       // Đóng modal
       setEditingCourse(null);
     } catch (error) {
@@ -158,8 +160,6 @@ const CoursesTable = () => {
       toast.error(`Error: ${error.message}`);
     }
   };
-  
-
 
   const handleView = (course) => {
     setEditingCourse(course); // Hiển thị chi tiết khóa học
@@ -186,7 +186,7 @@ const CoursesTable = () => {
     >
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-semibold text-gray-100">
-          Courses Unknown Approval
+          Courses Pending Review and Approval
         </h2>
         <div className="relative">
           <input
@@ -205,11 +205,26 @@ const CoursesTable = () => {
         <div className="bg-gray-700 p-4 rounded-lg">
           {/* Ảnh khóa học */}
           <div className="flex justify-center mb-4">
-            <img
-              src={editingCourse.images ? editingCourse.images[0] : ""}
-              alt={editingCourse.title}
-              className="w-100 h-100 object-cover rounded-lg"
-            />
+            <Swiper
+              spaceBetween={10} // Khoảng cách giữa các slide
+              slidesPerView={1} // Hiển thị 1 ảnh mỗi lần
+              navigation={true} // Hiển thị nút mũi tên điều hướng
+              loop={true} // Cho phép vòng lặp (quay lại ảnh đầu tiên khi đi qua ảnh cuối)
+              className="w-64 h-64" // Hình vuông 64x64
+            >
+              {editingCourse.imageUrls &&
+                editingCourse.imageUrls.map((image, index) => (
+                  <SwiperSlide key={index}>
+                    <div className="w-64 h-64 overflow-hidden rounded-lg">
+                      <img
+                        src={image}
+                        alt={`Course Image ${index + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  </SwiperSlide>
+                ))}
+            </Swiper>
           </div>
 
           <h3 className="text-lg font-semibold text-gray-100 mb-4">
@@ -392,7 +407,7 @@ const CoursesTable = () => {
         <table className="table-auto w-full text-left text-gray-100">
           <thead>
             <tr className="border-b bg-gray-700">
-              <th className="py-2 px-4">#</th>
+              <th className="py-2 px-4">ID</th>
               <th className="py-2 px-4">Name</th>
               <th className="py-2 px-4">Duration</th>
               <th className="py-2 px-4">Category</th>

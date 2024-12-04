@@ -15,8 +15,14 @@ const Dashboard = () => {
   const [salesData, setSalesData] = useState({});
   const [reviewData, setReviewData] = useState({});
   const [studentData, setStudentData] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+
       const token = localStorage.getItem("token");
       const config = {
         headers: {
@@ -25,22 +31,25 @@ const Dashboard = () => {
       };
 
       try {
-        const courseResponse = await axios.get(
-          "http://localhost:8080/api/instructor/dashboard/courses/2",
-          config
-        );
-        const salesResponse = await axios.get(
-          "http://localhost:8080/api/instructor/dashboard/sales/2",
-          config
-        );
-        const reviewResponse = await axios.get(
-          "http://localhost:8080/api/instructor/dashboard/reviews/2",
-          config
-        );
-        const studentResponse = await axios.get(
-          "http://localhost:8080/api/instructor/dashboard/students/2",
-          config
-        );
+        const [courseResponse, salesResponse, reviewResponse, studentResponse] =
+          await Promise.all([
+            axios.get(
+              "http://localhost:8080/api/instructor/dashboard/courses/2",
+              config
+            ),
+            axios.get(
+              "http://localhost:8080/api/instructor/dashboard/sales/2",
+              config
+            ),
+            axios.get(
+              "http://localhost:8080/api/instructor/dashboard/reviews/2",
+              config
+            ),
+            axios.get(
+              "http://localhost:8080/api/instructor/dashboard/students/2",
+              config
+            ),
+          ]);
 
         setCourseData(courseResponse.data);
         setSalesData(salesResponse.data);
@@ -48,11 +57,34 @@ const Dashboard = () => {
         setStudentData(studentResponse.data);
       } catch (error) {
         console.error("Error fetching data:", error);
+        setError("Failed to load data. Please try again.");
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchData();
-  }, []);
+  }, []); // Không thêm dependency để chỉ chạy khi tải lại.
+
+  if (loading) {
+    return (
+      <div className="p-8 bg-gray-100 min-h-screen flex items-center justify-center">
+        <p className="text-xl font-semibold text-gray-600 dark:text-gray-300">
+          Loading data...
+        </p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-8 bg-gray-100 min-h-screen flex items-center justify-center">
+        <p className="text-xl font-semibold text-red-600 dark:text-red-400">
+          {error}
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="p-8 bg-gray-100 min-h-screen">
@@ -60,79 +92,43 @@ const Dashboard = () => {
         Instructor Profile
       </h1>
 
-        {/* Left Section - User Profile */}
-
-
-        {/* Right Section - Card Data Stats */}
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-8">
+      {/* Cards Section */}
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-8">
         <CardDataStats title="Total Courses" total={courseData.totalCourses}>
-            <svg
-              className="fill-current text-primary dark:text-white"
-              width="22"
-              height="50"
-              viewBox="0 0 22 22"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <ImBook className="text-primary dark:text-white" size={22} />
-            </svg>
-          </CardDataStats>
+          <ImBook className="text-primary dark:text-white" size={22} />
+        </CardDataStats>
 
-          <CardDataStats title="Total Money" total={`$${salesData.totalSales}`}>
-            <svg
-              className="fill-current text-primary dark:text-white"
-              width="22"
-              height="50"
-              viewBox="0 0 22 22"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <FaDollarSign
-                className="text-primary dark:text-white"
-                size={22}
-              />
-            </svg>
-          </CardDataStats>
+        <CardDataStats title="Total Money" total={`$${salesData.totalSales}`}>
+          <FaDollarSign className="text-primary dark:text-white" size={22} />
+        </CardDataStats>
 
-          <CardDataStats title="Total Reviews" total={reviewData.totalReview}>
-            <svg
-              className="fill-current text-primary dark:text-white"
-              width="22"
-              height="50"
-              viewBox="0 0 22 22"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <FaStar className="text-primary dark:text-white" size={22} />
-            </svg>
-          </CardDataStats>
+        <CardDataStats title="Total Reviews" total={reviewData.totalReview}>
+          <FaStar className="text-primary dark:text-white" size={22} />
+        </CardDataStats>
 
-          <CardDataStats
-            title="Total Students"
-            total={studentData.totalStudent}
-          >
-            <svg
-              className="fill-current text-primary dark:text-white"
-              width="22"
-              height="50"
-              viewBox="0 0 22 22"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <PiStudentFill className="text-primary dark:text-white" size={22} />
-            </svg>
-          </CardDataStats>
-        </div>
-      <div className="flex-1">
-          <User />
-        </div>
+        <CardDataStats
+          title="Total Students"
+          total={studentData.totalStudent}
+        >
+          <PiStudentFill className="text-primary dark:text-white" size={22} />
+        </CardDataStats>
+      </div>
+
+      {/* User Section */}
+      <div className="flex-1 mt-6">
+        <User />
+      </div>
+
+      {/* Stats Section */}
       <div className="mt-4 grid grid-cols-12 gap-4 md:mt-6 md:gap-6 2xl:mt-7.5 2xl:gap-7.5">
         <CourseStats data={courseData} />
         <ReviewsStats data={reviewData} />
       </div>
+
+      {/* Sales Chart */}
       <div className="mt-4">
+        <SalesStats data={salesData} />
       </div>
-      <SalesStats data={salesData} />
     </div>
   );
 };
