@@ -27,7 +27,7 @@ import PagneCourseDetail from "./pages/instructor/PageCourses/PageCourseDetail";
 import PageAdd from "./pages/instructor/PageCourses/PageCoursesAdd";
 import PageQuestions from "./pages/instructor/PageQuestions";
 import StudentList from "./pages/instructor/PageStudents";
-import HocKhoaHoc from "./pages/student/courses/StudyACourse";
+import HocKhoaHoc from "./pages/student/content/StudyMyCourse";
 import CategoryPage from "./pages/admin/CategoryPage";
 import Wishlist from "./pages/student/courses/PageWishlist";
 import Test from "./pages/instructor/Test/PageTest";
@@ -70,7 +70,7 @@ function App() {
         theme="colored"
       />
       <Routes>
-        <Route path="/student/study/:id" element={<HocKhoaHoc />} />
+        <Route path="/student/study/:progress/:id" element={<HocKhoaHoc />} />
 
         <Route path="/student/wishlist" element={<Wishlist />} />
       </Routes>
