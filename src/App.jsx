@@ -31,7 +31,7 @@ import CourseViewerPage from "./pages/student/content/CourseViewerPage.jsx";
 import CategoryPage from "./pages/admin/CategoryPage";
 import Wishlist from "./pages/student/courses/PageWishlist";
 import Test from "./pages/instructor/Test/PageTest";
-import ForgotPasswordPage from "./pages/auth/ForgotPassPage";
+import ForgotPassPage from "./pages/auth/ForgotPassPage";
 import ResetPassPage from "./pages/auth/ResetPassPage";
 import SuccessPage from "./pages/student/cart/SuccessPage";
 import Logout from "./components/auth/Logout.jsx";
@@ -51,7 +51,10 @@ function App() {
 
     if (
       !token &&
-      !["/register", "/verify-otp", "/forgot-password", "/reset-password"].includes(location.pathname)
+      
+      location.pathname !== "/register" &&
+      location.pathname !== "/verify-otp" &&
+      location.pathname !== "/forgot-password"
     ) {
       navigate("/login");
     } else if (token) {
@@ -62,6 +65,7 @@ function App() {
 
   return (
     <>
+      {/* Toast Notifications */}
       <ToastContainer
         position="top-right"
         autoClose={3000}
@@ -71,9 +75,14 @@ function App() {
         draggable
         theme="colored"
       />
+      <Routes>
+       
+        <Route path="/student/wishlist" element={<Wishlist />} />
+        
+      </Routes>
 
       <div className="flex h-screen">
-        {/* Display background only for admin */}
+        {/* Hiển thị lớp nền chỉ dành cho admin */}
         {isLoggedIn && role === "ROLE_ADMIN" && (
           <div className="fixed inset-0 z-0">
             <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 opacity-80" />
@@ -81,23 +90,23 @@ function App() {
           </div>
         )}
 
-        {/* Show Sidebar only for Admin and not on login/verify pages */}
+        {/* Kiểm tra hiển thị Sidebar chỉ cho Admin và không hiển thị trên các trang đăng nhập/xác thực */}
         {isLoggedIn &&
           role === "ROLE_ADMIN" &&
-          !["/login", "/register", "/verify-otp", "/forgot-password", "/reset-password"].includes(location.pathname) && (
-            <Sidebar />
-          )}
+          !["/login", "/register", "/verify-otp", "/verify-otp", "/forgot-password", "/reset-password"].includes(
+            location.pathname
+          ) && <Sidebar />}
 
         <Routes>
-          {/* Authentication Routes */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/logout" element={<Logout />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/verify-otp" element={<OtpVerificationPage />} />
-          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/forgot-password" element={<ForgotPassPage />} />
           <Route path="/reset-password" element={<ResetPassPage />} />
+        
 
-          {/* Admin Routes */}
+          {/* Phân biệt các route dựa trên role */}
           {isLoggedIn && role === "ROLE_ADMIN" && (
             <>
               <Route path="/admin" element={<OverviewPage />} />
@@ -113,34 +122,46 @@ function App() {
             </>
           )}
 
-          {/* Student Routes */}
+          {/* Các route cho sinh viên khi role là student */}
           {isLoggedIn && role === "ROLE_STUDENT" && (
             <>
               <Route path="/student/home" element={<StudentHomePage />} />
               <Route path="/student/cart" element={<CartPage />} />
-              <Route path="/student/list-my-course" element={<MyCoursesPage />} />
+              <Route
+                path="/student/list-my-course"
+                element={<MyCoursesPage />}
+              />
               <Route path="/course/:courseId" element={<CourseDetailPage />} />
               <Route path="/student/profile" element={<ProfilePage />} />
               <Route path="/category/:categoryId" element={<CategoryStudentPage />} />
               <Route path="/student/study/:progress/:id" element={<CourseViewerPage />} />
-              <Route path="/student/wishlist" element={<Wishlist />} />
+              <Route path="/student/Success" element={<SuccessPage />} />
+        
             </>
           )}
 
-          {/* Instructor Routes */}
+          {/* Các route cho giảng viên khi role là instructor */}
           {isLoggedIn && role === "ROLE_INSTRUCTOR" && (
             <>
+              {/* <Route path="/instructor/courses" element={<InstructorPage />} /> */}
               <Route path="/instructor/user" element={<PageUser />} />
               <Route path="/instructor/dashboard" element={<PageDashboard />} />
               <Route path="/instructor/courses" element={<PageCourses />} />
-              <Route path="/instructor/courses/:id" element={<PagneCourseDetail />} />
-              <Route path="/instructor/courses/addCourses" element={<PageAdd />} />
+              <Route
+                path="/instructor/courses/:id"
+                element={<PagneCourseDetail />}
+              />
+              <Route
+                path="/instructor/courses/addCourses"
+                element={<PageAdd />}
+              />
               <Route path="/instructor/review" element={<PageReview />} />
+
               <Route path="/instructor/questions" element={<PageQuestions />} />
               <Route path="/instructor/students" element={<StudentList />} />
               <Route path="/instructor/sales" element={<PageSales />} />
               <Route path="/instructor/tests" element={<Test />} />
-              <Route path="/success" element={<SuccessPage />} />
+              <Route path="/payment/success" element={<SuccessPage />} />
             </>
           )}
         </Routes>

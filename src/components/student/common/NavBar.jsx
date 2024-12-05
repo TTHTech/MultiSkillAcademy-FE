@@ -7,6 +7,8 @@ import ProfileMenu from '../../../components/student/profile/ProfileMenu';
 const Navbar = () => {
   const [isMenuOpen, setMenuOpen] = useState(false);
   const [categories, setCategories] = useState([]); // State lưu danh mục
+  const [searchQuery, setSearchQuery] = useState('');  // State lưu giá trị tìm kiếm
+  const [searchResults, setSearchResults] = useState([]);  // State lưu kết quả tìm kiếm
   const timeoutRef = useRef(null);
 
   useEffect(() => {
@@ -33,6 +35,32 @@ const Navbar = () => {
     timeoutRef.current = setTimeout(() => {
       setMenuOpen(false); // Đóng menu nếu không di chuột lại vào menu hoặc nút "Thể loại"
     }, 1000);
+  };
+
+  // Handle search input change
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);  // Update search query as user types
+  };
+
+  // Handle search form submission
+  const handleSearchSubmit = async (e) => {
+    e.preventDefault();  // Prevent form submission
+    if (!searchQuery.trim()) {
+      alert('Vui lòng nhập tên khóa học');
+      return;
+    }
+
+    try {
+      const response = await axios.get(`http://localhost:8080/api/student/courses/search`, {
+        params: {
+          query: searchQuery
+        }
+      });
+
+      setSearchResults(response.data); // Cập nhật kết quả tìm kiếm
+    } catch (error) {
+      console.error('Lỗi khi tìm kiếm khóa học:', error);
+    }
   };
 
   return (
@@ -86,16 +114,23 @@ const Navbar = () => {
 
         {/* Thanh tìm kiếm */}
         <div className="flex-grow mx-8">
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="Tìm kiếm nội dung bất kỳ"
-              className="w-full px-4 py-2 text-sm border rounded-full focus:outline-none focus:ring focus:ring-gray-300"
-            />
-            <button className="absolute right-2 top-1/2 transform -translate-y-1/2">
-              <i className="fas fa-search text-gray-400"></i>
-            </button>
-          </div>
+          <form onSubmit={handleSearchSubmit}>
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Tìm kiếm khóa học"
+                className="w-full px-4 py-2 text-sm border rounded-full focus:outline-none focus:ring focus:ring-gray-300"
+                value={searchQuery}
+                onChange={handleSearchChange}  // Lắng nghe thay đổi input
+              />
+              <button 
+                type="submit"
+                className="absolute right-2 top-1/2 transform -translate-y-1/2"
+              >
+                <i className="fas fa-search text-gray-400"></i>
+              </button>
+            </div>
+          </form>
         </div>
 
         {/* Menu */}
@@ -107,9 +142,6 @@ const Navbar = () => {
             <Link to="/student/cart" className="text-gray-600 hover:text-black">
               <i className="fas fa-shopping-cart text-xl"></i>
             </Link>
-            {/*<a href="/student/category" className="text-gray-600 hover:text-black">
-            //   <i className="fas fa-bell text-xl"></i>
-            // </a>*/}
             <a href="/student/wishlist" className="text-gray-600 hover:text-black">
               <i className="fas fa-heart text-xl"></i>
             </a>
@@ -134,6 +166,26 @@ const Navbar = () => {
           ))}
         </div>
       </div>
+
+      {/* Kết quả tìm kiếm */}
+      {searchResults.length > 0 && (
+        <div className="bg-white py-4">
+          <div className="container mx-auto px-4">
+            <h3 className="text-xl font-semibold text-gray-800 mb-2">Kết quả tìm kiếm:</h3>
+            <div className="grid grid-cols-1 gap-4">
+              {searchResults.map((course, index) => (
+                <Link
+                  key={index}
+                  to={`/course/${course.courseId}`}  // Thêm đường dẫn tới khóa học
+                  className="text-gray-700 hover:text-black py-1 px-2 block"
+                >
+                  {course.name} {/* Hiển thị tên khóa học */}
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </nav>
   );
 };

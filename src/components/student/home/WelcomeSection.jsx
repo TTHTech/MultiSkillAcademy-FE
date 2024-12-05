@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Link } from 'react-router-dom'; // Import Link
 
 const DEFAULT_PROFILE_IMAGE = 'https://th.bing.com/th/id/OIP.t9Wb7K5Kp5iVn5IHLZS5HwHaH_?rs=1&pid=ImgDetMain'; // Default image if not found
 
@@ -55,7 +56,7 @@ const WelcomeSection = () => {
         <h3 className="text-2xl font-bold text-gray-900">
           Chào mừng {lastName ? lastName : 'Người dùng'} trở lại!
         </h3>
-        <a href="#" className="text-purple-600 underline text-sm">Thêm nghề nghiệp và sở thích</a>
+        <Link to="/student/profile" className="text-purple-600 underline text-sm">Thêm nghề nghiệp và sở thích</Link> {/* Updated to use Link */}
       </div>
     </div>
   );

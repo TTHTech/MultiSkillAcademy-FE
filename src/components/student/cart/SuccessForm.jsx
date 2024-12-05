@@ -6,7 +6,7 @@ const SuccessForm = () => {
   const navigate = useNavigate();
 
   const handleHomeClick = () => {
-    navigate('/'); // Chuyển hướng về trang chủ
+    navigate('/student/home'); // Chuyển hướng về trang /student/home
   };
 
   return (
