@@ -6,7 +6,7 @@ const calculateMaxYValue = (data) => {
     console.error("Expected data to be an array but got:", data);
     return 100; 
   }
-
+  console.log(data)
   const flattenedData = data.flatMap(item => item.data || []);
   const maxDataValue = Math.max(...flattenedData, 0);
   if (maxDataValue <= 100) return 100;

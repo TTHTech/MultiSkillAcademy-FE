@@ -6,7 +6,7 @@ const PageUser = () => {
   const [open, setOpen] = useState(true);
   return (
     <section
-      className={`m-3 text-xl text-gray-900 font-semibold duration-300 flex-1 bg-gradient-to-b from-gray-100 to-blue-100 shadow-lg rounded-lg min-h-screen ${
+      className={`m-3 text-xl text-gray-900 font-semibold duration-300 flex-1 bg-gradient-to-b from-gray-100 to-gray-100 shadow-lg rounded-lg min-h-screen ${
         open ? "ml-72" : "ml-16"
       }`}
     >

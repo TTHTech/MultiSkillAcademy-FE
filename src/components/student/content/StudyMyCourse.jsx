@@ -8,9 +8,9 @@ const CourseViewer = () => {
   const [selectedSection, setSelectedSection] = useState(null);
   const [selectedLecture, setSelectedLecture] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const { id, progress } = useParams(); // Course ID và progress
+  const { id, progress } = useParams();
   const navigate = useNavigate();
-  const userId = Number(localStorage.getItem("userId")); // Lấy userId từ localStorage
+  const userId = Number(localStorage.getItem("userId"));
 
   // Fetch thông tin khóa học
   useEffect(() => {
@@ -28,12 +28,23 @@ const CourseViewer = () => {
         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
         const data = await response.json();
 
-        // Áp dụng trạng thái hoàn thành từ progress
-        const completedLectures = new Set(progress?.split(",").map(Number)); // progress là chuỗi các ID bài học đã hoàn thành
+        // Tính toán số lượng bài học đã hoàn thành dựa trên progress
+        const totalLectures = data.sections.reduce(
+          (count, section) => count + section.lectures.length,
+          0
+        );
+        const completedCount = Math.round((progress / 100) * totalLectures);
+
+        // Đánh dấu bài học đã hoàn thành
+        let completedSoFar = 0;
         data.sections.forEach((section) => {
           section.lectures.forEach((lecture) => {
-            lecture.completed = completedLectures.has(lecture.lecture_id);
-            lecture.locked = lecture.completed; // Khóa bài học nếu đã hoàn thành
+            if (completedSoFar < completedCount) {
+              lecture.completed = true;
+              completedSoFar++;
+            } else {
+              lecture.completed = false;
+            }
           });
         });
 
@@ -48,7 +59,6 @@ const CourseViewer = () => {
     fetchCourseData();
   }, [id, userId, progress]);
 
-  // Hiển thị thông báo nếu khóa học chưa đăng ký
   const handleConfirmation = async () => {
     const swalResult = await Swal.fire({
       title: "Xác nhận",
@@ -61,12 +71,10 @@ const CourseViewer = () => {
     if (swalResult.isConfirmed) navigate(`/course/${id}`);
   };
 
-  // Nếu không có dữ liệu khóa học, hiển thị thông báo
   useEffect(() => {
     if (!isLoading && course === null) handleConfirmation();
   }, [isLoading, course, id]);
 
-  // Hàm cập nhật tiến độ bài giảng
   const updateProgress = async (lectureId) => {
     try {
       const response = await fetch("http://localhost:8080/api/student/update-progress", {
@@ -88,16 +96,27 @@ const CourseViewer = () => {
     }
   };
 
-  // Xử lý sự kiện tích chọn checkbox bài giảng
-  const handleCheckboxChange = (lecture) => {
-    if (lecture.locked) return; // Không cho phép thay đổi nếu đã khóa
-    lecture.completed = true; // Đánh dấu hoàn thành
-    lecture.locked = true; // Khóa bài học
-    setCourse({ ...course }); // Cập nhật lại state
-    updateProgress(lecture.lecture_id); // Gọi API để cập nhật tiến độ
+  const handleLectureClick = (lecture) => {
+    setSelectedLecture(lecture);
   };
 
-  // Tính số lượng bài học đã hoàn thành
+  const handleCheckboxChange = async (lecture) => {
+    if (lecture.completed) return; // Không cho phép thay đổi nếu đã hoàn thành
+    const swalResult = await Swal.fire({
+      title: "Xác nhận",
+      text: "Bạn có chắc chắn muốn cập nhật tiến độ tại bài học này không?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Có",
+      cancelButtonText: "Không",
+    });
+    if (!swalResult.isConfirmed) return;
+
+    lecture.completed = true;
+    setCourse({ ...course });
+    updateProgress(lecture.lecture_id);
+  };
+
   const calculateCompletedLectures = (lectures) =>
     lectures.filter((lecture) => lecture.completed).length;
 
@@ -143,15 +162,16 @@ const CourseViewer = () => {
                     <li
                       key={lecture.lecture_id}
                       className={`p-2 rounded-lg ${
-                        lecture.locked ? "bg-green-100" : "bg-gray-50"
+                        lecture.completed ? "bg-green-100" : "bg-gray-50"
                       } hover:bg-gray-200 cursor-pointer flex justify-between items-center`}
+                      onClick={() => handleLectureClick(lecture)}
                     >
                       <div>
                         <input
                           type="checkbox"
                           checked={lecture.completed}
                           className="mr-2"
-                          disabled={lecture.locked}
+                          disabled={lecture.completed}
                           onChange={() => handleCheckboxChange(lecture)}
                         />
                         {lecture.title}

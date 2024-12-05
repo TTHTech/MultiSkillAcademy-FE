@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai'; // Import các icon trái tim đầy và rỗng
+import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai';
+import { useParams } from 'react-router-dom';
 
 const CourseMedia = ({ 
   price, 
@@ -8,12 +9,40 @@ const CourseMedia = ({
   onBuyNow, 
   resourceDescription 
 }) => {
-  // Quản lý trạng thái yêu thích
-  const [isFavorite, setIsFavorite] = useState(false); // Khởi tạo với giá trị mặc định là false (trái tim trắng)
+  const [isFavorite, setIsFavorite] = useState(false); // Trạng thái yêu thích
+  const userId = Number(localStorage.getItem("userId")); // Lấy userId từ localStorage
+  const { courseId } = useParams(); // Course ID từ URL
+  const [error, setError] = useState(null); // Quản lý lỗi khi thêm vào wishlist
 
-  // Hàm thay đổi trạng thái yêu thích khi người dùng nhấn vào trái tim
-  const handleFavoriteToggle = () => {
+  // Hàm thay đổi trạng thái yêu thích và gửi yêu cầu đến API
+  const handleFavoriteToggle = async () => {
     setIsFavorite(!isFavorite); // Đảo trạng thái yêu thích
+    
+    // Gửi request đến API để thêm vào wishlist
+    const requestData = {
+      userId: userId,
+      courseId: courseId,
+      createdAt: new Date(), // Thời gian tạo wishlist
+    };
+
+    try {
+      const response = await fetch('http://localhost:8080/api/student/add-wishlist', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
+      });
+
+      if (response.ok) {
+        console.log('Thêm vào wishlist thành công');
+        // Có thể hiển thị thông báo thành công ở đây
+      } else {
+        throw new Error('Đã xảy ra lỗi khi thêm vào wishlist');
+      }
+    } catch (err) {
+      setError(err.message); // Cập nhật lỗi nếu có
+    }
   };
 
   return (
@@ -25,7 +54,7 @@ const CourseMedia = ({
       {/* Price */}
       <div className="text-3xl font-bold text-gray-800 mb-4">đ {price}</div>
 
-      {/* Add to Cart Button and Heart Icon with equal width */}
+      {/* Add to Cart Button and Heart Icon */}
       <div className="flex items-center justify-between mb-4">
         {/* Thêm vào giỏ hàng */}
         <button 
@@ -34,7 +63,7 @@ const CourseMedia = ({
         >
           Thêm vào giỏ hàng
         </button>
-        
+
         {/* Biểu tượng trái tim */}
         <div onClick={handleFavoriteToggle} className="cursor-pointer w-10 h-10 flex items-center justify-center border-2 border-gray-600 rounded-lg bg-white">
           {isFavorite ? (
@@ -69,6 +98,9 @@ const CourseMedia = ({
           )}
         </ul>
       </div>
+
+      {/* Error Message */}
+      {error && <p className="text-red-500 text-sm">{error}</p>}
 
       {/* Additional Links */}
       <div className="flex justify-between text-sm text-blue-600">
