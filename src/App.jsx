@@ -34,6 +34,7 @@ import Test from "./pages/instructor/Test/PageTest";
 import ForgotPasswordPage from "./pages/auth/ForgotPassPage";
 import ResetPassPage from "./pages/auth/ResetPassPage";
 import SuccessPage from "./pages/student/cart/SuccessPage";
+
 import PageReview from "./pages/instructor/PageReview";
 import PageSales from "./pages/instructor/PageSales";
 import ProfilePage from "./pages/student/profile/ProfilePage.jsx";
@@ -128,7 +129,6 @@ function App() {
                 element={<MyCoursesPage />}
               />
               <Route path="/course/:courseId" element={<CourseDetailPage />} />
-              <Route path="/student/wishlist" element={<Wishlist />} />
               <Route path="/student/profile" element={<ProfilePage />} />
               <Route path="/category/:categoryId" element={<CategoryStudentPage />} />
             </>
