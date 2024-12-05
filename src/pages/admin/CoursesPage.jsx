@@ -50,11 +50,11 @@ const ProductsPage = () => {
         <ProductsTable />
         <AcceptedCoursesTable />
 
-        {/* CHARTS */}
+        {/* CHARTS 
         <div className="grid grid-col-1 lg:grid-cols-2 gap-8">
           <SalesTrendChart />
           <CategoryDistributionChart />
-        </div>
+        </div>*/}
       </main>
     </div>
   );

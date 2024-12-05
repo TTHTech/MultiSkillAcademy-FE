@@ -27,14 +27,14 @@ import PagneCourseDetail from "./pages/instructor/PageCourses/PageCourseDetail";
 import PageAdd from "./pages/instructor/PageCourses/PageCoursesAdd";
 import PageQuestions from "./pages/instructor/PageQuestions";
 import StudentList from "./pages/instructor/PageStudents";
-import HocKhoaHoc from "./pages/student/content/StudyMyCourse";
+import CourseViewerPage from "./pages/student/content/CourseViewerPage.jsx";
 import CategoryPage from "./pages/admin/CategoryPage";
 import Wishlist from "./pages/student/courses/PageWishlist";
 import Test from "./pages/instructor/Test/PageTest";
 import ForgotPasswordPage from "./pages/auth/ForgotPassPage";
 import ResetPassPage from "./pages/auth/ResetPassPage";
 import SuccessPage from "./pages/student/cart/SuccessPage";
-
+import Logout from "./components/auth/Logout.jsx";
 import PageReview from "./pages/instructor/PageReview";
 import PageSales from "./pages/instructor/PageSales";
 import ProfilePage from "./pages/student/profile/ProfilePage.jsx";
@@ -51,6 +51,7 @@ function App() {
 
     if (
       !token &&
+      
       location.pathname !== "/register" &&
       location.pathname !== "/verify-otp" &&
       location.pathname !== "/forgot-password"
@@ -75,8 +76,7 @@ function App() {
         theme="colored"
       />
       <Routes>
-        <Route path="/student/study/:progress/:id" element={<HocKhoaHoc />} />
-
+       
         <Route path="/student/wishlist" element={<Wishlist />} />
       </Routes>
 
@@ -98,6 +98,7 @@ function App() {
 
         <Routes>
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/logout" element={<Logout />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/verify-otp" element={<OtpVerificationPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
@@ -131,6 +132,8 @@ function App() {
               <Route path="/course/:courseId" element={<CourseDetailPage />} />
               <Route path="/student/profile" element={<ProfilePage />} />
               <Route path="/category/:categoryId" element={<CategoryStudentPage />} />
+              <Route path="/student/study/:progress/:id" element={<CourseViewerPage />} />
+        
             </>
           )}
 
