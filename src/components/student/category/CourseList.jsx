@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
-import CourseCard from './CourseCard';
 import { Link } from 'react-router-dom';
+import CourseCard from './CourseCard';  // Assuming you have this component for rendering course details
 
 const CourseList = ({ categoryId, filter }) => {
   const [courses, setCourses] = useState([]);
@@ -52,14 +52,21 @@ const CourseList = ({ categoryId, filter }) => {
           <p>Không có khóa học nào phù hợp với bộ lọc của bạn.</p>
           {/* Button to go back to home */}
           <Link to="/student/home">
-            <button className="bg-blue-500 text-white px-4 py-2 rounded-md mt-4 ">
+            <button className="bg-blue-500 text-white px-4 py-2 rounded-md mt-4">
               Quay về trang chủ
             </button>
           </Link>
         </div>
       ) : (
         filteredCourses().map((course, index) => (
-          <CourseCard key={index} course={course} />
+          // Wrap each course card in a Link component to navigate to course detail page
+          <Link
+            key={index}
+            to={`/course/${course.courseId}`} // Navigate to the detail page of the course
+            className="w-full"
+          >
+            <CourseCard course={course} />
+          </Link>
         ))
       )}
     </div>
@@ -68,7 +75,7 @@ const CourseList = ({ categoryId, filter }) => {
 
 // Helper function to filter by price range
 const isInPriceRange = (price, priceRange) => {
-  const priceStr = String(price);  // Chuyển price thành chuỗi nếu không phải chuỗi
+  const priceStr = String(price);  // Convert price to string if it's not already
   const priceInt = parseInt(priceStr.replace(/[^\d]/g, ''));
   const [minPrice, maxPrice] = priceRange.split('-').map(val => parseInt(val.replace(/[^\d]/g, '')));
   return priceInt >= minPrice && priceInt <= maxPrice;

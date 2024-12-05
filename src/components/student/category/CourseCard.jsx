@@ -16,24 +16,30 @@ const CourseCard = ({ course }) => {
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md border">
+    <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200 hover:shadow-xl transition-shadow duration-300">
+      {/* Course Image */}
       <img
-        src={course.imageUrls[0]} 
+        src={course.imageUrls[0] || 'default-image-url.jpg'} // Fallback image if no image is provided
         alt={course.title}
         className="w-full h-48 object-cover rounded-md mb-4"
       />
-      <h2 className="text-xl font-semibold text-gray-800">{course.title}</h2>
-      <p className="text-sm text-gray-600">
+      {/* Course Title */}
+      <h2 className="text-xl font-semibold text-gray-800 mb-2">{course.title}</h2>
+      {/* Instructor Name */}
+      <p className="text-sm text-gray-600 mb-1">
         Giảng viên: {course.instructorFirstName} {course.instructorLastName}
       </p>
-      <p className="text-sm text-gray-600">Mức độ: {course.level}</p>
-      <p className="text-sm text-gray-600">Giá: {course.price.toLocaleString('vi-VN')} VND</p>
-      <p className="text-sm text-gray-600">Thời gian: {course.duration}</p>
-      <div className="flex items-center mt-2">
+      {/* Course Level */}
+      <p className="text-sm text-gray-600 mb-1">Mức độ: {course.level}</p>
+      {/* Price */}
+      <p className="text-sm text-gray-600 mb-1">Giá: {course.price.toLocaleString('vi-VN')} VND</p>
+      {/* Duration */}
+      <p className="text-sm text-gray-600 mb-3">Thời gian: {course.duration}</p>
+      {/* Rating */}
+      <div className="flex items-center">
         {renderStars(course.rating)}
         <span className="ml-2 text-sm text-gray-600">({course.rating})</span>
       </div>
-      <button className="mt-4 bg-blue-600 text-white py-2 px-4 rounded-md">Xem chi tiết</button>
     </div>
   );
 };

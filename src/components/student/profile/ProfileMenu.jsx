@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 
-const DEFAULT_PROFILE_IMAGE = 'https://via.placeholder.com/150'; // Default profile image if none is provided
+const DEFAULT_PROFILE_IMAGE = 'https://cdn3.vectorstock.com/i/1000x1000/51/87/student-avatar-user-profile-icon-vector-47025187.jpg'; // Default profile image if none is provided
 
 const ProfileMenu = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -34,8 +34,8 @@ const ProfileMenu = () => {
         });
 
         // Cập nhật dữ liệu người dùng
-        const { profileImageUrl, firstName, lastName, email } = response.data;
-        setProfileImage(profileImageUrl || DEFAULT_PROFILE_IMAGE);
+        const { profileImage, firstName, lastName, email } = response.data;
+        setProfileImage(profileImage || DEFAULT_PROFILE_IMAGE);
         setUserName(`${firstName} ${lastName}`);
         setUserEmail(email);
       } catch (error) {

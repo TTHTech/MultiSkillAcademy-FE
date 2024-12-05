@@ -107,9 +107,9 @@ const Navbar = () => {
             <Link to="/student/cart" className="text-gray-600 hover:text-black">
               <i className="fas fa-shopping-cart text-xl"></i>
             </Link>
-            <a href="/student/category" className="text-gray-600 hover:text-black">
-              <i className="fas fa-bell text-xl"></i>
-            </a>
+            {/*<a href="/student/category" className="text-gray-600 hover:text-black">
+            //   <i className="fas fa-bell text-xl"></i>
+            // </a>*/}
             <a href="/student/wishlist" className="text-gray-600 hover:text-black">
               <i className="fas fa-heart text-xl"></i>
             </a>
