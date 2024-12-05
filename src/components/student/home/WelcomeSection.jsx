@@ -1,19 +1,60 @@
-// src/components/home/WelcomeSection.jsx
-import React from "react";
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+
+const DEFAULT_PROFILE_IMAGE = 'https://th.bing.com/th/id/OIP.t9Wb7K5Kp5iVn5IHLZS5HwHaH_?rs=1&pid=ImgDetMain'; // Default image if not found
 
 const WelcomeSection = () => {
+  const [profileImage, setProfileImage] = useState(DEFAULT_PROFILE_IMAGE);
+  const [lastName, setLastName] = useState('');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const userId = localStorage.getItem('userId');
+
+        if (!token || !userId) {
+          console.error('No token or userId found');
+          return;
+        }
+
+        const response = await axios.get(`http://localhost:8080/api/student/profile/${userId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        // Assuming response.data contains profileImageUrl and lastName
+        const { profileImage, lastName } = response.data;
+
+        setProfileImage(profileImage || DEFAULT_PROFILE_IMAGE);
+        setLastName(lastName || 'Người dùng'); // Default to 'User' if lastName is missing
+      } catch (error) {
+        console.error('Error fetching profile data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserProfile();
+  }, []); // Fetch data when the component mounts
+
   return (
     <div className="flex items-center space-x-4 p-6 bg-white shadow-md rounded-md my-6">
-      {/* Avatar người dùng */}
-      <img 
-        src="https://th.bing.com/th/id/OIP.i3OCpdwqxkglpt9oOMDLzwHaHa?w=190&h=190&c=7&r=0&o=5&dpr=1.6&pid=1.7" 
-        alt="User Avatar" 
-        className="h-16 w-16 rounded-full object-cover" 
+      {/* Avatar */}
+      <img
+        src={profileImage}
+        alt="User Avatar"
+        className="h-16 w-16 rounded-full object-cover"
+        onError={() => setProfileImage(DEFAULT_PROFILE_IMAGE)} // Fallback if image fails to load
       />
-      
-      {/* Phần chào mừng và liên kết */}
+
+      {/* Welcome Text */}
       <div>
-        <h3 className="text-2xl font-bold text-gray-900">Chào mừng Hoài trở lại!</h3>
+        <h3 className="text-2xl font-bold text-gray-900">
+          Chào mừng {lastName ? lastName : 'Người dùng'} trở lại!
+        </h3>
         <a href="#" className="text-purple-600 underline text-sm">Thêm nghề nghiệp và sở thích</a>
       </div>
     </div>

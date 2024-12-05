@@ -51,10 +51,7 @@ function App() {
 
     if (
       !token &&
-      
-      location.pathname !== "/register" &&
-      location.pathname !== "/verify-otp" &&
-      location.pathname !== "/forgot-password"
+      !["/register", "/verify-otp", "/forgot-password", "/reset-password"].includes(location.pathname)
     ) {
       navigate("/login");
     } else if (token) {
@@ -65,7 +62,6 @@ function App() {
 
   return (
     <>
-      {/* Toast Notifications */}
       <ToastContainer
         position="top-right"
         autoClose={3000}
@@ -75,13 +71,9 @@ function App() {
         draggable
         theme="colored"
       />
-      <Routes>
-       
-        <Route path="/student/wishlist" element={<Wishlist />} />
-      </Routes>
 
       <div className="flex h-screen">
-        {/* Hiển thị lớp nền chỉ dành cho admin */}
+        {/* Display background only for admin */}
         {isLoggedIn && role === "ROLE_ADMIN" && (
           <div className="fixed inset-0 z-0">
             <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 opacity-80" />
@@ -89,14 +81,15 @@ function App() {
           </div>
         )}
 
-        {/* Kiểm tra hiển thị Sidebar chỉ cho Admin và không hiển thị trên các trang đăng nhập/xác thực */}
+        {/* Show Sidebar only for Admin and not on login/verify pages */}
         {isLoggedIn &&
           role === "ROLE_ADMIN" &&
-          !["/login", "/register", "/verify-otp"].includes(
-            location.pathname
-          ) && <Sidebar />}
+          !["/login", "/register", "/verify-otp", "/forgot-password", "/reset-password"].includes(location.pathname) && (
+            <Sidebar />
+          )}
 
         <Routes>
+          {/* Authentication Routes */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/logout" element={<Logout />} />
           <Route path="/register" element={<RegisterPage />} />
@@ -104,7 +97,7 @@ function App() {
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password" element={<ResetPassPage />} />
 
-          {/* Phân biệt các route dựa trên role */}
+          {/* Admin Routes */}
           {isLoggedIn && role === "ROLE_ADMIN" && (
             <>
               <Route path="/admin" element={<OverviewPage />} />
@@ -120,40 +113,29 @@ function App() {
             </>
           )}
 
-          {/* Các route cho sinh viên khi role là student */}
+          {/* Student Routes */}
           {isLoggedIn && role === "ROLE_STUDENT" && (
             <>
               <Route path="/student/home" element={<StudentHomePage />} />
               <Route path="/student/cart" element={<CartPage />} />
-              <Route
-                path="/student/list-my-course"
-                element={<MyCoursesPage />}
-              />
+              <Route path="/student/list-my-course" element={<MyCoursesPage />} />
               <Route path="/course/:courseId" element={<CourseDetailPage />} />
               <Route path="/student/profile" element={<ProfilePage />} />
               <Route path="/category/:categoryId" element={<CategoryStudentPage />} />
               <Route path="/student/study/:progress/:id" element={<CourseViewerPage />} />
-        
+              <Route path="/student/wishlist" element={<Wishlist />} />
             </>
           )}
 
-          {/* Các route cho giảng viên khi role là instructor */}
+          {/* Instructor Routes */}
           {isLoggedIn && role === "ROLE_INSTRUCTOR" && (
             <>
-              {/* <Route path="/instructor/courses" element={<InstructorPage />} /> */}
               <Route path="/instructor/user" element={<PageUser />} />
               <Route path="/instructor/dashboard" element={<PageDashboard />} />
               <Route path="/instructor/courses" element={<PageCourses />} />
-              <Route
-                path="/instructor/courses/:id"
-                element={<PagneCourseDetail />}
-              />
-              <Route
-                path="/instructor/courses/addCourses"
-                element={<PageAdd />}
-              />
+              <Route path="/instructor/courses/:id" element={<PagneCourseDetail />} />
+              <Route path="/instructor/courses/addCourses" element={<PageAdd />} />
               <Route path="/instructor/review" element={<PageReview />} />
-
               <Route path="/instructor/questions" element={<PageQuestions />} />
               <Route path="/instructor/students" element={<StudentList />} />
               <Route path="/instructor/sales" element={<PageSales />} />

@@ -139,7 +139,7 @@ const ProfileInfo = () => {
             src={
               newImage
                 ? URL.createObjectURL(newImage)
-                : profile.profileImageUrl || "https://via.placeholder.com/150"
+                : profile.profileImage || "https://via.placeholder.com/150"
             }
             alt="User Avatar"
             className="w-32 h-32 rounded-full object-cover border-2 border-gray-200"

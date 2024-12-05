@@ -111,7 +111,7 @@ const CartItems = () => {
             </p>
             {/* Actions */}
             <div className="flex space-x-4 text-purple-700 mt-2 font-semibold">
-              <button className="underline hover:text-purple-900">Lưu để mua sau</button>
+              {/*<button className="underline hover:text-purple-900">Lưu để mua sau</button>*/}
               <button className="underline hover:text-purple-900">Chuyển vào danh sách mong ước</button>
               {/* Delete Button */}
               <button
