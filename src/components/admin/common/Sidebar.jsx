@@ -29,7 +29,7 @@ const Sidebar = () => {
 
   return (
     <motion.div
-      className={`relative z-10 transition-all duration-300 ease-in-out flex-shrink-0 ${
+      className={`relative z-10 transition-all duration-300 ease-in-out flex-shrink-0    ${
         isSidebarOpen ? "w-64" : "w-20"
       }`}
       animate={{ width: isSidebarOpen ? 256 : 80 }}
@@ -58,7 +58,7 @@ const Sidebar = () => {
                   <AnimatePresence>
                     {isSidebarOpen && (
                       <motion.span
-                        className="ml-4 whitespace-nowrap"
+                        className="ml-4 whitespace-nowrap text-white" // Màu chữ vàng
                         initial={{ opacity: 0, width: 0 }}
                         animate={{ opacity: 1, width: "auto" }}
                         exit={{ opacity: 0, width: 0 }}
@@ -78,7 +78,7 @@ const Sidebar = () => {
                     <AnimatePresence>
                       {isSidebarOpen && (
                         <motion.span
-                          className="ml-4 whitespace-nowrap"
+                          className="ml-4 whitespace-nowrap text-white" // Màu chữ vàng
                           initial={{ opacity: 0, width: 0 }}
                           animate={{ opacity: 1, width: "auto" }}
                           exit={{ opacity: 0, width: 0 }}

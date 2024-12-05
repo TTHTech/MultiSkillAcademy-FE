@@ -1,26 +1,28 @@
 import { useState } from "react";
-import { Camera } from "lucide-react"; // Import icon Camera
+import { Camera } from "lucide-react";
+import { toast } from "react-toastify"; // Import toast
+import "react-toastify/dist/ReactToastify.css"; // Import css cho Toast
 
 const CreateUserForm = () => {
   const [newUser, setNewUser] = useState({
-    username: "", // Thêm trường username
+    username: "",
     firstName: "",
     lastName: "",
     email: "",
     password: "",
-    confirmPassword: "", // Chỉ kiểm tra phía client
-    role: "ROLE_STUDENT", // Mặc định là Student, có thể thay đổi qua select
+    confirmPassword: "",
+    role: "ROLE_STUDENT",
     phoneNumber: "",
     address: "",
     bio: "",
     dateOfBirth: "",
-    active: "true", // Mặc định trạng thái là Active
-    profileImage: "", // Lưu ảnh đại diện
+    active: "true",
+    profileImage: "",
   });
 
-  const [passwordError, setPasswordError] = useState(""); // Để lưu lỗi liên quan đến mật khẩu
+  const [passwordError, setPasswordError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [responseMessage, setResponseMessage] = useState("");
+  const [responseMessage, setResponseMessage] = useState(""); // Khai báo state cho responseMessage
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -30,23 +32,18 @@ const CreateUserForm = () => {
     });
   };
 
-  // Xử lý khi người dùng tải lên ảnh đại diện
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setNewUser({ ...newUser, profileImage: file }); // Lưu file ảnh, không cần dùng base64
+      setNewUser({ ...newUser, profileImage: file });
     }
   };
 
-  // Hàm gọi API để tạo người dùng mới
   const onCreateUser = async (userData) => {
-    setLoading(true); // Bắt đầu trạng thái loading
+    setLoading(true);
     const formData = new FormData();
-
-    // Thêm các thông tin về user vào FormData
     formData.append("user", JSON.stringify(userData));
 
-    // Nếu có file ảnh, thêm vào formData
     if (newUser.profileImage) {
       formData.append("profileImage", newUser.profileImage);
     }
@@ -55,35 +52,42 @@ const CreateUserForm = () => {
       const response = await fetch("http://localhost:8080/api/admin/users?role=" + userData.role, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`, // Nếu có token
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
-        body: formData, // Dùng FormData cho multipart request
+        body: formData,
       });
 
       if (response.ok) {
         const data = await response.json();
-        setResponseMessage("User created successfully: " + data.firstName);
+        setResponseMessage(`User created successfully: ${data.firstName}`); // Cập nhật responseMessage
+        toast.success(`User created successfully: ${data.firstName}`);
       } else {
         const errorData = await response.json();
-        setResponseMessage("Error: " + errorData.message);
+        setResponseMessage(`Error: ${errorData.message}`); // Cập nhật responseMessage với thông báo lỗi
+        toast.error(`Error: ${errorData.message}`);
       }
     } catch (error) {
-      setResponseMessage("Error: " + error.message);
+      setResponseMessage(`Error: ${error.message}`); // Cập nhật responseMessage nếu có lỗi
+      toast.error(`Error: ${error.message}`);
     } finally {
-      setLoading(false); // Kết thúc trạng thái loading
+      setLoading(false);
     }
   };
 
-  // Xử lý khi nhấn "Create Account"
   const handleCreateUser = () => {
-    if (newUser.password !== newUser.confirmPassword) {
-      setPasswordError("Passwords do not match");
+    if (!newUser.username || !newUser.email || !newUser.password) {
+      toast.error("Please fill in all required fields: Username, Email, Password.");
       return;
     }
 
-    // Tạo dữ liệu user nhưng không bao gồm `confirmPassword`
+    if (newUser.password !== newUser.confirmPassword) {
+      setPasswordError("Passwords do not match");
+      toast.error("Passwords do not match");
+      return;
+    }
+
     const userData = {
-      username: newUser.username, // Thêm username
+      username: newUser.username,
       firstName: newUser.firstName,
       lastName: newUser.lastName,
       email: newUser.email,
@@ -96,26 +100,24 @@ const CreateUserForm = () => {
       active: newUser.active,
     };
 
-    // Gọi API để tạo người dùng mới
     onCreateUser(userData);
 
-    // Reset form sau khi tạo
     setNewUser({
-      username: "", // Reset username
+      username: "",
       firstName: "",
       lastName: "",
       email: "",
       password: "",
       confirmPassword: "",
-      role: "ROLE_STUDENT", // Reset về mặc định
+      role: "ROLE_STUDENT",
       phoneNumber: "",
       address: "",
       bio: "",
       dateOfBirth: "",
-      active: "true", // Reset trạng thái Active
-      profileImage: "", // Reset ảnh đại diện
+      active: "true",
+      profileImage: "",
     });
-    setPasswordError(""); // Reset lỗi
+    setPasswordError("");
   };
 
   return (

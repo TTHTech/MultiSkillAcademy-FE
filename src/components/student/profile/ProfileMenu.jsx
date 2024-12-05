@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 
 const DEFAULT_PROFILE_IMAGE = 'https://via.placeholder.com/150'; // Default profile image if none is provided
 
@@ -12,19 +13,27 @@ const ProfileMenu = () => {
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
-        const token = localStorage.getItem('token'); // Retrieve token from localStorage
+        // Lấy token từ localStorage
+        const token = localStorage.getItem('token');
         if (!token) {
           console.error('No token found');
           return;
         }
 
-        const response = await axios.get('http://localhost:8080/api/student/profile', {
+        // Lấy userId từ localStorage
+        const userId = localStorage.getItem('userId');
+        if (!userId) {
+          console.error('No userId found');
+          return;
+        }
+
+        const response = await axios.get(`http://localhost:8080/api/student/profile/${userId}`, {
           headers: {
-            Authorization: `Bearer ${token}`, // Pass token in Authorization header
+            Authorization: `Bearer ${token}`, // Pass token vào header Authorization
           },
         });
 
-        // Update user data
+        // Cập nhật dữ liệu người dùng
         const { profileImageUrl, firstName, lastName, email } = response.data;
         setProfileImage(profileImageUrl || DEFAULT_PROFILE_IMAGE);
         setUserName(`${firstName} ${lastName}`);
@@ -35,20 +44,20 @@ const ProfileMenu = () => {
     };
 
     fetchUserProfile();
-  }, []);
+  }, []); // Run only once when the component is rendered
 
-  // Helper to delay menu close
+  // Helper to delay menu closing
   let closeMenuTimeout;
 
   const handleMouseEnter = () => {
-    clearTimeout(closeMenuTimeout); // Cancel any pending close operations
+    clearTimeout(closeMenuTimeout); // Clear any existing close menu timeout
     setIsMenuOpen(true);
   };
 
   const handleMouseLeave = () => {
     closeMenuTimeout = setTimeout(() => {
       setIsMenuOpen(false);
-    }, 300); // Add a slight delay (300ms) to close the menu
+    }, 300); // Adding a slight delay before closing the menu
   };
 
   return (
@@ -57,7 +66,7 @@ const ProfileMenu = () => {
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      {/* User Avatar */}
+      {/* Avatar and User Info */}
       <img
         src={profileImage}
         alt="User Avatar"
@@ -69,38 +78,40 @@ const ProfileMenu = () => {
         <div className="absolute right-0 top-full mt-2 w-64 bg-white shadow-lg py-4 rounded-md z-10">
           {/* Profile Header */}
           <div className="px-4 py-2 flex items-center">
-            <img
-              src={profileImage}
-              alt="User Avatar"
-              className="w-10 h-10 rounded-full mr-3"
-              onError={() => setProfileImage(DEFAULT_PROFILE_IMAGE)} // Fallback if image fails to load
-            />
-            <div>
-              <p className="font-bold text-gray-900">{userName}</p>
-              <p className="text-sm text-gray-500">{userEmail}</p>
-            </div>
+            <Link to="/student/profile">
+              <img
+                src={profileImage}
+                alt="User Avatar"
+                className="w-10 h-10 rounded-full mr-3"
+                onError={() => setProfileImage(DEFAULT_PROFILE_IMAGE)} // Fallback if image fails to load
+              />
+              <div>
+                <p className="font-bold text-gray-900">{userName}</p>
+                <p className="text-sm text-gray-500">{userEmail}</p>
+              </div>
+            </Link>
           </div>
           <hr className="my-2" />
 
           {/* Menu Items */}
-          <a href="/" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">Học tập</a>
+          <Link to="/study" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">Học tập</Link>
           <div className="relative block px-4 py-2 text-gray-700 hover:bg-gray-100 flex items-center">
             <span>Giỏ hàng của tôi</span>
             <span className="ml-auto bg-purple-600 text-white text-xs font-semibold rounded-full px-2 py-0.5">1</span>
           </div>
-          <a href="/" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">Mong muốn</a>
-          <a href="/" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">Bảng điều khiển của giảng viên</a>
-          <a href="/" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">Thông báo</a>
-          <a href="/" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">Tin nhắn</a>
+          <Link to="/wishlist" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">Mong muốn</Link>
+          <Link to="/instructor-dashboard" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">Bảng điều khiển của giảng viên</Link>
+          <Link to="/notifications" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">Thông báo</Link>
+          <Link to="/messages" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">Tin nhắn</Link>
 
           <hr className="my-2" />
 
           {/* Account Settings */}
-          <a href="/" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">Cài đặt tài khoản</a>
-          <a href="/" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">Phương thức thanh toán</a>
-          <a href="/" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">Thuê bao</a>
-          <a href="/" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">Ưu đãi Udemy</a>
-          <a href="/" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">Lịch sử mua</a>
+          <Link to="/account-settings" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">Cài đặt tài khoản</Link>
+          <Link to="/payment-methods" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">Phương thức thanh toán</Link>
+          <Link to="/subscriptions" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">Thuê bao</Link>
+          <Link to="/udemy-discounts" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">Ưu đãi Udemy</Link>
+          <Link to="/purchase-history" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">Lịch sử mua</Link>
 
           <hr className="my-2" />
 
@@ -109,14 +120,14 @@ const ProfileMenu = () => {
             <span>Ngôn ngữ</span>
             <span className="font-semibold">Tiếng Việt <i className="fas fa-globe"></i></span>
           </div>
-          <a href="/" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">Hồ sơ công khai</a>
-          <a href="/" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">Chỉnh sửa hồ sơ</a>
-          <a href="/" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">Trợ giúp và Hỗ trợ</a>
+          <Link to="/public-profile" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">Hồ sơ công khai</Link>
+          <Link to="/edit-profile" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">Chỉnh sửa hồ sơ</Link>
+          <Link to="/help" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">Trợ giúp và Hỗ trợ</Link>
 
           <hr className="my-2" />
 
           {/* Sign Out */}
-          <a href="/" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">Đăng xuất</a>
+          <Link to="/logout" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">Đăng xuất</Link>
         </div>
       )}
     </div>

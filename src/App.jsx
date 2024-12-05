@@ -34,6 +34,7 @@ import Test from "./pages/instructor/Test/PageTest";
 import ForgotPasswordPage from "./pages/auth/ForgotPassPage";
 import ResetPassPage from "./pages/auth/ResetPassPage";
 import SuccessPage from "./pages/student/cart/SuccessPage";
+import ProfilePage from "./pages/student/profile/ProfilePage";
 import PageReview from "./pages/instructor/PageReview";
 import PageSales from "./pages/instructor/PageSales";
 function App() {
@@ -73,6 +74,7 @@ function App() {
       />
       <Routes>
         <Route path="/student/study/:progress/:id" element={<HocKhoaHoc />} />
+        <Route path="/student/wishlist" element={<Wishlist />} />
       </Routes>
 
       <div className="flex h-screen">
@@ -124,7 +126,7 @@ function App() {
                 element={<MyCoursesPage />}
               />
               <Route path="/course/:courseId" element={<CourseDetailPage />} />
-              <Route path="/student/wishlist" element={<Wishlist />} />
+              <Route path="/student/profile" element={<ProfilePage />} />
             </>
           )}
 
