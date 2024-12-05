@@ -62,6 +62,8 @@ function App() {
     <>
       {/* Toast Notifications */}
       <ToastContainer
+      {/* Toast Notifications */}
+      <ToastContainer
         position="top-right"
         autoClose={3000}
         hideProgressBar={false}
@@ -76,6 +78,7 @@ function App() {
         <Route path="/student/wishlist" element={<Wishlist />} />
       </Routes>
 
+      <div className="flex h-screen">
       <div className="flex h-screen">
         {/* Hiển thị lớp nền chỉ dành cho admin */}
         {isLoggedIn && role === "ROLE_ADMIN" && (
@@ -124,6 +127,10 @@ function App() {
                 path="/student/list-my-course"
                 element={<MyCoursesPage />}
               />
+              <Route
+                path="/student/list-my-course"
+                element={<MyCoursesPage />}
+              />
               <Route path="/course/:courseId" element={<CourseDetailPage />} />
               <Route path="/student/wishlist" element={<Wishlist />} />
               <Route path="/student/profile" element={<ProfilePage />} />
@@ -134,6 +141,21 @@ function App() {
           {isLoggedIn && role === "ROLE_INSTRUCTOR" && (
             <>
               {/* <Route path="/instructor/courses" element={<InstructorPage />} /> */}
+              <Route path="/instructor/user" element={<PageUser />} />
+              <Route path="/instructor/dashboard" element={<PageDashboard />} />
+              <Route path="/instructor/courses" element={<PageCourses />} />
+              <Route
+                path="/instructor/courses/:id"
+                element={<PagneCourseDetail />}
+              />
+              <Route
+                path="/instructor/courses/addCourses"
+                element={<PageAdd />}
+              />
+              <Route path="/instructor/questions" element={<PageQuestions />} />
+              <Route path="/instructor/students" element={<StudentList />} />
+              <Route path="/instructor/tests" element={<Test />} />
+              <Route path="/success" element={<SuccessPage />} />
               <Route path="/instructor/user" element={<PageUser />} />
               <Route path="/instructor/dashboard" element={<PageDashboard />} />
               <Route path="/instructor/courses" element={<PageCourses />} />

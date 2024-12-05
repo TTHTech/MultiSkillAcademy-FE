@@ -23,7 +23,7 @@ const CourseCard = ({ course }) => {
     const purchaseDate = new Date(course.enrolled_at).toLocaleDateString();
     const navigate = useNavigate();
     const handleCardClick = () => {
-        navigate(`/student/study/${course.courseId}`)
+        navigate(`/student/study/${course.progress}/${course.courseId}`)
     };
 
     return (
