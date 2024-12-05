@@ -73,8 +73,6 @@ function App() {
       />
       <Routes>
         <Route path="/student/study/:progress/:id" element={<HocKhoaHoc />} />
-
-        <Route path="/student/wishlist" element={<Wishlist />} />
       </Routes>
 
       <div className="flex h-screen">

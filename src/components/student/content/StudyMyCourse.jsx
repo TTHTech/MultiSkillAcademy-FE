@@ -8,9 +8,9 @@ const CourseViewer = () => {
   const [selectedSection, setSelectedSection] = useState(null);
   const [selectedLecture, setSelectedLecture] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const { id, progress } = useParams(); // Course ID và progress
+  const { id, progress } = useParams();
   const navigate = useNavigate();
-  const userId = Number(localStorage.getItem("userId")); // Lấy userId từ localStorage
+  const userId = Number(localStorage.getItem("userId"));
 
   // Fetch thông tin khóa học
   useEffect(() => {
@@ -59,7 +59,6 @@ const CourseViewer = () => {
     fetchCourseData();
   }, [id, userId, progress]);
 
-  // Hiển thị thông báo nếu khóa học chưa đăng ký
   const handleConfirmation = async () => {
     const swalResult = await Swal.fire({
       title: "Xác nhận",
@@ -72,12 +71,10 @@ const CourseViewer = () => {
     if (swalResult.isConfirmed) navigate(`/course/${id}`);
   };
 
-  // Nếu không có dữ liệu khóa học, hiển thị thông báo
   useEffect(() => {
     if (!isLoading && course === null) handleConfirmation();
   }, [isLoading, course, id]);
 
-  // Hàm cập nhật tiến độ bài giảng
   const updateProgress = async (lectureId) => {
     try {
       const response = await fetch("http://localhost:8080/api/student/update-progress", {
@@ -98,7 +95,13 @@ const CourseViewer = () => {
       console.error("Lỗi khi cập nhật tiến độ:", error);
     }
   };
-  const confirmProgressUpdate = async () => {
+
+  const handleLectureClick = (lecture) => {
+    setSelectedLecture(lecture);
+  };
+
+  const handleCheckboxChange = async (lecture) => {
+    if (lecture.completed) return; // Không cho phép thay đổi nếu đã hoàn thành
     const swalResult = await Swal.fire({
       title: "Xác nhận",
       text: "Bạn có chắc chắn muốn cập nhật tiến độ tại bài học này không?",
@@ -107,20 +110,13 @@ const CourseViewer = () => {
       confirmButtonText: "Có",
       cancelButtonText: "Không",
     });
-  
-    return swalResult.isConfirmed; 
-  };
-  // Xử lý sự kiện tích chọn checkbox bài giảng
-  const handleCheckboxChange = async (lecture) => {
-    if (lecture.completed) return; // Không cho phép thay đổi nếu đã hoàn thành
-    const confirmUpdate = await confirmProgressUpdate();
-    if (!confirmUpdate) return;
-    lecture.completed = true; // Đánh dấu hoàn thành
-    setCourse({ ...course }); // Cập nhật lại state
-    updateProgress(lecture.lecture_id); // Gọi API để cập nhật tiến độ
+    if (!swalResult.isConfirmed) return;
+
+    lecture.completed = true;
+    setCourse({ ...course });
+    updateProgress(lecture.lecture_id);
   };
 
-  // Tính số lượng bài học đã hoàn thành
   const calculateCompletedLectures = (lectures) =>
     lectures.filter((lecture) => lecture.completed).length;
 
@@ -168,6 +164,7 @@ const CourseViewer = () => {
                       className={`p-2 rounded-lg ${
                         lecture.completed ? "bg-green-100" : "bg-gray-50"
                       } hover:bg-gray-200 cursor-pointer flex justify-between items-center`}
+                      onClick={() => handleLectureClick(lecture)}
                     >
                       <div>
                         <input
