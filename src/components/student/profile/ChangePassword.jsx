@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from "axios";
 import { toast } from "react-toastify";
 
 const ChangePassword = () => {
@@ -11,6 +12,7 @@ const ChangePassword = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Check if passwords match
     if (newPassword !== confirmPassword) {
       toast.error("Mật khẩu mới không khớp.");
       return;
@@ -19,16 +21,33 @@ const ChangePassword = () => {
     try {
       setLoading(true);
 
-      // Giả sử đây là API gọi
-      // const response = await axios.post('your-api-url', { oldPassword, newPassword });
+      const token = localStorage.getItem("token");
+      const userId = localStorage.getItem("userId");
 
-      // Example success handling, replace with your API logic
-      const response = { data: { success: true } };
+      if (!token || !userId) {
+        toast.error("Không tìm thấy token hoặc userId trong localStorage.");
+        return;
+      }
 
-      if (response.data.success) {
+      // Make the API call to change the password with userId
+      const response = await axios.post(
+        `http://localhost:8080/api/auth/change-password/${userId}`, // API URL based on your endpoint
+        {
+          currentPassword: oldPassword,
+          newPassword: newPassword,
+          confirmPassword: confirmPassword,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Bearer token for authentication
+          },
+        }
+      );
+
+      if (response.status === 200) {
         toast.success("Mật khẩu đã được thay đổi.");
       } else {
-        toast.error("Đổi mật khẩu không thành công.");
+        toast.error(response.data || "Đổi mật khẩu không thành công.");
       }
     } catch (err) {
       setError("Có lỗi xảy ra khi thay đổi mật khẩu.");

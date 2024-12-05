@@ -19,7 +19,7 @@ import StudentHomePage from "./pages/student/home/StudentHomePage";
 import CartPage from "./pages/student/cart/CartPage";
 import MyCoursesPage from "./pages/student/Enrollment/MyCoursesPage";
 import CourseDetailPage from "./pages/student/CoursesDetail/CourseDetailPage";
-
+import CategoryStudentPage from "./pages/student/category/CategoryStudentPage";
 import PageUser from "./pages/instructor/PageUser";
 import PageDashboard from "./pages/instructor/PageDashboard";
 import PageCourses from "./pages/instructor/PageCourses/PageCourses";
@@ -34,9 +34,11 @@ import Test from "./pages/instructor/Test/PageTest";
 import ForgotPasswordPage from "./pages/auth/ForgotPassPage";
 import ResetPassPage from "./pages/auth/ResetPassPage";
 import SuccessPage from "./pages/student/cart/SuccessPage";
-import ProfilePage from "./pages/student/profile/ProfilePage";
+
 import PageReview from "./pages/instructor/PageReview";
 import PageSales from "./pages/instructor/PageSales";
+import ProfilePage from "./pages/student/profile/ProfilePage.jsx";
+
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [role, setRole] = useState("");
@@ -74,6 +76,7 @@ function App() {
       />
       <Routes>
         <Route path="/student/study/:progress/:id" element={<HocKhoaHoc />} />
+
         <Route path="/student/wishlist" element={<Wishlist />} />
       </Routes>
 
@@ -127,6 +130,7 @@ function App() {
               />
               <Route path="/course/:courseId" element={<CourseDetailPage />} />
               <Route path="/student/profile" element={<ProfilePage />} />
+              <Route path="/category/:categoryId" element={<CategoryStudentPage />} />
             </>
           )}
 
