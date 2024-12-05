@@ -27,14 +27,15 @@ import PagneCourseDetail from "./pages/instructor/PageCourses/PageCourseDetail";
 import PageAdd from "./pages/instructor/PageCourses/PageCoursesAdd";
 import PageQuestions from "./pages/instructor/PageQuestions";
 import StudentList from "./pages/instructor/PageStudents";
-import HocKhoaHoc from "./pages/student/courses/StudyACourse";
+import HocKhoaHoc from "./pages/student/content/StudyMyCourse";
 import CategoryPage from "./pages/admin/CategoryPage";
 import Wishlist from "./pages/student/courses/PageWishlist";
 import Test from "./pages/instructor/Test/PageTest";
 import ForgotPasswordPage from "./pages/auth/ForgotPassPage";
 import ResetPassPage from "./pages/auth/ResetPassPage";
 import SuccessPage from "./pages/student/cart/SuccessPage";
-import ProfilePage from "./pages/student/profile/ProfilePage";
+import PageReview from "./pages/instructor/PageReview";
+import PageSales from "./pages/instructor/PageSales";
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [role, setRole] = useState("");
@@ -62,8 +63,6 @@ function App() {
     <>
       {/* Toast Notifications */}
       <ToastContainer
-      {/* Toast Notifications */}
-      <ToastContainer
         position="top-right"
         autoClose={3000}
         hideProgressBar={false}
@@ -73,12 +72,11 @@ function App() {
         theme="colored"
       />
       <Routes>
-        <Route path="/student/study/:id" element={<HocKhoaHoc />} />
+        <Route path="/student/study/:progress/:id" element={<HocKhoaHoc />} />
 
         <Route path="/student/wishlist" element={<Wishlist />} />
       </Routes>
 
-      <div className="flex h-screen">
       <div className="flex h-screen">
         {/* Hiển thị lớp nền chỉ dành cho admin */}
         {isLoggedIn && role === "ROLE_ADMIN" && (
@@ -127,13 +125,8 @@ function App() {
                 path="/student/list-my-course"
                 element={<MyCoursesPage />}
               />
-              <Route
-                path="/student/list-my-course"
-                element={<MyCoursesPage />}
-              />
               <Route path="/course/:courseId" element={<CourseDetailPage />} />
               <Route path="/student/wishlist" element={<Wishlist />} />
-              <Route path="/student/profile" element={<ProfilePage />} />
             </>
           )}
 
@@ -152,23 +145,11 @@ function App() {
                 path="/instructor/courses/addCourses"
                 element={<PageAdd />}
               />
+              <Route path="/instructor/review" element={<PageReview />} />
+
               <Route path="/instructor/questions" element={<PageQuestions />} />
               <Route path="/instructor/students" element={<StudentList />} />
-              <Route path="/instructor/tests" element={<Test />} />
-              <Route path="/success" element={<SuccessPage />} />
-              <Route path="/instructor/user" element={<PageUser />} />
-              <Route path="/instructor/dashboard" element={<PageDashboard />} />
-              <Route path="/instructor/courses" element={<PageCourses />} />
-              <Route
-                path="/instructor/courses/:id"
-                element={<PagneCourseDetail />}
-              />
-              <Route
-                path="/instructor/courses/addCourses"
-                element={<PageAdd />}
-              />
-              <Route path="/instructor/questions" element={<PageQuestions />} />
-              <Route path="/instructor/students" element={<StudentList />} />
+              <Route path="/instructor/sales" element={<PageSales />} />
               <Route path="/instructor/tests" element={<Test />} />
               <Route path="/success" element={<SuccessPage />} />
             </>
