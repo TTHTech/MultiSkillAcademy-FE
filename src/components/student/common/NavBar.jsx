@@ -68,13 +68,13 @@ const Navbar = () => {
               <div className="grid grid-cols-1 gap-2 px-4">
                 {categories.length > 0 ? (
                   categories.map((category, index) => (
-                    <a 
+                    <Link 
                       key={index} 
-                      href={`/category/${category.categoryId}`} 
+                      to={`/category/${category.categoryId}`} // Pass categoryId to URL
                       className="text-gray-700 hover:text-black py-1 px-2 block"
                     >
-                      {category}
-                    </a>
+                      {category.name} {/* Ensure you display the name */}
+                    </Link>
                   ))
                 ) : (
                   <div className="text-gray-500 px-4">Không có danh mục</div>
@@ -100,7 +100,6 @@ const Navbar = () => {
 
         {/* Menu */}
         <div className="flex items-center space-x-6">
-    
           <a href="/student/list-my-course" className="text-gray-600 hover:text-black">Học tập</a>
 
           {/* Icons */}
@@ -108,7 +107,7 @@ const Navbar = () => {
             <Link to="/student/cart" className="text-gray-600 hover:text-black">
               <i className="fas fa-shopping-cart text-xl"></i>
             </Link>
-            <a href="/" className="text-gray-600 hover:text-black">
+            <a href="/student/category" className="text-gray-600 hover:text-black">
               <i className="fas fa-bell text-xl"></i>
             </a>
             <a href="/student/wishlist" className="text-gray-600 hover:text-black">
@@ -125,13 +124,13 @@ const Navbar = () => {
       <div className="bg-white py-2 border-t border-b border-gray-300 backdrop-blur-md shadow-sm">
         <div className="container mx-auto px-4 flex justify-between space-x-4">
           {categories.slice(0, 6).map((category, index) => (
-            <a 
+            <Link 
               key={index} 
-              href={`/category/${index}`} 
+              to={`/category/${category.categoryId}`} // Pass categoryId to the Category page
               className="text-gray-700 hover:text-black"
             >
-              {category}
-            </a>
+              {category.name} {/* Ensure you display the name */}
+            </Link>
           ))}
         </div>
       </div>
