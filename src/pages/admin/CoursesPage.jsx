@@ -8,6 +8,7 @@ import CategoryDistributionChart from "../../components/admin/overview/CategoryD
 import SalesTrendChart from "../../components/admin/courses/SalesTrendChart";
 import ProductsTable from "../../components/admin/courses/CoursesTable";
 import AcceptedCoursesTable from "../../components/admin/courses/AcceptedCoursesTable";
+import ClockCoursesTable from "../../components/admin/courses/ClockCoursesTable";
 const ProductsPage = () => {
   return (
     <div className="flex-1 overflow-auto relative z-10">
@@ -49,6 +50,7 @@ const ProductsPage = () => {
 
         <ProductsTable />
         <AcceptedCoursesTable />
+        <ClockCoursesTable />
 
         {/* CHARTS 
         <div className="grid grid-col-1 lg:grid-cols-2 gap-8">

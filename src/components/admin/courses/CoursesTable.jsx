@@ -205,27 +205,27 @@ const CoursesTable = () => {
         <div className="bg-gray-700 p-4 rounded-lg">
           {/* Ảnh khóa học */}
           <div className="flex justify-center mb-4">
-            <Swiper
-              spaceBetween={10} // Khoảng cách giữa các slide
-              slidesPerView={1} // Hiển thị 1 ảnh mỗi lần
-              navigation={true} // Hiển thị nút mũi tên điều hướng
-              loop={true} // Cho phép vòng lặp (quay lại ảnh đầu tiên khi đi qua ảnh cuối)
-              className="w-64 h-64" // Hình vuông 64x64
-            >
-              {editingCourse.imageUrls &&
-                editingCourse.imageUrls.map((image, index) => (
-                  <SwiperSlide key={index}>
-                    <div className="w-64 h-64 overflow-hidden rounded-lg">
-                      <img
-                        src={image}
-                        alt={`Course Image ${index + 1}`}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  </SwiperSlide>
-                ))}
-            </Swiper>
-          </div>
+          <Swiper
+            spaceBetween={10} // Khoảng cách giữa các slide
+            slidesPerView={1} // Hiển thị 1 ảnh mỗi lần
+            navigation={true} // Hiển thị nút mũi tên điều hướng
+            loop={true} // Cho phép vòng lặp (quay lại ảnh đầu tiên khi đi qua ảnh cuối)
+            className="w-full h-[400px]" // Cập nhật kích thước cho Swiper (mở rộng chiều rộng)
+          >
+            {editingCourse.imageUrls &&
+              editingCourse.imageUrls.map((image, index) => (
+                <SwiperSlide key={index}>
+                  <div className="w-full h-full overflow-hidden rounded-lg"> {/* Sử dụng w-full và h-full để phóng to */}
+                    <img
+                      src={image}
+                      alt={`Course Image ${index + 1}`}
+                      className="w-full h-full object-cover" // Đảm bảo hình ảnh chiếm toàn bộ không gian của div
+                    />
+                  </div>
+                </SwiperSlide>
+              ))}
+          </Swiper>
+        </div>
 
           <h3 className="text-lg font-semibold text-gray-100 mb-4">
             Course Details

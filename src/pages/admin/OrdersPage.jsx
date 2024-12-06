@@ -3,9 +3,9 @@ import { motion } from "framer-motion";
 
 import Header from "../../components/admin/common/Header";
 import StatCard from "../../components/admin/common/StatCard";
-import DailyOrders from "../../components/admin/orders/DailyOrders";
-import OrderDistribution from "../../components/admin/orders/OrderDistribution";
-import OrdersTable from "../../components/admin/orders/OrdersTable";
+import DailyOrders from "../../components/admin/sales/DailyOrders";
+import OrderDistribution from "../../components/admin/sales/SalesDistribution";
+import OrdersTable from "../../components/admin/sales/SalesTable";
 
 const orderStats = {
   totalOrders: "1,234",
