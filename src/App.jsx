@@ -83,7 +83,6 @@ function App() {
 
       <Routes>
         {/* Các route cho sinh viên */}
-        <Route path="/student/wishlist" element={<Wishlist />} />
         {/* ... các route khác */}
       </Routes>
 
@@ -140,6 +139,7 @@ function App() {
               <Route path="/student/profile" element={<ProfilePage />} />
               <Route path="/category/:categoryId" element={<CategoryStudentPage />} />
               <Route path="/student/study/:progress/:id" element={<CourseViewerPage />} />
+              <Route path="/student/wishlist" element={<Wishlist />} />
               <Route path="/student/Success" element={<SuccessPage />} />
               <Route path="/payment/success" element={<SuccessPage />} />
             </>
