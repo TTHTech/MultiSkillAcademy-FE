@@ -24,12 +24,16 @@ const CourseDetailPage = () => {
     const fetchCourseDetails = async () => {
       try {
         // Lấy thông tin khóa học
-        const courseResponse = await axios.get(`http://localhost:8080/api/student/courses/${courseId}`);
+        const courseResponse = await axios.get(
+          `http://localhost:8080/api/student/courses/${courseId}`
+        );
         setCourseData(courseResponse.data);
-  
+
         // Lấy reviews của khóa học
-        const reviewsResponse = await axios.get(`http://localhost:8080/api/student/reviews/${courseId}`);
-        
+        const reviewsResponse = await axios.get(
+          `http://localhost:8080/api/student/reviews/${courseId}`
+        );
+
         console.log("Reviews Response: ", reviewsResponse.data); // Thêm log để kiểm tra dữ liệu trả về
         setReviews(reviewsResponse.data);
       } catch (error) {
@@ -38,7 +42,7 @@ const CourseDetailPage = () => {
         setLoading(false);
       }
     };
-  
+
     fetchCourseDetails();
   }, [courseId]);
 
@@ -68,7 +72,8 @@ const CourseDetailPage = () => {
     <div className="w-full h-full min-h-screen bg-gray-100 overflow-y-auto">
       <NavBar />
       <div className="container mx-auto px-8 py-8 lg:flex lg:gap-8 lg:pr-16">
-        <div className="lg:w-3/4">
+        <div className="lg:w-3/4 overflow-auto">
+          {/* Nội dung khóa học */}
           <CourseHeader
             title={courseData.title}
             description={courseData.description}
@@ -77,8 +82,9 @@ const CourseDetailPage = () => {
             studentCount={courseData.studentCount || 0}
             lastUpdated={courseData.updatedAt}
           />
-
-          <CourseContentDetails contentDetails={courseData.courseContent || []} />
+          <CourseContentDetails
+            contentDetails={courseData.courseContent || []}
+          />
           <CourseContent content={courseData.sections || []} />
           <CourseRequirements
             requirements={courseData.requirements || []}
@@ -89,7 +95,8 @@ const CourseDetailPage = () => {
             instructor={{
               name: `${courseData.instructorFirstName} ${courseData.instructorLastName}`,
               title: courseData.instructorTitle || "Giảng viên",
-              image: courseData.instructorProfileImage || "default-image-url.jpg",
+              image:
+                courseData.instructorProfileImage || "default-image-url.jpg",
               rating: courseData.instructorRating || 0,
               reviews: courseData.instructorReviews || 0,
               students: courseData.instructorStudents || 0,
