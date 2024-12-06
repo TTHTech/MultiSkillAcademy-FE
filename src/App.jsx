@@ -38,6 +38,8 @@ import Logout from "./components/auth/Logout.jsx";
 import PageReview from "./pages/instructor/PageReview";
 import PageSales from "./pages/instructor/PageSales";
 import ProfilePage from "./pages/student/profile/ProfilePage.jsx";
+import QuizPage from "./pages/student/quiz/QuizPage";
+
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -51,7 +53,6 @@ function App() {
 
     if (
       !token &&
-      
       location.pathname !== "/register" &&
       location.pathname !== "/verify-otp" &&
       location.pathname !== "/forgot-password"
@@ -62,6 +63,10 @@ function App() {
       setRole(userRole);
     }
   }, [navigate, location.pathname]);
+
+  // Kiểm tra xem trang hiện tại có phải là trang admin không
+  const isAdminLayout =
+    isLoggedIn && role === "ROLE_ADMIN" && !["/login", "/register", "/verify-otp", "/forgot-password"].includes(location.pathname);
 
   return (
     <>
@@ -75,13 +80,15 @@ function App() {
         draggable
         theme="colored"
       />
+
       <Routes>
-       
+        {/* Các route cho sinh viên */}
         <Route path="/student/wishlist" element={<Wishlist />} />
-        
+        {/* ... các route khác */}
       </Routes>
 
-      <div className="flex h-screen">
+      {/* Áp dụng flex h-screen chỉ cho các trang admin */}
+      <div className={isAdminLayout ? "flex h-screen" : ""}>
         {/* Hiển thị lớp nền chỉ dành cho admin */}
         {isLoggedIn && role === "ROLE_ADMIN" && (
           <div className="fixed inset-0 z-0">
@@ -90,13 +97,14 @@ function App() {
           </div>
         )}
 
-        {/* Kiểm tra hiển thị Sidebar chỉ cho Admin và không hiển thị trên các trang đăng nhập/xác thực */}
+        {/* Sidebar chỉ hiển thị cho Admin */}
         {isLoggedIn &&
           role === "ROLE_ADMIN" &&
-          !["/login", "/register", "/verify-otp", "/verify-otp", "/forgot-password", "/reset-password"].includes(
-            location.pathname
-          ) && <Sidebar />}
+          !["/login", "/register", "/verify-otp", "/forgot-password", "/reset-password"].includes(location.pathname) && (
+            <Sidebar />
+          )}
 
+        {/* Routes */}
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/logout" element={<Logout />} />
@@ -104,9 +112,9 @@ function App() {
           <Route path="/verify-otp" element={<OtpVerificationPage />} />
           <Route path="/forgot-password" element={<ForgotPassPage />} />
           <Route path="/reset-password" element={<ResetPassPage />} />
-        
-
-          {/* Phân biệt các route dựa trên role */}
+          <Route path="/student/quiz" element={<QuizPage />} />
+          
+          {/* Các route cho admin */}
           {isLoggedIn && role === "ROLE_ADMIN" && (
             <>
               <Route path="/admin" element={<OverviewPage />} />
@@ -122,46 +130,34 @@ function App() {
             </>
           )}
 
-          {/* Các route cho sinh viên khi role là student */}
+          {/* Các route cho sinh viên */}
           {isLoggedIn && role === "ROLE_STUDENT" && (
             <>
               <Route path="/student/home" element={<StudentHomePage />} />
               <Route path="/student/cart" element={<CartPage />} />
-              <Route
-                path="/student/list-my-course"
-                element={<MyCoursesPage />}
-              />
+              <Route path="/student/list-my-course" element={<MyCoursesPage />} />
               <Route path="/course/:courseId" element={<CourseDetailPage />} />
               <Route path="/student/profile" element={<ProfilePage />} />
               <Route path="/category/:categoryId" element={<CategoryStudentPage />} />
               <Route path="/student/study/:progress/:id" element={<CourseViewerPage />} />
               <Route path="/student/Success" element={<SuccessPage />} />
-        
+              <Route path="/payment/success" element={<SuccessPage />} />
             </>
           )}
 
-          {/* Các route cho giảng viên khi role là instructor */}
+          {/* Các route cho giảng viên */}
           {isLoggedIn && role === "ROLE_INSTRUCTOR" && (
             <>
-              {/* <Route path="/instructor/courses" element={<InstructorPage />} /> */}
               <Route path="/instructor/user" element={<PageUser />} />
               <Route path="/instructor/dashboard" element={<PageDashboard />} />
               <Route path="/instructor/courses" element={<PageCourses />} />
-              <Route
-                path="/instructor/courses/:id"
-                element={<PagneCourseDetail />}
-              />
-              <Route
-                path="/instructor/courses/addCourses"
-                element={<PageAdd />}
-              />
+              <Route path="/instructor/courses/:id" element={<PagneCourseDetail />} />
+              <Route path="/instructor/courses/addCourses" element={<PageAdd />} />
               <Route path="/instructor/review" element={<PageReview />} />
-
               <Route path="/instructor/questions" element={<PageQuestions />} />
               <Route path="/instructor/students" element={<StudentList />} />
               <Route path="/instructor/sales" element={<PageSales />} />
               <Route path="/instructor/tests" element={<Test />} />
-              <Route path="/payment/success" element={<SuccessPage />} />
             </>
           )}
         </Routes>

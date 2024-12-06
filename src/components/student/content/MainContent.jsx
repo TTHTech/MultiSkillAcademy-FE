@@ -2,17 +2,16 @@ import { useState } from "react"; // Import useState để quản lý trạng th
 import { useParams } from "react-router-dom"; // Để lấy id từ URL
 
 import QuestionsAndAnswers from "../../../pages/student/courses/QuestionAndAnswers"; // Giả sử bạn có component này cho tab "Bình luận"
-import TabComment from "../../student/content/TabComment ";
-import TabDocument from "../../student/content/TabDocument";
-
+import TabComment from "../../student/content/TabComment";
+import TabListTest from "./TabListTest";
 
 const MainContent = ({ selectedLecture, setSelectedLecture }) => {
   const { id } = useParams(); // Lấy id từ URL
 
-  const [selectedTab, setSelectedTab] = useState(0); // 0: Bình luận, 1: Tab 2, 2: Tab 3
+  const [selectedTab, setSelectedTab] = useState(0); // 0: Bình luận, 1: Hỏi Đáp, 2: Bài Kiểm Tra
 
   return (
-    <div className="w-3/4 p-6 bg-white overflow-y-auto"> {/* Phần này là MainContent */}
+    <div className="w-full h-full p-6 bg-white overflow-y-auto"> {/* Đảm bảo chiếm hết chiều cao và cuộn nội dung */}
       {selectedLecture ? (
         <div>
           <h2 className="text-2xl font-bold mb-4">{selectedLecture.title}</h2>
@@ -64,7 +63,7 @@ const MainContent = ({ selectedLecture, setSelectedLecture }) => {
             onClick={() => setSelectedTab(2)}
             className={`py-2 px-4 ${selectedTab === 2 ? "border-b-2 border-blue-500" : "text-gray-600"}`}
           >
-            Tab 3
+            Bài Kiểm Tra
           </button>
         </div>
 
@@ -73,7 +72,6 @@ const MainContent = ({ selectedLecture, setSelectedLecture }) => {
           {selectedTab === 0 && (
             <div>
               <h3 className="text-xl font-semibold">Bình Luận</h3>
-              {/* Thêm phần hiển thị bình luận tại đây */}
               <TabComment courseId={id} />
             </div>
           )}
@@ -81,7 +79,6 @@ const MainContent = ({ selectedLecture, setSelectedLecture }) => {
           {selectedTab === 1 && (
             <div>
               <h3 className="text-xl font-semibold">Hỏi Đáp</h3>
-              {/* Nội dung cho Tab 2 */}
               <QuestionsAndAnswers courseId={id} />
             </div>
           )}
@@ -89,8 +86,7 @@ const MainContent = ({ selectedLecture, setSelectedLecture }) => {
           {selectedTab === 2 && (
             <div>
               <h3 className="text-xl font-semibold">Tài Liệu</h3>
-              {/* Nội dung cho Tab 3 */}
-              <TabDocument content="Tab 3 Content" />
+              <TabListTest content="Tab 3 Content" />
             </div>
           )}
         </div>
