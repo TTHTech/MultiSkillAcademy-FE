@@ -1,26 +1,25 @@
+import { CheckCircle, Clock, DollarSign, ShoppingBag } from "lucide-react";
 import { motion } from "framer-motion";
 
 import Header from "../../components/admin/common/Header";
 import StatCard from "../../components/admin/common/StatCard";
-import { CreditCard, DollarSign, ShoppingCart, TrendingUp } from "lucide-react";
-import SalesOverviewChart from "../../components/admin/sales/SalesOverviewChart";
-import SalesByCategoryChart from "../../components/admin/sales/SalesByCategoryChart";
-import DailySalesTrend from "../../components/admin/sales/DailySalesTrend";
+import DailySales from "../../components/admin/sales/DailySales";
+import SalesDistribution from "../../components/admin/sales/SalesDistribution";
+import SalesTable from "../../components/admin/sales/SalesTable";
 
-const salesStats = {
-  totalRevenue: "$1,234,567",
-  averageOrderValue: "$78.90",
-  conversionRate: "3.45%",
-  salesGrowth: "12.3%",
+const orderStats = {
+  totalOrders: "1,234",
+  pendingOrders: "56",
+  completedOrders: "1,178",
+  totalRevenue: "$98,765",
 };
 
 const SalesPage = () => {
   return (
-    <div className="flex-1 overflow-auto relative z-10">
-      <Header title="Sales Dashboard" />
+    <div className="flex-1 relative z-10 overflow-auto">
+      <Header title={"Orders"} />
 
       <main className="max-w-7xl mx-auto py-6 px-4 lg:px-8">
-        {/* SALES STATS */}
         <motion.div
           className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8"
           initial={{ opacity: 0, y: 20 }}
@@ -28,37 +27,37 @@ const SalesPage = () => {
           transition={{ duration: 1 }}
         >
           <StatCard
-            name="Total Revenue"
-            icon={DollarSign}
-            value={salesStats.totalRevenue}
+            name="Total Orders"
+            icon={ShoppingBag}
+            value={orderStats.totalOrders}
             color="#6366F1"
           />
           <StatCard
-            name="Avg. Order Value"
-            icon={ShoppingCart}
-            value={salesStats.averageOrderValue}
-            color="#10B981"
-          />
-          <StatCard
-            name="Conversion Rate"
-            icon={TrendingUp}
-            value={salesStats.conversionRate}
+            name="Pending Orders"
+            icon={Clock}
+            value={orderStats.pendingOrders}
             color="#F59E0B"
           />
           <StatCard
-            name="Sales Growth"
-            icon={CreditCard}
-            value={salesStats.salesGrowth}
+            name="Completed Orders"
+            icon={CheckCircle}
+            value={orderStats.completedOrders}
+            color="#10B981"
+          />
+          <StatCard
+            name="Total Revenue"
+            icon={DollarSign}
+            value={orderStats.totalRevenue}
             color="#EF4444"
           />
         </motion.div>
 
-        <SalesOverviewChart />
-
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          <SalesByCategoryChart />
-          <DailySalesTrend />
+          <DailySales />
+          <SalesDistribution />
         </div>
+
+        <SalesTable />
       </main>
     </div>
   );

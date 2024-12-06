@@ -9,7 +9,7 @@ import "swiper/swiper-bundle.css"; // Đường dẫn chính xác hơn
 // Số lượng khóa học hiển thị mỗi trang
 const ITEMS_PER_PAGE = 10;
 
-const AcceptedCoursesTable = () => {
+const ClockCoursesTable = () => {
   const [courses, setCourses] = useState([]); // Lưu trữ danh sách khóa học lấy từ API
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1); // Lưu trữ trang hiện tại
@@ -22,7 +22,7 @@ const AcceptedCoursesTable = () => {
     setLoading(true);
     try {
       const response = await fetch(
-        "http://localhost:8080/api/admin/courses/active",
+        "http://localhost:8080/api/admin/courses/clock",
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -134,7 +134,7 @@ const AcceptedCoursesTable = () => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
-          body: JSON.stringify({ status: "Clock" }),
+          body: JSON.stringify({ status: "Declined" }),
         }
       );
 
@@ -148,7 +148,7 @@ const AcceptedCoursesTable = () => {
       setCourses((prevCourses) =>
         prevCourses.map((course) =>
           course.courseId === courseId
-            ? { ...course, status: "Clock" }
+            ? { ...course, status: "Declined" }
             : course
         )
       );
@@ -205,27 +205,29 @@ const AcceptedCoursesTable = () => {
         <div className="bg-gray-700 p-4 rounded-lg">
           {/* Ảnh khóa học */}
           <div className="flex justify-center mb-4">
-          <Swiper
-            spaceBetween={10} // Khoảng cách giữa các slide
-            slidesPerView={1} // Hiển thị 1 ảnh mỗi lần
-            navigation={true} // Hiển thị nút mũi tên điều hướng
-            loop={true} // Cho phép vòng lặp (quay lại ảnh đầu tiên khi đi qua ảnh cuối)
-            className="w-full h-[400px]" // Cập nhật kích thước cho Swiper (mở rộng chiều rộng)
-          >
-            {editingCourse.imageUrls &&
-              editingCourse.imageUrls.map((image, index) => (
-                <SwiperSlide key={index}>
-                  <div className="w-full h-full overflow-hidden rounded-lg"> {/* Sử dụng w-full và h-full để phóng to */}
-                    <img
-                      src={image}
-                      alt={`Course Image ${index + 1}`}
-                      className="w-full h-full object-cover" // Đảm bảo hình ảnh chiếm toàn bộ không gian của div
-                    />
-                  </div>
-                </SwiperSlide>
-              ))}
-          </Swiper>
-        </div>
+            <Swiper
+              spaceBetween={10} // Khoảng cách giữa các slide
+              slidesPerView={1} // Hiển thị 1 ảnh mỗi lần
+              navigation={true} // Hiển thị nút mũi tên điều hướng
+              loop={true} // Cho phép vòng lặp (quay lại ảnh đầu tiên khi đi qua ảnh cuối)
+              className="w-full h-[400px]" // Cập nhật kích thước cho Swiper (mở rộng chiều rộng)
+            >
+              {editingCourse.imageUrls &&
+                editingCourse.imageUrls.map((image, index) => (
+                  <SwiperSlide key={index}>
+                    <div className="w-full h-full overflow-hidden rounded-lg">
+                      {" "}
+                      {/* Sử dụng w-full và h-full để phóng to */}
+                      <img
+                        src={image}
+                        alt={`Course Image ${index + 1}`}
+                        className="w-full h-full object-cover" // Đảm bảo hình ảnh chiếm toàn bộ không gian của div
+                      />
+                    </div>
+                  </SwiperSlide>
+                ))}
+            </Swiper>
+          </div>
 
           <h3 className="text-lg font-semibold text-gray-100 mb-4">
             Course Details
@@ -370,20 +372,20 @@ const AcceptedCoursesTable = () => {
             </ul>
           </div>
 
-         
-
           <button
-            className="bg-red-500 text-white px-4 py-2 rounded-lg mr-2"
+            className="bg-green-500 text-white px-4 py-2 rounded-lg mr-2"
             onClick={() => {
               if (!editingCourse || !editingCourse.courseId) {
                 console.error("Course ID is undefined");
                 return;
               }
-              handleReject(editingCourse.courseId);
+              handleAccept(editingCourse.courseId);
             }}
           >
-            Clock
+            Unclock
           </button>
+
+      
 
           <button
             className="bg-gray-500 text-white px-4 py-2 rounded-lg"
@@ -452,4 +454,4 @@ const AcceptedCoursesTable = () => {
   );
 };
 
-export default AcceptedCoursesTable;
+export default ClockCoursesTable;
