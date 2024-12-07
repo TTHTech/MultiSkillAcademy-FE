@@ -30,10 +30,7 @@ const StatCard = ({ name, icon: Icon, value, color }) => {
         </div>
       </div>
 
-      <div className="mt-4 flex items-center text-white">
-        <span className="ml-1 text-sm font-medium">{value}%</span>
-        <span className="ml-2 text-sm text-gray-300">vs last period</span>
-      </div>
+   
     </motion.div>
   );
 };
