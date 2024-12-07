@@ -47,12 +47,12 @@ const ClockCoursesTable = () => {
   // Gọi hàm fetchCourses trong useEffect để lấy dữ liệu khi component được render lần đầu
   useEffect(() => {
     fetchCourses();
-    toast.info("Loading courses...");
+    // toast.info("Loading courses...");
   }, []);
 
-  if (courses.length === 0) {
-    toast.info("No courses available.");
-  }
+  // if (courses.length === 0) {
+  //   toast.info("No courses available.");
+  // }
 
   // Lọc khóa học theo từ khóa tìm kiếm
   const filteredCourses = courses.filter(
@@ -415,7 +415,7 @@ const ClockCoursesTable = () => {
                 <td className="py-2 px-4">{course.duration}</td>
                 <td className="py-2 px-4">{course.categoryName}</td>
                 <td className="py-2 px-4">${course.price}</td>
-                <td className="py-2 px-4 text-yellow-500">{course.status}</td>
+                <td className="py-2 px-4 text-red-500">{course.status}</td>
                 <td className="py-2 px-4">
                   <button
                     className="bg-blue-500 text-white px-3 py-1 rounded-lg"

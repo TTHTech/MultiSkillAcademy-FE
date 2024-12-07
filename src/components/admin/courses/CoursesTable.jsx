@@ -47,11 +47,11 @@ const CoursesTable = () => {
   // Gọi hàm fetchCourses trong useEffect để lấy dữ liệu khi component được render lần đầu
   useEffect(() => {
     fetchCourses();
-    toast.info("Loading courses...");
+   
   }, []);
 
   if (courses.length === 0) {
-    toast.info("No courses available.");
+    // toast.info("No courses available.");
   }
 
   // Lọc khóa học theo từ khóa tìm kiếm

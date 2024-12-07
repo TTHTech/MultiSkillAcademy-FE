@@ -8,6 +8,7 @@ import CoursesPage from "./pages/admin/CoursesPage";
 import StudentPage from "./pages/admin/StudentPage";
 import SalesPage from "./pages/admin/SalesPage.jsx";
 import SalePage from "./pages/admin/DemoPage.jsx";
+import ReviewPage from "./pages/admin/ReviewPage.jsx";
 import AnalyticsPage from "./pages/admin/AnalyticsPage";
 import SettingsPage from "./pages/admin/SettingsPage";
 import InstructorPage from "./pages/admin/InstructorPage";
@@ -126,6 +127,7 @@ function App() {
               <Route path="/admin/analytics" element={<AnalyticsPage />} />
               <Route path="/admin/settings" element={<SettingsPage />} />
               <Route path="/admin/add-user" element={<AddNewUserPage />} />
+              <Route path="/admin/review" element={<ReviewPage />} />
             </>
           )}
 

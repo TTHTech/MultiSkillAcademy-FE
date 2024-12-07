@@ -16,6 +16,8 @@ const AcceptedCoursesTable = () => {
   const [editingCourse, setEditingCourse] = useState(null); // Lưu trữ khóa học đang xem
   const [loading, setLoading] = useState(true); // Trạng thái loading khi gọi API
   const [error, setError] = useState(null); // Trạng thái lỗi khi gọi API
+  const [showPopup, setShowPopup] = useState(false); // Quản lý trạng thái popup
+  const [messageContent, setMessageContent] = useState(""); // Nội dung thông điệp
 
   // Di chuyển hàm fetchCourses ra ngoài useEffect để tái sử dụng
   const fetchCourses = async () => {
@@ -47,11 +49,11 @@ const AcceptedCoursesTable = () => {
   // Gọi hàm fetchCourses trong useEffect để lấy dữ liệu khi component được render lần đầu
   useEffect(() => {
     fetchCourses();
-    toast.info("Loading courses...");
+    // toast.info("Loading courses...");
   }, []);
 
   if (courses.length === 0) {
-    toast.info("No courses available.");
+    // toast.info("No courses available.");
   }
 
   // Lọc khóa học theo từ khóa tìm kiếm
@@ -118,6 +120,60 @@ const AcceptedCoursesTable = () => {
       toast.error(`Error: ${error.message}`);
     }
   };
+  // Gửi email và cập nhật trạng thái
+  const handleClockClick = () => {
+    if (!editingCourse || !editingCourse.courseId) {
+      console.error("Course ID is undefined");
+      return;
+    }
+    setShowPopup(true); // Hiển thị popup khi nhấn Clock
+  };
+
+  // Hàm đóng popup
+  const closePopup = () => {
+    setShowPopup(false);
+    setMessageContent(""); // Reset nội dung khi đóng popup
+  };
+
+  // Gửi email và cập nhật trạng thái khóa học
+  const handleSendMessage = async () => {
+    if (!messageContent.trim()) {
+      toast.error("Please enter a message.");
+      return;
+    }
+
+    try {
+      // Gửi email
+      const response = await fetch(
+        "http://localhost:8080/api/admin/emails/send",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify({
+            courseId: editingCourse.courseId,
+            messageContent,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to send email.");
+      }
+
+      toast.success("Email sent successfully!");
+
+      // Cập nhật trạng thái khóa học thành 'Clocked' (hoặc trạng thái khác)
+      await handleReject(editingCourse.courseId);
+
+      closePopup(); // Đóng popup khi hoàn tất
+    } catch (error) {
+      console.error("Error sending email or updating course:", error);
+      toast.error(`Error: ${error.message}`);
+    }
+  };
 
   const handleReject = async (courseId) => {
     if (!courseId) {
@@ -147,9 +203,7 @@ const AcceptedCoursesTable = () => {
       // Cập nhật lại danh sách ngay lập tức
       setCourses((prevCourses) =>
         prevCourses.map((course) =>
-          course.courseId === courseId
-            ? { ...course, status: "Clock" }
-            : course
+          course.courseId === courseId ? { ...course, status: "Clock" } : course
         )
       );
 
@@ -205,27 +259,29 @@ const AcceptedCoursesTable = () => {
         <div className="bg-gray-700 p-4 rounded-lg">
           {/* Ảnh khóa học */}
           <div className="flex justify-center mb-4">
-          <Swiper
-            spaceBetween={10} // Khoảng cách giữa các slide
-            slidesPerView={1} // Hiển thị 1 ảnh mỗi lần
-            navigation={true} // Hiển thị nút mũi tên điều hướng
-            loop={true} // Cho phép vòng lặp (quay lại ảnh đầu tiên khi đi qua ảnh cuối)
-            className="w-full h-[400px]" // Cập nhật kích thước cho Swiper (mở rộng chiều rộng)
-          >
-            {editingCourse.imageUrls &&
-              editingCourse.imageUrls.map((image, index) => (
-                <SwiperSlide key={index}>
-                  <div className="w-full h-full overflow-hidden rounded-lg"> {/* Sử dụng w-full và h-full để phóng to */}
-                    <img
-                      src={image}
-                      alt={`Course Image ${index + 1}`}
-                      className="w-full h-full object-cover" // Đảm bảo hình ảnh chiếm toàn bộ không gian của div
-                    />
-                  </div>
-                </SwiperSlide>
-              ))}
-          </Swiper>
-        </div>
+            <Swiper
+              spaceBetween={10} // Khoảng cách giữa các slide
+              slidesPerView={1} // Hiển thị 1 ảnh mỗi lần
+              navigation={true} // Hiển thị nút mũi tên điều hướng
+              loop={true} // Cho phép vòng lặp (quay lại ảnh đầu tiên khi đi qua ảnh cuối)
+              className="w-full h-[400px]" // Cập nhật kích thước cho Swiper (mở rộng chiều rộng)
+            >
+              {editingCourse.imageUrls &&
+                editingCourse.imageUrls.map((image, index) => (
+                  <SwiperSlide key={index}>
+                    <div className="w-full h-full overflow-hidden rounded-lg">
+                      {" "}
+                      {/* Sử dụng w-full và h-full để phóng to */}
+                      <img
+                        src={image}
+                        alt={`Course Image ${index + 1}`}
+                        className="w-full h-full object-cover" // Đảm bảo hình ảnh chiếm toàn bộ không gian của div
+                      />
+                    </div>
+                  </SwiperSlide>
+                ))}
+            </Swiper>
+          </div>
 
           <h3 className="text-lg font-semibold text-gray-100 mb-4">
             Course Details
@@ -370,17 +426,9 @@ const AcceptedCoursesTable = () => {
             </ul>
           </div>
 
-         
-
           <button
             className="bg-red-500 text-white px-4 py-2 rounded-lg mr-2"
-            onClick={() => {
-              if (!editingCourse || !editingCourse.courseId) {
-                console.error("Course ID is undefined");
-                return;
-              }
-              handleReject(editingCourse.courseId);
-            }}
+            onClick={handleClockClick} // Mở popup khi nhấn
           >
             Clock
           </button>
@@ -391,6 +439,34 @@ const AcceptedCoursesTable = () => {
           >
             Cancel
           </button>
+          {showPopup && (
+            <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50">
+              <div className="bg-gray-800 p-6 rounded-lg w-1/3">
+                <h3 className="text-lg font-semibold text-gray-100 mb-4">Enter message for deletion</h3>
+                <textarea
+                  value={messageContent}
+                  onChange={(e) => setMessageContent(e.target.value)}
+                  className="w-full p-2 bg-gray-600 text-white rounded-lg mb-4"
+                  rows="4"
+                  placeholder="Enter your message here..."
+                />
+                <div className="flex justify-end">
+                  <button
+                    className="bg-blue-500 text-white px-4 py-2 rounded-lg mr-2"
+                    onClick={handleSendMessage}
+                  >
+                    Send
+                  </button>
+                  <button
+                    className="bg-gray-500 text-white px-4 py-2 rounded-lg"
+                    onClick={closePopup}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       ) : (
         <table className="table-auto w-full text-left text-gray-100">
@@ -413,7 +489,7 @@ const AcceptedCoursesTable = () => {
                 <td className="py-2 px-4">{course.duration}</td>
                 <td className="py-2 px-4">{course.categoryName}</td>
                 <td className="py-2 px-4">${course.price}</td>
-                <td className="py-2 px-4 text-yellow-500">{course.status}</td>
+                <td className="py-2 px-4 text-green-500">{course.status}</td>
                 <td className="py-2 px-4">
                   <button
                     className="bg-blue-500 text-white px-3 py-1 rounded-lg"
