@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
-import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai';
-import { useParams } from 'react-router-dom';
+import React, { useState } from "react";
+import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
+import { useParams } from "react-router-dom";
 
-const CourseMedia = ({ 
-  price, 
-  thumbnail, 
-  onAddToCart, 
-  onBuyNow, 
-  resourceDescription 
+const CourseMedia = ({
+  price,
+  thumbnail,
+  onAddToCart,
+  onBuyNow,
+  resourceDescription,
 }) => {
   const [isFavorite, setIsFavorite] = useState(false); // Trạng thái yêu thích
   const userId = Number(localStorage.getItem("userId")); // Lấy userId từ localStorage
@@ -46,7 +46,7 @@ const CourseMedia = ({
   };
 
   return (
-    <div className="bg-white p-6 rounded shadow-lg text-center max-w-xs w-full lg:sticky lg:top-24 lg:mr-4">
+    <div className="bg-white p-6 rounded shadow-lg text-center max-w-xs w-full lg:sticky lg:top-24 lg:mr-4 z-10 border-2 border-red-500">
       {/* Thumbnail */}
       <img src={thumbnail} alt="Preview" className="w-full mb-4 rounded-lg" />
       
@@ -73,10 +73,6 @@ const CourseMedia = ({
         </div>
       </div>
 
-      {/* Buy Now Button */}
-  
-
-
 
       {/* Course Details */}
       <div className="text-left text-gray-700">
@@ -94,9 +90,6 @@ const CourseMedia = ({
 
       {/* Error Message */}
       {error && <p className="text-red-500 text-sm">{error}</p>}
-
-      {/* Additional Links */}
-  
     </div>
   );
 };

@@ -18,6 +18,8 @@
     "axios": "^1.7.7",
     "fireworks-js": "^2.10.8",
     "framer-motion": "^11.11.8",
+    "jspdf": "^2.5.2",
+    "jspdf-autotable": "^3.8.4",
     "jwt-decode": "^4.0.0",
     "lucide-react": "^0.417.0",
     "moment": "^2.30.1",

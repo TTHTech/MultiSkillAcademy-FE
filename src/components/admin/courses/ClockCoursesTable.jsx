@@ -22,7 +22,7 @@ const ClockCoursesTable = () => {
     setLoading(true);
     try {
       const response = await fetch(
-        "http://localhost:8080/api/admin/courses/clock",
+        "http://localhost:8080/api/admin/courses/inactive",
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,

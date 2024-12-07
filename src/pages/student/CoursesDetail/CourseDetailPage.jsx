@@ -106,7 +106,7 @@ const CourseDetailPage = () => {
           />
           <CourseReviews reviews={reviews || []} />
         </div>
-        <div className="lg:flex lg:justify-center lg:w-1/4 lg:mr-4 lg:items-start">
+        <div className="lg:w-1/4 lg:sticky lg:top-24 lg:mr-4 z-10">
           <CourseMedia
             price={courseData.price}
             thumbnail={courseData.imageUrls?.[0] || "default-image-url.jpg"}
