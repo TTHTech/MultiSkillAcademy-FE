@@ -190,7 +190,7 @@ const AcceptedCoursesTable = () => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
-          body: JSON.stringify({ status: "Clock" }),
+          body: JSON.stringify({ status: "Inactive" }),
         }
       );
 
@@ -203,7 +203,7 @@ const AcceptedCoursesTable = () => {
       // Cập nhật lại danh sách ngay lập tức
       setCourses((prevCourses) =>
         prevCourses.map((course) =>
-          course.courseId === courseId ? { ...course, status: "Clock" } : course
+          course.courseId === courseId ? { ...course, status: "Inactive" } : course
         )
       );
 
