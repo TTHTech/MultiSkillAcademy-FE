@@ -11,30 +11,34 @@ const MainContent = ({ selectedLecture, setSelectedLecture }) => {
   const [selectedTab, setSelectedTab] = useState(0); // 0: Bình luận, 1: Hỏi Đáp, 2: Bài Kiểm Tra
 
   return (
-    <div className="w-full h-full p-6 bg-white overflow-y-auto"> {/* Đảm bảo chiếm hết chiều cao và cuộn nội dung */}
+    <div className="w-full h-full p-6 bg-white overflow-y-auto flex flex-col"> {/* Đảm bảo chiếm hết chiều cao và cuộn nội dung */}
       {selectedLecture ? (
-        <div>
-          <h2 className="text-2xl font-bold mb-4">{selectedLecture.title}</h2>
-          {selectedLecture.content_type.toLowerCase() === "video" &&
-            selectedLecture.video_url && (
-              <div className="aspect-w-16 aspect-h-9 mb-4">
-                <video controls className="w-full h-full">
-                  <source src={selectedLecture.video_url} type="video/mp4" />
-                  Your browser does not support the video tag.
-                </video>
-              </div>
-            )}
-          {selectedLecture.content_type.toLowerCase() === "pdf" &&
-            selectedLecture.document_url && (
-              <iframe
-                src={selectedLecture.document_url}
-                className="w-full h-[500px] border"
-                title={selectedLecture.title}
-              />
-            )}
-          <p className="text-gray-600 mt-2">
-            Thời lượng: {selectedLecture.duration} phút
-          </p>
+        <div className="flex flex-col flex-grow">
+          {/* Di chuyển title xuống dưới cùng */}
+          <div className="flex flex-col flex-grow">
+            {selectedLecture.content_type.toLowerCase() === "video" &&
+              selectedLecture.video_url && (
+                <div className="aspect-w-16 aspect-h-9 mb-4">
+                  <video controls className="w-full h-full">
+                    <source src={selectedLecture.video_url} type="video/mp4" />
+                    Your browser does not support the video tag.
+                  </video>
+                </div>
+              )}
+            {selectedLecture.content_type.toLowerCase() === "pdf" &&
+              selectedLecture.document_url && (
+                <iframe
+                  src={selectedLecture.document_url}
+                  className="w-full h-[500px] border mb-4"
+                  title={selectedLecture.title}
+                />
+              )}
+            <p className="text-gray-600 mt-2">
+              Thời lượng: {selectedLecture.duration} phút
+            </p>
+          </div>
+
+          {/* Nút quay lại */}
           <button
             onClick={() => setSelectedLecture(null)}
             className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
@@ -49,19 +53,19 @@ const MainContent = ({ selectedLecture, setSelectedLecture }) => {
         <div className="flex border-b">
           <button
             onClick={() => setSelectedTab(0)}
-            className={`py-2 px-4 ${selectedTab === 0 ? "border-b-2 border-blue-500" : "text-gray-600"}`}
+            className={`py-2 px-4 ${selectedTab === 0 ? "border-b-2 border-blue-500 font-semibold" : "text-gray-600"}`}
           >
             Bình Luận
           </button>
           <button
             onClick={() => setSelectedTab(1)}
-            className={`py-2 px-4 ${selectedTab === 1 ? "border-b-2 border-blue-500" : "text-gray-600"}`}
+            className={`py-2 px-4 ${selectedTab === 1 ? "border-b-2 border-blue-500 font-semibold" : "text-gray-600"}`}
           >
             Hỏi Đáp
           </button>
           <button
             onClick={() => setSelectedTab(2)}
-            className={`py-2 px-4 ${selectedTab === 2 ? "border-b-2 border-blue-500" : "text-gray-600"}`}
+            className={`py-2 px-4 ${selectedTab === 2 ? "border-b-2 border-blue-500 font-semibold" : "text-gray-600"}`}
           >
             Bài Kiểm Tra
           </button>
@@ -85,12 +89,15 @@ const MainContent = ({ selectedLecture, setSelectedLecture }) => {
 
           {selectedTab === 2 && (
             <div>
-              <h3 className="text-xl font-semibold">Tài Liệu</h3>
+              <h3 className="text-xl font-semibold">Bài Kiểm Tra</h3>
               <TabListTest content="Tab 3 Content" />
             </div>
           )}
         </div>
       </div>
+
+      {/* Title section ở dưới cùng */}
+    
     </div>
   );
 };

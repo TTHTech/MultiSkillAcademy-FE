@@ -2,9 +2,8 @@ import { useState, useEffect } from "react";
 import moment from "moment";
 import Swal from "sweetalert2";
 
-
-
 const userID = localStorage.getItem("userId");
+
 const QuestionsAndAnswers = ({ courseId }) => {
   const [questions, setQuestions] = useState([]);
   const [expandedQuestionId, setExpandedQuestionId] = useState(null);
@@ -44,9 +43,8 @@ const QuestionsAndAnswers = ({ courseId }) => {
       confirmButtonText: "Yes",
       cancelButtonText: "No",
     });
-    if (swalResult.isDismissed) {
-      return;
-    }
+    if (!swalResult.isConfirmed) return;
+
     try {
       await fetch(
         `http://localhost:8080/api/student/delete-questions/${questionId}`,
@@ -54,6 +52,7 @@ const QuestionsAndAnswers = ({ courseId }) => {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         }
       );
@@ -78,9 +77,8 @@ const QuestionsAndAnswers = ({ courseId }) => {
       confirmButtonText: "Yes",
       cancelButtonText: "No",
     });
-    if (swalResult.isDismissed) {
-      return;
-    }
+    if (!swalResult.isConfirmed) return;
+
     try {
       await fetch(
         `http://localhost:8080/api/student/delete-answers/${answerId}`,
@@ -88,6 +86,7 @@ const QuestionsAndAnswers = ({ courseId }) => {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         }
       );
@@ -124,7 +123,7 @@ const QuestionsAndAnswers = ({ courseId }) => {
       userId: userID,
       questionText: newQuestionText,
       createdAt: new Date().toISOString(),
-      answers: []
+      answers: [],
     };
 
     try {
@@ -146,10 +145,9 @@ const QuestionsAndAnswers = ({ courseId }) => {
         icon: "success",
         confirmButtonText: "Yes",
       });
-      setQuestions([...questions, { ...data, answers: [] }]);
+      setQuestions([...questions, { ...newQuestion, answers: [] }]);
       setNewQuestionText("");
       setShowQuestionModal(false);
-      window.location.reload();
     } catch (error) {
       console.error("Error adding question: ", error);
     }
@@ -164,7 +162,7 @@ const QuestionsAndAnswers = ({ courseId }) => {
     if (!newAnswerText || newAnswerText.trim() === "") return;
 
     const newAnswer = {
-      answersId:`A${Math.floor(Math.random() * 100000)}`,
+      answersId: `A${Math.floor(Math.random() * 100000)}`,
       questionId: currentQuestionId,
       userId: userID,
       answersText: newAnswerText,
@@ -179,6 +177,7 @@ const QuestionsAndAnswers = ({ courseId }) => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
           body: JSON.stringify(newAnswer),
         }
@@ -199,7 +198,6 @@ const QuestionsAndAnswers = ({ courseId }) => {
       );
       setNewAnswerText("");
       setShowAnswerModal(false);
-      window.location.reload();
     } catch (error) {
       console.error("Error adding answer: ", error);
     }
@@ -214,7 +212,7 @@ const QuestionsAndAnswers = ({ courseId }) => {
   return (
     <div className="w-full max-w-4xl mx-auto p-6 bg-gray-50">
       <h1 className="text-3xl font-bold mb-6 text-center text-gray-800">
-        Hỏi đáp thắc mắt học tập
+        Hỏi đáp thắc mắc học tập
       </h1>
       <button
         onClick={handleAddQuestion}
@@ -271,10 +269,10 @@ const QuestionsAndAnswers = ({ courseId }) => {
                       <p
                         className={`font-semibold ${
                           answer.evaluate === "Unknown"
-                                      ? "text-gray-500"
-                                      : answer.evaluate === "Correct"
-                                      ? "text-green-500"
-                                      : "text-red-500"
+                            ? "text-gray-500"
+                            : answer.evaluate === "Correct"
+                            ? "text-green-500"
+                            : "text-red-500"
                         }`}
                       >
                         Evaluate: {answer.evaluate}
@@ -282,12 +280,9 @@ const QuestionsAndAnswers = ({ courseId }) => {
                       {answer.userId === userID && (
                         <button
                           onClick={() =>
-                            handleDeleteAnswer(
-                              question.questionsId,
-                              answer.answersId
-                            )
+                            handleDeleteAnswer(question.questionsId, answer.answersId)
                           }
-                          className="text-red-500 hover:text-red-600 text-sm"
+                          className="text-red-500 hover:text-red-700"
                         >
                           Delete Answer
                         </button>
@@ -307,56 +302,60 @@ const QuestionsAndAnswers = ({ courseId }) => {
         </div>
       ))}
 
-      {/* Modal for Adding Question */}
       {showQuestionModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-            <h2 className="text-xl font-bold mb-4">Enter Question</h2>
-            <input
-              type="text"
+        <div className="fixed inset-0 flex justify-center items-center z-50 bg-black bg-opacity-50">
+          <div className="bg-white rounded-lg p-6 shadow-md w-96">
+            <h3 className="text-xl font-semibold mb-4">Add New Question</h3>
+            <textarea
               value={newQuestionText}
               onChange={(e) => setNewQuestionText(e.target.value)}
-              className="w-full border border-gray-300 p-2 rounded mb-4"
-            />
-            <button
-              onClick={confirmAddQuestion}
-              className="px-4 py-2 bg-blue-500 text-white rounded-lg mr-2"
-            >
-              Confirm
-            </button>
-            <button
-              onClick={() => setShowQuestionModal(false)}
-              className="px-4 py-2 bg-gray-500 text-white rounded-lg"
-            >
-              Cancel
-            </button>
+              placeholder="Type your question here..."
+              rows={4}
+              className="w-full border border-gray-300 rounded-md p-4 mb-4"
+            ></textarea>
+            <div className="flex justify-between">
+              <button
+                onClick={() => setShowQuestionModal(false)}
+                className="bg-gray-500 text-white rounded-md px-4 py-2 hover:bg-gray-600 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmAddQuestion}
+                className="bg-blue-500 text-white rounded-md px-4 py-2 hover:bg-blue-600 transition-colors"
+              >
+                Add Question
+              </button>
+            </div>
           </div>
         </div>
       )}
 
-      {/* Modal for Adding Answer */}
       {showAnswerModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-            <h2 className="text-xl font-bold mb-4">Enter Answer</h2>
-            <input
-              type="text"
+        <div className="fixed inset-0 flex justify-center items-center z-50 bg-black bg-opacity-50">
+          <div className="bg-white rounded-lg p-6 shadow-md w-96">
+            <h3 className="text-xl font-semibold mb-4">Add New Answer</h3>
+            <textarea
               value={newAnswerText}
               onChange={(e) => setNewAnswerText(e.target.value)}
-              className="w-full border border-gray-300 p-2 rounded mb-4"
-            />
-            <button
-              onClick={confirmAddAnswer}
-              className="px-4 py-2 bg-blue-500 text-white rounded-lg mr-2"
-            >
-              Confirm
-            </button>
-            <button
-              onClick={() => setShowAnswerModal(false)}
-              className="px-4 py-2 bg-gray-500 text-white rounded-lg"
-            >
-              Cancel
-            </button>
+              placeholder="Type your answer here..."
+              rows={4}
+              className="w-full border border-gray-300 rounded-md p-4 mb-4"
+            ></textarea>
+            <div className="flex justify-between">
+              <button
+                onClick={() => setShowAnswerModal(false)}
+                className="bg-gray-500 text-white rounded-md px-4 py-2 hover:bg-gray-600 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmAddAnswer}
+                className="bg-green-500 text-white rounded-md px-4 py-2 hover:bg-green-600 transition-colors"
+              >
+                Add Answer
+              </button>
+            </div>
           </div>
         </div>
       )}
