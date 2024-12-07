@@ -1,4 +1,5 @@
 import React from "react";
+import { FaBook, FaExclamationTriangle } from "react-icons/fa";
 
 const CourseContentDetails = ({ contentDetails }) => {
   return (
@@ -11,14 +12,18 @@ const CourseContentDetails = ({ contentDetails }) => {
           {contentDetails.map((content, index) => (
             <div
               key={index}
-              className="text-gray-800 border border-gray-300 p-4 rounded-lg hover:shadow-lg hover:border-gray-500"
+              className="text-gray-800 border border-gray-300 p-4 rounded-lg hover:shadow-lg hover:border-gray-500 flex items-center space-x-3"
             >
+              <FaBook className="text-blue-600" />
               <p>{content}</p>
             </div>
           ))}
         </div>
       ) : (
-        <p className="text-gray-600">Không có nội dung khóa học để hiển thị.</p>
+        <div className="flex items-center text-gray-600">
+          <FaExclamationTriangle className="text-yellow-500 mr-2" />
+          <p>Không có nội dung khóa học để hiển thị.</p>
+        </div>
       )}
     </div>
   );
