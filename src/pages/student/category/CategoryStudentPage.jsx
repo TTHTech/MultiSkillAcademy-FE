@@ -38,12 +38,17 @@ const CategoryStudentPage = () => {
           {categoryName ? `${categoryName} - Khóa Học` : 'Danh Mục Khóa Học'}
         </h1>
 
-        {/* Filter for the courses */}
-        <CourseFilter onFilter={handleFilter} />
+        {/* Layout with flex: filter on the left and course list on the right */}
+        <div className="flex space-x-6">
+          {/* Filter on the left */}
+          <div className="w-1/4">
+            <CourseFilter onFilter={handleFilter} />
+          </div>
 
-        {/* Display courses based on categoryId and filters */}
-        <div className="mt-6">
-          <CourseList categoryId={categoryId} filter={filter} />
+          {/* Course List on the right */}
+          <div className="w-3/4">
+            <CourseList categoryId={categoryId} filter={filter} />
+          </div>
         </div>
       </div>
       <Footer /> {/* Add Footer to the page */}
