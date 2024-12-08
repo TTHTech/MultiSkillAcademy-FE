@@ -1,58 +1,107 @@
 import React, { useState } from 'react';
+import { FaStar, FaRegStar, FaCheck, FaRegCheckCircle } from 'react-icons/fa';
 
 const CourseFilter = ({ onFilter }) => {
   const [level, setLevel] = useState('');
   const [priceRange, setPriceRange] = useState('');
   const [rating, setRating] = useState('');
 
-  const handleFilter = () => {
-    onFilter({ level, priceRange, rating });
+  // Function to handle level change
+  const handleLevelClick = (selectedLevel) => {
+    setLevel(level === selectedLevel ? '' : selectedLevel); // Toggle the selected level
+    onFilter({ level: level === selectedLevel ? '' : selectedLevel, priceRange, rating });
+  };
+
+  // Function to render the stars based on rating
+  const renderStars = (minRating) => {
+    const stars = [];
+    for (let i = 1; i <= 5; i++) {
+      stars.push(
+        i <= minRating ? (
+          <FaStar key={i} className="text-yellow-400" style={{ fontSize: '20px' }} />
+        ) : (
+          <FaRegStar key={i} className="text-yellow-400" style={{ fontSize: '20px' }} />
+        )
+      );
+    }
+    return stars;
+  };
+
+  // Toggle the selected price range
+  const handlePriceRangeClick = (range) => {
+    const newPriceRange = priceRange === range ? '' : range;
+    setPriceRange(newPriceRange);
+    onFilter({ level, priceRange: newPriceRange, rating });
+  };
+
+  // Toggle the selected rating
+  const handleRatingClick = (minRating) => {
+    const newRating = rating === minRating.toString() ? '' : minRating.toString();
+    setRating(newRating);
+    onFilter({ level, priceRange, rating: newRating });
   };
 
   return (
-    <div className="flex space-x-4 mb-6">
-      <select
-        value={level}
-        onChange={(e) => setLevel(e.target.value)}
-        className="border px-3 py-2 rounded-md"
-      >
-        <option value="">Chọn mức độ</option>
-        <option value="Beginner">Beginner</option>
-        <option value="Intermediate">Intermediate</option>
-        <option value="Advanced">Advanced</option>
-      </select>
+    <div className="flex flex-col items-center space-y-4 mb-6">
+      {/* Level Filter */}
+      <div className="flex flex-col items-center space-y-2 w-full max-w-xs">
+        <label className="text-gray-700">Mức độ</label>
+        <div className="flex flex-col space-y-2 w-full">
+          {['Beginner', 'Intermediate', 'Advanced'].map((levelOption) => (
+            <div
+              key={levelOption}
+              onClick={() => handleLevelClick(levelOption)}
+              className={`flex items-center cursor-pointer px-4 py-2 rounded-md ${level === levelOption ? 'bg-blue-600 text-white' : 'bg-transparent text-blue-600 border-2 border-blue-600'}`}
+            >
+              {level === levelOption ? <FaCheck className="mr-2" /> : <FaRegCheckCircle className="mr-2" />}
+              <span className={level === levelOption ? 'text-white' : 'text-blue-600'}>
+                {levelOption}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
 
-      <select
-        value={priceRange}
-        onChange={(e) => setPriceRange(e.target.value)}
-        className="border px-3 py-2 rounded-md"
-      >
-        <option value="">Chọn khoảng giá</option>
-        <option value="1000000-1100000">1.000.000 - 1.100.000 VND</option>
-        <option value="1100000-1200000">1.100.000 - 1.200.000 VND</option>
-        <option value="1200000-1300000">1.200.000 - 1.300.000 VND</option>
-        <option value="1300000-1400000">1.300.000 - 1.400.000 VND</option>
-        <option value="1400000-1500000">1.400.000 - 1.500.000 VND</option>
-      </select>
+      {/* Price Range Filter */}
+      <div className="flex flex-col items-center space-y-2 w-full max-w-xs">
+        <label className="text-gray-700">Khoảng giá</label>
+        <div className="flex flex-col space-y-2 w-full">
+          {['100000-200000', '200000-300000', '300000-400000', '400000-500000', '500000-600000'].map((range) => (
+            <div
+              key={range}
+              onClick={() => handlePriceRangeClick(range)}
+              className={`flex items-center cursor-pointer px-4 py-2 rounded-md ${priceRange === range ? 'bg-blue-600 text-white' : 'bg-transparent text-blue-600 border-2 border-blue-600'}`}
+            >
+              {priceRange === range ? <FaCheck className="mr-2" /> : <FaRegCheckCircle className="mr-2" />}
+              <span className={priceRange === range ? 'text-white' : 'text-blue-600'}>
+                {range.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.')}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
 
-      <select
-        value={rating}
-        onChange={(e) => setRating(e.target.value)}
-        className="border px-3 py-2 rounded-md"
-      >
-        <option value="">Chọn đánh giá sao</option>
-        <option value="3">Từ 3 sao trở lên</option>
-        <option value="3.5">Từ 3.5 sao trở lên</option>
-        <option value="4">Từ 4 sao trở lên</option>
-        <option value="5">5 sao</option>
-      </select>
-
-      <button
-        onClick={handleFilter}
-        className="bg-blue-600 text-white px-4 py-2 rounded-md"
-      >
-        Lọc
-      </button>
+      {/* Rating Filter */}
+      <div className="flex flex-col items-center space-y-2 w-full max-w-xs">
+        <label className="text-gray-700">Đánh giá sao</label>
+        <div className="flex flex-col space-y-2 w-full">
+          {[3, 3.5, 4, 4.5].map((minRating) => (
+            <div
+              key={minRating}
+              onClick={() => handleRatingClick(minRating)}
+              className={`flex items-center cursor-pointer px-4 py-2 rounded-md ${rating === minRating.toString() ? 'bg-blue-600 text-white' : 'bg-transparent text-blue-600 border-2 border-blue-600'}`}
+            >
+              {rating === minRating.toString() ? <FaCheck className="mr-2" /> : <FaRegCheckCircle className="mr-2" />}
+              <div className="flex items-center">
+                {renderStars(minRating)}
+                <span className={rating === minRating.toString() ? 'text-white' : 'text-blue-600'} className="ml-2 text-sm">
+                  {minRating} sao trở lên
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 };

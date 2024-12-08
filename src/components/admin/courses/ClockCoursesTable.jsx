@@ -9,22 +9,20 @@ import "swiper/swiper-bundle.css"; // Đường dẫn chính xác hơn
 // Số lượng khóa học hiển thị mỗi trang
 const ITEMS_PER_PAGE = 10;
 
-const AcceptedCoursesTable = () => {
+const ClockCoursesTable = () => {
   const [courses, setCourses] = useState([]); // Lưu trữ danh sách khóa học lấy từ API
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1); // Lưu trữ trang hiện tại
   const [editingCourse, setEditingCourse] = useState(null); // Lưu trữ khóa học đang xem
   const [loading, setLoading] = useState(true); // Trạng thái loading khi gọi API
   const [error, setError] = useState(null); // Trạng thái lỗi khi gọi API
-  const [showPopup, setShowPopup] = useState(false); // Quản lý trạng thái popup
-  const [messageContent, setMessageContent] = useState(""); // Nội dung thông điệp
 
   // Di chuyển hàm fetchCourses ra ngoài useEffect để tái sử dụng
   const fetchCourses = async () => {
     setLoading(true);
     try {
       const response = await fetch(
-        "http://localhost:8080/api/admin/courses/active",
+        "http://localhost:8080/api/admin/courses/inactive",
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -52,9 +50,9 @@ const AcceptedCoursesTable = () => {
     // toast.info("Loading courses...");
   }, []);
 
-  if (courses.length === 0) {
-    // toast.info("No courses available.");
-  }
+  // if (courses.length === 0) {
+  //   toast.info("No courses available.");
+  // }
 
   // Lọc khóa học theo từ khóa tìm kiếm
   const filteredCourses = courses.filter(
@@ -120,60 +118,6 @@ const AcceptedCoursesTable = () => {
       toast.error(`Error: ${error.message}`);
     }
   };
-  // Gửi email và cập nhật trạng thái
-  const handleClockClick = () => {
-    if (!editingCourse || !editingCourse.courseId) {
-      console.error("Course ID is undefined");
-      return;
-    }
-    setShowPopup(true); // Hiển thị popup khi nhấn Clock
-  };
-
-  // Hàm đóng popup
-  const closePopup = () => {
-    setShowPopup(false);
-    setMessageContent(""); // Reset nội dung khi đóng popup
-  };
-
-  // Gửi email và cập nhật trạng thái khóa học
-  const handleSendMessage = async () => {
-    if (!messageContent.trim()) {
-      toast.error("Please enter a message.");
-      return;
-    }
-
-    try {
-      // Gửi email
-      const response = await fetch(
-        "http://localhost:8080/api/admin/emails/send",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-          body: JSON.stringify({
-            courseId: editingCourse.courseId,
-            messageContent,
-          }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to send email.");
-      }
-
-      toast.success("Email sent successfully!");
-
-      // Cập nhật trạng thái khóa học thành 'Clocked' (hoặc trạng thái khác)
-      await handleReject(editingCourse.courseId);
-
-      closePopup(); // Đóng popup khi hoàn tất
-    } catch (error) {
-      console.error("Error sending email or updating course:", error);
-      toast.error(`Error: ${error.message}`);
-    }
-  };
 
   const handleReject = async (courseId) => {
     if (!courseId) {
@@ -190,7 +134,7 @@ const AcceptedCoursesTable = () => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
-          body: JSON.stringify({ status: "Inactive" }),
+          body: JSON.stringify({ status: "Declined" }),
         }
       );
 
@@ -203,7 +147,9 @@ const AcceptedCoursesTable = () => {
       // Cập nhật lại danh sách ngay lập tức
       setCourses((prevCourses) =>
         prevCourses.map((course) =>
-          course.courseId === courseId ? { ...course, status: "Inactive" } : course
+          course.courseId === courseId
+            ? { ...course, status: "Declined" }
+            : course
         )
       );
 
@@ -427,11 +373,19 @@ const AcceptedCoursesTable = () => {
           </div>
 
           <button
-            className="bg-red-500 text-white px-4 py-2 rounded-lg mr-2"
-            onClick={handleClockClick} // Mở popup khi nhấn
+            className="bg-green-500 text-white px-4 py-2 rounded-lg mr-2"
+            onClick={() => {
+              if (!editingCourse || !editingCourse.courseId) {
+                console.error("Course ID is undefined");
+                return;
+              }
+              handleAccept(editingCourse.courseId);
+            }}
           >
-            Clock
+            Unclock
           </button>
+
+      
 
           <button
             className="bg-gray-500 text-white px-4 py-2 rounded-lg"
@@ -439,34 +393,6 @@ const AcceptedCoursesTable = () => {
           >
             Cancel
           </button>
-          {showPopup && (
-            <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50">
-              <div className="bg-gray-800 p-6 rounded-lg w-1/3">
-                <h3 className="text-lg font-semibold text-gray-100 mb-4">Enter message for deletion</h3>
-                <textarea
-                  value={messageContent}
-                  onChange={(e) => setMessageContent(e.target.value)}
-                  className="w-full p-2 bg-gray-600 text-white rounded-lg mb-4"
-                  rows="4"
-                  placeholder="Enter your message here..."
-                />
-                <div className="flex justify-end">
-                  <button
-                    className="bg-blue-500 text-white px-4 py-2 rounded-lg mr-2"
-                    onClick={handleSendMessage}
-                  >
-                    Send
-                  </button>
-                  <button
-                    className="bg-gray-500 text-white px-4 py-2 rounded-lg"
-                    onClick={closePopup}
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       ) : (
         <table className="table-auto w-full text-left text-gray-100">
@@ -489,7 +415,7 @@ const AcceptedCoursesTable = () => {
                 <td className="py-2 px-4">{course.duration}</td>
                 <td className="py-2 px-4">{course.categoryName}</td>
                 <td className="py-2 px-4">${course.price}</td>
-                <td className="py-2 px-4 text-green-500">{course.status}</td>
+                <td className="py-2 px-4 text-red-500">{course.status}</td>
                 <td className="py-2 px-4">
                   <button
                     className="bg-blue-500 text-white px-3 py-1 rounded-lg"
@@ -528,4 +454,4 @@ const AcceptedCoursesTable = () => {
   );
 };
 
-export default AcceptedCoursesTable;
+export default ClockCoursesTable;

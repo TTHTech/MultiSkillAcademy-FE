@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { FaChevronDown, FaChevronUp, FaPlay } from 'react-icons/fa';
+import { FaAngleDown, FaAngleUp, FaRegPlayCircle } from 'react-icons/fa';
 
 const CourseContent = ({ content }) => {
   const [expandedSections, setExpandedSections] = useState({});
+  const [showAll, setShowAll] = useState(false); // State để kiểm soát việc hiển thị tất cả các section
 
   // Hàm toggle để mở/đóng từng section
   const toggleSection = (index) => {
@@ -12,16 +13,23 @@ const CourseContent = ({ content }) => {
     }));
   };
 
+  // Hàm toggle để chuyển đổi trạng thái "Xem thêm"
+  const toggleShowAll = () => {
+    setShowAll((prev) => !prev);
+  };
+
+  const sectionsToDisplay = showAll ? content : content.slice(0, 3); // Chỉ lấy 3 section đầu nếu chưa bấm "Xem thêm"
+
   return (
     <div className="bg-white p-6 rounded-lg shadow-lg mt-8">
       <h2 className="text-3xl font-bold text-gray-900 mb-6">Nội dung khóa học</h2>
       <ul className="space-y-6">
-        {content.map((section, index) => (
+        {sectionsToDisplay.map((section, index) => (
           <li key={index} className="border-b pb-6 hover:bg-gray-50 transition-all rounded-lg">
             {/* Tiêu đề section với nút toggle */}
             <div className="flex justify-between items-center cursor-pointer">
               <div className="flex items-center space-x-4">
-                <div className="h-2 w-2 rounded-full bg-gray-800"></div>
+                <div className="h-2 w-2 rounded-full bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500"></div>
                 <strong className="text-xl font-semibold text-gray-800">{section.title}</strong>
               </div>
               <button
@@ -29,9 +37,9 @@ const CourseContent = ({ content }) => {
                 className="flex items-center text-gray-600 hover:text-gray-800 transition-colors"
               >
                 {expandedSections[index] ? (
-                  <FaChevronUp className="text-2xl" />
+                  <FaAngleUp className="text-2xl text-blue-500" />
                 ) : (
-                  <FaChevronDown className="text-2xl" />
+                  <FaAngleDown className="text-2xl text-blue-500" />
                 )}
               </button>
             </div>
@@ -46,7 +54,7 @@ const CourseContent = ({ content }) => {
                 {section.lectures?.map((lecture, lectureIndex) => (
                   <li key={lectureIndex} className="flex items-center space-x-3 hover:bg-gray-100 p-2 rounded-lg">
                     {/* Icon Play và Tên bài giảng */}
-                    <FaPlay className="text-gray-500" size={16} />
+                    <FaRegPlayCircle className="text-gray-600" size={18} />
                     <span>{lecture}</span> {/* Chỉ hiển thị tên bài giảng */}
                   </li>
                 ))}
@@ -55,6 +63,15 @@ const CourseContent = ({ content }) => {
           </li>
         ))}
       </ul>
+
+      {content.length > 3 && (
+        <button
+          onClick={toggleShowAll}
+          className="mt-4 text-blue-600 hover:text-blue-800 transition-colors"
+        >
+          {showAll ? 'Thu gọn' : 'Xem thêm'}
+        </button>
+      )}
     </div>
   );
 };

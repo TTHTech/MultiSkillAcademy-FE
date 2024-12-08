@@ -8,17 +8,21 @@ const QuizQuestionSection = ({ question, options, currentQuestionIndex, totalQue
   };
 
   return (
-    <div className="flex flex-col items-center justify-center p-8 bg-white shadow-md rounded-lg max-w-4xl mx-auto">
-      <h2 className="text-4xl font-semibold mb-8">
+    <div className="flex flex-col items-center justify-center p-8 bg-white shadow-xl rounded-lg max-w-3xl mx-auto space-y-8">
+      <h2 className="text-3xl font-semibold text-gray-800">
         Câu hỏi {currentQuestionIndex + 1}/{totalQuestions}
       </h2>
-      <p className="text-xl mb-8 text-center">{question}</p>
+      <p className="text-xl text-gray-600 text-center">{question}</p>
 
-      <div className="space-y-6 w-full max-w-lg">
+      <div className="space-y-4 w-full max-w-lg">
         {options.map((option, index) => (
           <button
             key={index}
-            className={`w-full p-5 text-2xl border rounded-md ${selectedAnswer === option ? "bg-blue-600 text-white" : "bg-gray-300"}`}
+            className={`w-full p-4 text-xl font-medium rounded-lg border transition-all duration-300 ease-in-out ${
+              selectedAnswer === option
+                ? "bg-blue-600 text-white border-blue-600 transform scale-105"
+                : "bg-gray-200 text-gray-800 border-gray-400 hover:bg-gray-300 hover:border-gray-500"
+            }`}
             onClick={() => handleSelectAnswer(option)}
           >
             {option}

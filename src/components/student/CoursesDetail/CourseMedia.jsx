@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
-import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai';
-import { useParams } from 'react-router-dom';
+import React, { useState } from "react";
+import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
+import { useParams } from "react-router-dom";
 
-const CourseMedia = ({ 
-  price, 
-  thumbnail, 
-  onAddToCart, 
-  onBuyNow, 
-  resourceDescription 
+const CourseMedia = ({
+  price,
+  thumbnail,
+  onAddToCart,
+  onBuyNow,
+  resourceDescription,
 }) => {
   const [isFavorite, setIsFavorite] = useState(false); // Trạng thái yêu thích
   const userId = Number(localStorage.getItem("userId")); // Lấy userId từ localStorage
@@ -46,10 +46,9 @@ const CourseMedia = ({
   };
 
   return (
-    <div className="bg-white p-6 rounded shadow-lg text-center max-w-xs w-full lg:sticky lg:top-24 lg:mr-4">
+    <div className="bg-white p-6 rounded shadow-lg text-center max-w-xs w-full lg:sticky lg:top-24 lg:mr-4 z-10 border-2 border-red-500">
       {/* Thumbnail */}
       <img src={thumbnail} alt="Preview" className="w-full mb-4 rounded-lg" />
-      <p className="text-sm font-medium text-gray-500 mb-2">Xem trước khóa học này</p>
       
       {/* Price */}
       <div className="text-3xl font-bold text-gray-800 mb-4">đ {price}</div>
@@ -74,16 +73,6 @@ const CourseMedia = ({
         </div>
       </div>
 
-      {/* Buy Now Button */}
-      <button 
-        onClick={onBuyNow} 
-        className="border w-full py-2 rounded-lg font-semibold text-lg mb-4 text-gray-800 hover:bg-gray-100"
-      >
-        Mua ngay
-      </button>
-
-      {/* Refund Policy */}
-      <p className="text-sm text-gray-400 mb-4">Đảm bảo hoàn tiền trong 30 ngày</p>
 
       {/* Course Details */}
       <div className="text-left text-gray-700">
@@ -101,12 +90,6 @@ const CourseMedia = ({
 
       {/* Error Message */}
       {error && <p className="text-red-500 text-sm">{error}</p>}
-
-      {/* Additional Links */}
-      <div className="flex justify-between text-sm text-blue-600">
-        <a href="#share" className="hover:underline">Chia sẻ</a>
-        <a href="#gift" className="hover:underline">Tặng khóa học này</a>
-      </div>
     </div>
   );
 };

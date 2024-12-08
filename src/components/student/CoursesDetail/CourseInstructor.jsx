@@ -40,7 +40,7 @@ const CourseInstructor = ({ instructor }) => {
 
       {/* Instructor Description with "Read More" Toggle */}
       <p className="text-gray-700">
-        {isExpanded ? instructor.description : `${truncatedDescription}...`}
+   
         {instructor.description.length > 150 && (
           <button 
             onClick={toggleDescription} 

@@ -6,8 +6,9 @@ import Sidebar from "./components/admin/common/Sidebar";
 import OverviewPage from "./pages/admin/OverviewPage";
 import CoursesPage from "./pages/admin/CoursesPage";
 import StudentPage from "./pages/admin/StudentPage";
-import SalesPage from "./pages/admin/SalesPage";
-import OrdersPage from "./pages/admin/OrdersPage";
+import SalesPage from "./pages/admin/SalesPage.jsx";
+import SalePage from "./pages/admin/DemoPage.jsx";
+import ReviewPage from "./pages/admin/ReviewPage.jsx";
 import AnalyticsPage from "./pages/admin/AnalyticsPage";
 import SettingsPage from "./pages/admin/SettingsPage";
 import InstructorPage from "./pages/admin/InstructorPage";
@@ -39,8 +40,7 @@ import PageReview from "./pages/instructor/PageReview";
 import PageSales from "./pages/instructor/PageSales";
 import ProfilePage from "./pages/student/profile/ProfilePage.jsx";
 import QuizPage from "./pages/student/quiz/QuizPage";
-
-
+import ResultPage from "./pages/student/quiz/ResultPage";
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [role, setRole] = useState("");
@@ -73,7 +73,7 @@ function App() {
       {/* Toast Notifications */}
       <ToastContainer
         position="top-right"
-        autoClose={3000}
+        autoClose={1000}
         hideProgressBar={false}
         closeOnClick
         pauseOnHover
@@ -121,11 +121,12 @@ function App() {
               <Route path="/admin/student" element={<StudentPage />} />
               <Route path="/admin/instructor" element={<InstructorPage />} />
               <Route path="/admin/sales" element={<SalesPage />} />
-              <Route path="/admin/orders" element={<OrdersPage />} />
+              <Route path="/admin/sale" element={<SalePage />} />
               <Route path="/admin/category" element={<CategoryPage />} />
               <Route path="/admin/analytics" element={<AnalyticsPage />} />
               <Route path="/admin/settings" element={<SettingsPage />} />
               <Route path="/admin/add-user" element={<AddNewUserPage />} />
+              <Route path="/admin/review" element={<ReviewPage />} />
             </>
           )}
 
@@ -142,6 +143,7 @@ function App() {
               <Route path="/student/wishlist" element={<Wishlist />} />
               <Route path="/student/Success" element={<SuccessPage />} />
               <Route path="/payment/success" element={<SuccessPage />} />
+              <Route path="/student/result" element={<ResultPage />} />
             </>
           )}
 

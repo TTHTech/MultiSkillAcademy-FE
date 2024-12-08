@@ -19,7 +19,7 @@ const StudentHomePage = () => {
       <WelcomeSection />
       <HeroSection />
       
-      <FeaturedCourses />
+
       <SuggestedCoursesSection />
       <RecommendedCoursesSection />
       <TopPythonCoursesSection /> {/* Thêm component TopWebCoursesSection mới */}

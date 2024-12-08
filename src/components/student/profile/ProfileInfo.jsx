@@ -132,8 +132,8 @@ const ProfileInfo = () => {
   }
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md max-w-4xl mx-auto">
-      <div className="flex flex-col items-center space-y-4">
+    <div className="bg-white p-8 rounded-lg shadow-lg max-w-3xl mx-auto mt-8">
+      <div className="flex flex-col items-center space-y-6">
         <div className="relative">
           <img
             src={
@@ -142,10 +142,10 @@ const ProfileInfo = () => {
                 : profile.profileImage || "https://via.placeholder.com/150"
             }
             alt="User Avatar"
-            className="w-32 h-32 rounded-full object-cover border-2 border-gray-200"
+            className="w-36 h-36 rounded-full object-cover border-4 border-indigo-500"
           />
           {isEditing && (
-            <label className="absolute bottom-0 right-0 bg-blue-600 text-white p-2 rounded-full cursor-pointer">
+            <label className="absolute bottom-0 right-0 bg-indigo-500 text-white p-2 rounded-full cursor-pointer shadow-lg">
               <FaCamera />
               <input
                 type="file"
@@ -155,114 +155,114 @@ const ProfileInfo = () => {
             </label>
           )}
         </div>
+        
+        <div className="space-y-6 w-full">
+        <div>
+        <p className="text-lg text-gray-800">
+          <strong>Tên đăng nhập:</strong> {profile.username}
+        </p>
+        <p className="text-lg text-gray-800">
+          <strong>Email:</strong> {profile.email}
+        </p>
+      </div>
+    
+      <div>
+        <p className="text-xl text-gray-800">
+          <strong>Họ và tên:</strong>{" "}
+          {isEditing ? (
+            <div className="flex space-x-4">
+              <input
+                type="text"
+                value={newLastName || profile.lastName}
+                onChange={(e) => setNewLastName(e.target.value)}
+                className="border-2 border-gray-300 rounded px-4 py-2 w-full"
+                placeholder="Họ"
+              />
+              <input
+                type="text"
+                value={newFirstName || profile.firstName}
+                onChange={(e) => setNewFirstName(e.target.value)}
+                className="border-2 border-gray-300 rounded px-4 py-2 w-full"
+                placeholder="Tên"
+              />
+            </div>
+          ) : (
+            `${profile.lastName} ${profile.firstName}`
+          )}
+        </p>
       </div>
 
-      <div className="mt-6 space-y-4">
-        <div className="space-y-2">
-          <p className="text-lg text-gray-700">
-            <strong>Tên đăng nhập:</strong> {profile.username}
-          </p>
-          <p className="text-lg text-gray-700">
-            <strong>Email:</strong> {profile.email}
-          </p>
-        </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <p className="text-xl text-gray-800">
+              <strong>Ngày sinh:</strong>{" "}
+              {isEditing ? (
+                <input
+                  type="date"
+                  value={newDateOfBirth || profile.dateOfBirth || ""}
+                  onChange={(e) => setNewDateOfBirth(e.target.value)}
+                  className="border-2 border-gray-300 rounded px-4 py-2 w-full"
+                />
+              ) : (
+                profile.dateOfBirth || "Chưa cập nhật"
+              )}
+            </p>
 
-        <div>
-          <p className="text-lg text-gray-700">
-            <strong>Họ và tên:</strong>{" "}
+            <p className="text-xl text-gray-800">
+              <strong>Số điện thoại:</strong>{" "}
+              {isEditing ? (
+                <input
+                  type="tel"
+                  value={newPhone || profile.phoneNumber || ""}
+                  onChange={(e) => setNewPhone(e.target.value)}
+                  className="border-2 border-gray-300 rounded px-4 py-2 w-full"
+                />
+              ) : (
+                profile.phoneNumber || "Chưa cập nhật"
+              )}
+            </p>
+          </div>
+
+          <div>
+            <p className="text-xl text-gray-800">
+              <strong>Địa chỉ:</strong>{" "}
+              {isEditing ? (
+                <textarea
+                  value={newAddress || profile.address || ""}
+                  onChange={(e) => setNewAddress(e.target.value)}
+                  className="border-2 border-gray-300 rounded px-4 py-2 w-full"
+                />
+              ) : (
+                profile.address || "Chưa cập nhật"
+              )}
+            </p>
+          </div>
+
+          <div className="flex justify-end space-x-4">
             {isEditing ? (
               <>
-                <input
-                  type="text"
-                  value={newLastName || profile.lastName}
-                  onChange={(e) => setNewLastName(e.target.value)}
-                  className="border border-gray-300 rounded px-2 py-1 w-full"
-                  placeholder="Họ"
-                />
-                <input
-                  type="text"
-                  value={newFirstName || profile.firstName}
-                  onChange={(e) => setNewFirstName(e.target.value)}
-                  className="border border-gray-300 rounded px-2 py-1 w-full mt-2"
-                  placeholder="Tên"
-                />
+                <button
+                  onClick={handleUpdate}
+                  className="px-6 py-2 bg-green-500 text-white rounded-full hover:bg-green-600 transition duration-200"
+                >
+                  Cập nhật
+                </button>
+                <button
+                  onClick={handleCancel}
+                  className="px-6 py-2 bg-gray-300 text-black rounded-full hover:bg-gray-400 transition duration-200"
+                >
+                  Hủy
+                </button>
               </>
             ) : (
-              `${profile.lastName} ${profile.firstName}`
+              <button
+                onClick={() => setIsEditing(true)}
+                className="px-6 py-2 bg-indigo-500 text-white rounded-full hover:bg-indigo-600 transition duration-200"
+              >
+                Chỉnh sửa
+              </button>
             )}
-          </p>
+          </div>
         </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <p className="text-lg text-gray-700">
-            <strong>Ngày sinh:</strong>{" "}
-            {isEditing ? (
-              <input
-                type="date"
-                value={newDateOfBirth || profile.dateOfBirth || ""}
-                onChange={(e) => setNewDateOfBirth(e.target.value)}
-                className="border border-gray-300 rounded px-2 py-1 w-full"
-              />
-            ) : (
-              profile.dateOfBirth || "Chưa cập nhật"
-            )}
-          </p>
-
-          <p className="text-lg text-gray-700">
-            <strong>Số điện thoại:</strong>{" "}
-            {isEditing ? (
-              <input
-                type="tel"
-                value={newPhone || profile.phoneNumber || ""}
-                onChange={(e) => setNewPhone(e.target.value)}
-                className="border border-gray-300 rounded px-2 py-1 w-full"
-              />
-            ) : (
-              profile.phoneNumber || "Chưa cập nhật"
-            )}
-          </p>
-        </div>
-
-        <div className="mt-4">
-          <p className="text-lg text-gray-700">
-            <strong>Địa chỉ:</strong>{" "}
-            {isEditing ? (
-              <textarea
-                value={newAddress || profile.address || ""}
-                onChange={(e) => setNewAddress(e.target.value)}
-                className="border border-gray-300 rounded px-2 py-1 w-full"
-              />
-            ) : (
-              profile.address || "Chưa cập nhật"
-            )}
-          </p>
-        </div>
-      </div>
-
-      <div className="mt-6 flex justify-end space-x-4">
-        {isEditing ? (
-          <>
-            <button
-              onClick={handleUpdate}
-              className="bg-blue-600 text-white px-4 py-2 rounded-md"
-            >
-              Cập nhật
-            </button>
-            <button
-              onClick={handleCancel}
-              className="bg-gray-300 text-gray-800 px-4 py-2 rounded-md"
-            >
-              Hủy
-            </button>
-          </>
-        ) : (
-          <button
-            onClick={() => setIsEditing(true)}
-            className="bg-yellow-500 text-white px-4 py-2 rounded-md"
-          >
-            Chỉnh sửa
-          </button>
-        )}
       </div>
     </div>
   );

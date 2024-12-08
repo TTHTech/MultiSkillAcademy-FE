@@ -3,9 +3,9 @@ import { motion } from "framer-motion";
 
 import Header from "../../components/admin/common/Header";
 import StatCard from "../../components/admin/common/StatCard";
-import DailySales from "../../components/admin/sales/DailySales";
-import SalesDistribution from "../../components/admin/sales/SalesDistribution";
-import SalesTable from "../../components/admin/sales/SalesTable";
+import DailyReview from "../../components/admin/review/DailyReview";
+import ReviewDistribution from "../../components/admin/review/ReviewDistribution";
+import ReviewTable from "../../components/admin/review/ReviewTable";
 
 const orderStats = {
   totalOrders: "1,234",
@@ -52,8 +52,12 @@ const SalesPage = () => {
           />
         </motion.div>
 
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          <DailyReview />
+          <ReviewDistribution />
+        </div>
 
-        <SalesTable />
+        <ReviewTable />
       </main>
     </div>
   );

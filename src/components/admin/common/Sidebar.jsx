@@ -1,4 +1,4 @@
-import { BarChart2, Menu, Settings } from "lucide-react";
+import { BarChart2, Menu, TrendingUp, Star  } from "lucide-react";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
@@ -13,7 +13,8 @@ const SIDEBAR_ITEMS = [
   { name: "Instructor", icon: ChalkboardTeacher, color: "#EC4899", href: "/admin/instructor" },
   { name: "Add New User", icon: Plus, color: "#10B981", href: "/admin/add-user" },
   { name: "Category", icon: Layers, color: "#F97316", href: "/admin/category" }, // Mục Category
-  { name: "Sales", icon: Settings, color: "#6EE7B7", href: "/admin/analytics" },
+  // { name: "Review", icon: Star , color: "#FBBF24", href: "/admin/review" }, // Cập nhật href cho logout để xử lý logic bên dưới  
+  { name: "Sales", icon: TrendingUp , color: "#6EE7B7", href: "/admin/sales" }, // Mục Sales
   { name: "Logout", icon: LogOut, color: "#EF4444", href: "/logout" }, // Cập nhật href cho logout để xử lý logic bên dưới
 ];
 
