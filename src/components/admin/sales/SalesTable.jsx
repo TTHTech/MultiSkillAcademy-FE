@@ -54,7 +54,7 @@ const SalesTable = () => {
           averageReviews: course.averageReviews || 0,
           reviewCount: course.reviewCount || 0,
           totalSales: course.totalSales || 0,
-          courseStatus: course.courseStatus || "Clock",
+          courseStatus: course.courseStatus || "Inactive",
         }));
 
         setCourses(updatedData);
@@ -256,9 +256,9 @@ const SalesTable = () => {
               }}
               className="bg-gray-700 text-white placeholder-gray-400 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="">Course Status</option>
+              <option value="">Status</option>
               <option value="Active">Active</option>
-              <option value="Clock">Clock</option>
+              <option value="Inactive">Inactive</option>
             </select>
           </div>
         </div>
