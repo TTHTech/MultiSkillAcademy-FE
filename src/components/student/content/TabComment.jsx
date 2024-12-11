@@ -22,6 +22,7 @@ const TabComment = ({ courseId }) => {
           `http://localhost:8080/api/student/reviews/${courseId}`
         );
         setReviews(response.data); // Set the reviews data
+        console.log(response.data);
       } catch (error) {
         console.error("Failed to fetch reviews", error);
       } finally {
@@ -184,6 +185,11 @@ const TabComment = ({ courseId }) => {
               className="border p-6 rounded-lg bg-gray-50 shadow-md hover:shadow-xl hover:border-blue-500 transition-all duration-300 ease-in-out"
             >
               <div className="flex items-center mb-2">
+                <img
+                  src={review.profileImage}
+                  alt={`${review.studentFirstName} ${review.studentLastName}`}
+                  className="w-10 h-10 rounded-full mr-4 object-cover"
+                />
                 <span className="font-semibold mr-2 text-gray-900">
                   {review.studentFirstName} {review.studentLastName}
                 </span>
