@@ -12,14 +12,14 @@ const InstructorReviews = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [open, setOpen] = useState(true);
-
+  const userId = Number(localStorage.getItem("userId"));
   const token = localStorage.getItem("token");
 
   useEffect(() => {
     const fetchReviews = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:8080/api/instructor/reviews/2",
+          `http://localhost:8080/api/instructor/reviews/${userId}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setReviews(response.data);
@@ -32,7 +32,7 @@ const InstructorReviews = () => {
     };
 
     fetchReviews();
-  }, [token]);
+  }, [token, userId]);
 
   const calculateAverageRating = () => {
     if (filteredReviews.length === 0) return 0;

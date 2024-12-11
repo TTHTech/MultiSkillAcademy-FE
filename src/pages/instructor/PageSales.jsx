@@ -24,14 +24,14 @@ const InstructorDashboard = () => {
   const [currentPage, setCurrentPage] = useState(1); // Trang hiện tại
   const itemsPerPage = 8; // Số khóa học mỗi trang
   const [open, setOpen] = useState(true); // Quản lý trạng thái Sidebar
-
+  const userId = Number(localStorage.getItem("userId"));
   const token = localStorage.getItem("token"); // Lấy token từ localStorage
 
   useEffect(() => {
     const fetchSalesData = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:8080/api/instructor/dashboard/total-sales/2",
+          `http://localhost:8080/api/instructor/dashboard/total-sales/${userId}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }

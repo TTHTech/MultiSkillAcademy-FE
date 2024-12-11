@@ -1,56 +1,48 @@
 import React, { useState, useEffect } from "react";
-import NavBar from "../../../components/student/common/NavBar"; 
-import Footer from "../../../components/student/common/Footer"; 
+import axios from "axios";
+import NavBar from "../../../components/student/common/NavBar";
+import Footer from "../../../components/student/common/Footer";
 import QuizSidebar from "../../../components/student/Quiz/QuizSidebar";
 import QuizQuestionSection from "../../../components/student/Quiz/QuizQuestionSection";
 import QuizNavigation from "../../../components/student/Quiz/QuizNavigation";
+import { useParams, useNavigate } from "react-router-dom";
 
 const QuizPage = () => {
-  const questions = [
-    { 
-      question: "Câu hỏi 1: Bạn nghĩ gì về việc học trực tuyến trong thời gian qua? Liệu nó có thể thay thế hoàn toàn phương pháp học truyền thống không?", 
-      options: ["Có, học trực tuyến rất tiện lợi", "Không, học trực tuyến thiếu tính tương tác", "Cả hai phương pháp đều có ưu điểm riêng", "Tôi không chắc"] 
-    },
-    { 
-      question: "Câu hỏi 2: Theo bạn, điều gì là quan trọng nhất trong việc chọn nghề nghiệp? Hãy cho tôi biết suy nghĩ của bạn.", 
-      options: ["Đam mê và sở thích cá nhân", "Mức lương cao", "Cơ hội thăng tiến trong công việc", "Sự ổn định và an toàn"] 
-    },
-    { 
-      question: "Câu hỏi 3: Bạn cảm thấy như thế nào về vấn đề ô nhiễm môi trường hiện nay? Bạn nghĩ chúng ta có thể làm gì để giảm thiểu ô nhiễm?", 
-      options: ["Đó là vấn đề nghiêm trọng, cần có hành động ngay lập tức", "Ô nhiễm không phải là vấn đề lớn đối với tôi", "Chúng ta cần giảm thiểu rác thải nhựa", "Chỉ có các tổ chức mới có thể giải quyết được"] 
-    },
-    { 
-      question: "Câu hỏi 4: Bạn có nghĩ rằng sự thay đổi khí hậu là một mối nguy hiểm lớn trong tương lai? Nếu có, bạn nghĩ chính phủ và cộng đồng có thể làm gì?", 
-      options: ["Có, chúng ta cần hành động ngay", "Không, tôi không nghĩ nó sẽ ảnh hưởng lớn", "Chúng ta nên tập trung vào giáo dục về môi trường", "Chỉ có các quốc gia lớn mới có thể giải quyết vấn đề này"] 
-    },
-    { 
-      question: "Câu hỏi 5: Bạn có nghĩ rằng việc học ngoại ngữ sẽ giúp bạn thành công hơn trong sự nghiệp không? Tại sao?", 
-      options: ["Có, ngoại ngữ mở ra cơ hội toàn cầu", "Không, chỉ cần chuyên môn là đủ", "Có thể, nhưng không phải lúc nào cũng cần thiết", "Tôi không chắc"] 
-    },
-    { 
-      question: "Câu hỏi 6: Bạn nghĩ gì về việc làm việc từ xa? Liệu mô hình này có thể trở thành xu hướng lâu dài?", 
-      options: ["Có, làm việc từ xa rất tiện lợi và hiệu quả", "Không, tôi thích làm việc ở văn phòng", "Chỉ nên làm việc từ xa trong một số ngành nghề nhất định", "Tôi không biết, cần phải nghiên cứu thêm"] 
-    },
-    { 
-      question: "Câu hỏi 7: Trong xã hội hiện nay, bạn nghĩ ai là người đóng vai trò quan trọng trong việc giáo dục thế hệ trẻ?", 
-      options: ["Các thầy cô giáo", "Các bậc phụ huynh", "Cộng đồng và xã hội", "Nhà nước và các tổ chức giáo dục"] 
-    },
-    { 
-      question: "Câu hỏi 8: Bạn cảm thấy như thế nào về việc sử dụng công nghệ trong giáo dục? Liệu công nghệ có thể thay thế giáo viên không?", 
-      options: ["Công nghệ có thể hỗ trợ nhưng không thể thay thế giáo viên", "Công nghệ hoàn toàn có thể thay thế giáo viên trong tương lai", "Công nghệ chỉ là công cụ hỗ trợ", "Không, tôi không tin công nghệ có thể thay thế giáo viên"] 
-    },
-    { 
-      question: "Câu hỏi 9: Bạn có nghĩ rằng mỗi cá nhân đều có trách nhiệm trong việc bảo vệ động vật và thiên nhiên không? Bạn có hành động gì để bảo vệ chúng?", 
-      options: ["Có, tôi luôn tham gia các hoạt động bảo vệ động vật", "Không, tôi không quan tâm nhiều đến vấn đề này", "Có, nhưng tôi không biết phải làm gì", "Tôi không chắc"] 
-    },
-    { 
-      question: "Câu hỏi 10: Bạn có nghĩ rằng việc giữ gìn văn hóa truyền thống là quan trọng? Nếu có, bạn nghĩ chúng ta cần làm gì để bảo tồn các giá trị này?", 
-      options: ["Có, tôi nghĩ chúng ta cần bảo tồn các giá trị văn hóa truyền thống", "Không, văn hóa truyền thống không còn quan trọng nữa", "Chúng ta cần kết hợp văn hóa truyền thống và hiện đại", "Tôi không biết"] 
-    }
-  ];
-
+  const [quizData, setQuizData] = useState(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(15 * 60); // 15 phút
+  const [answers, setAnswers] = useState([]);
+  const [timeLeft, setTimeLeft] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [score, setScore] = useState(null); // Điểm cuối cùng
+  const [isScoreSaved, setIsScoreSaved] = useState(false); // Trạng thái lưu điểm
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const userId = Number(localStorage.getItem("userId"));
+
+  useEffect(() => {
+    const fetchQuizData = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:8080/api/student/course/test/${id}`
+        );
+        const data = response.data;
+
+        setQuizData(data);
+        setAnswers(
+          data.questions.map(() => ({ selectedAnswer: null, isCorrect: false }))
+        );
+        setTimeLeft(data.duration * 60);
+      } catch (err) {
+        setError("Lỗi khi tải dữ liệu bài kiểm tra");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchQuizData();
+  }, [id]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -69,8 +61,52 @@ const QuizPage = () => {
     setCurrentQuestionIndex(index);
   };
 
+  const handleAnswer = (index, answer) => {
+    setAnswers((prev) =>
+      prev.map((item, i) =>
+        i === index
+          ? {
+              selectedAnswer: answer,
+              isCorrect:
+                quizData.questions[index].answers.find((a) => a.text === answer)
+                  ?.isCorrect || false,
+            }
+          : item
+      )
+    );
+  };
+
+  const handleFinish = () => {
+    const correctAnswers = answers.filter((answer) => answer.isCorrect).length;
+    const totalQuestions = quizData.questions.length;
+    const finalScore = (correctAnswers / totalQuestions) * 10;
+    setScore(finalScore.toFixed(2)); // Điểm trên thang 10
+  };
+
+  const handleSaveScore = async () => {
+    if (!quizData || isScoreSaved) return;
+
+    const payload = {
+      id: null,
+      courseId: quizData.courseId,
+      userId: userId,
+      testId: id,
+      score: parseFloat(score),
+      testDate: new Date(),
+    };
+
+    try {
+      await axios.post("http://localhost:8080/api/student/scores", payload);
+      setIsScoreSaved(true);
+      alert("Lưu điểm thành công!");
+    } catch (err) {
+      console.error("Lỗi khi lưu điểm:", err);
+      alert("Lưu điểm thất bại!");
+    }
+  };
+
   const handleNext = () => {
-    if (currentQuestionIndex < questions.length - 1) {
+    if (quizData && currentQuestionIndex < quizData.questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     }
   };
@@ -81,39 +117,78 @@ const QuizPage = () => {
     }
   };
 
+  if (loading) return <div>Đang tải...</div>;
+  if (error) return <div>{error}</div>;
+  if (!quizData) return <div>Không có dữ liệu bài kiểm tra</div>;
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      <NavBar /> 
-      
-      <div className="flex flex-1 justify-center p-8 flex-row-reverse"> {/* Updated here */}
-        {/* Sidebar */}
+      <NavBar />
+
+      <div className="flex flex-1 justify-center p-8 flex-row-reverse">
         <QuizSidebar
-          questions={questions}
+          questions={quizData.questions}
           currentQuestionIndex={currentQuestionIndex}
           onSelectQuestion={handleSelectQuestion}
+          onFinish={handleFinish}
         />
 
-        {/* Main content */}
         <div className="flex-1 max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg">
-          <div className="flex justify-between items-center mb-4">
-            <div className="text-xl font-semibold">
-              Thời gian còn lại: {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, "0")}
+          {score !== null ? (
+            <div className="text-center space-y-4">
+              <div className="text-2xl font-bold text-green-600">
+                Điểm của bạn: {score}/10
+              </div>
+              <div className="flex justify-center items-center space-x-1">
+              <button
+                  onClick={handleSaveScore}
+                  className={`py-2 px-6 text-white text-lg font-semibold rounded-md ${
+                    isScoreSaved
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-blue-600 hover:bg-blue-700"
+                  }`}
+                  disabled={isScoreSaved}
+                >
+                  {isScoreSaved ? "Đã lưu điểm" : "Lưu điểm"}
+                </button>
+                <button
+                  onClick={() => navigate(-1)}
+                  className="py-2 px-6 text-white text-lg font-semibold rounded-md bg-red-500 hover:bg-red-600"
+                >
+                  <span>Quay lại</span>
+                </button>
+              </div>
             </div>
-          </div>
+          ) : (
+            <>
+              <div className="flex justify-between items-center mb-4">
+                <div className="text-xl font-semibold">
+                  Thời gian còn lại: {Math.floor(timeLeft / 60)}:
+                  {String(timeLeft % 60).padStart(2, "0")}
+                </div>
+              </div>
 
-          <QuizQuestionSection
-            question={questions[currentQuestionIndex].question}
-            options={questions[currentQuestionIndex].options}
-            currentQuestionIndex={currentQuestionIndex}
-            totalQuestions={questions.length}
-          />
+              <QuizQuestionSection
+                question={quizData.questions[currentQuestionIndex].text}
+                options={quizData.questions[currentQuestionIndex].answers.map(
+                  (a) => a.text
+                )}
+                currentQuestionIndex={currentQuestionIndex}
+                totalQuestions={quizData.questions.length}
+                selectedAnswer={answers[currentQuestionIndex].selectedAnswer}
+                onAnswer={handleAnswer}
+              />
 
-          <QuizNavigation
-            onNext={handleNext}
-            onPrev={handlePrev}
-            isLastQuestion={currentQuestionIndex === questions.length - 1}
-            isFirstQuestion={currentQuestionIndex === 0}
-          />
+              <QuizNavigation
+                onNext={handleNext}
+                onPrev={handlePrev}
+                isLastQuestion={
+                  currentQuestionIndex === quizData.questions.length - 1
+                }
+                isFirstQuestion={currentQuestionIndex === 0}
+              />
+            </>
+          )}
         </div>
       </div>
 
