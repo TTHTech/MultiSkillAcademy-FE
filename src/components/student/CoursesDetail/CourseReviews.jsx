@@ -5,7 +5,7 @@ const CourseReviews = ({ reviews }) => {
   const [showAll, setShowAll] = useState(false);
 
   // Kiểm tra nếu reviews có dữ liệu và chỉ hiển thị 6 reviews đầu tiên
-  const displayedReviews = Array.isArray(reviews) && reviews.length > 0 
+  const displayedReviews = Array.isArray(reviews) && reviews.length > 0
     ? showAll ? reviews : reviews.slice(0, 6)
     : [];
 
@@ -20,32 +20,36 @@ const CourseReviews = ({ reviews }) => {
         <p className="text-gray-600">Chưa có đánh giá nào cho khóa học này.</p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {displayedReviews.map((review, index) => (
-            <div
-              key={index}
-              className="border p-6 rounded-lg bg-gray-50 shadow-sm hover:shadow-lg transition-all duration-300"
-            >
-              <div className="flex items-center mb-4">
-                {/* Hiển thị tên người đánh giá (first name và last name) */}
-                <span className="font-semibold text-gray-900 mr-2">{review.studentFirstName} {review.studentLastName}</span>
-                <span className="text-yellow-400 font-semibold">{review.rating} <FaStar className="inline" /></span>
-              </div>
-              <p className="text-gray-800">{review.comment}</p>
+        {displayedReviews.map((review, index) => (
+          <div
+            key={index}
+            className="border p-6 rounded-lg bg-gray-50 shadow-md hover:shadow-xl hover:border-blue-500 transition-all duration-300 ease-in-out"
+          >
+            <div className="flex items-center mb-2">
+              <img
+                src={review.profileImage}
+                alt={`${review.studentFirstName} ${review.studentLastName}`}
+                className="w-10 h-10 rounded-full mr-4 object-cover"
+              />
+              <span className="font-semibold mr-2 text-gray-900">
+                {review.studentFirstName} {review.studentLastName}
+              </span>
+              <span className="text-yellow-500">{review.rating} ★</span>
             </div>
-          ))}
+            <p className="text-gray-800">{review.comment}</p>
+          </div>
+        ))}
         </div>
       )}
 
-      {/* Hiển thị nút để ẩn/hiện tất cả đánh giá nếu có nhiều hơn 6 đánh giá */}
-      {Array.isArray(reviews) && reviews.length > 6 && (
-        <div className="text-center mt-6">
-          <button
-            onClick={() => setShowAll(!showAll)}
-            className="px-6 py-2 border rounded-full font-semibold text-gray-800 hover:bg-yellow-400 hover:text-white transition-all duration-300"
-          >
-            {showAll ? "Ẩn bớt đánh giá" : "Hiện tất cả đánh giá"}
-          </button>
-        </div>
+      {/* Hiển thị nút để xem tất cả đánh giá */}
+      {reviews.length > 6 && (
+        <button
+          onClick={() => setShowAll(!showAll)}
+          className="text-blue-500 mt-4 hover:underline"
+        >
+          {showAll ? 'Ẩn bớt' : 'Xem tất cả'}
+        </button>
       )}
     </div>
   );

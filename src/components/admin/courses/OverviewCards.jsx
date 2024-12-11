@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Users, UserPlus, UserCheck, UserX } from "lucide-react";
+import { BookOpen, Hourglass, CheckCircle, XCircle } from "lucide-react"; // Cập nhật các biểu tượng
 import { useState, useEffect } from "react";
 import axios from "axios";
 
@@ -29,14 +29,15 @@ const StatCard = ({ name, icon: Icon, value, color }) => {
 };
 
 const OverviewCards = () => {
-  const [instructorStats, setInstructorStats] = useState({
-    totalInstructors: 0,
-    newInstructorsToday: 0,
-    activeInstructors: 0,
-    inactiveInstructors: 0,
+  const [courseStats, setCourseStats] = useState({
+    totalCourses: 0,
+    pendingCourses: 0,
+    activeCourses: 0,
+    inactiveCourses: 0,
   });
   const [error, setError] = useState(null);
 
+  // Gọi API khi component được tải
   useEffect(() => {
     const token = localStorage.getItem("token");
 
@@ -46,21 +47,21 @@ const OverviewCards = () => {
     }
 
     axios
-      .get("http://localhost:8080/api/admin/instructors/stats", {
+      .get("http://localhost:8080/api/admin/courses/stats", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       })
       .then((response) => {
-        setInstructorStats({
-          totalInstructors: response.data.totalInstructors ?? 0,
-          newInstructorsToday: response.data.newInstructorsToday ?? 0,
-          activeInstructors: response.data.activeInstructors ?? 0,
-          inactiveInstructors: response.data.inactiveInstructors ?? 0,
+        setCourseStats({
+          totalCourses: response.data.totalCourses ?? 0,
+          pendingCourses: response.data.pendingCourses ?? 0,
+          activeCourses: response.data.activeCourses ?? 0,
+          inactiveCourses: response.data.inactiveCourses ?? 0,
         });
       })
       .catch((error) => {
-        console.error("Error fetching instructor stats:", error);
+        console.error("Error fetching course stats:", error);
         setError("Failed to load stats.");
       });
   }, []);
@@ -77,27 +78,27 @@ const OverviewCards = () => {
       transition={{ duration: 1 }}
     >
       <StatCard
-        name="Total Instructors"
-        icon={Users}
-        value={instructorStats.totalInstructors.toLocaleString()}
+        name="Total Courses"
+        icon={BookOpen}
+        value={courseStats.totalCourses.toLocaleString()}
         color="#6366F1"
       />
       <StatCard
-        name="New Instructors Today"
-        icon={UserPlus}
-        value={instructorStats.newInstructorsToday}
-        color="#10B981"
-      />
-      <StatCard
-        name="Active Instructors"
-        icon={UserCheck}
-        value={instructorStats.activeInstructors.toLocaleString()}
+        name="Pending Courses"
+        icon={Hourglass}
+        value={courseStats.pendingCourses}
         color="#F59E0B"
       />
       <StatCard
-        name="Inactive Instructors"
-        icon={UserX}
-        value={instructorStats.inactiveInstructors.toLocaleString()}
+        name="Active Courses"
+        icon={CheckCircle} // Thay đổi biểu tượng cho Active Courses
+        value={courseStats.activeCourses.toLocaleString()}
+        color="#10B981"
+      />
+      <StatCard
+        name="Inactive Courses"
+        icon={XCircle} // Thay đổi biểu tượng cho Inactive Courses
+        value={courseStats.inactiveCourses.toLocaleString()}
         color="#EF4444"
       />
     </motion.div>

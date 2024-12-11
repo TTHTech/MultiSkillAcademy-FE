@@ -1,7 +1,7 @@
+import { useEffect, useState } from "react";
+import axios from "axios"; // Import axios
+import { BookOpen, Users, Tag, DollarSign } from "lucide-react";
 import { motion } from "framer-motion";
-import { Users, UserPlus, UserCheck, UserX } from "lucide-react";
-import { useState, useEffect } from "react";
-import axios from "axios";
 
 const StatCard = ({ name, icon: Icon, value, color }) => {
   return (
@@ -29,14 +29,15 @@ const StatCard = ({ name, icon: Icon, value, color }) => {
 };
 
 const OverviewCards = () => {
-  const [instructorStats, setInstructorStats] = useState({
-    totalInstructors: 0,
-    newInstructorsToday: 0,
-    activeInstructors: 0,
-    inactiveInstructors: 0,
+  const [stats, setStats] = useState({
+    totalCourses: 0,
+    totalUsers: 0,
+    totalCategories: 0,
+    totalSales: 0,
   });
   const [error, setError] = useState(null);
 
+  // Gọi API khi component được tải
   useEffect(() => {
     const token = localStorage.getItem("token");
 
@@ -46,21 +47,21 @@ const OverviewCards = () => {
     }
 
     axios
-      .get("http://localhost:8080/api/admin/instructors/stats", {
+      .get("http://localhost:8080/api/admin/stats", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       })
       .then((response) => {
-        setInstructorStats({
-          totalInstructors: response.data.totalInstructors ?? 0,
-          newInstructorsToday: response.data.newInstructorsToday ?? 0,
-          activeInstructors: response.data.activeInstructors ?? 0,
-          inactiveInstructors: response.data.inactiveInstructors ?? 0,
+        setStats({
+          totalCourses: response.data.totalCourses ?? 0,
+          totalUsers: response.data.totalUsers ?? 0,
+          totalCategories: response.data.totalCategories ?? 0,
+          totalSales: response.data.totalSales ?? 0,
         });
       })
       .catch((error) => {
-        console.error("Error fetching instructor stats:", error);
+        console.error("Error fetching stats:", error);
         setError("Failed to load stats.");
       });
   }, []);
@@ -77,28 +78,28 @@ const OverviewCards = () => {
       transition={{ duration: 1 }}
     >
       <StatCard
-        name="Total Instructors"
+        name="Total Courses"
+        icon={BookOpen}
+        value={stats.totalCourses.toLocaleString()}
+        color="#4CAF50"
+      />
+      <StatCard
+        name="Total Users"
         icon={Users}
-        value={instructorStats.totalInstructors.toLocaleString()}
-        color="#6366F1"
+        value={stats.totalUsers.toLocaleString()}
+        color="#FF6347"
       />
       <StatCard
-        name="New Instructors Today"
-        icon={UserPlus}
-        value={instructorStats.newInstructorsToday}
-        color="#10B981"
+        name="Total Categories"
+        icon={Tag}
+        value={stats.totalCategories.toLocaleString()}
+        color="#FFA500"
       />
       <StatCard
-        name="Active Instructors"
-        icon={UserCheck}
-        value={instructorStats.activeInstructors.toLocaleString()}
-        color="#F59E0B"
-      />
-      <StatCard
-        name="Inactive Instructors"
-        icon={UserX}
-        value={instructorStats.inactiveInstructors.toLocaleString()}
-        color="#EF4444"
+        name="Total Sales"
+        icon={DollarSign}
+        value={`₫${stats.totalSales.toLocaleString()}`}
+        color="#2196F3"
       />
     </motion.div>
   );
