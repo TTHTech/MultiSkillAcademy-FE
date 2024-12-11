@@ -111,7 +111,7 @@ function App() {
           <Route path="/verify-otp" element={<OtpVerificationPage />} />
           <Route path="/forgot-password" element={<ForgotPassPage />} />
           <Route path="/reset-password" element={<ResetPassPage />} />
-          <Route path="/student/quiz" element={<QuizPage />} />
+          <Route path="/student/quiz/:id" element={<QuizPage />} />
           
           {/* Các route cho admin */}
           {isLoggedIn && role === "ROLE_ADMIN" && (

@@ -54,7 +54,7 @@ const SalesTable = () => {
           averageReviews: course.averageReviews || 0,
           reviewCount: course.reviewCount || 0,
           totalSales: course.totalSales || 0,
-          courseStatus: course.courseStatus || "Clock",
+          courseStatus: course.courseStatus || "Inactive",
         }));
 
         setCourses(updatedData);
@@ -258,7 +258,7 @@ const SalesTable = () => {
             >
               <option value="">Status</option>
               <option value="Active">Active</option>
-              <option value="Clock">Clock</option>
+              <option value="Inactive">Inactive</option>
             </select>
           </div>
         </div>
