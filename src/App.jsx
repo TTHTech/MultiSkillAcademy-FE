@@ -142,7 +142,7 @@ function App() {
               <Route path="/student/study/:progress/:id" element={<CourseViewerPage />} />
               <Route path="/student/wishlist" element={<Wishlist />} />
               <Route path="/student/Success" element={<SuccessPage />} />
-              <Route path="/payment/success" element={<SuccessPage />} />
+              <Route path="/student/payment/success" element={<SuccessPage />} />
               <Route path="/student/result" element={<ResultPage />} />
             </>
           )}

@@ -5,7 +5,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 // Số lượng category hiển thị mỗi trang
-const ITEMS_PER_PAGE = 10;
+const ITEMS_PER_PAGE = 5;
 
 const CategoryTable = () => {
     const [categories, setCategories] = useState([]);
