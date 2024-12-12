@@ -53,6 +53,7 @@ function App() {
 
     if (
       !token &&
+      location.pathname !== "/login" &&
       location.pathname !== "/register" &&
       location.pathname !== "/verify-otp" &&
       location.pathname !== "/forgot-password"
