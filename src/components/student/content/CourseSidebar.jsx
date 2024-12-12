@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { FaCheckCircle, FaRegCircle } from "react-icons/fa";
 
 const CourseSidebar = ({
@@ -8,23 +8,18 @@ const CourseSidebar = ({
   handleLectureClick,
   handleCheckboxChange,
   calculateCompletedLectures,
+  selectedLecture, // Nhận bài học đã chọn từ component cha
 }) => {
-  const [selectedLecture, setSelectedLecture] = useState(null); // State lưu trữ bài học được chọn
-
   if (!course) {
     return <div>Loading...</div>; // Hiển thị khi chưa có dữ liệu
   }
 
-  const { title, sections } = course;
+  const { sections } = course; // Lấy danh sách phần trong khóa học
 
+  // Hàm xử lý khi người dùng nhấn vào phần (section)
   const handleSectionClick = (section) => {
+    // Đóng/mở danh sách bài học của phần được chọn
     setSelectedSection(selectedSection === section ? null : section);
-  };
-
-  const handleLectureItemClick = (lecture) => {
-    // Đánh dấu bài học đã được chọn
-    setSelectedLecture(selectedLecture === lecture ? null : lecture);
-    handleLectureClick(lecture); // Gọi hàm xử lý khi nhấn vào bài học
   };
 
   return (
@@ -35,89 +30,82 @@ const CourseSidebar = ({
         <div className="mt-4">
           {sections && (
             <div className="flex justify-between">
-              <span className="text-gray-600">Tổng số bài học:</span>
-              <span className="text-blue-600 font-semibold">
-                {sections.reduce((acc, section) => acc + section.lectures.length, 0)}
+              <span className="text-gray-500">Tiến độ:</span>
+              <span className="text-gray-500">
+                {sections.reduce(
+                  (total, section) =>
+                    total + calculateCompletedLectures(section.lectures),
+                  0
+                )}{" "}
+                /{" "}
+                {sections.reduce(
+                  (total, section) => total + section.lectures.length,
+                  0
+                )}{" "}
+                bài học
               </span>
             </div>
           )}
-          <div className="mt-2">
-            <span className="text-gray-600">Hoàn thành:</span>
-            <span className="text-green-600 font-semibold">
-              {sections.reduce((acc, section) => acc + calculateCompletedLectures(section.lectures), 0)}{" "}
-              /{" "}
-              {sections.reduce((acc, section) => acc + section.lectures.length, 0)} bài học
-            </span>
-          </div>
         </div>
       </div>
 
-      <hr className="my-6 border-t-2 border-gray-200" />
-
-      {/* Phần Danh sách bài học */}
-      <div className="mb-6 flex-1 overflow-y-auto">
-        <h2 className="text-xl font-semibold text-gray-800">Danh sách bài học</h2>
-        <div className="mt-4 space-y-6">
-          {sections &&
-            sections.map((section) => (
+      {/* Danh sách các phần và bài học */}
+      <div>
+        <h2 className="text-lg font-semibold text-gray-800">Các phần trong khóa học</h2>
+        <div className="mt-4 space-y-4">
+          {sections?.map((section, sectionIndex) => (
+            <div key={sectionIndex}>
+              {/* Hiển thị tiêu đề phần và biểu tượng mở/đóng */}
               <div
-                key={section.section_id}
-                className="hover:bg-gray-50 rounded-lg transition duration-200 ease-in-out"
+                className="flex justify-between items-center cursor-pointer"
+                onClick={() => handleSectionClick(section)} // Xử lý khi nhấn vào phần
               >
-                <h3
-                  className="text-md font-semibold text-gray-700 cursor-pointer hover:text-blue-600 flex justify-between items-center py-2"
-                  onClick={() => handleSectionClick(section)}
-                >
-                  <div className="flex items-center space-x-2">
-                    <FaRegCircle className="text-gray-400" />
-                    <span>{section.title}</span>
-                  </div>
-                  <span className="text-sm text-gray-500">
-                    {calculateCompletedLectures(section.lectures)}/{section.lectures.length}
-                  </span>
-                </h3>
-
-                {/* Đường gạch ngang phân cách giữa các phần */}
-                <hr className="my-4 border-t-1 border-gray-300" />
-
-                {selectedSection === section && (
-                  <ul className="mt-4 space-y-3 pl-6">
-                    {section.lectures.map((lecture) => (
-                      <li
-                        key={lecture.lecture_id}
-                        className={`p-3 rounded-lg cursor-pointer flex justify-between items-center transition-all duration-300 ease-in-out ${
-                          lecture.completed
-                            ? "bg-green-100 text-green-700"
-                            : "bg-gray-100 text-gray-700"
-                        } hover:bg-blue-100 hover:text-blue-700 ${
-                          selectedLecture === lecture ? "bg-blue-200" : "" // Thêm lớp màu khi bài học được chọn
-                        }`}
-                        onClick={() => handleLectureItemClick(lecture)}
-                      >
-                        <div className="flex items-center space-x-3">
-                          <input
-                            type="checkbox"
-                            checked={lecture.completed}
-                            className="mr-3"
-                            disabled={lecture.completed}
-                            onChange={() => handleCheckboxChange(lecture)}
-                          />
-                          <span className="font-medium">{lecture.title}</span>
-                        </div>
-                        <span className="text-sm">{lecture.duration}</span>
-                        <span className="ml-2">
-                          {lecture.completed ? (
-                            <FaCheckCircle className="text-green-400" />
-                          ) : (
-                            <FaRegCircle className="text-gray-400" />
-                          )}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                )}
+                <h3 className="text-lg font-medium text-gray-700">{section.title}</h3>
+                <span className="text-gray-400">
+                  {selectedSection === section ? "-" : "+"}
+                </span>
               </div>
-            ))}
+
+              {/* Danh sách bài học trong phần (hiển thị khi phần được mở) */}
+              {selectedSection === section && (
+                <div className="mt-4 space-y-2">
+                  {section.lectures?.map((lecture) => (
+                    <div
+                      key={lecture.lecture_id}
+                      className={`flex items-center justify-between p-2 cursor-pointer rounded-lg transition-all duration-200 ${
+                        selectedLecture?.lecture_id === lecture.lecture_id
+                          ? "bg-blue-100"
+                          : "hover:bg-gray-100"
+                      }`}
+                      onClick={() => handleLectureClick(lecture)} // Xử lý khi nhấn vào bài học
+                    >
+                      <div className="flex items-center">
+                        {/* Checkbox trạng thái hoàn thành */}
+                        <input
+                          type="checkbox"
+                          checked={lecture.completed}
+                          onChange={() => handleCheckboxChange(lecture)} // Cập nhật trạng thái hoàn thành
+                          className="mr-2"
+                          disabled={lecture.completed} // Vô hiệu hóa nếu đã hoàn thành
+                        />
+                        <span
+                          className={`text-sm ${
+                            lecture.completed ? "line-through text-gray-400" : "text-gray-800"
+                          }`}
+                        >
+                          {lecture.title}
+                        </span>
+                      </div>
+                      {/* Biểu tượng trạng thái hoàn thành */}
+                      <div className="text-green-500">
+                        {lecture.completed ? <FaCheckCircle /> : <FaRegCircle />}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
         </div>
       </div>
     </div>
