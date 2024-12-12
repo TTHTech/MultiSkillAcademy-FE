@@ -49,7 +49,7 @@ const Footer = () => {
         
         {/* Logo và bản quyền */}
         <div className="flex justify-between items-center mt-4">
-          <img src="https://frontends.udemycdn.com/frontends-logged-in-homepages/staticx/udemy/images/v7/logo-udemy.svg" alt="Udemy Logo" className="h-6" />
+          <img src="https://firebasestorage.googleapis.com/v0/b/appgallery-30bf7.appspot.com/o/images%2FIronix-fotor-2024112911327.png?alt=media&token=47065fe1-64a1-449c-8cb1-4f91b96484ec" alt="Udemy Logo" className="h-6" />
           <span className="text-gray-500 text-sm"></span>
         </div>
       </div>

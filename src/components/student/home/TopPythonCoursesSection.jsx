@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 
-const TopPythonCoursesSection = () => {
+const RecommendedCoursesSection = () => {
   const [courses, setCourses] = useState([]);
   const scrollContainer = useRef(null);
 
@@ -35,20 +35,26 @@ const TopPythonCoursesSection = () => {
 
   return (
     <section className="p-6 bg-gray-50">
-      <h2 className="text-2xl font-bold mb-6 text-gray-900 text-center">
-        Các khóa học PYTHON phổ biến
-      </h2>
-      <div className="relative">
+      <div className="pl-50"> {/* Thêm padding-left cho tiêu đề */}
+        <h2 className="text-2xl font-bold mb-6 text-gray-900"> 
+          Các Khóa Học Python Được Đề Xuất
+        </h2>
+      </div>
+      <div className="relative px-50"> {/* Thêm padding-x cho container khóa học */}
         {/* Nút cuộn trái */}
         <button
           onClick={scrollLeft}
-          className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 p-3 bg-white shadow-md rounded-full hover:bg-gray-200 transition-all"
+          className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 p-3 bg-white shadow-md rounded-full hover:bg-gray-200 transition-all" 
         >
           <i className="fas fa-chevron-left text-gray-700"></i>
         </button>
 
         {/* Container khóa học */}
-        <div ref={scrollContainer} className="flex space-x-4 overflow-x-scroll no-scrollbar">
+        <div
+          ref={scrollContainer}
+          className="flex space-x-4 overflow-x-scroll no-scrollbar scroll-smooth" 
+          style={{ scrollbarWidth: "none" }} 
+        >
           {courses.map((course, index) => (
             <Link
               to={`/course/${course.courseId}`}
@@ -84,7 +90,7 @@ const TopPythonCoursesSection = () => {
                             ? "text-yellow-500"
                             : "text-gray-300"
                         }`}
-                        style={{ fontSize: "14px" }} // Ngôi sao thon gọn
+                        style={{ fontSize: "14px" }} 
                       ></i>
                     ))}
                   </div>
@@ -104,7 +110,7 @@ const TopPythonCoursesSection = () => {
         {/* Nút cuộn phải */}
         <button
           onClick={scrollRight}
-          className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 p-3 bg-white shadow-md rounded-full hover:bg-gray-200 transition-all"
+          className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 p-3 bg-white shadow-md rounded-full hover:bg-gray-200 transition-all" 
         >
           <i className="fas fa-chevron-right text-gray-700"></i>
         </button>
@@ -113,4 +119,4 @@ const TopPythonCoursesSection = () => {
   );
 };
 
-export default TopPythonCoursesSection;
+export default RecommendedCoursesSection;
