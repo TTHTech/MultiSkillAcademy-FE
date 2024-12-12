@@ -13,6 +13,8 @@ const TabComment = ({ courseId }) => {
   const [newRating, setNewRating] = useState(5); // Default to 5 stars
   const [newComment, setNewComment] = useState(""); // Text of the new comment
   const [submitLoading, setSubmitLoading] = useState(false);
+  const userId = Number(localStorage.getItem("userId"));
+  const [showAddReview, setShowAddReview] = useState(true);
 
   // Fetch reviews when the component is mounted
   useEffect(() => {
@@ -69,22 +71,37 @@ const TabComment = ({ courseId }) => {
     try {
       const newReview = {
         courseId,
+        userId: userId,
         rating: newRating,
         comment: newComment,
+        created_at: Date.now(),
+        studentLastName: null,
+        studentFirstName: null,
       };
 
       // Make the API call to submit the new review
-      await axios.post("http://localhost:8080/api/student/reviews", newReview);
+      await axios.post(
+        "http://localhost:8080/api/student/add-review",
+        newReview
+      );
 
       // Re-fetch the reviews after submission
       const response = await axios.get(
         `http://localhost:8080/api/student/reviews/${courseId}`
       );
+      setShowAddReview(false)
       setReviews(response.data); // Update reviews list
       setNewComment(""); // Reset the comment field
       setNewRating(5); // Reset the rating to default (5 stars)
     } catch (error) {
-      console.error("Failed to submit review", error);
+      if (error.response && error.response.status === 400) {
+        alert(error.response.data);
+        setShowAddReview(false)
+        setNewComment("");
+        setNewRating(5);
+      } else {
+        console.error("Failed to submit review", error);
+      }
     } finally {
       setSubmitLoading(false);
     }
@@ -94,6 +111,7 @@ const TabComment = ({ courseId }) => {
     <div className="bg-white p-6 rounded-lg shadow-lg mt-4">
       <h2 className="text-2xl font-bold text-gray-900 mb-4">Đánh giá</h2>
       {/* Add Review Form */}
+      {showAddReview && (
       <div className="mt-6">
         <h3 className="text-xl font-semibold text-gray-900 mb-4">
           Thêm đánh giá của bạn
@@ -131,7 +149,7 @@ const TabComment = ({ courseId }) => {
           </button>
         </div>
       </div>
-
+      )}
       {/* Filter, Sort, and Search Section */}
       <div className="flex justify-between mt-4 mb-4">
         <div className="flex space-x-4">
