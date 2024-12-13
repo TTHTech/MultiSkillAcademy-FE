@@ -27,11 +27,14 @@ const TestList = () => {
 
         const courseIds = response.data.map((course) => course.courseId);
         const testPromises = courseIds.map((courseId) =>
-          axios.get(`http://localhost:8080/api/instructor/course/test/${courseId}`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          })
+          axios.get(
+            `http://localhost:8080/api/instructor/course/test/${courseId}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          )
         );
 
         Promise.all(testPromises)
@@ -53,7 +56,9 @@ const TestList = () => {
   const handleFilterByCourse = (e) => {
     const selectedCourseId = e.target.value;
     if (selectedCourseId) {
-      const filtered = tests.filter((test) => test.courseId === selectedCourseId);
+      const filtered = tests.filter(
+        (test) => test.courseId === selectedCourseId
+      );
       setFilteredTests(filtered);
     } else {
       setFilteredTests(tests);
@@ -99,7 +104,9 @@ const TestList = () => {
       <Sidebar open={open} setOpen={setOpen} />
       <div className="p-8">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-extrabold text-blue-700">Danh sách bài kiểm tra</h1>
+          <h1 className="text-3xl font-extrabold text-blue-700">
+            Danh sách bài kiểm tra
+          </h1>
           <button
             className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition-all"
             onClick={() => setShowAddTestForm(true)}
@@ -152,23 +159,38 @@ const TestList = () => {
 
         {/* Test List */}
         <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {filteredTests.map((test) => (
-            <div
-              key={test.id}
-              className="p-6 bg-white rounded-xl shadow-md hover:shadow-xl border transition-all cursor-pointer"
-              onClick={() => handleViewTestDetails(test.id)}
-            >
-              <h2 className="text-lg font-semibold text-gray-800">{test.title}</h2>
-              <p className="text-sm text-gray-600">{test.description}</p>
-              <p className="text-sm text-gray-600 mt-2">
-                <strong>Khóa học:</strong> {test.courseTitle}
-              </p>
-              <p className="text-sm text-gray-600 mt-1">
-                <strong>Số câu hỏi:</strong> {test.questionCount} |{" "}
-                <strong>Thời gian:</strong> {test.duration} phút
-              </p>
-            </div>
-          ))}
+          {filteredTests.map((test) => {
+            // Kiểm tra nếu bài test có câu hỏi bị liệt
+            const hasInvalidQuestions = test.questions.some((q) => {
+              const correctAnswersCount = q.answers.filter(
+                (a) => a.isCorrect
+              ).length;
+              return correctAnswersCount === 0 || correctAnswersCount > 1;
+            });
+
+            // Màu nền bài test
+            const testBgColor = hasInvalidQuestions ? "bg-red-100" : "bg-white";
+
+            return (
+              <div
+                key={test.id}
+                className={`p-6 ${testBgColor} rounded-xl shadow-md hover:shadow-xl border transition-all cursor-pointer`}
+                onClick={() => handleViewTestDetails(test.id)}
+              >
+                <h2 className="text-lg font-semibold text-gray-800">
+                  {test.title}
+                </h2>
+                <p className="text-sm text-gray-600">{test.description}</p>
+                <p className="text-sm text-gray-600 mt-2">
+                  <strong>Khóa học:</strong> {test.courseTitle}
+                </p>
+                <p className="text-sm text-gray-600 mt-1">
+                  <strong>Số câu hỏi:</strong> {test.questionCount} |{" "}
+                  <strong>Thời gian:</strong> {test.duration} phút
+                </p>
+              </div>
+            );
+          })}
         </div>
 
         {/* Test Details Modal */}
