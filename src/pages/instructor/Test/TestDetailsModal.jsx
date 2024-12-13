@@ -87,7 +87,7 @@ const TestDetailsModal = ({ test, onClose }) => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-  
+
       setTestData((prev) => {
         const updatedQuestions = prev.questions.map((q) =>
           q.id === questionId
@@ -96,9 +96,9 @@ const TestDetailsModal = ({ test, onClose }) => {
         );
         return { ...prev, questions: updatedQuestions };
       });
-  
+
       handleCancelAddAnswer();
-        await Swal.fire({
+      await Swal.fire({
         title: "Thành công",
         text: "Câu trả lời đã được thêm thành công.",
         icon: "success",
@@ -114,7 +114,7 @@ const TestDetailsModal = ({ test, onClose }) => {
       });
     }
   };
-  
+
   const handleSaveChanges = async () => {
     if (!testData.title.trim()) {
       await Swal.fire({
@@ -125,7 +125,7 @@ const TestDetailsModal = ({ test, onClose }) => {
       });
       return;
     }
-  
+
     if (!testData.description.trim()) {
       await Swal.fire({
         title: "Thông báo",
@@ -135,7 +135,7 @@ const TestDetailsModal = ({ test, onClose }) => {
       });
       return;
     }
-  
+
     if (!testData.courseId.trim()) {
       await Swal.fire({
         title: "Thông báo",
@@ -155,7 +155,7 @@ const TestDetailsModal = ({ test, onClose }) => {
           duration: testData.duration,
           questionCount: testData.questionCount,
           correctAnswersRequired: testData.correctAnswersRequired,
-          questions: [], 
+          questions: [],
         },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -168,7 +168,7 @@ const TestDetailsModal = ({ test, onClose }) => {
         icon: "success",
         confirmButtonText: "OK",
       });
-  
+
       setIsEditing(false);
     } catch (error) {
       console.error("Error updating test:", error);
@@ -180,7 +180,6 @@ const TestDetailsModal = ({ test, onClose }) => {
       });
     }
   };
-  
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -191,7 +190,21 @@ const TestDetailsModal = ({ test, onClose }) => {
     setTestData(test);
     setIsEditing(false);
   };
-
+  const clodeForm = async () => {
+    const swalResult = await Swal.fire({
+      title: "Xác nhận",
+      text: "Chú ý nếu bài kiểm tra không hợp lý sẽ không hiển thị cho học viên thực hiện.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes",
+      cancelButtonText: "No",
+    });
+    if (swalResult.isDismissed) {
+      return;
+    }
+    setIsEditing(false);
+    onClose();
+  }
   const handleDeleteTest = async () => {
     const swalResult = await Swal.fire({
       title: "Xác nhận",
@@ -201,16 +214,19 @@ const TestDetailsModal = ({ test, onClose }) => {
       confirmButtonText: "Yes",
       cancelButtonText: "No",
     });
-  
+
     if (swalResult.isDismissed) {
       return;
     }
-  
+
     try {
-      await axios.delete(`http://localhost:8080/api/instructor/deleteTest/${test.id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-  
+      await axios.delete(
+        `http://localhost:8080/api/instructor/deleteTest/${test.id}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
       await Swal.fire({
         title: "Thành công",
         text: "Xóa bài kiểm tra thành công.",
@@ -229,7 +245,6 @@ const TestDetailsModal = ({ test, onClose }) => {
       });
     }
   };
-  
 
   const handleDeleteQuestion = async (questionId) => {
     // Xác nhận xóa câu hỏi
@@ -241,11 +256,11 @@ const TestDetailsModal = ({ test, onClose }) => {
       confirmButtonText: "Yes",
       cancelButtonText: "No",
     });
-  
+
     if (swalResult.isDismissed) {
       return;
     }
-  
+
     try {
       await axios.delete(
         `http://localhost:8080/api/instructor/deleteTestQuestion/${questionId}`,
@@ -253,13 +268,13 @@ const TestDetailsModal = ({ test, onClose }) => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-        await Swal.fire({
+      await Swal.fire({
         title: "Thành công",
         text: "Xóa câu hỏi thành công.",
         icon: "success",
         confirmButtonText: "OK",
       });
-        setTestData((prev) => {
+      setTestData((prev) => {
         const updatedQuestions = prev.questions.filter(
           (q) => q.id !== questionId
         );
@@ -279,7 +294,6 @@ const TestDetailsModal = ({ test, onClose }) => {
       });
     }
   };
-  
 
   const handleDeleteAnswer = async (answerId, questionId) => {
     const swalResult = await Swal.fire({
@@ -290,11 +304,11 @@ const TestDetailsModal = ({ test, onClose }) => {
       confirmButtonText: "Yes",
       cancelButtonText: "No",
     });
-  
+
     if (swalResult.isDismissed) {
       return;
     }
-  
+
     try {
       await axios.delete(
         `http://localhost:8080/api/instructor/deleteTestAnswers/${answerId}`,
@@ -302,14 +316,14 @@ const TestDetailsModal = ({ test, onClose }) => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-  
+
       await Swal.fire({
         title: "Thành công",
         text: "Xóa câu trả lời thành công.",
         icon: "success",
         confirmButtonText: "OK",
       });
-  
+
       setTestData((prev) => ({
         ...prev,
         questions: prev.questions.map((q) =>
@@ -338,8 +352,7 @@ const TestDetailsModal = ({ test, onClose }) => {
       <button
         className="absolute top-8 right-8 text-white bg-gray-600 rounded-full p-2 hover:bg-red-700 focus:ring-4 focus:ring-red-300"
         onClick={() => {
-          setIsEditing(false);
-          onClose();
+          clodeForm();
         }}
         aria-label="Đóng"
       >
@@ -463,84 +476,99 @@ const TestDetailsModal = ({ test, onClose }) => {
         </div>
 
         <ul className="mt-6 space-y-4">
-          {testData.questions.map((q) => (
-            <li key={q.id} className="bg-gray-50 p-4 rounded-lg shadow-md">
-              <div className="flex justify-between items-center">
-                <strong className="text-blue-700">{q.text}</strong>
-                <button
-                  className="text-red-500 hover:text-red-700"
-                  onClick={() => handleDeleteQuestion(q.id)}
-                >
-                  Xóa câu hỏi
-                </button>
-              </div>
-              <ul className="mt-2 space-y-2 pl-4">
-                {q.answers.map((a) => (
-                  <li
-                    key={a.id}
-                    className={`flex justify-between items-center ${
-                      a.isCorrect
-                        ? "text-green-600 font-semibold"
-                        : "text-gray-800"
-                    }`}
+          {testData.questions.map((q) => {
+            const correctAnswersCount = q.answers.filter(
+              (a) => a.isCorrect
+            ).length;
+            const questionBgColor =
+              correctAnswersCount === 0 || correctAnswersCount > 1
+                ? "bg-red-100"
+                : "bg-gray-50";
+
+            return (
+              <li
+                key={q.id}
+                className={`${questionBgColor} p-4 rounded-lg shadow-md`}
+              >
+                <div className="flex justify-between items-center">
+                  <strong className="text-blue-700">{q.text}</strong>
+                  <button
+                    className="text-red-500 hover:text-red-700"
+                    onClick={() => handleDeleteQuestion(q.id)}
                   >
-                    <span>{a.text}</span>
-                    <button
-                      className="text-red-500 hover:text-red-700"
-                      onClick={() => handleDeleteAnswer(a.id, q.id)}
-                    >
-                      Xóa câu trả lời
-                    </button>
-                  </li>
-                ))}
-              </ul>
-              {selectedQuestionId === q.id && (
-                <div className="mb-4">
-                  <h3 className="text-lg font-semibold text-gray-800">
-                    Thêm câu trả lời
-                  </h3>
-                  <input
-                    type="text"
-                    value={newAnswerText}
-                    onChange={(e) => setNewAnswerText(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2"
-                    placeholder="Nhập câu trả lời mới"
-                  />
-                  <div className="flex items-center space-x-2">
-                    <label className="text-sm text-gray-700">Đúng</label>
-                    <input
-                      type="checkbox"
-                      checked={newAnswerCorrect}
-                      onChange={() => setNewAnswerCorrect(!newAnswerCorrect)}
-                      className="h-4 w-4 text-blue-500 border-gray-300 rounded"
-                    />
-                  </div>
-                  <div className="flex space-x-4 mt-2">
-                    <button
-                      onClick={() => handleAddAnswer(q.id)}
-                      className="px-6 py-2 bg-green-500 text-white rounded-lg shadow-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500"
-                    >
-                      Thêm câu trả lời
-                    </button>
-                    <button
-                      onClick={handleCancelAddAnswer}
-                      className="px-6 py-2 bg-gray-500 text-white rounded-lg shadow-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500"
-                    >
-                      Hủy
-                    </button>
-                  </div>
+                    Xóa câu hỏi
+                  </button>
                 </div>
-              )}
-              {!selectedQuestionId && (
-                <button
-                  onClick={() => setSelectedQuestionId(q.id)}
-                  className="mt-2 px-6 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  Thêm câu trả lời
-                </button>
-              )}
-            </li>
-          ))}
+                <ul className="mt-2 space-y-2 pl-4">
+                  {q.answers.map((a) => {
+                    const answerTextColor = a.isCorrect
+                      ? "text-green-700 font-semibold"
+                      : "text-gray-800";
+
+                    return (
+                      <li
+                        key={a.id}
+                        className={`flex justify-between items-center ${answerTextColor}`}
+                      >
+                        <span>{a.text}</span>
+                        <button
+                          className="text-red-500 hover:text-red-700"
+                          onClick={() => handleDeleteAnswer(a.id, q.id)}
+                        >
+                          Xóa câu trả lời
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+                {selectedQuestionId === q.id && (
+                  <div className="mb-4">
+                    <h3 className="text-lg font-semibold text-gray-800">
+                      Thêm câu trả lời
+                    </h3>
+                    <input
+                      type="text"
+                      value={newAnswerText}
+                      onChange={(e) => setNewAnswerText(e.target.value)}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2"
+                      placeholder="Nhập câu trả lời mới"
+                    />
+                    <div className="flex items-center space-x-2">
+                      <label className="text-sm text-gray-700">Đúng</label>
+                      <input
+                        type="checkbox"
+                        checked={newAnswerCorrect}
+                        onChange={() => setNewAnswerCorrect(!newAnswerCorrect)}
+                        className="h-4 w-4 text-blue-500 border-gray-300 rounded"
+                      />
+                    </div>
+                    <div className="flex space-x-4 mt-2">
+                      <button
+                        onClick={() => handleAddAnswer(q.id)}
+                        className="px-6 py-2 bg-green-500 text-white rounded-lg shadow-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500"
+                      >
+                        Thêm câu trả lời
+                      </button>
+                      <button
+                        onClick={handleCancelAddAnswer}
+                        className="px-6 py-2 bg-gray-500 text-white rounded-lg shadow-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                      >
+                        Hủy
+                      </button>
+                    </div>
+                  </div>
+                )}
+                {!selectedQuestionId && (
+                  <button
+                    onClick={() => setSelectedQuestionId(q.id)}
+                    className="mt-2 px-6 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    Thêm câu trả lời
+                  </button>
+                )}
+              </li>
+            );
+          })}
         </ul>
 
         <div className="mt-6 flex justify-between">
@@ -553,8 +581,7 @@ const TestDetailsModal = ({ test, onClose }) => {
           <button
             className="px-6 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
             onClick={() => {
-              setIsEditing(false);
-              onClose();
+              clodeForm();
             }}
           >
             Đóng

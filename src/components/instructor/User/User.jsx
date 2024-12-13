@@ -9,7 +9,9 @@ const InstructorProfile = () => {
   const [loading, setLoading] = useState(true);
   const userId = Number(localStorage.getItem("userId"));
   const [isChangingPassword, setIsChangingPassword] = useState(false);
-
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const updateUrl = `http://localhost:8080/api/instructor/edit-user/${userId}`;
 
   // Lấy dữ liệu giảng viên từ API
@@ -99,23 +101,24 @@ const InstructorProfile = () => {
     const { name, value } = e.target;
     setInstructor({ ...instructor, [name]: value });
   };
+  
   const handleChangePassword = async () => {
-    const currentPassword = document.querySelector(
-      'input[name="currentPassword"]'
-    ).value;
-    const newPassword = document.querySelector(
-      'input[name="newPassword"]'
-    ).value;
-    const confirmNewPassword = document.querySelector(
-      'input[name="confirmNewPassword"]'
-    ).value;
+    if (!currentPassword || !newPassword || !confirmNewPassword) {
+      await Swal.fire({
+        title: "Lỗi",
+        text: "Vui lòng điền đầy đủ thông tin!",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
+      return;
+    }
 
     if (newPassword !== confirmNewPassword) {
       await Swal.fire({
-        title: "Confirmation",
-        text: "Mật khảu mới không trùng nhau!",
-        icon: "question",
-        confirmButtonText: "Yes",
+        title: "Lỗi",
+        text: "Mật khẩu mới không khớp nhau!",
+        icon: "error",
+        confirmButtonText: "OK",
       });
       return;
     }
@@ -123,32 +126,35 @@ const InstructorProfile = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `http://localhost:8080/api/instructor/change-password/${userId}`,
+        `http://localhost:8080/api/auth/change-password/${userId}`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ currentPassword, newPassword }),
+          body: JSON.stringify({ currentPassword, newPassword, confirmPassword: confirmNewPassword }),
         }
       );
 
-      if (!response.ok) throw new Error("Failed to change password");
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || "Failed to change password");
+      }
 
       await Swal.fire({
-        title: "Confirmation",
-        text: "Đổi mật khẩu thành công",
+        title: "Thành công",
+        text: "Đổi mật khẩu thành công!",
         icon: "success",
-        confirmButtonText: "Yes",
+        confirmButtonText: "OK",
       });
       setIsChangingPassword(false);
     } catch (err) {
       await Swal.fire({
-        title: "Confirmation",
+        title: "Lỗi",
         text: err.message,
         icon: "error",
-        confirmButtonText: "Yes",
+        confirmButtonText: "OK",
       });
     }
   };
@@ -175,74 +181,77 @@ const InstructorProfile = () => {
     <div className="rounded-lg p-6">
       {isChangingPassword ? (
         <div className="p-6 bg-white rounded-lg shadow-lg max-w-md mx-auto">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">
-            Change Password
-          </h2>
-          <div className="space-y-6">
-            <div>
-              <label
-                htmlFor="currentPassword"
-                className="text-gray-700 font-medium"
-              >
-                Current Password
-              </label>
-              <input
-                type="password"
-                name="currentPassword"
-                id="currentPassword"
-                placeholder="Enter your current password"
-                className="w-full p-4 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300 ease-in-out"
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="newPassword"
-                className="text-gray-700 font-medium"
-              >
-                New Password
-              </label>
-              <input
-                type="password"
-                name="newPassword"
-                id="newPassword"
-                placeholder="Enter a new password"
-                className="w-full p-4 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300 ease-in-out"
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="confirmNewPassword"
-                className="text-gray-700 font-medium"
-              >
-                Confirm New Password
-              </label>
-              <input
-                type="password"
-                name="confirmNewPassword"
-                id="confirmNewPassword"
-                placeholder="Confirm your new password"
-                className="w-full p-4 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300 ease-in-out"
-              />
-            </div>
-          </div>
-
-          <div className="mt-8 flex justify-end space-x-6">
-            <button
-              onClick={handleChangePassword}
-              className="px-8 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 transition duration-300 ease-in-out"
-            >
-              Save
-            </button>
-            <button
-              onClick={() => setIsChangingPassword(false)}
-              className="px-8 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-400 transition duration-300 ease-in-out"
-            >
-              Cancel
-            </button>
-          </div>
+      <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">
+        Change Password
+      </h2>
+      <div className="space-y-6">
+        <div>
+          <label
+            htmlFor="currentPassword"
+            className="text-gray-700 font-medium"
+          >
+            Current Password
+          </label>
+          <input
+            type="password"
+            name="currentPassword"
+            id="currentPassword"
+            placeholder="Enter your current password"
+            value={currentPassword}
+            onChange={(e) => setCurrentPassword(e.target.value)}
+            className="w-full p-4 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300 ease-in-out"
+          />
         </div>
+
+        <div>
+          <label htmlFor="newPassword" className="text-gray-700 font-medium">
+            New Password
+          </label>
+          <input
+            type="password"
+            name="newPassword"
+            id="newPassword"
+            placeholder="Enter a new password"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+            className="w-full p-4 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300 ease-in-out"
+          />
+        </div>
+
+        <div>
+          <label
+            htmlFor="confirmNewPassword"
+            className="text-gray-700 font-medium"
+          >
+            Confirm New Password
+          </label>
+          <input
+            type="password"
+            name="confirmNewPassword"
+            id="confirmNewPassword"
+            placeholder="Confirm your new password"
+            value={confirmNewPassword}
+            onChange={(e) => setConfirmNewPassword(e.target.value)}
+            className="w-full p-4 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300 ease-in-out"
+          />
+        </div>
+      </div>
+
+      <div className="mt-8 flex justify-end space-x-6">
+        <button
+          onClick={handleChangePassword}
+          className="px-8 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 transition duration-300 ease-in-out"
+        >
+          Save
+        </button>
+        <button
+          onClick={() => setIsChangingPassword(false)}
+          className="px-8 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-400 transition duration-300 ease-in-out"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
       ) : isEditing ? (
         <div className="p-6 bg-white rounded-lg shadow-lg">
           <h2 className="text-2xl font-semibold text-gray-900 mb-6">
