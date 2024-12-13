@@ -4,35 +4,70 @@ import QuestionsAndAnswers from "../../../pages/student/courses/QuestionAndAnswe
 import TabComment from "../../student/content/TabComment";
 import TabListTest from "./TabListTest";
 
-const MainContent = ({ selectedLecture, setSelectedLecture, lectures }) => {
-  const { id } = useParams(); // Lấy id khóa học từ URL
-  const [selectedTab, setSelectedTab] = useState(0); // Tab hiện tại: 0 - Bình Luận, 1 - Hỏi Đáp, 2 - Bài Kiểm Tra
-  const [currentVideoTime, setCurrentVideoTime] = useState(0); // Thời gian xem video hiện tại
-  const videoRef = useRef(null); // Tham chiếu đến thẻ video
+const MainContent = ({
+  selectedLecture,
+  setSelectedLecture,
+  lectures,
+  updateProgress,
+}) => {
+  const { id } = useParams();
+  const [selectedTab, setSelectedTab] = useState(0);
+  const [progress, setProgress] = useState(0); // Tiến độ xem video
+  const videoRef = useRef(null);
 
-  // Khôi phục thời gian xem video từ localStorage khi component được tải
+  // Khôi phục tiến độ từ localStorage khi chọn bài học mới
   useEffect(() => {
     if (selectedLecture) {
-      const savedTime = localStorage.getItem(
-        `videoTime-${id}-${selectedLecture.lecture_id}`
+      const savedProgress = localStorage.getItem(
+        `progress-${id}-${selectedLecture.lecture_id}`
       );
-      if (savedTime) {
-        setCurrentVideoTime(parseFloat(savedTime)); // Khôi phục thời gian xem video
-      } else {
-        setCurrentVideoTime(0); // Nếu không có dữ liệu lưu, bắt đầu từ 0
-      }
+      setProgress(savedProgress ? parseFloat(savedProgress) : 0);
+
+      const setInitialTime = () => {
+        if (videoRef.current && savedProgress && !isNaN(savedProgress)) {
+          const duration = videoRef.current.duration;
+          if (duration && savedProgress) {
+            videoRef.current.currentTime = (savedProgress / 100) * duration;
+          }
+        }
+      };
+
+      videoRef.current?.addEventListener("loadedmetadata", setInitialTime);
+      return () => {
+        videoRef.current?.removeEventListener("loadedmetadata", setInitialTime);
+      };
     }
   }, [id, selectedLecture]);
 
-  // Cập nhật thời gian video vào localStorage khi video đang phát
+  // Cập nhật tiến độ video khi đang phát
   const handleTimeUpdate = () => {
     if (videoRef.current && selectedLecture) {
       const currentTime = videoRef.current.currentTime;
-      setCurrentVideoTime(currentTime);
-      localStorage.setItem(
-        `videoTime-${id}-${selectedLecture.lecture_id}`,
-        currentTime
-      );
+      const duration = videoRef.current.duration;
+
+      if (duration && currentTime) {
+        const newProgress = Math.min((currentTime / duration) * 100, 100);
+
+        setProgress(newProgress);
+        localStorage.setItem(
+          `progress-${id}-${selectedLecture.lecture_id}`,
+          newProgress
+        );
+
+        // Nếu đạt 70% hoặc hơn, đánh dấu "watched"
+        if (newProgress >= 70) {
+          const watchedKey = `watched-${id}-${selectedLecture.lecture_id}`;
+          if (!localStorage.getItem(watchedKey)) {
+            localStorage.setItem(watchedKey, "true");
+            updateProgress(selectedLecture.lecture_id);
+          }
+        }
+
+        // Nếu đạt 100%, gọi hàm updateProgress
+        if (newProgress === 100) {
+          updateProgress(selectedLecture.lecture_id);
+        }
+      }
     }
   };
 
@@ -46,13 +81,8 @@ const MainContent = ({ selectedLecture, setSelectedLecture, lectures }) => {
     const nextLecture = lectures[currentIndex + 1];
 
     if (nextLecture) {
-      setSelectedLecture(nextLecture); // Cập nhật bài học mới
-      setCurrentVideoTime(0); // Đặt lại thời gian xem video
-      localStorage.removeItem(
-        `videoTime-${id}-${selectedLecture.lecture_id}`
-      ); // Xóa thời gian cũ
-    } else {
-      console.log("No more lectures available."); // Thông báo nếu không còn bài học tiếp theo
+      setSelectedLecture(nextLecture);
+      localStorage.removeItem(`progress-${id}-${selectedLecture.lecture_id}`);
     }
   };
 
@@ -60,19 +90,18 @@ const MainContent = ({ selectedLecture, setSelectedLecture, lectures }) => {
     <div className="w-full h-full p-6 bg-white overflow-y-auto flex flex-col">
       {selectedLecture ? (
         <div className="flex flex-col flex-grow">
-          {/* Phần hiển thị video hoặc nội dung bài học */}
           <div className="flex flex-col flex-grow">
             {selectedLecture.content_type.toLowerCase() === "video" &&
               selectedLecture.video_url && (
                 <div className="aspect-w-16 aspect-h-9 mb-4">
                   <video
-                    key={selectedLecture.lecture_id} // Thêm key để React render lại khi lecture thay đổi
+                    key={selectedLecture.lecture_id}
                     ref={videoRef}
                     controls
                     className="w-full h-full"
                     autoPlay
-                    onTimeUpdate={handleTimeUpdate} // Gọi mỗi khi thời gian video thay đổi
-                    onEnded={handleVideoEnd} // Xử lý khi video kết thúc
+                    onTimeUpdate={handleTimeUpdate}
+                    onEnded={handleVideoEnd}
                   >
                     <source src={selectedLecture.video_url} type="video/mp4" />
                     Trình duyệt của bạn không hỗ trợ video.
@@ -90,9 +119,9 @@ const MainContent = ({ selectedLecture, setSelectedLecture, lectures }) => {
             <p className="text-gray-600 mt-2">
               Thời lượng: {selectedLecture.duration} phút
             </p>
+            <p className="text-gray-600">Tiến độ: {Math.round(progress)}%</p>
           </div>
 
-          {/* Nút quay lại */}
           <button
             onClick={() => setSelectedLecture(null)}
             className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
@@ -106,7 +135,6 @@ const MainContent = ({ selectedLecture, setSelectedLecture, lectures }) => {
         </div>
       )}
 
-      {/* Tab Navigation */}
       <div className="mt-6">
         <div className="flex border-b">
           <button
@@ -141,7 +169,6 @@ const MainContent = ({ selectedLecture, setSelectedLecture, lectures }) => {
           </button>
         </div>
 
-        {/* Nội dung của các tab */}
         <div className="mt-4">
           {selectedTab === 0 && (
             <div>

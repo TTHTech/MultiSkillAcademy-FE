@@ -161,12 +161,14 @@ const CourseViewer = () => {
         handleLectureClick={handleLectureClick}
         handleCheckboxChange={handleCheckboxChange}
         selectedLecture={selectedLecture}
+        id={id} 
       />
       {/* MainContent hiển thị nội dung bài học */}
       <MainContent
         selectedLecture={selectedLecture}
         setSelectedLecture={setSelectedLecture}
         lectures={course.sections.flatMap((section) => section.lectures)}
+        updateProgress={updateProgress} // Truyền đúng hàm
       />
     </div>
   );

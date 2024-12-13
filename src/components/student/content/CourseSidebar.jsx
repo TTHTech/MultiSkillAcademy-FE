@@ -1,30 +1,42 @@
 import React from "react";
 import { FaCheckCircle, FaRegCircle } from "react-icons/fa";
+import Swal from "sweetalert2";
 
 const CourseSidebar = ({
   course,
   selectedSection,
   setSelectedSection,
   handleLectureClick,
-  handleCheckboxChange,
   calculateCompletedLectures,
-  selectedLecture, // Nhận bài học đã chọn từ component cha
+  selectedLecture,
+  id,
 }) => {
   if (!course) {
-    return <div>Loading...</div>; // Hiển thị khi chưa có dữ liệu
+    return <div>Loading...</div>;
   }
 
-  const { sections } = course; // Lấy danh sách phần trong khóa học
+  const { sections } = course;
+
+  // Kiểm tra trạng thái "watched" từ localStorage
+  const isWatched = (lecture) => {
+    const watchedKey = `watched-${id}-${lecture.lecture_id}`;
+    return localStorage.getItem(watchedKey) === "true";
+  };
+
+  // Lấy tiến độ từ localStorage
+  const getProgress = (lecture) => {
+    const progressKey = `progress-${id}-${lecture.lecture_id}`;
+    return parseFloat(localStorage.getItem(progressKey)) || 0;
+  };
 
   // Hàm xử lý khi người dùng nhấn vào phần (section)
   const handleSectionClick = (section) => {
-    // Đóng/mở danh sách bài học của phần được chọn
     setSelectedSection(selectedSection === section ? null : section);
   };
 
   return (
     <div className="w-1/4 bg-white p-6 border-r h-screen flex flex-col shadow-xl rounded-lg">
-      {/* Phần Tiến độ học tập */}
+      {/* Tiến độ học tập */}
       <div className="mb-8">
         <h2 className="text-xl font-semibold text-gray-800">Tiến độ học tập</h2>
         <div className="mt-4">
@@ -51,57 +63,71 @@ const CourseSidebar = ({
 
       {/* Danh sách các phần và bài học */}
       <div>
-        <h2 className="text-lg font-semibold text-gray-800">Các phần trong khóa học</h2>
+        <h2 className="text-lg font-semibold text-gray-800">
+          Các phần trong khóa học
+        </h2>
         <div className="mt-4 space-y-4">
           {sections?.map((section, sectionIndex) => (
             <div key={sectionIndex}>
-              {/* Hiển thị tiêu đề phần và biểu tượng mở/đóng */}
               <div
                 className="flex justify-between items-center cursor-pointer"
-                onClick={() => handleSectionClick(section)} // Xử lý khi nhấn vào phần
+                onClick={() => handleSectionClick(section)}
               >
-                <h3 className="text-lg font-medium text-gray-700">{section.title}</h3>
+                <h3 className="text-lg font-medium text-gray-700">
+                  {section.title}
+                </h3>
                 <span className="text-gray-400">
                   {selectedSection === section ? "-" : "+"}
                 </span>
               </div>
 
-              {/* Danh sách bài học trong phần (hiển thị khi phần được mở) */}
               {selectedSection === section && (
                 <div className="mt-4 space-y-2">
-                  {section.lectures?.map((lecture) => (
-                    <div
-                      key={lecture.lecture_id}
-                      className={`flex items-center justify-between p-2 cursor-pointer rounded-lg transition-all duration-200 ${
-                        selectedLecture?.lecture_id === lecture.lecture_id
-                          ? "bg-blue-100"
-                          : "hover:bg-gray-100"
-                      }`}
-                      onClick={() => handleLectureClick(lecture)} // Xử lý khi nhấn vào bài học
-                    >
-                      <div className="flex items-center">
-                        {/* Checkbox trạng thái hoàn thành */}
-                        <input
-                          type="checkbox"
-                          checked={lecture.completed}
-                          onChange={() => handleCheckboxChange(lecture)} // Cập nhật trạng thái hoàn thành
-                          className="mr-2"
-                          disabled={lecture.completed} // Vô hiệu hóa nếu đã hoàn thành
-                        />
-                        <span
-                          className={`text-sm ${
-                            lecture.completed ? "line-through text-gray-400" : "text-gray-800"
-                          }`}
-                        >
-                          {lecture.title}
-                        </span>
+                  {section.lectures?.map((lecture, index) => {
+                    const progress = getProgress(lecture);
+                    const watched = isWatched(lecture);
+
+                    return (
+                      <div
+                        key={lecture.lecture_id}
+                        className={`flex items-center justify-between p-2 cursor-pointer rounded-lg transition-all duration-200 ${
+                          selectedLecture?.lecture_id === lecture.lecture_id
+                            ? "bg-blue-100"
+                            : "hover:bg-gray-100"
+                        }`}
+                        onClick={() => {
+                          if (
+                            index === 0 || // Cho phép chọn bài học đầu tiên
+                            watched || // Bài học đã hoàn thành
+                            progress >= 70 // Hoặc tiến độ đạt ít nhất 70%
+                          ) {
+                            handleLectureClick(lecture);
+                          } else {
+                            Swal.fire({
+                              title: "Thông báo",
+                              text: "Bạn cần xem ít nhất 70% video trước khi chuyển sang bài học tiếp theo.",
+                              icon: "warning",
+                            });
+                          }
+                        }}
+                      >
+                        <div className="flex items-center">
+                          <span
+                            className={`text-sm ${
+                              watched || progress >= 70
+                                ? "text-green-600"
+                                : "text-gray-800"
+                            }`}
+                          >
+                            {lecture.title}
+                          </span>
+                        </div>
+                        <div className="text-green-500">
+                          {watched ? <FaCheckCircle /> : <FaRegCircle />}
+                        </div>
                       </div>
-                      {/* Biểu tượng trạng thái hoàn thành */}
-                      <div className="text-green-500">
-                        {lecture.completed ? <FaCheckCircle /> : <FaRegCircle />}
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>
