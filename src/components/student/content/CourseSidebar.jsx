@@ -9,25 +9,12 @@ const CourseSidebar = ({
   handleLectureClick,
   calculateCompletedLectures,
   selectedLecture,
-  id,
 }) => {
   if (!course) {
     return <div>Loading...</div>;
   }
 
   const { sections } = course;
-
-  // Kiểm tra trạng thái "watched" từ localStorage
-  const isWatched = (lecture) => {
-    const watchedKey = `watched-${id}-${lecture.lecture_id}`;
-    return localStorage.getItem(watchedKey) === "true";
-  };
-
-  // Lấy tiến độ từ localStorage
-  const getProgress = (lecture) => {
-    const progressKey = `progress-${id}-${lecture.lecture_id}`;
-    return parseFloat(localStorage.getItem(progressKey)) || 0;
-  };
 
   // Hàm xử lý khi người dùng nhấn vào phần (section)
   const handleSectionClick = (section) => {
@@ -84,8 +71,8 @@ const CourseSidebar = ({
               {selectedSection === section && (
                 <div className="mt-4 space-y-2">
                   {section.lectures?.map((lecture, index) => {
-                    const progress = getProgress(lecture);
-                    const watched = isWatched(lecture);
+                    const watched = lecture.watched || false; // Trạng thái watched từ API
+                    const progress = lecture.progress || 0; // Tiến độ từ API nếu có
 
                     return (
                       <div
@@ -100,7 +87,7 @@ const CourseSidebar = ({
                             index === 0 || // Cho phép chọn bài học đầu tiên
                             watched || // Bài học đã hoàn thành
                             progress >= 70 || // Bài học đạt ít nhất 70%
-                            (index > 0 && isWatched(section.lectures[index - 1])) // Bài học nằm sau bài đã hoàn thành ít nhất 70%
+                            (index > 0 && section.lectures[index - 1]?.watched) // Bài học nằm sau bài đã hoàn thành
                           ) {
                             handleLectureClick(lecture);
                           } else {

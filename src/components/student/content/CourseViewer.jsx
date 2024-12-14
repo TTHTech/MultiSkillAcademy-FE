@@ -78,7 +78,7 @@ const CourseViewer = () => {
   }, [isLoading, course, id]);
 
   // Cập nhật tiến độ qua API
-  const updateProgress = async (lectureId) => {
+  const updateProgress = async (lectureId, progress) => {
     try {
       const response = await fetch("http://localhost:8080/api/student/update-progress", {
         method: "PUT",
@@ -90,15 +90,17 @@ const CourseViewer = () => {
           userId,
           courseId: id,
           lectureId,
+          progress, // Gửi tiến độ hiện tại
         }),
       });
+  
       if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
       console.log("Cập nhật tiến độ thành công!");
     } catch (error) {
       console.error("Lỗi khi cập nhật tiến độ:", error);
     }
   };
-
+  
   // Xử lý khi người dùng chọn bài học
   const handleLectureClick = (lecture) => {
     console.log("Selected Lecture:", lecture); // Debug bài học được chọn
