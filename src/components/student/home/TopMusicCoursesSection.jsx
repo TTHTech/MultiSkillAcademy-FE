@@ -1,19 +1,26 @@
 import React, { useRef, useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom"; // Import Link and useNavigate
 import axios from "axios";
 
-const TopPythonCoursesSection = () => {
+const TopMusicCoursesSection = () => {
   const [courses, setCourses] = useState([]);
+  const [categoryName, setCategoryName] = useState("");
   const scrollContainer = useRef(null);
+  const navigate = useNavigate(); // To navigate programmatically
+
+  const categoryId = "CAT010"; // ID danh mục cho âm nhạc
 
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const response = await axios.get("http://localhost:8080/api/student/courses/python"); // API endpoint
-        const shuffledCourses = response.data.sort(() => 0.5 - Math.random()); // Shuffle courses
-        setCourses(shuffledCourses);
+        const response = await axios.get(
+          `http://localhost:8080/api/student/courses/category/${categoryId}`
+        );
+        const { categoryName, courses } = response.data; // Lấy thông tin danh mục và danh sách khóa học
+        setCategoryName(categoryName);
+        setCourses(courses);
       } catch (error) {
-        console.error("Failed to fetch courses", error);
+        console.error("Failed to fetch courses for music category", error);
       }
     };
 
@@ -43,10 +50,18 @@ const TopPythonCoursesSection = () => {
   };
 
   return (
-    <section className="p-6 bg-gray-50 w-full mb-[30px]">
+    <section className="p-6 bg-gray-50 w-full mb-[50px]">
       {/* Title */}
       <div className="text-left mb-6 ml-[70px] mb-[30px]">
-        <h2 className="text-2xl font-bold text-gray-900">Các Khóa Học Hàng Đầu Về Python</h2>
+        <h2
+          className="text-2xl font-bold text-gray-900 cursor-pointer"
+          onClick={() => navigate(`/category/${categoryId}`)} // Navigate to the category page
+        >
+          Các Khóa Học Hàng Đầu Về{" "}
+          <span className="text-blue-500">
+            Nghệ Thuật và{categoryName && ` ${categoryName}`}
+          </span>
+        </h2>
       </div>
 
       <div className="relative w-full mx-auto" style={{ maxWidth: "1500px" }}>
@@ -132,4 +147,4 @@ const TopPythonCoursesSection = () => {
   );
 };
 
-export default TopPythonCoursesSection;
+export default TopMusicCoursesSection;

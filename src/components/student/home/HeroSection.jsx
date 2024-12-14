@@ -16,11 +16,12 @@ const HeroSection = () => {
 
   return (
     <section
-      className="py-16 px-4 relative"
+      className="py-16 px-4 relative mx-auto max-w-[1500px]"
       style={{
         backgroundImage:
           'url("https://img-b.udemycdn.com/notices/web_carousel_slide/image/9fa1fa32-1920-45d1-8be1-e4653bbd7726.png")',
         backgroundSize: "cover",
+        backgroundPosition: "center", // Giữ hình ảnh cân đối
       }}
     >
       <div className="container mx-auto max-w-5xl">
@@ -28,7 +29,6 @@ const HeroSection = () => {
           {/* Slide 1 */}
           <div className="relative">
             {/* Button at the top */}
-            
 
             <div className="flex flex-col lg:flex-row items-center space-y-8 lg:space-y-0 lg:space-x-8">
               <div className="lg:w-1/2 mb-8 lg:mb-0 lg:pr-8 flex justify-center items-center">
@@ -63,7 +63,6 @@ const HeroSection = () => {
           {/* Slide 2 */}
           <div className="relative">
             {/* Button at the top */}
-           
 
             <div className="flex flex-col lg:flex-row items-center space-y-8 lg:space-y-0 lg:space-x-8">
               <div className="lg:w-1/2 mb-8 lg:mb-0 lg:pr-8 flex justify-center items-center">
@@ -72,7 +71,9 @@ const HeroSection = () => {
                     Học những gì bạn có hứng thú
                   </h2>
                   <p className="text-gray-800 text-base">
-                  Trong một thế giới không ngừng thay đổi, việc trang bị cho bản thân những kỹ năng mới và cập nhật kiến thức là vô cùng cần thiết.
+                    Trong một thế giới không ngừng thay đổi, việc trang bị cho
+                    bản thân những kỹ năng mới và cập nhật kiến thức là vô cùng
+                    cần thiết.
                   </p>
                 </div>
               </div>
@@ -96,7 +97,6 @@ const HeroSection = () => {
           {/* Slide 3 */}
           <div className="relative">
             {/* Button at the top */}
-            
 
             <div className="flex flex-col lg:flex-row items-center space-y-8 lg:space-y-0 lg:space-x-8">
               <div className="lg:w-1/2 mb-8 lg:mb-0 lg:pr-8 flex justify-center items-center">
@@ -105,7 +105,9 @@ const HeroSection = () => {
                     Khám phá tiềm năng của bạn
                   </h2>
                   <p className="text-gray-800 text-base">
-                  Với hàng ngàn khóa học từ các chuyên gia hàng đầu, bạn sẽ có cơ hội tiếp cận những kiến thức tiên tiến và nâng cao kỹ năng của mình một cách hiệu quả.
+                    Với hàng ngàn khóa học từ các chuyên gia hàng đầu, bạn sẽ có
+                    cơ hội tiếp cận những kiến thức tiên tiến và nâng cao kỹ
+                    năng của mình một cách hiệu quả.
                   </p>
                 </div>
               </div>
@@ -129,7 +131,6 @@ const HeroSection = () => {
           {/* Slide 4 */}
           <div className="relative">
             {/* Button at the top */}
-         
 
             <div className="flex flex-col lg:flex-row items-center space-y-8 lg:space-y-0 lg:space-x-8">
               <div className="lg:w-1/2 mb-8 lg:mb-0 lg:pr-8 flex justify-center items-center">
@@ -138,7 +139,9 @@ const HeroSection = () => {
                     Học mọi lúc, mọi nơi vô cùng tiện ích
                   </h2>
                   <p className="text-gray-800 text-base">
-                  Chúng tôi cung cấp các khóa học trực tuyến với nội dung chất lượng, phù hợp với lịch trình của từng học viên.chủ động nâng cao kỹ năng và kiến thức không giới hạn.
+                    Chúng tôi cung cấp các khóa học trực tuyến với nội dung chất
+                    lượng, phù hợp với lịch trình của từng học viên.chủ động
+                    nâng cao kỹ năng và kiến thức không giới hạn.
                   </p>
                 </div>
               </div>
@@ -162,7 +165,6 @@ const HeroSection = () => {
           {/* Slide 5 */}
           <div className="relative">
             {/* Button at the top */}
-        
 
             <div className="flex flex-col lg:flex-row items-center space-y-8 lg:space-y-0 lg:space-x-8">
               <div className="lg:w-1/2 mb-8 lg:mb-0 lg:pr-8 flex justify-center items-center">
@@ -171,7 +173,9 @@ const HeroSection = () => {
                     Tham gia cộng đồng học tập hàng triệu người
                   </h2>
                   <p className="text-gray-800 text-base">
-                  Bạn sẽ được tiếp xúc với những quan điểm khác biệt, chia sẻ kiến thức, cũng như tạo dựng các mối quan hệ giá trị trong cộng đồng.
+                    Bạn sẽ được tiếp xúc với những quan điểm khác biệt, chia sẻ
+                    kiến thức, cũng như tạo dựng các mối quan hệ giá trị trong
+                    cộng đồng.
                   </p>
                 </div>
               </div>
