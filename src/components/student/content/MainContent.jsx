@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import QuestionsAndAnswers from "../../../pages/student/courses/QuestionAndAnswers";
 import TabComment from "../../student/content/TabComment";
 import TabListTest from "./TabListTest";
+import Swal from "sweetalert2";
 
 const MainContent = ({
   selectedLecture,
@@ -12,23 +13,25 @@ const MainContent = ({
 }) => {
   const { id } = useParams();
   const [selectedTab, setSelectedTab] = useState(0);
-  const [progress, setProgress] = useState(0); // Tiến độ xem video
+  const [progress, setProgress] = useState(0); // Tiến độ xem video (theo %)
+  const [lastWatchedTime, setLastWatchedTime] = useState(0); // Thời gian cuối cùng đã xem (giây)
   const videoRef = useRef(null);
 
-  // Khôi phục tiến độ từ localStorage khi chọn bài học mới
+  const videoKey = `progress-${id}-${selectedLecture?.lecture_id}`;
+  const timeKey = `lastWatchedTime-${id}-${selectedLecture?.lecture_id}`;
+  const watchedKey = `watched-${id}-${selectedLecture?.lecture_id}`;
+
+  // Khôi phục tiến độ và thời gian cuối cùng đã xem từ localStorage khi chọn bài học mới
   useEffect(() => {
     if (selectedLecture) {
-      const savedProgress = localStorage.getItem(
-        `progress-${id}-${selectedLecture.lecture_id}`
-      );
+      const savedProgress = localStorage.getItem(videoKey);
+      const savedTime = localStorage.getItem(timeKey);
       setProgress(savedProgress ? parseFloat(savedProgress) : 0);
+      setLastWatchedTime(savedTime ? parseFloat(savedTime) : 0);
 
       const setInitialTime = () => {
-        if (videoRef.current && savedProgress && !isNaN(savedProgress)) {
-          const duration = videoRef.current.duration;
-          if (duration && savedProgress) {
-            videoRef.current.currentTime = (savedProgress / 100) * duration;
-          }
+        if (videoRef.current && savedTime && !isNaN(savedTime)) {
+          videoRef.current.currentTime = parseFloat(savedTime);
         }
       };
 
@@ -37,7 +40,7 @@ const MainContent = ({
         videoRef.current?.removeEventListener("loadedmetadata", setInitialTime);
       };
     }
-  }, [id, selectedLecture]);
+  }, [id, selectedLecture, videoKey, timeKey]);
 
   // Cập nhật tiến độ video khi đang phát
   const handleTimeUpdate = () => {
@@ -49,23 +52,51 @@ const MainContent = ({
         const newProgress = Math.min((currentTime / duration) * 100, 100);
 
         setProgress(newProgress);
-        localStorage.setItem(
-          `progress-${id}-${selectedLecture.lecture_id}`,
-          newProgress
-        );
+        if (currentTime > lastWatchedTime) {
+          setLastWatchedTime(currentTime);
+          localStorage.setItem(timeKey, currentTime); // Lưu thời gian cuối cùng đã xem
+        }
+        localStorage.setItem(videoKey, newProgress); // Lưu tiến độ theo %
 
-        // Nếu đạt 70% hoặc hơn, đánh dấu "watched"
-        if (newProgress >= 70) {
-          const watchedKey = `watched-${id}-${selectedLecture.lecture_id}`;
+        // Nếu đạt 100%, đánh dấu "watched"
+        if (newProgress === 100) {
           if (!localStorage.getItem(watchedKey)) {
             localStorage.setItem(watchedKey, "true");
             updateProgress(selectedLecture.lecture_id);
           }
         }
+      }
+    }
+  };
 
-        // Nếu đạt 100%, gọi hàm updateProgress
-        if (newProgress === 100) {
-          updateProgress(selectedLecture.lecture_id);
+  // Kiểm tra khi người dùng tua video
+  const handleSeeking = () => {
+    if (videoRef.current) {
+      const currentTime = videoRef.current.currentTime; // Thời gian hiện tại trong video
+      const isWatched = localStorage.getItem(watchedKey) === "true"; // Kiểm tra nếu bài học đã hoàn thành
+
+      // Nếu video chưa được hoàn thành
+      if (!isWatched) {
+        const duration = videoRef.current.duration;
+
+        // Không cho phép tua vượt qua phần đã xem
+        if (currentTime > lastWatchedTime + 0.5) {
+          videoRef.current.currentTime = lastWatchedTime; // Quay lại thời gian cuối cùng đã xem
+          Swal.fire({
+            title: "Cảnh báo",
+            text: `Bạn không nên tua quá nhanh. Vui lòng xem đầy đủ nội dung để đảm bảo hiệu quả học tập.`,
+            icon: "warning",
+          });
+        }
+
+        // Không cho phép tua vượt quá thời gian cuối cùng của video
+        if (currentTime >= duration) {
+          videoRef.current.currentTime = lastWatchedTime; // Quay lại thời gian cuối cùng đã xem
+          Swal.fire({
+            title: "Cảnh báo",
+            text: `Bạn không thể tua qua phần chưa hoàn thành.`,
+            icon: "warning",
+          });
         }
       }
     }
@@ -78,11 +109,22 @@ const MainContent = ({
     const currentIndex = lectures.findIndex(
       (lecture) => lecture.lecture_id === selectedLecture.lecture_id
     );
+
+    // Tìm bài học tiếp theo
     const nextLecture = lectures[currentIndex + 1];
 
+    // Nếu có bài học tiếp theo, chọn bài học đó
     if (nextLecture) {
       setSelectedLecture(nextLecture);
-      localStorage.removeItem(`progress-${id}-${selectedLecture.lecture_id}`);
+      localStorage.removeItem(videoKey);
+      localStorage.removeItem(timeKey);
+    } else {
+      // Nếu không có bài học tiếp theo, thông báo hoàn thành khóa học
+      Swal.fire({
+        title: "Khóa học đã hoàn thành",
+        text: "Bạn đã hoàn thành tất cả các bài học. Vui lòng chọn bài học hoặc khóa học khác.",
+        icon: "success",
+      });
     }
   };
 
@@ -100,8 +142,9 @@ const MainContent = ({
                     controls
                     className="w-full h-full"
                     autoPlay
-                    onTimeUpdate={handleTimeUpdate}
-                    onEnded={handleVideoEnd}
+                    onTimeUpdate={handleTimeUpdate} // Cập nhật tiến độ
+                    onSeeking={handleSeeking} // Kiểm tra khi tua video
+                    onEnded={handleVideoEnd} // Xử lý khi video kết thúc
                   >
                     <source src={selectedLecture.video_url} type="video/mp4" />
                     Trình duyệt của bạn không hỗ trợ video.
