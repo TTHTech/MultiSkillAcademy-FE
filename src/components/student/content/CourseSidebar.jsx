@@ -93,7 +93,7 @@ const CourseSidebar = ({
                           } else {
                             Swal.fire({
                               title: "Thông báo",
-                              text: "Bạn cần xem ít nhất 70% video của bài học trước khi chuyển sang bài học tiếp theo.",
+                              text: "Bạn cần hoàn thành video của bài học trước khi chuyển sang bài học tiếp theo.",
                               icon: "warning",
                             });
                           }
