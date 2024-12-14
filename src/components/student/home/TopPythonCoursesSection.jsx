@@ -95,7 +95,7 @@ const RecommendedCoursesSection = () => {
                     ))}
                   </div>
                   <span className="ml-2 text-sm text-gray-600">
-                    ({course.reviews || 999})
+                    ({course.reviews || course.numberReview})
                   </span>
                 </div>
                 {/* Giá */}
