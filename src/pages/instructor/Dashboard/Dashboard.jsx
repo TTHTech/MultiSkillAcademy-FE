@@ -98,7 +98,10 @@ const Dashboard = () => {
           <ImBook className="text-primary dark:text-white" size={22} />
         </CardDataStats>
 
-        <CardDataStats title="Total Money" total={`$${salesData.totalSales.toLocaleString()}`}>
+        <CardDataStats
+          title="Total Money"
+          total={`$${salesData.totalSales.toLocaleString()}`}
+        >
           <FaDollarSign className="text-primary dark:text-white" size={22} />
         </CardDataStats>
 
@@ -106,10 +109,7 @@ const Dashboard = () => {
           <FaStar className="text-primary dark:text-white" size={22} />
         </CardDataStats>
 
-        <CardDataStats
-          title="Total Students"
-          total={studentData.totalStudent}
-        >
+        <CardDataStats title="Total Students" total={studentData.totalStudent}>
           <PiStudentFill className="text-primary dark:text-white" size={22} />
         </CardDataStats>
       </div>
@@ -121,8 +121,12 @@ const Dashboard = () => {
 
       {/* Stats Section */}
       <div className="mt-4 grid grid-cols-12 gap-4 md:mt-6 md:gap-6 2xl:mt-7.5 2xl:gap-7.5">
-        <CourseStats data={courseData} />
-        <ReviewsStats data={reviewData} />
+        <div className="col-span-12 md:col-span-6">
+          <CourseStats data={courseData} />
+        </div>
+        <div className="col-span-12 md:col-span-6">
+          <ReviewsStats data={reviewData} />
+        </div>
       </div>
 
       {/* Sales Chart */}
