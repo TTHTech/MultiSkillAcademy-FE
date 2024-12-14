@@ -1,4 +1,3 @@
-// src/components/home/RecommendedTopics.jsx
 import React from "react";
 
 const topics = [
@@ -16,8 +15,8 @@ const topics = [
 
 const RecommendedTopics = () => {
   return (
-    <section className="p-6">
-      <h2 className="text-2xl font-bold text-gray-900 mb-4">Các chủ đề đề xuất dành cho bạn</h2>
+    <section className="p-6 mx-auto max-w-[1500px]">
+      <h2 className="text-2xl font-bold text-gray-900 mb-4">Các chủ đề được đề xuất dành cho bạn</h2>
       <div className="flex flex-wrap gap-4">
         {topics.map((topic, index) => (
           <div
