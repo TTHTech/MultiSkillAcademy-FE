@@ -99,13 +99,14 @@ const CourseSidebar = ({
                           if (
                             index === 0 || // Cho phép chọn bài học đầu tiên
                             watched || // Bài học đã hoàn thành
-                            progress >= 70 // Hoặc tiến độ đạt ít nhất 70%
+                            progress >= 70 || // Bài học đạt ít nhất 70%
+                            (index > 0 && isWatched(section.lectures[index - 1])) // Bài học nằm sau bài đã hoàn thành ít nhất 70%
                           ) {
                             handleLectureClick(lecture);
                           } else {
                             Swal.fire({
                               title: "Thông báo",
-                              text: "Bạn cần xem ít nhất 70% video trước khi chuyển sang bài học tiếp theo.",
+                              text: "Bạn cần xem ít nhất 70% video của bài học trước khi chuyển sang bài học tiếp theo.",
                               icon: "warning",
                             });
                           }
