@@ -17,30 +17,37 @@ const MainContent = ({
   const [lastWatchedTime, setLastWatchedTime] = useState(0); // Thời gian cuối cùng đã xem (giây)
   const videoRef = useRef(null);
 
-  const videoKey = `progress-${id}-${selectedLecture?.lecture_id}`;
-  const timeKey = `lastWatchedTime-${id}-${selectedLecture?.lecture_id}`;
-  const watchedKey = `watched-${id}-${selectedLecture?.lecture_id}`;
-
-  // Khôi phục tiến độ và thời gian cuối cùng đã xem từ localStorage khi chọn bài học mới
+  // Fetch tiến độ từ API khi chọn bài học mới
   useEffect(() => {
     if (selectedLecture) {
-      const savedProgress = localStorage.getItem(videoKey);
-      const savedTime = localStorage.getItem(timeKey);
-      setProgress(savedProgress ? parseFloat(savedProgress) : 0);
-      setLastWatchedTime(savedTime ? parseFloat(savedTime) : 0);
+      const fetchProgress = async () => {
+        try {
+          const response = await fetch(
+            `http://localhost:8080/api/student/lecture-progress/${id}/${selectedLecture.lecture_id}`,
+            {
+              method: "GET",
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+              },
+            }
+          );
+          if (!response.ok) throw new Error("Failed to fetch progress.");
+          const data = await response.json();
+          setProgress(data.progress || 0);
+          setLastWatchedTime(data.lastWatchedTime || 0);
 
-      const setInitialTime = () => {
-        if (videoRef.current && savedTime && !isNaN(savedTime)) {
-          videoRef.current.currentTime = parseFloat(savedTime);
+          // Đặt thời gian bắt đầu cho video
+          if (videoRef.current && data.lastWatchedTime) {
+            videoRef.current.currentTime = data.lastWatchedTime;
+          }
+        } catch (error) {
+          console.error("Error fetching progress:", error);
         }
       };
 
-      videoRef.current?.addEventListener("loadedmetadata", setInitialTime);
-      return () => {
-        videoRef.current?.removeEventListener("loadedmetadata", setInitialTime);
-      };
+      fetchProgress();
     }
-  }, [id, selectedLecture, videoKey, timeKey]);
+  }, [id, selectedLecture]);
 
   // Cập nhật tiến độ video khi đang phát
   const handleTimeUpdate = () => {
@@ -50,18 +57,16 @@ const MainContent = ({
 
       if (duration && currentTime) {
         const newProgress = Math.min((currentTime / duration) * 100, 100);
-
         setProgress(newProgress);
+
         if (currentTime > lastWatchedTime) {
           setLastWatchedTime(currentTime);
-          localStorage.setItem(timeKey, currentTime); // Lưu thời gian cuối cùng đã xem
-        }
-        localStorage.setItem(videoKey, newProgress); // Lưu tiến độ theo %
 
-        // Nếu đạt 100%, đánh dấu "watched"
-        if (newProgress === 100) {
-          if (!localStorage.getItem(watchedKey)) {
-            localStorage.setItem(watchedKey, "true");
+          // Gửi API để cập nhật tiến độ
+          updateProgressAPI(newProgress, currentTime);
+
+          // Đánh dấu là watched nếu đạt đủ tiến độ
+          if (newProgress >= 100) {
             updateProgress(selectedLecture.lecture_id);
           }
         }
@@ -69,32 +74,48 @@ const MainContent = ({
     }
   };
 
+  // Gửi API để cập nhật tiến độ
+  const updateProgressAPI = async (newProgress, currentTime) => {
+    try {
+      await fetch("http://localhost:8080/api/student/update-progress", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify({
+          userId: Number(localStorage.getItem("userId")),
+          courseId: id,
+          lectureId: selectedLecture.lecture_id,
+          progress: newProgress,
+          lastWatchedTime: currentTime,
+        }),
+      });
+    } catch (error) {
+      console.error("Error updating progress:", error);
+    }
+  };
+
   // Kiểm tra khi người dùng tua video
   const handleSeeking = () => {
     if (videoRef.current) {
       const currentTime = videoRef.current.currentTime; // Thời gian hiện tại trong video
-      const isWatched = localStorage.getItem(watchedKey) === "true"; // Kiểm tra nếu bài học đã hoàn thành
+      const duration = videoRef.current.duration;
 
-      // Nếu video chưa được hoàn thành
-      if (!isWatched) {
-        const duration = videoRef.current.duration;
-
-        // Không cho phép tua vượt qua phần đã xem
+      // Nếu video chưa được hoàn thành, kiểm tra logic tua
+      if (progress < 100) {
         if (currentTime > lastWatchedTime + 0.5) {
           videoRef.current.currentTime = lastWatchedTime; // Quay lại thời gian cuối cùng đã xem
           Swal.fire({
             title: "Cảnh báo",
-            text: `Bạn không nên tua quá nhanh. Vui lòng xem đầy đủ nội dung để đảm bảo hiệu quả học tập.`,
+            text: "Bạn không nên tua quá nhanh. Vui lòng xem đầy đủ nội dung để đảm bảo hiệu quả học tập.",
             icon: "warning",
           });
-        }
-
-        // Không cho phép tua vượt quá thời gian cuối cùng của video
-        if (currentTime >= duration) {
+        } else if (currentTime >= duration) {
           videoRef.current.currentTime = lastWatchedTime; // Quay lại thời gian cuối cùng đã xem
           Swal.fire({
             title: "Cảnh báo",
-            text: `Bạn không thể tua qua phần chưa hoàn thành.`,
+            text: "Bạn không thể tua qua phần chưa hoàn thành.",
             icon: "warning",
           });
         }
@@ -110,14 +131,15 @@ const MainContent = ({
       (lecture) => lecture.lecture_id === selectedLecture.lecture_id
     );
 
+    // Gọi API để đánh dấu là watched
+    updateProgress(selectedLecture.lecture_id);
+
     // Tìm bài học tiếp theo
     const nextLecture = lectures[currentIndex + 1];
 
     // Nếu có bài học tiếp theo, chọn bài học đó
     if (nextLecture) {
       setSelectedLecture(nextLecture);
-      localStorage.removeItem(videoKey);
-      localStorage.removeItem(timeKey);
     } else {
       // Nếu không có bài học tiếp theo, thông báo hoàn thành khóa học
       Swal.fire({
