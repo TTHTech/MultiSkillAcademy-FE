@@ -1,52 +1,60 @@
-# Admin Dashboard - ReactJS
+# ✨ Admin Dashboard - ReactJS ✨
 
-## 📦 Tổng Quan Dự Án
+## 📆 **Tổng Quan Dự Án**
 **Tên dự án**: Admin Dashboard  
 **Công nghệ sử dụng**: ReactJS, Framer Motion, Tailwind CSS  
 **Chức năng chính**:  
-- Quản lý người dùng  
-- Quản lý khóa học  
-- Các chức năng quản trị khác  
+- 🔍 Quản lý người dùng  
+- 🏢 Quản lý khóa học  
+- 📋 Các chức năng quản trị khác  
 
 ---
 
-## 🚀 Hướng Dẫn Cài Đặt
+## 🚀 **Hướng Dẫn Cài Đặt**
 
-### Yêu Cầu Môi Trường
+### ✅ **Yêu Cầu Môi Trường**
 - **Node.js**: Phiên bản mới nhất hoặc từ `14.x` trở lên.  
 - **npm** hoặc **yarn**: Công cụ quản lý các thư viện.  
 
 ---
 
-### Bước 1: Sao Chép Dự Án
+### 🔧 **Bước 1: Sao Chép Dự Án**
 Clone dự án từ repository:
 
-    git clone https://github.com/TTHTech/ADMINDASHBOARD.git
+```bash
+git clone https://github.com/TTHTech/ADMINDASHBOARD.git
 cd AdminDashboard
+```
 
 ---
 
-### Bước 2: Cài Đặt Các Phụ Thuộc
+### ♻️ **Bước 2: Cài Đặt Các Phụ Thuộc**
 Sử dụng lệnh dưới đây để cài đặt tất cả thư viện phụ thuộc:
 
-    npm install
+```bash
+npm install
+```
 
 ---
 
-### Bước 3: Chạy Dự Án Trong Chế Độ Phát Triển
+### 🌄 **Bước 3: Chạy Dự Án Trong Chế Độ Phát Triển**
 Khởi chạy dự án bằng lệnh:
 
-    npm run dev
+```bash
+npm run dev
+```
 
 Truy cập địa chỉ:  
 
-    http://localhost:5173
+```bash
+http://localhost:5173
+```
 
 ---
 
-# 📜 Các Thư Viện và Phiên Bản Sử Dụng
+# 📘 **Các Thư Viện và Phiên Bản Sử Dụng**
 
-## Thư viện Cơ bản
+## ✔️ Thư viện Cơ bản
 - **React và React DOM**: Dùng để xây dựng giao diện người dùng.
     ```bash
     npm install react@18.3.1
@@ -65,7 +73,7 @@ Truy cập địa chỉ:
 
 ---
 
-## Thư viện Hiệu Ứng và Giao Diện
+## 🔬 Thư viện Hiệu Ứng và Giao Diện
 - **Framer Motion**: Tạo hiệu ứng động cho giao diện.
     ```bash
     npm install framer-motion@^11.11.8
@@ -93,7 +101,7 @@ Truy cập địa chỉ:
 
 ---
 
-## Thư viện Biểu Đồ và Báo Cáo
+## 🔼 Thư viện Biểu Đồ và Báo Cáo
 - **React ApexCharts**: Thư viện biểu đồ tích hợp cho React.
     ```bash
     npm install react-apexcharts@^1.5.0
@@ -121,7 +129,7 @@ Truy cập địa chỉ:
 
 ---
 
-## Thư viện Tiện Ích
+## ♻️ Thư viện Tiện Ích
 - **Lodash**: Cung cấp các tiện ích thao tác dữ liệu.
     ```bash
     npm install lodash@^4.17.21
@@ -149,7 +157,7 @@ Truy cập địa chỉ:
 
 ---
 
-## Thư viện Xử Lý Đa Phương Tiện
+## 🌐 Thư viện Xử Lý Đa Phương Tiện
 - **React Player**: Hỗ trợ phát video và âm thanh.
     ```bash
     npm install react-player@^2.16.0
@@ -177,7 +185,7 @@ Truy cập địa chỉ:
 
 ---
 
-## Công Cụ Dành Cho Nhà Phát Triển
+## 🛠️ Công Cụ Dành Cho Nhà Phát Triển
 - **Vite Plugin React**: Hỗ trợ React trong Vite.
     ```bash
     npm install @vitejs/plugin-react@^4.3.1
@@ -205,6 +213,6 @@ Truy cập địa chỉ:
 
 ---
 
-⚡ **Lưu Ý**:  
+🚨 **Lưu Ý**:  
 - Đảm bảo cài đặt đúng phiên bản Node.js.  
 - Nếu gặp lỗi, kiểm tra lại phiên bản của các thư viện và môi trường.
