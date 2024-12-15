@@ -297,7 +297,6 @@ http://localhost:5173
 
 ```plaintext
 
->>> tprint("test","rnd-xlarge")
                               _____                    _____                    _____                _____          
                              /\    \                  /\    \                  /\    \              /\    \         
                             /::\    \                /::\    \                /::\    \            /::\    \        
@@ -352,12 +351,12 @@ http://localhost:5173
                                                                 .    *        *    
                                                                    *     *   .     
                                                                        *           
-
-     Từ Thanh Hoài Dev
-    --------------------
-    |  Code the Future |
-    --------------------
-
+                                                        
+                                                               Từ Thanh Hoài Dev
+                                                             --------------------
+                                                             |  Code the Future |
+                                                             --------------------
+```
 🚨 **Lưu Ý**:  
 - Đảm bảo cài đặt đúng phiên bản Node.js.  
 - Nếu gặp lỗi, kiểm tra lại phiên bản của các thư viện và môi trường.
