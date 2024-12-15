@@ -43,7 +43,7 @@ const SuggestedCoursesSection = () => {
   };
 
   return (
-    <section className="p-6 bg-gray-50 w-full mt-[50px] mb-[30px]">
+    <section className="p-6 from-yellow-50 to-purple-100 w-full mt-[50px] mb-[30px]">
       {/* Title */}
       <div className="text-left mb-6 ml-[70px] mb-[30px]">
         <h2 className="text-2xl font-bold text-gray-900">Được Đề Xuất Dành Cho Bạn</h2>

@@ -81,7 +81,7 @@ const CartItems = () => {
   }
   // Render cart items
   return (
-    <div className="lg:w-2/3 space-y-4">
+    <div className="lg:w-2/3 space-y-4 from-yellow-50 to-purple-100 ml-[30px]">
       <p className="text-lg font-semibold text-gray-900">
         {cartItems.length} khóa học trong giỏ hàng
       </p>

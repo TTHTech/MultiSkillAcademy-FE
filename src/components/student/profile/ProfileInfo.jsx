@@ -132,7 +132,7 @@ const ProfileInfo = () => {
   }
 
   return (
-    <div className="bg-white p-8 rounded-lg shadow-lg max-w-3xl mx-auto mt-8">
+    <div className="bg-white p-8 rounded-lg shadow-lg max-w-3xl mx-auto mt-8 mt-[50px] mb-[50px]">
       <div className="flex flex-col items-center space-y-6">
         <div className="relative">
           <img
