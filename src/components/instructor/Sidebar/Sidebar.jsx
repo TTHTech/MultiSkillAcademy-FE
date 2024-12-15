@@ -10,6 +10,7 @@ import { Link, useLocation } from "react-router-dom";
 import { LuFileSignature } from "react-icons/lu";
 import { MdOutlineReviews } from "react-icons/md";
 import { FaCircleDollarToSlot } from "react-icons/fa6";
+import { GrScorecard } from "react-icons/gr";
 
 const Sidebar = ({ open, setOpen }) => {
   const location = useLocation();
@@ -20,6 +21,7 @@ const Sidebar = ({ open, setOpen }) => {
     { name: "Courses", link: "/instructor/courses", icon: ImBook },
     { name: "Review", link: "/instructor/review", icon: MdOutlineReviews },
     { name: "Test", link: "/instructor/tests", icon: LuFileSignature },
+    { name: "Scores", link: "/instructor/scores", icon: GrScorecard },
     { name: "Questions", link: "/instructor/questions", icon: BsFillQuestionSquareFill },
     { name: "Students", link: "/instructor/students", icon: PiStudentFill },
     { name: "Sign Out", link: "/login", icon: FaSignOutAlt },

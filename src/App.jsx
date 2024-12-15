@@ -42,6 +42,7 @@ import ProfilePage from "./pages/student/profile/ProfilePage.jsx";
 import QuizPage from "./pages/student/quiz/QuizPage";
 import ResultPage from "./pages/student/quiz/ResultPage";
 import SearchCoursePage from "./pages/student/search/SearchCoursePage";
+import PageViewScores from "./pages/instructor/PageViewScores";
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [role, setRole] = useState("");
@@ -163,6 +164,7 @@ function App() {
               <Route path="/instructor/students" element={<StudentList />} />
               <Route path="/instructor/sales" element={<PageSales />} />
               <Route path="/instructor/tests" element={<Test />} />
+              <Route path="/instructor/scores" element={<PageViewScores />} />
             </>
           )}
         </Routes>
