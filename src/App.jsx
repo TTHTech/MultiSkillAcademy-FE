@@ -43,6 +43,7 @@ import QuizPage from "./pages/student/quiz/QuizPage";
 import ResultPage from "./pages/student/quiz/ResultPage";
 import SearchCoursePage from "./pages/student/search/SearchCoursePage";
 import PageViewScores from "./pages/instructor/PageViewScores";
+import CertificateGenerator from "./components/student/certificate/Certificate.jsx";
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [role, setRole] = useState("");
@@ -115,8 +116,8 @@ function App() {
           <Route path="/forgot-password" element={<ForgotPassPage />} />
           <Route path="/reset-password" element={<ResetPassPage />} />
           <Route path="/student/quiz/:id" element={<QuizPage />} />
+          <Route path="/certificate" element={<CertificateGenerator />} />
           <Route path="/search" element={<SearchCoursePage />} />
-          
           {/* Các route cho admin */}
           {isLoggedIn && role === "ROLE_ADMIN" && (
             <>
