@@ -125,7 +125,7 @@ function App() {
               <Route path="/admin/courses" element={<CoursesPage />} />
               <Route path="/admin/student" element={<StudentPage />} />
               <Route path="/admin/instructor" element={<InstructorPage />} />
-              <Route path="/admin/sales" element={<SalesPage />} />
+              <Route path="/admin/statistics" element={<SalesPage />} />
               <Route path="/admin/sale" element={<SalePage />} />
               <Route path="/admin/category" element={<CategoryPage />} />
               <Route path="/admin/analytics" element={<AnalyticsPage />} />

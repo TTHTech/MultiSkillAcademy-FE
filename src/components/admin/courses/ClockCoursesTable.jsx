@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/swiper-bundle.css"; // Đường dẫn chính xác hơn
-
+import { FaUserCircle, FaBook, FaTools, FaClipboardList } from "react-icons/fa";
 // Số lượng khóa học hiển thị mỗi trang
 const ITEMS_PER_PAGE = 10;
 
@@ -208,9 +208,9 @@ const ClockCoursesTable = () => {
             <Swiper
               spaceBetween={10} // Khoảng cách giữa các slide
               slidesPerView={1} // Hiển thị 1 ảnh mỗi lần
-              navigation={true} // Hiển thị nút mũi tên điều hướng
+              // navigation={true} // Hiển thị nút mũi tên điều hướng
               loop={true} // Cho phép vòng lặp (quay lại ảnh đầu tiên khi đi qua ảnh cuối)
-              className="w-full h-[400px]" // Cập nhật kích thước cho Swiper (mở rộng chiều rộng)
+              className="w-full h-[500px]" // Cập nhật kích thước cho Swiper (mở rộng chiều rộng)
             >
               {editingCourse.imageUrls &&
                 editingCourse.imageUrls.map((image, index) => (
@@ -333,11 +333,23 @@ const ClockCoursesTable = () => {
           </div>
 
           <div className="mb-4">
+            <label className="text-gray-400">Level:</label>
+            <input
+              type="text"
+              name="level"
+              value={editingCourse.level}
+              className="w-full p-2 bg-gray-600 text-white rounded-lg"
+              readOnly
+            />
+          </div>
+          <div className="mb-4">
             <label className="text-gray-400">Target Audience:</label>
             <ul className="w-full p-2 bg-gray-600 text-white rounded-lg">
               {editingCourse.targetAudience &&
                 editingCourse.targetAudience.map((audience, idx) => (
-                  <li key={idx}>{audience}</li>
+                  <li key={idx} className="flex items-center gap-2">
+                    <FaUserCircle /> <span>{audience}</span>
+                  </li>
                 ))}
             </ul>
           </div>
@@ -347,7 +359,9 @@ const ClockCoursesTable = () => {
             <ul className="w-full p-2 bg-gray-600 text-white rounded-lg">
               {editingCourse.courseContent &&
                 editingCourse.courseContent.map((content, idx) => (
-                  <li key={idx}>{content}</li>
+                  <li key={idx} className="flex items-center gap-2">
+                    <FaBook /> <span>{content}</span>
+                  </li>
                 ))}
             </ul>
           </div>
@@ -357,17 +371,9 @@ const ClockCoursesTable = () => {
             <ul className="w-full p-2 bg-gray-600 text-white rounded-lg">
               {editingCourse.resourceDescription &&
                 editingCourse.resourceDescription.map((resource, idx) => (
-                  <li key={idx}>{resource}</li>
-                ))}
-            </ul>
-          </div>
-
-          <div className="mb-4">
-            <label className="text-gray-400">Requirements:</label>
-            <ul className="w-full p-2 bg-gray-600 text-white rounded-lg">
-              {editingCourse.requirements &&
-                editingCourse.requirements.map((requirement, idx) => (
-                  <li key={idx}>{requirement}</li>
+                  <li key={idx} className="flex items-center gap-2">
+                    <FaTools /> <span>{resource}</span>
+                  </li>
                 ))}
             </ul>
           </div>
@@ -384,8 +390,6 @@ const ClockCoursesTable = () => {
           >
             Unclock
           </button>
-
-      
 
           <button
             className="bg-gray-500 text-white px-4 py-2 rounded-lg"

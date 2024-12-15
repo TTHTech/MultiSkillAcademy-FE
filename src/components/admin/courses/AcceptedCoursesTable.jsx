@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/swiper-bundle.css"; // Đường dẫn chính xác hơn
-
+import { FaUserCircle, FaBook, FaTools, FaClipboardList } from "react-icons/fa";
 // Số lượng khóa học hiển thị mỗi trang
 const ITEMS_PER_PAGE = 10;
 
@@ -203,7 +203,9 @@ const AcceptedCoursesTable = () => {
       // Cập nhật lại danh sách ngay lập tức
       setCourses((prevCourses) =>
         prevCourses.map((course) =>
-          course.courseId === courseId ? { ...course, status: "Inactive" } : course
+          course.courseId === courseId
+            ? { ...course, status: "Inactive" }
+            : course
         )
       );
 
@@ -262,9 +264,9 @@ const AcceptedCoursesTable = () => {
             <Swiper
               spaceBetween={10} // Khoảng cách giữa các slide
               slidesPerView={1} // Hiển thị 1 ảnh mỗi lần
-              navigation={true} // Hiển thị nút mũi tên điều hướng
+              // navigation={true} // Hiển thị nút mũi tên điều hướng
               loop={true} // Cho phép vòng lặp (quay lại ảnh đầu tiên khi đi qua ảnh cuối)
-              className="w-full h-[400px]" // Cập nhật kích thước cho Swiper (mở rộng chiều rộng)
+              className="w-full h-[500px]" // Cập nhật kích thước cho Swiper (mở rộng chiều rộng)
             >
               {editingCourse.imageUrls &&
                 editingCourse.imageUrls.map((image, index) => (
@@ -385,13 +387,14 @@ const AcceptedCoursesTable = () => {
               readOnly
             />
           </div>
-
           <div className="mb-4">
             <label className="text-gray-400">Target Audience:</label>
             <ul className="w-full p-2 bg-gray-600 text-white rounded-lg">
               {editingCourse.targetAudience &&
                 editingCourse.targetAudience.map((audience, idx) => (
-                  <li key={idx}>{audience}</li>
+                  <li key={idx} className="flex items-center gap-2">
+                    <FaUserCircle /> <span>{audience}</span>
+                  </li>
                 ))}
             </ul>
           </div>
@@ -401,7 +404,9 @@ const AcceptedCoursesTable = () => {
             <ul className="w-full p-2 bg-gray-600 text-white rounded-lg">
               {editingCourse.courseContent &&
                 editingCourse.courseContent.map((content, idx) => (
-                  <li key={idx}>{content}</li>
+                  <li key={idx} className="flex items-center gap-2">
+                    <FaBook /> <span>{content}</span>
+                  </li>
                 ))}
             </ul>
           </div>
@@ -411,7 +416,9 @@ const AcceptedCoursesTable = () => {
             <ul className="w-full p-2 bg-gray-600 text-white rounded-lg">
               {editingCourse.resourceDescription &&
                 editingCourse.resourceDescription.map((resource, idx) => (
-                  <li key={idx}>{resource}</li>
+                  <li key={idx} className="flex items-center gap-2">
+                    <FaTools /> <span>{resource}</span>
+                  </li>
                 ))}
             </ul>
           </div>
@@ -421,7 +428,9 @@ const AcceptedCoursesTable = () => {
             <ul className="w-full p-2 bg-gray-600 text-white rounded-lg">
               {editingCourse.requirements &&
                 editingCourse.requirements.map((requirement, idx) => (
-                  <li key={idx}>{requirement}</li>
+                  <li key={idx} className="flex items-center gap-2">
+                    <FaClipboardList /> <span>{requirement}</span>
+                  </li>
                 ))}
             </ul>
           </div>
@@ -442,7 +451,9 @@ const AcceptedCoursesTable = () => {
           {showPopup && (
             <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50">
               <div className="bg-gray-800 p-6 rounded-lg w-1/3">
-                <h3 className="text-lg font-semibold text-gray-100 mb-4">Enter message for deletion</h3>
+                <h3 className="text-lg font-semibold text-gray-100 mb-4">
+                  Enter message for deletion
+                </h3>
                 <textarea
                   value={messageContent}
                   onChange={(e) => setMessageContent(e.target.value)}
