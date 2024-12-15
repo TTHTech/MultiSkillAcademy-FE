@@ -1,10 +1,13 @@
 import { FaClock, FaDollarSign, FaStar, FaTrash } from "react-icons/fa";
 import axios from "axios";
 import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
 
 const userId = Number(localStorage.getItem("userId"));
 const WishlistCard = ({ course, onDelete }) => {
-  const handleDelete = async () => {
+  const navigate = useNavigate();
+  const handleDelete = async (e) => {
+    e.stopPropagation();
     const swalResult = await Swal.fire({
       title: "Confirmation",
       text: "Bạn có chắc chắn muốn xóa khóa học này ra khỏi Wishlist này?",
@@ -35,9 +38,14 @@ const WishlistCard = ({ course, onDelete }) => {
       console.error("Error deleting course from wishlist:", error);
     }
   };
-
+  const handleCardClick = () => {
+    navigate(`/course/${course.courseId}`);
+  };
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-transform hover:scale-105 duration-300 w-64">
+    <div
+      className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-transform hover:scale-105 duration-300 w-64"
+      onClick={handleCardClick}
+    >
       {/* Phần hình ảnh và tiêu đề */}
       <div className="relative h-40 overflow-hidden">
         <img
