@@ -140,7 +140,7 @@ const QuizPage = () => {
                 Điểm của bạn: {score}/10
               </div>
               <div className="flex justify-center items-center space-x-1">
-              <button
+              {/* <button
                   onClick={handleSaveScore}
                   className={`py-2 px-6 text-white text-lg font-semibold rounded-md ${
                     isScoreSaved
@@ -150,7 +150,7 @@ const QuizPage = () => {
                   disabled={isScoreSaved}
                 >
                   {isScoreSaved ? "Đã lưu điểm" : "Lưu điểm"}
-                </button>
+                </button> */}
                 <button
                   onClick={() => navigate(-1)}
                   className="py-2 px-6 text-white text-lg font-semibold rounded-md bg-red-500 hover:bg-red-600"

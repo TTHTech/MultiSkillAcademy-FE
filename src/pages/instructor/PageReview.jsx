@@ -7,7 +7,7 @@ const InstructorReviews = () => {
   const [filteredReviews, setFilteredReviews] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const reviewsPerPage = 10;
-  const [courseId, setCourseId] = useState("");
+  const [courseNameFilter, setCourseNameFilter] = useState("");
   const [ratingFilter, setRatingFilter] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -45,11 +45,15 @@ const InstructorReviews = () => {
 
   const handleFilter = () => {
     const filtered = reviews.filter((review) => {
-      const matchesCourse = courseId ? review.courseId === courseId : true;
+      const matchesCourseName = courseNameFilter
+        ? review.courseName
+            .toLowerCase()
+            .includes(courseNameFilter.toLowerCase())
+        : true;
       const matchesRating = ratingFilter
         ? review.rating === parseInt(ratingFilter)
         : true;
-      return matchesCourse && matchesRating;
+      return matchesCourseName && matchesRating;
     });
     setFilteredReviews(filtered);
     setCurrentPage(1); // Reset về trang đầu
@@ -91,10 +95,10 @@ const InstructorReviews = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <input
                 type="text"
-                placeholder="Nhập mã khóa học (e.g., CR001)"
+                placeholder="Nhập tên khóa học"
                 className="border rounded-md p-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={courseId}
-                onChange={(e) => setCourseId(e.target.value)}
+                value={courseNameFilter}
+                onChange={(e) => setCourseNameFilter(e.target.value)}
               />
               <select
                 className="border rounded-md p-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -123,7 +127,8 @@ const InstructorReviews = () => {
               Số đánh giá: <strong>{filteredReviews.length}</strong>
             </p>
             <p className="text-lg font-semibold text-blue-700">
-              Đánh giá trung bình: <strong>{calculateAverageRating()} ⭐</strong>
+              Đánh giá trung bình:{" "}
+              <strong>{calculateAverageRating()} ⭐</strong>
             </p>
           </div>
 
