@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Search } from "lucide-react";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
+import * as XLSX from "xlsx";
 
 const SalesTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -11,20 +12,17 @@ const SalesTable = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const coursesPerPage = 10;
   const [totalPages, setTotalPages] = useState(1);
 
-  // Filters
   const [categoryFilter, setCategoryFilter] = useState("");
   const [revenueFilter, setRevenueFilter] = useState("");
   const [reviewFilter, setReviewFilter] = useState("");
   const [salesFilter, setSalesFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
 
-  // Export selection
-  const [exportOption, setExportOption] = useState("currentPage"); // default to export current page
+  const [exportOption, setExportOption] = useState("currentPage");
 
   useEffect(() => {
     const fetchSalesData = async () => {
@@ -114,7 +112,7 @@ const SalesTable = () => {
 
     setFilteredCourses(filtered);
     setTotalPages(Math.ceil(filtered.length / coursesPerPage));
-    setCurrentPage(1); // Reset to first page
+    setCurrentPage(1);
   };
 
   const indexOfLastCourse = currentPage * coursesPerPage;
@@ -139,7 +137,6 @@ const SalesTable = () => {
     let tableData = [];
 
     if (exportOption === "all") {
-      // Export all data
       tableData = courses.map(course => [
         course.courseId,
         course.title,
@@ -150,7 +147,6 @@ const SalesTable = () => {
         course.courseStatus,
       ]);
     } else {
-      // Export only current page data
       tableData = currentCourses.map(course => [
         course.courseId,
         course.title,
@@ -168,6 +164,35 @@ const SalesTable = () => {
     });
 
     doc.save("sales_table.pdf");
+  };
+
+  const handleExportExcel = () => {
+    const tableData =
+      exportOption === "all"
+        ? courses.map((course) => ({
+            "ID": course.courseId,
+            "Title": course.title,
+            "Revenue": course.totalRevenue,
+            "Average Review": course.averageReviews,
+            "Review Count": course.reviewCount,
+            "Total Sales": course.totalSales,
+            "Status": course.courseStatus,
+          }))
+        : currentCourses.map((course) => ({
+            "ID": course.courseId,
+            "Title": course.title,
+            "Revenue": course.totalRevenue,
+            "Average Review": course.averageReviews,
+            "Review Count": course.reviewCount,
+            "Total Sales": course.totalSales,
+            "Status": course.courseStatus,
+          }));
+
+    const worksheet = XLSX.utils.json_to_sheet(tableData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Sales Data");
+
+    XLSX.writeFile(workbook, "sales_table.xlsx");
   };
 
   return (
@@ -190,7 +215,6 @@ const SalesTable = () => {
             <Search className="absolute left-3 top-2.5 text-gray-400" size={18} />
           </div>
 
-          {/* Filters */}
           <div className="flex gap-4 items-center">
             <select
               value={categoryFilter}
@@ -262,8 +286,6 @@ const SalesTable = () => {
             </select>
           </div>
         </div>
-
-        
       </div>
 
       <table className="w-full text-sm text-left text-white">
@@ -293,7 +315,6 @@ const SalesTable = () => {
         </tbody>
       </table>
 
-      {/* Pagination Controls */}
       <div className="flex justify-between items-center mt-6">
         <button
           onClick={prevPage}
@@ -311,24 +332,31 @@ const SalesTable = () => {
           Next
         </button>
       </div>
-      {/* Export Options */}
-      <div className="flex items-center justify-end gap-4 mt-4 mb-4">
-      <select
-        value={exportOption}
-        onChange={(e) => setExportOption(e.target.value)}
-        className="bg-gray-700 text-white placeholder-gray-400 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-      >
-        <option value="currentPage">Export Current Page</option>
-        <option value="all">Export All</option>
-      </select>
 
-      <button
-        onClick={handleExportPDF}
-        className="bg-blue-600 text-white rounded-lg py-2 px-4 focus:outline-none hover:bg-blue-700"
-      >
-        Export to PDF
-      </button>
-    </div>
+      <div className="flex items-center justify-end gap-4 mt-4 mb-4">
+        <select
+          value={exportOption}
+          onChange={(e) => setExportOption(e.target.value)}
+          className="bg-gray-700 text-white placeholder-gray-400 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="currentPage">Export Current Page</option>
+          <option value="all">Export All</option>
+        </select>
+
+        <button
+          onClick={handleExportPDF}
+          className="bg-blue-600 text-white rounded-lg py-2 px-4 focus:outline-none hover:bg-blue-700"
+        >
+          Export to PDF
+        </button>
+
+        <button
+          onClick={handleExportExcel}
+          className="bg-green-600 text-white rounded-lg py-2 px-4 focus:outline-none hover:bg-green-700"
+        >
+          Export to Excel
+        </button>
+      </div>
     </motion.div>
   );
 };
