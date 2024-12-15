@@ -99,7 +99,7 @@ const TestList = () => {
     <section
       className={`flex-1 m-4 p-6 transition-all font-medium text-gray-900 ${
         open ? "ml-72" : "ml-16"
-      } bg-gradient-to-b from-gray-50 to-blue-50 shadow-lg rounded-xl`}
+      } bg-gradient-to-b from-gray-100 to-gray-100 rounded-xl`}
     >
       <Sidebar open={open} setOpen={setOpen} />
       <div className="p-8">

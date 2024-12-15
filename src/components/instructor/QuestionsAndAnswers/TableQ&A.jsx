@@ -17,6 +17,12 @@ const QuestionTable = ({
   const [expandedQuestionId, setExpandedQuestionId] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [isFilterOptionsOpen, setIsFilterOptionsOpen] = useState(false);
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0, // Vị trí trên cùng
+      behavior: "smooth", // Cuộn mượt mà
+    });
+  };
 
   const toggleFilterOptions = () => {
     setIsFilterOptionsOpen(!isFilterOptionsOpen);
@@ -417,6 +423,25 @@ const QuestionTable = ({
                 )}
               </tbody>
             </table>
+            <button
+              onClick={scrollToTop}
+              className="fixed bottom-5 right-5 w-14 h-14 bg-gray-700 bg-opacity-70 text-white rounded-full flex items-center justify-center hover:bg-opacity-100 transition-all duration-300 group transform hover:scale-110"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6 group-hover:scale-125 transform transition-transform duration-300"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M5 15l7-7 7 7"
+                />
+              </svg>
+            </button>
           </div>
         );
       })}
