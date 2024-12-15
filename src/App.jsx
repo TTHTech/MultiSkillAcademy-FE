@@ -117,7 +117,7 @@ function App() {
           <Route path="/reset-password" element={<ResetPassPage />} />
           <Route path="/student/quiz/:id" element={<QuizPage />} />
           <Route path="/certificate" element={<CertificateGenerator />} />
-
+          <Route path="/search" element={<SearchCoursePage />} />
           {/* Các route cho admin */}
           {isLoggedIn && role === "ROLE_ADMIN" && (
             <>
@@ -146,10 +146,11 @@ function App() {
               <Route path="/category/:categoryId" element={<CategoryStudentPage />} />
               <Route path="/student/study/:progress/:id" element={<CourseViewerPage />} />
               <Route path="/student/wishlist" element={<Wishlist />} />
+             
               <Route path="/student/Success" element={<SuccessPage />} />
               <Route path="/student/payment/success" element={<SuccessPage />} />
               <Route path="/student/result" element={<ResultPage />} />
-              <Route path="/search" element={<SearchCoursePage />} />
+              
             </>
           )}
 
