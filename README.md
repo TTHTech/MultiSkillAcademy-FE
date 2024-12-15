@@ -1,7 +1,7 @@
 # ✨ Admin Dashboard - ReactJS ✨
 
-## 📆 **Tổng Quan Dự Án**
-**Tên dự án**: Admin Dashboard  
+## 📆 **Website Bán Khóa Học**
+**Tên dự án**: Smart Learning
 **Công nghệ sử dụng**: ReactJS, Framer Motion, Tailwind CSS  
 **Chức năng chính**:  
 
