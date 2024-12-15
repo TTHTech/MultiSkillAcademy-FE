@@ -57,10 +57,6 @@ const CourseCard = ({ course }) => {
                     Duration: {course.duration}
                 </p>
 
-                <p className="text-gray-600 text-sm mb-1">
-                    Price: ${course.price.toFixed(2)}
-                </p>
-
                 <p className="text-gray-500 text-xs mb-2">
                     Purchased on: {purchaseDate}
                 </p>
