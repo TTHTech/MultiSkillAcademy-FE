@@ -9,6 +9,7 @@ const CourseSidebar = ({
   handleLectureClick,
   calculateCompletedLectures,
   selectedLecture,
+  progressCourses,
 }) => {
   if (!course) {
     return <div>Loading...</div>;
@@ -19,6 +20,14 @@ const CourseSidebar = ({
   // Hàm xử lý khi người dùng nhấn vào phần (section)
   const handleSectionClick = (section) => {
     setSelectedSection(selectedSection === section ? null : section);
+  };
+
+  // Hàm xử lý khi nhấn vào "Nhận chứng chỉ"
+  const handleCertificateClick = () => {
+    const queryParams = new URLSearchParams({
+      courseName: course.title,
+    }).toString();
+    window.open(`/certificate?${queryParams}`, "_blank");
   };
 
   return (
@@ -49,7 +58,7 @@ const CourseSidebar = ({
       </div>
 
       {/* Danh sách các phần và bài học */}
-      <div>
+      <div className="relative">
         <h2 className="text-lg font-semibold text-gray-800">
           Các phần trong khóa học
         </h2>
@@ -121,6 +130,15 @@ const CourseSidebar = ({
             </div>
           ))}
         </div>
+
+        {progressCourses == 100 && (
+          <button
+            onClick={handleCertificateClick}
+            className="px-6 py-3 bg-blue-500 text-white font-bold rounded-lg shadow-lg hover:bg-blue-600 transition-all absolute right-4 mt-5"
+            >
+            Nhận chứng chỉ
+          </button>
+        )}
       </div>
     </div>
   );

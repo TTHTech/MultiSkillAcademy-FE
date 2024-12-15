@@ -163,6 +163,7 @@ const CourseViewer = () => {
         handleLectureClick={handleLectureClick}
         handleCheckboxChange={handleCheckboxChange}
         selectedLecture={selectedLecture}
+        progressCourses={progress}
         id={id} 
       />
       {/* MainContent hiển thị nội dung bài học */}
