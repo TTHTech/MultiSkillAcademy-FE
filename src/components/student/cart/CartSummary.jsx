@@ -72,7 +72,7 @@ const CartSummary = () => {
   }
 
   return (
-    <div className="max-w-xs mx-auto bg-white p-6 rounded-lg shadow-md lg:sticky lg:top-24">
+    <div className="max-w-xs mx-auto from-yellow-50 to-purple-100 p-6 rounded-lg shadow-md lg:sticky lg:top-24 ml-[100px]">
       <div className="text-lg font-bold mb-2 text-gray-900">Tổng:</div>
       <p className="text-3xl font-bold text-purple-700 mb-4">
         {totalAmount !== null ? `₫ ${totalAmount.toLocaleString()}` : "₫ 0"}

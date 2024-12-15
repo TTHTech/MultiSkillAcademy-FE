@@ -51,7 +51,7 @@ const CourseList = ({ categoryId, filter }) => {
   const totalPages = Math.ceil(filteredCourses().length / coursesPerPage);
 
   return (
-    <div className="flex flex-col space-y-6">
+    <div className="flex flex-col space-y-6 from-yellow-50 to-purple-100">
       {loading ? (
         <p>Đang tải...</p>
       ) : noCourses ? (

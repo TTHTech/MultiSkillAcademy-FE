@@ -15,7 +15,7 @@ import Footer from "../../../components/student/common/Footer";
 
 const StudentHomePage = () => {
   return (
-    <div className="w-full h-full min-h-screen bg-gray-50 overflow-y-auto">
+    <div className="w-full h-full min-h-screen bg-white overflow-y-auto">
       <TopBanner />
       <NavBar />
       <WelcomeSection />

@@ -58,7 +58,7 @@ const ChangePassword = () => {
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md max-w-lg mx-auto">
+    <div className="bg-white p-6 rounded-lg shadow-md max-w-lg mx-auto mt-[50px] mb-[50px]">
       <h2 className="text-2xl font-semibold text-gray-800 mb-6">Đổi Mật Khẩu</h2>
       {error && <p className="text-red-600 mb-4">{error}</p>}
 

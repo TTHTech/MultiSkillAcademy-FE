@@ -8,7 +8,7 @@ import RecommendedCoursesList from "../../../components/student/cart/Recommended
 
 const CartPage = () => {
   return (
-    <div className="w-full h-full min-h-screen bg-white overflow-y-auto">
+    <div className="w-full h-full min-h-screen bg-white overflow-y-auto mt-[100px]">
       <NavBar /> {/* Added NavBar at the top */}
       
       <div className="container mx-auto p-6 bg-white">
