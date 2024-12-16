@@ -94,7 +94,7 @@ const CourseFilter = ({ onFilter }) => {
               {rating === minRating.toString() ? <FaCheck className="mr-2" /> : <FaRegCheckCircle className="mr-2" />}
               <div className="flex items-center">
                 {renderStars(minRating)}
-                <span className={rating === minRating.toString() ? 'text-white' : 'text-blue-600'} className="ml-2 text-sm">
+                <span className={`ml-2 text-sm ${rating === minRating.toString() ? 'text-white' : 'text-blue-600'}`}>
                   {minRating} sao trở lên
                 </span>
               </div>

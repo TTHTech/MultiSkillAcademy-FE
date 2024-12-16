@@ -59,10 +59,10 @@ const CertificateGenerator = () => {
         style={{ backgroundImage: `url(${certificateBg})` }}
       >
         <div className="absolute left-16 top-48 flex flex-col justify-start items-start text-left text-black">
-          <h2 className="text-4xl font-serif italic font-bold mb-6">
+          <h2 className="text-3xl font-serif italic font-bold mb-6">
             {studentName}
           </h2>
-          <h3 className="text-2xl font-serif font-semibold mb-4">
+          <h3 className="text-4xl font-serif font-semibold mb-4">
             {courseName}
           </h3>
           <p className="text-lg font-sans font-light">

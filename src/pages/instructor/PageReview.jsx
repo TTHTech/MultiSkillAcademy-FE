@@ -71,7 +71,9 @@ const InstructorReviews = () => {
   const totalPages = Math.ceil(filteredReviews.length / reviewsPerPage);
 
   const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber);
+    if (pageNumber > 0 && pageNumber <= totalPages) {
+      setCurrentPage(pageNumber);
+    }
   };
 
   return (
@@ -200,19 +202,31 @@ const InstructorReviews = () => {
 
               {/* Phân trang */}
               <div className="flex justify-center items-center mt-4">
-                {Array.from({ length: totalPages }, (_, index) => (
-                  <button
-                    key={index}
-                    onClick={() => handlePageChange(index + 1)}
-                    className={`px-3 py-2 mx-1 rounded ${
-                      currentPage === index + 1
-                        ? "bg-blue-500 text-white"
-                        : "bg-gray-200 text-gray-700"
-                    } hover:bg-blue-600 transition`}
-                  >
-                    {index + 1}
-                  </button>
-                ))}
+                <button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className={`px-3 py-2 mx-1 rounded ${
+                    currentPage === 1
+                      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                      : "bg-gray-200 text-gray-700 hover:bg-blue-500 hover:text-white transition"
+                  }`}
+                >
+                  Trang trước
+                </button>
+                <span className="px-4 py-2 mx-2 text-gray-700">
+                  Trang {currentPage} / {totalPages}
+                </span>
+                <button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className={`px-3 py-2 mx-1 rounded ${
+                    currentPage === totalPages
+                      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                      : "bg-gray-200 text-gray-700 hover:bg-blue-500 hover:text-white transition"
+                  }`}
+                >
+                  Trang sau
+                </button>
               </div>
             </>
           )}
