@@ -3,7 +3,7 @@ import { Camera } from "lucide-react";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-toast.configure();
+// toast.configure();
 
 const CreateUserForm = () => {
   const [newUser, setNewUser] = useState({

@@ -14,7 +14,22 @@ const StudentList = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-
+  const [currentPage, setCurrentPage] = useState(1);
+  const studentsPerPage = 10;
+  const indexOfLastStudent = currentPage * studentsPerPage;
+  const indexOfFirstStudent = indexOfLastStudent - studentsPerPage;
+  const handlePageChange = (newPage) => {
+    if (
+      newPage > 0 &&
+      newPage <= Math.ceil(filteredStudents.length / studentsPerPage)
+    ) {
+      setCurrentPage(newPage);
+    }
+  };
+  const currentStudents = filteredStudents.slice(
+    indexOfFirstStudent,
+    indexOfLastStudent
+  );
   const handleEmailClick = (email) => {
     setSelectedStudentEmail(email);
     setIsModalOpen(true);
@@ -36,7 +51,7 @@ const StudentList = () => {
         {
           headers: {
             "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${localStorage.getItem("token")}`, 
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         }
       );
@@ -44,20 +59,18 @@ const StudentList = () => {
     } catch (error) {
       console.error("Error sending email:", error);
     } finally {
-      setIsLoading(false); 
+      setIsLoading(false);
       setIsModalOpen(false);
     }
   };
 
   useEffect(() => {
     axios
-      .get(`http://localhost:8080/api/instructor/students/${userId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      )
+      .get(`http://localhost:8080/api/instructor/students/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      })
       .then((response) => {
         setStudents(response.data);
       })
@@ -101,7 +114,10 @@ const StudentList = () => {
         <div className="mb-4">
           <select
             className="block appearance-none bg-white py-2 pl-3 pr-8 text-sm font-medium text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            onChange={(e) => setSelectedCourse(e.target.value)}
+            onChange={(e) => {
+              setSelectedCourse(e.target.value);
+              setCurrentPage(1);
+            }}
             value={selectedCourse}
           >
             <option value="">All Courses</option>
@@ -130,48 +146,78 @@ const StudentList = () => {
             </thead>
 
             <tbody>
-              {(filteredStudents.length > 0 ? filteredStudents : students).map(
-                (student, index) => (
-                  <tr
-                    key={student.studentId}
-                    className={`border-b ${
-                      index % 2 === 0 ? "bg-gray-50" : "bg-white"
-                    }`}
-                  >
-                    <td className="py-4 px-6">{index + 1}</td>
-                    <td className="py-4 px-6 font-medium">
-                      {student.firstName} {student.lastName}
-                    </td>
-                    <td className="py-4 px-6">
-                      <button onClick={() => handleEmailClick(student.email)}>
-                        {student.email}
-                      </button>
-                    </td>
-                    <td className="py-4 px-6">
-                      {student.phoneNumber || "N/A"}
-                    </td>
-                    <td className="py-4 px-6">{student.courseName}</td>
-                    <td className="py-4 px-6">
-                      {moment(student.enrolled_at).format("DD-MM-YYYY")}
-                    </td>
-                    <td className="py-4 px-6">
-                      <div className="w-full bg-gray-200 rounded-full h-4">
-                        <div
-                          className={`${getProgressColor(
-                            student.progress
-                          )} h-4 rounded-full`}
-                          style={{ width: `${student.progress}%` }}
-                        ></div>
-                      </div>
-                      <p className="text-sm text-gray-700 mt-1">
-                        {student.progress}%
-                      </p>
-                    </td>
-                  </tr>
-                )
-              )}
+              {currentStudents.map((student, index) => (
+                <tr
+                  key={student.studentId}
+                  className={`border-b ${
+                    index % 2 === 0 ? "bg-gray-50" : "bg-white"
+                  }`}
+                >
+                  <td className="py-4 px-6">
+                    {indexOfFirstStudent + index + 1}
+                  </td>
+                  <td className="py-4 px-6 font-medium">
+                    {student.firstName} {student.lastName}
+                  </td>
+                  <td className="py-4 px-6">
+                    <button onClick={() => handleEmailClick(student.email)}>
+                      {student.email}
+                    </button>
+                  </td>
+                  <td className="py-4 px-6">{student.phoneNumber || "N/A"}</td>
+                  <td className="py-4 px-6">{student.courseName}</td>
+                  <td className="py-4 px-6">
+                    {moment(student.enrolled_at).format("DD-MM-YYYY")}
+                  </td>
+                  <td className="py-4 px-6">
+                    <div className="w-full bg-gray-200 rounded-full h-4">
+                      <div
+                        className={`${getProgressColor(
+                          student.progress
+                        )} h-4 rounded-full`}
+                        style={{ width: `${student.progress}%` }}
+                      ></div>
+                    </div>
+                    <p className="text-sm text-gray-700 mt-1">
+                      {student.progress}%
+                    </p>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
+          <div className="flex justify-center items-center mt-4">
+            <button
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className={`px-4 py-2 mx-1 rounded-lg shadow-md border transition-all ${
+                currentPage === 1
+                  ? "bg-gray-300 text-gray-500 cursor-not-allowed border-gray-300"
+                  : "bg-gradient-to-r from-blue-500 to-blue-600 text-white border-blue-500 hover:from-blue-600 hover:to-blue-700 hover:shadow-lg"
+              }`}
+            >
+              Trang trước
+            </button>
+            <span className="px-4 py-2 mx-2 text-gray-700 font-medium">
+              Trang {currentPage} /{" "}
+              {Math.ceil(filteredStudents.length / studentsPerPage)}
+            </span>
+            <button
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={
+                currentPage ===
+                Math.ceil(filteredStudents.length / studentsPerPage)
+              }
+              className={`px-4 py-2 mx-1 rounded-lg shadow-md border transition-all ${
+                currentPage ===
+                Math.ceil(filteredStudents.length / studentsPerPage)
+                  ? "bg-gray-300 text-gray-500 cursor-not-allowed border-gray-300"
+                  : "bg-gradient-to-r from-green-500 to-green-600 text-white border-green-500 hover:from-green-600 hover:to-green-700 hover:shadow-lg"
+              }`}
+            >
+              Trang sau
+            </button>
+          </div>
         </div>
       </div>
 
