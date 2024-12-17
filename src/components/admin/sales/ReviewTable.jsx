@@ -13,7 +13,7 @@ const ReviewTable = () => {
   const [error, setError] = useState(null);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const reviewsPerPage = 5;
+  const reviewsPerPage = 10;
   const [totalPages, setTotalPages] = useState(1);
 
   const [courseFilter, setCourseFilter] = useState("");
