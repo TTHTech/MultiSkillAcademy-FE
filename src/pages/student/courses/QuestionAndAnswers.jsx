@@ -210,7 +210,7 @@ const QuestionsAndAnswers = ({ courseId }) => {
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto p-6 bg-gray-50">
+    <div className="w-full max-w-4xl mx-auto p-6 bg-gray-50 mb-[200px] mt-[100px]">
       <h1 className="text-3xl font-bold mb-6 text-center text-gray-800">
         Hỏi đáp thắc mắc học tập
       </h1>

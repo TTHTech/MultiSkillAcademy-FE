@@ -7,7 +7,7 @@ const CourseViewerPage = () => {
   const { id } = useParams(); // Lấy id khóa học từ URL
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen ">
       {/* Navbar */}
       <NavBar />
 

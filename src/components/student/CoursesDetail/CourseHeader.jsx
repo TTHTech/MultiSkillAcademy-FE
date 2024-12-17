@@ -3,7 +3,7 @@ import { FaStar, FaUser } from 'react-icons/fa';
 
 const CourseHeader = ({ title, description, instructor, rating, studentCount, lastUpdated }) => {
   return (
-    <div className="bg-gray-900 p-6 rounded-lg shadow-lg text-white">
+    <div className="bg-gray-900 p-6 rounded-lg shadow-lg text-white mt-[65px]">
       <h1 className="text-4xl font-extrabold mb-2 text-white hover:text-yellow-300 transition-all">{title}</h1>
       <p className="text-lg text-gray-300 mb-4 italic">{description}</p>
       

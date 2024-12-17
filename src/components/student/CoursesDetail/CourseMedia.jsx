@@ -102,7 +102,7 @@ const CourseMedia = ({
   };
 
   return (
-    <div className="bg-white p-6 rounded shadow-lg text-center max-w-xs w-full lg:sticky lg:top-24 lg:mr-4 z-10 border-2 border-red-500">
+    <div className="bg-white p-6 rounded shadow-lg text-center max-w-xs w-full lg:sticky lg:top-24 lg:mr-4 z-10 border-2 border-red-500 ml-[70px]">
       {/* Thumbnail */}
       <img src={thumbnail} alt="Preview" className="w-full mb-4 rounded-lg" />
 

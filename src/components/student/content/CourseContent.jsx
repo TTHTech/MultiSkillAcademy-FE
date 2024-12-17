@@ -36,9 +36,9 @@ const CourseContent = ({ selectedLecture, setSelectedLecture, courseId }) => {
   };
 
   return (
-    <div className="w-3/4 p-6 bg-white overflow-y-auto">
+    <div className="w-3/4 p-6 bg-white overflow-y-auto ">
       {/* Tab Navigation */}
-      <div className="flex border-b">
+      <div className="flex border-b mb-[100px]">
         <button
           onClick={() => setActiveTab(1)}
           className={`py-2 px-4 text-lg font-semibold ${activeTab === 1 ? 'border-b-2 border-blue-500' : 'text-gray-500'}`}
