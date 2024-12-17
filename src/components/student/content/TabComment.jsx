@@ -224,7 +224,7 @@ const TabComment = ({ courseId }) => {
         <div className="text-center mt-4">
           <button
             onClick={() => setShowAll(!showAll)}
-            className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition duration-200 ease-in-out"
+            className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition duration-200 ease-in-out mb-[100px] mt-[50px]"
           >
             {showAll ? "Ẩn bớt đánh giá" : "Hiện tất cả đánh giá"}
           </button>

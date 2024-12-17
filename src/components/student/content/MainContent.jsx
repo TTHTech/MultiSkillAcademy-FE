@@ -4,7 +4,7 @@ import QuestionsAndAnswers from "../../../pages/student/courses/QuestionAndAnswe
 import TabComment from "../../student/content/TabComment";
 import TabListTest from "./TabListTest";
 import Swal from "sweetalert2";
-
+import { FaClock, FaChartLine } from "react-icons/fa";
 const MainContent = ({
   selectedLecture,
   setSelectedLecture,
@@ -73,7 +73,6 @@ const MainContent = ({
       }
     }
   };
-
   // Gửi API để cập nhật tiến độ
   const updateProgressAPI = async (newProgress, currentTime) => {
     try {
@@ -98,26 +97,40 @@ const MainContent = ({
 
   // Kiểm tra khi người dùng tua video
   const handleSeeking = () => {
-    if (videoRef.current) {
-      const currentTime = videoRef.current.currentTime; // Thời gian hiện tại trong video
-      const duration = videoRef.current.duration;
+    if (videoRef.current && selectedLecture) {
+      const currentTime = videoRef.current.currentTime; // Thời gian hiện tại
+      const savedTime = restoreVideoProgress(selectedLecture.lecture_id) || 0; // Thời gian đã lưu
+      const duration = videoRef.current.duration; // Tổng thời lượng video
+      const lastTime = lastWatchedTime || savedTime; // Thời gian cuối cùng đã xem
+      const threshold = 5; // Ngưỡng sai lệch cho phép
 
-      // Nếu video chưa được hoàn thành, kiểm tra logic tua
+      // Trường hợp video chưa hoàn thành
       if (progress < 100) {
-        if (currentTime > lastWatchedTime + 0.5) {
-          videoRef.current.currentTime = lastWatchedTime; // Quay lại thời gian cuối cùng đã xem
+        // Chặn tua vượt qua lastWatchedTime
+        if (currentTime > lastTime + threshold) {
+          videoRef.current.currentTime = lastTime; // Quay lại vị trí đã xem
+          Swal.fire({
+            title: "Hãy cố lên!",
+            text: "Việc xem đầy đủ nội dung sẽ giúp bạn đạt kết quả tốt nhất và phát triển kỹ năng của mình!",
+            icon: "success",
+          });
+        }
+        // Chặn tua đến cuối video nếu chưa hoàn thành
+        else if (
+          currentTime >= duration - threshold &&
+          lastTime < duration - threshold
+        ) {
+          videoRef.current.currentTime = lastTime; // Quay lại vị trí đã xem
           Swal.fire({
             title: "Cảnh báo",
-            text: "Bạn không nên tua quá nhanh. Vui lòng xem đầy đủ nội dung để đảm bảo hiệu quả học tập.",
+            text: "Bạn không thể tua đến cuối video khi chưa hoàn thành nội dung.",
             icon: "warning",
           });
-        } else if (currentTime >= duration) {
-          videoRef.current.currentTime = lastWatchedTime; // Quay lại thời gian cuối cùng đã xem
-          Swal.fire({
-            title: "Cảnh báo",
-            text: "Bạn không thể tua qua phần chưa hoàn thành.",
-            icon: "warning",
-          });
+        }
+        // Cho phép tua trong phạm vi từ 0 đến lastWatchedTime
+        else {
+          saveVideoProgress(selectedLecture.lecture_id, currentTime); // Lưu tiến trình
+          setLastWatchedTime(Math.max(lastTime, currentTime)); // Cập nhật lastWatchedTime
         }
       }
     }
@@ -149,24 +162,103 @@ const MainContent = ({
       });
     }
   };
+  // Lưu thời gian xem vào localStorage
+  const saveVideoProgress = (lectureId, time) => {
+    localStorage.setItem(`video_progress_${id}_${lectureId}`, time);
+  };
+
+  // Khôi phục thời gian xem từ localStorage
+  const restoreVideoProgress = (lectureId) => {
+    const savedTime = localStorage.getItem(`video_progress_${id}_${lectureId}`);
+    return savedTime ? parseFloat(savedTime) : 0;
+  };
+  const saveCurrentLecture = (lectureId) => {
+    localStorage.setItem("current_lecture_id", lectureId);
+  };
+  const restoreCurrentLecture = () => {
+    return localStorage.getItem("current_lecture_id");
+  };
+  useEffect(() => {
+    if (selectedLecture) {
+      saveCurrentLecture(selectedLecture.lecture_id); // Lưu bài giảng hiện tại
+    }
+  }, [selectedLecture]);
+  useEffect(() => {
+    const savedLectureId = restoreCurrentLecture();
+
+    if (savedLectureId && lectures) {
+      const savedLecture = lectures.find(
+        (lecture) => lecture.lecture_id === parseInt(savedLectureId)
+      );
+
+      if (savedLecture) {
+        setSelectedLecture(savedLecture);
+      }
+    }
+  }, [lectures]);
+
+  // Hàm xử lý trạng thái video
+  const handleVideoState = (action, lectureId, time = 0) => {
+    switch (action) {
+      case "save":
+        saveVideoProgress(lectureId, time);
+        break;
+      case "restore":
+        return restoreVideoProgress(lectureId);
+      default:
+        console.error("Invalid action for handleVideoState");
+        break;
+    }
+  };
+  // Chuyển đổi giây sang dạng phút hoặc giây
+  const formatDuration = (duration) => {
+    if (!duration || isNaN(duration)) return "Đang tải..."; // Xử lý dữ liệu không hợp lệ
+    const minutes = Math.floor(duration / 60);
+    const seconds = duration % 60;
+
+    if (minutes > 0) {
+      return seconds > 0
+        ? `${minutes} phút ${seconds} giây`
+        : `${minutes} phút`;
+    }
+    return `${seconds} giây`;
+  };
 
   return (
-    <div className="w-full h-full p-6 bg-white overflow-y-auto flex flex-col">
+    <div
+      className="w-full h-full bg-white overflow-y-auto flex flex-col mt-[90px]"
+      style={{
+        scrollbarWidth: "none" /* Firefox */,
+        msOverflowStyle: "none" /* IE và Edge */,
+      }}
+    >
       {selectedLecture ? (
         <div className="flex flex-col flex-grow">
           <div className="flex flex-col flex-grow">
             {selectedLecture.content_type.toLowerCase() === "video" &&
               selectedLecture.video_url && (
-                <div className="aspect-w-16 aspect-h-9 mb-4">
+                <div className="w-full md:w-[1370px] md:h-[500px]  border-black rounded-lg shadow-lg">
                   <video
                     key={selectedLecture.lecture_id}
                     ref={videoRef}
                     controls
                     className="w-full h-full"
                     autoPlay
-                    onTimeUpdate={handleTimeUpdate} // Cập nhật tiến độ
+                    onLoadedMetadata={() => {
+                      const savedTime = handleVideoState(
+                        "restore",
+                        selectedLecture.lecture_id
+                      );
+                      if (videoRef.current && savedTime) {
+                        videoRef.current.currentTime = savedTime; // Đặt lại tiến trình đã xem
+                      }
+                    }}
                     onSeeking={handleSeeking} // Kiểm tra khi tua video
-                    onEnded={handleVideoEnd} // Xử lý khi video kết thúc
+                    onTimeUpdate={handleTimeUpdate} // Cập nhật tiến độ
+                    onEnded={() => {
+                      handleVideoState("save", selectedLecture.lecture_id, 0);
+                      handleVideoEnd();
+                    }}
                   >
                     <source src={selectedLecture.video_url} type="video/mp4" />
                     Trình duyệt của bạn không hỗ trợ video.
@@ -181,21 +273,27 @@ const MainContent = ({
                   title={selectedLecture.title}
                 />
               )}
-            <p className="text-gray-600 mt-2">
-              Thời lượng: {selectedLecture.duration} phút
+            <p className="flex items-center text-gray-600 mt-2 text-sm ml-[30px] mt-[30px]">
+              <FaClock className="mr-2 text-blue-500" />{" "}
+              {/* Biểu tượng thời lượng */}
+              <span className="font-semibold text-gray-700">Thời lượng:</span>
+              <span className="ml-1 text-gray-800">
+                {selectedLecture.duration}
+              </span>
             </p>
-            <p className="text-gray-600">Tiến độ: {Math.round(progress)}%</p>
-          </div>
 
-          <button
-            onClick={() => setSelectedLecture(null)}
-            className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-          >
-            Quay lại danh sách bài giảng
-          </button>
+            <p className="flex items-center text-gray-600 mt-1 text-sm ml-[30px] ">
+              <FaChartLine className="mr-2 text-green-500" />{" "}
+              {/* Biểu tượng tiến độ */}
+              <span className="font-semibold text-gray-700">Tiến độ:</span>
+              <span className="ml-1 text-gray-800">
+                {Math.round(progress)}%
+              </span>
+            </p>
+          </div>
         </div>
       ) : (
-        <div className="flex justify-center items-center h-full">
+        <div className="flex justify-center items-center h-full mt-[200px] mb-[200px]">
           <p className="text-gray-500">Vui lòng chọn một bài học để bắt đầu.</p>
         </div>
       )}
