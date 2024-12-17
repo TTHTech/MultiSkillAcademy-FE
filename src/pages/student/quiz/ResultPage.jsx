@@ -6,7 +6,7 @@ const ResultPage = () => {
   const { score, totalQuestions } = location.state;
 
   return (
-    <div className="flex flex-col items-center justify-center p-8 bg-white shadow-md rounded-lg max-w-4xl mx-auto">
+    <div className="flex flex-col items-center justify-center p-8 bg-white shadow-md rounded-lg max-w-4xl mx-auto mt-[100px]">
       <h2 className="text-4xl font-semibold mb-8">Kết quả thi</h2>
       <p className="text-xl mb-8 text-center">
         Bạn đã trả lời đúng {score}/{totalQuestions} câu hỏi.

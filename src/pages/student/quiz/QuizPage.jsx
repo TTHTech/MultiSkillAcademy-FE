@@ -122,7 +122,7 @@ const QuizPage = () => {
   if (!quizData) return <div>Không có dữ liệu bài kiểm tra</div>;
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen bg-gray-50 flex flex-col mt-[90px]">
       <NavBar />
 
       <div className="flex flex-1 justify-center p-8 flex-row-reverse">
