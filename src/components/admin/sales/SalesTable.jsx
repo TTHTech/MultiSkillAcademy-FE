@@ -227,10 +227,10 @@ const SalesTable = () => {
               <option value="">All Categories</option>
               <option value="Phát triển">Phát triển</option>
               <option value="Kinh doanh">Kinh doanh</option>
-              <option value="Tài chính & Kế toán">Tài chính & Kế toán</option>
-              <option value="CNTT & Phần mềm">CNTT & Phần mềm</option>
-              <option value="Năng suất văn phòng">Năng suất văn phòng</option>
-              <option value="Thiết kế đồ họa">Thiết kế đồ họa</option>
+              <option value="Tài chính & Kế toán">Tài chính</option>
+              <option value="CNTT & Phần mềm">CNTT </option>
+              <option value="Năng suất văn phòng">Văn phòng</option>
+              <option value="Thiết kế đồ họa">Đồ họa</option>
             </select>
 
             <select
@@ -254,7 +254,7 @@ const SalesTable = () => {
               }}
               className="bg-gray-700 text-white placeholder-gray-400 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="">Average Reviews</option>
+              <option value="">Avg Reviews</option>
               <option value="low">Low to High</option>
               <option value="high">High to Low</option>
             </select>
