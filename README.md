@@ -1,4 +1,4 @@
-# ✨ Admin Dashboard - ReactJS ✨
+# ✨ SMART LEARNING - ReactJS ✨
 
 ## 📆 **Website Bán Khóa Học**
 **Tên dự án**: Smart Learning
