@@ -898,7 +898,7 @@ const PageCourseDetail = () => {
                     className="block text-gray-700 mb-2"
                     htmlFor="duration"
                   >
-                    Duration (hours)
+                    Duration
                   </label>
                   <input
                     id="duration"
@@ -1453,7 +1453,7 @@ const PageCourseDetail = () => {
                           </a>
                         )}
                         <p className="text-gray-600">
-                          Duration: {lecture.duration} mins
+                          Duration: {lecture.duration} 
                         </p>
                         <div className="flex justify-end space-x-4 mt-2">
                           <button

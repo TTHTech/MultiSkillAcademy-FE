@@ -62,7 +62,15 @@ const CertificateGenerator = () => {
           <h2 className="text-3xl font-serif italic font-bold mb-6">
             {studentName}
           </h2>
-          <h3 className="text-4xl font-serif font-semibold mb-4">
+          <h3
+            className="text-4xl font-serif font-semibold mb-4"
+            style={{
+              maxWidth: "600px",
+              whiteSpace: "normal",
+              wordWrap: "break-word",
+              overflowWrap: "break-word",
+            }}
+          >
             {courseName}
           </h3>
           <p className="text-lg font-sans font-light">
