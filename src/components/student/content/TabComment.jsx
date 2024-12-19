@@ -109,7 +109,7 @@ const TabComment = ({ courseId }) => {
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-lg mt-4">
-      <h2 className="text-2xl font-bold text-gray-900 mb-4">Đánh giá</h2>
+
       {/* Add Review Form */}
       {showAddReview && (
       <div className="mt-6">

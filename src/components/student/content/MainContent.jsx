@@ -298,7 +298,7 @@ const MainContent = ({
         </div>
       )}
 
-      <div className="mt-6">
+      <div className="mt-4">
         <div className="flex border-b">
           <button
             onClick={() => setSelectedTab(0)}
@@ -332,22 +332,22 @@ const MainContent = ({
           </button>
         </div>
 
-        <div className="mt-4">
+        <div className="mt-2">
           {selectedTab === 0 && (
             <div>
-              <h3 className="text-xl font-semibold">Bình Luận</h3>
+              <h3 className="text-2xl font-semibold ml-8 mt-8">Bình Luận</h3>
               <TabComment courseId={id} />
             </div>
           )}
           {selectedTab === 1 && (
             <div>
-              <h3 className="text-xl font-semibold">Hỏi Đáp</h3>
+              <h3 className="text-2xl font-semibold ml-8 mt-8">Hỏi Đáp</h3>
               <QuestionsAndAnswers courseId={id} />
             </div>
           )}
           {selectedTab === 2 && (
             <div>
-              <h3 className="text-xl font-semibold">Bài Kiểm Tra</h3>
+              <h3 className="text-2xl font-semibold ml-8 mt-8">Bài Kiểm Tra</h3>
               <TabListTest content="Danh sách bài kiểm tra" />
             </div>
           )}

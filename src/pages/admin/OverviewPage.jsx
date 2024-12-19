@@ -27,10 +27,10 @@ const OverviewPage = () => {
           </div>
 
           {/* Đưa CategoryDistributionChart và CoursesDistributionChart vào cùng hàng */}
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-2">
             <CategoryDistributionChart />
           </div>
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-2">
             <CoursesDistributionChart />
           </div>
           <div className="lg:col-span-2">
