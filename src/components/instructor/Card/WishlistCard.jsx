@@ -1,4 +1,4 @@
-import { FaClock, FaDollarSign, FaStar, FaTrash } from "react-icons/fa";
+import { FaClock, FaStar, FaTrash } from "react-icons/fa";
 import axios from "axios";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
@@ -78,7 +78,7 @@ const WishlistCard = ({ course, onDelete }) => {
             <FaClock className="mr-1 text-sm" /> {course.duration}
           </div>
           <div className="flex items-center text-green-600 text-sm font-bold">
-            <FaDollarSign className="mr-1" /> {course.price.toFixed(2)}
+            {new Intl.NumberFormat("vi-VN").format(course.price)}
           </div>
         </div>
 

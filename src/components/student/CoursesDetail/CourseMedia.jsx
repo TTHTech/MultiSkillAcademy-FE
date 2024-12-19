@@ -107,7 +107,7 @@ const CourseMedia = ({
       <img src={thumbnail} alt="Preview" className="w-full mb-4 rounded-lg" />
 
       {/* Price */}
-      <div className="text-3xl font-bold text-gray-800 mb-4">đ {price}</div>
+      <div className="text-3xl font-bold text-gray-800 mb-4">đ {new Intl.NumberFormat("vi-VN").format(price)}</div>
 
       {/* Add to Cart Button and Heart Icon */}
       <div className="flex items-center justify-between mb-4">
