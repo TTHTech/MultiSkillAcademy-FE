@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Search, Camera } from "lucide-react";
 
 // Hằng số số lượng item trên mỗi trang
-const ITEMS_PER_PAGE = 6;
+const ITEMS_PER_PAGE = 10;
 
 // Hàm tạo màu ngẫu nhiên cho avatar
 const getRandomColor = () => {
@@ -95,17 +95,32 @@ const InstructorsTable = () => {
                         Authorization: `Bearer ${token}`,
                     },
                 });
+    
+                // Kiểm tra xem API có trả về kết quả thành công hay không
                 if (!response.ok) {
                     throw new Error('Failed to delete instructor');
                 }
+    
+                // Cập nhật lại danh sách giảng viên sau khi xóa
                 const updatedInstructors = instructors.filter((instructor) => instructor.id !== instructorId);
                 setInstructors(updatedInstructors);
                 setFilteredInstructors(updatedInstructors);
+    
+                // Nếu bạn cần cập nhật trạng thái "active" sau khi xóa, thực hiện tại đây
+                // Ví dụ: Cập nhật lại danh sách giảng viên mà không xóa trạng thái "active"
+                setFilteredInstructors((prevInstructors) => 
+                    prevInstructors.map((instructor) => ({
+                        ...instructor,
+                        active: instructor.id === instructorId ? false : instructor.active
+                    }))
+                );
+                
             } catch (error) {
-                console.error(error);
+                console.error("Error deleting instructor:", error);
             }
         }
     };
+    
 
     // Xử lý lưu thông tin sau khi chỉnh sửa
     const handleSave = async () => {

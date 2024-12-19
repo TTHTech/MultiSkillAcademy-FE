@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Search, Camera } from "lucide-react";
 
-const ITEMS_PER_PAGE = 6;
+const ITEMS_PER_PAGE = 10;
 
 // Hàm tạo màu ngẫu nhiên cho avatar
 const getRandomColor = () => {
@@ -86,26 +86,38 @@ const UsersTable = () => {
         const confirmed = window.confirm("Are you sure you want to delete this user?");
         if (confirmed) {
             try {
-                const token = localStorage.getItem("token"); // Lấy token từ localStorage
+                const token = localStorage.getItem("token");
                 const response = await fetch(`http://localhost:8080/api/admin/students/${userId}`, {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json',
-                        Authorization: `Bearer ${token}`, // Sử dụng token từ localStorage
+                        Authorization: `Bearer ${token}`,
                     },
                 });
+    
                 if (!response.ok) {
                     throw new Error('Failed to delete user');
                 }
+    
+                // Cập nhật lại danh sách người dùng sau khi xóa
                 const updatedUsers = users.filter((user) => user.id !== userId);
                 setUsers(updatedUsers);
                 setFilteredUsers(updatedUsers);
+                
+                // Cập nhật lại trạng thái "active" nếu cần thiết
+                // Ví dụ: nếu có trường hợp nào người dùng bị xóa nhưng chưa được cập nhật trạng thái đúng
+                setFilteredUsers((prevUsers) => 
+                    prevUsers.map((user) => ({
+                        ...user,
+                        active: user.id === userId ? false : user.active
+                    }))
+                );
             } catch (error) {
                 console.error(error);
             }
         }
     };
-
+    
     // Xử lý lưu thông tin sau khi chỉnh sửa
     const handleSave = async () => {
         const formData = new FormData();
@@ -205,7 +217,7 @@ const UsersTable = () => {
             transition={{ delay: 0.2 }}
         >
             <div className='flex justify-between items-center mb-6'>
-                <h2 className='text-xl font-semibold text-gray-100'>Users</h2>
+                <h2 className='text-xl font-semibold text-gray-100'>Students</h2>
                 <div className='relative'>
                     <input
                         type='text'
