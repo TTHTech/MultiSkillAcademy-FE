@@ -102,7 +102,7 @@ const CourseDetails = () => {
 
   return (
     <div className="w-full mx-auto p-8 bg-gray-100 shadow-lg rounded-lg">
-      <h1 className="text-5xl font-medium text-center text-blue-700 mb-10">
+      <h1 className="text-3xl font-bold text-blue-600 mb-6 text-center">
         Detailed Description Information
       </h1>
       {[

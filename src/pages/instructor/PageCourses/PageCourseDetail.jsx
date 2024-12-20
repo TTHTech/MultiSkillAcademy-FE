@@ -16,6 +16,7 @@ import axios from "axios";
 import moment from "moment";
 import Swal from "sweetalert2";
 import CourseDetails from "./EditableList";
+import LecturesFree from "../../../components/instructor/LecturesFree/LecturesFree"
 const PageCourseDetail = () => {
   const [open, setOpen] = useState(true);
   const { id } = useParams();
@@ -1000,8 +1001,12 @@ const PageCourseDetail = () => {
         <div className="mb-4">
           <CourseDetails />
         </div>
+        <div className="mb-4">
+          <LecturesFree courseId={id}/>
+        </div>
+        
         <div className="bg-white shadow-md rounded-lg p-6">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+          <h2 className="text-3xl font-bold text-blue-600 mb-6 text-center">
             Sections & Lectures
           </h2>
 
