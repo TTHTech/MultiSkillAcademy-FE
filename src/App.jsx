@@ -118,6 +118,7 @@ function App() {
           <Route path="/student/quiz/:id" element={<QuizPage />} />
           <Route path="/certificate" element={<CertificateGenerator />} />
           <Route path="/search" element={<SearchCoursePage />} />
+          <Route path="/course/:courseId" element={<CourseDetailPage />} />
           {/* Các route cho admin */}
           {isLoggedIn && role === "ROLE_ADMIN" && (
             <>
@@ -141,7 +142,7 @@ function App() {
               <Route path="/student/home" element={<StudentHomePage />} />
               <Route path="/student/cart" element={<CartPage />} />
               <Route path="/student/list-my-course" element={<MyCoursesPage />} />
-              <Route path="/course/:courseId" element={<CourseDetailPage />} />
+             
               <Route path="/student/profile" element={<ProfilePage />} />
               <Route path="/category/:categoryId" element={<CategoryStudentPage />} />
               <Route path="/student/study/:progress/:id" element={<CourseViewerPage />} />

@@ -25,25 +25,24 @@ const CourseDetailPage = () => {
   useEffect(() => {
     const fetchCourseDetails = async () => {
       try {
-        // Lấy thông tin khóa học
         const courseResponse = await axios.get(
           `http://localhost:8080/api/student/courses/${courseId}`
         );
         setCourseData(courseResponse.data);
+
         const studentResponse = await axios.get(
           `http://localhost:8080/api/student/number-student/${courseId}`
         );
         setStudent(studentResponse.data);
+
         const instructorDetailResponse = await axios.get(
           `http://localhost:8080/api/student/number-detail/${courseId}`
         );
         setInstructorDetail(instructorDetailResponse.data);
-        // Lấy reviews của khóa học
+
         const reviewsResponse = await axios.get(
           `http://localhost:8080/api/student/reviews/${courseId}`
         );
-
-        console.log("Reviews Response: ", reviewsResponse.data); // Thêm log để kiểm tra dữ liệu trả về
         setReviews(reviewsResponse.data);
       } catch (error) {
         console.error("Failed to fetch course details or reviews", error);
@@ -78,11 +77,11 @@ const CourseDetailPage = () => {
   if (!courseData) return <p>Không tìm thấy khóa học.</p>;
 
   return (
-    <div className="w-full h-full min-h-screen bg-gray-100 overflow-y-auto mt-[30px] ">
+    <div className="w-full h-full min-h-screen bg-gray-100 overflow-y-auto mt-[30px] ml-[20px]">
       <NavBar />
-      <div className="container mx-auto px-8 py-8 lg:flex lg:gap-8 lg:pr-16">
+      <div className="container mx-auto max-w-[1600px] px-8 py-8 lg:flex lg:gap-8 lg:pr-16">
+        {/* Nội dung bên trái */}
         <div className="lg:w-3/4 overflow-auto">
-          {/* Nội dung khóa học */}
           <CourseHeader
             title={courseData.title}
             description={courseData.description}
@@ -115,14 +114,23 @@ const CourseDetailPage = () => {
           />
           <CourseReviews reviews={reviews || []} />
         </div>
-        <div className="lg:w-1/4 lg:sticky lg:top-24 lg:mr-4 z-10">
-          <CourseMedia
-            price={courseData.price}
-            thumbnail={courseData.imageUrls?.[0] || "default-image-url.jpg"}
-            onAddToCart={handleAddToCart}
-            onBuyNow={() => alert("Mua ngay")}
-            resourceDescription={courseData.resourceDescription || []}
-          />
+
+        {/* Nội dung bên phải */}
+        <div className="lg:w-1/4">
+          <div
+            className="sticky top-24"
+            style={{
+              height: "fit-content", // Đảm bảo chiều cao phù hợp
+            }}
+          >
+            <CourseMedia
+              price={courseData.price}
+              thumbnail={courseData.imageUrls?.[0] || "default-image-url.jpg"}
+              onAddToCart={handleAddToCart}
+              onBuyNow={() => alert("Mua ngay")}
+              resourceDescription={courseData.resourceDescription || []}
+            />
+          </div>
         </div>
       </div>
       <Footer />
