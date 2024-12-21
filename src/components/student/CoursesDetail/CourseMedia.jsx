@@ -3,134 +3,154 @@ import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
+import ListLectureFree from "./ListLectureFree";
+
 const CourseMedia = ({
   price,
-  thumbnail,
+  thumbnail = "default-thumbnail.jpg", // Fallback cho thumbnail
   onAddToCart,
   onBuyNow,
-  resourceDescription,
+  resourceDescription = [],
 }) => {
-  const userId = Number(localStorage.getItem("userId")); // Lấy userId từ localStorage
-  const { courseId } = useParams(); // Course ID từ URL
-  const [error, setError] = useState(null); // Quản lý lỗi khi thêm vào wishlist
+  const userId = Number(localStorage.getItem("userId"));
+  const { courseId } = useParams();
+  const [error, setError] = useState(null);
   const [checkCart, setCheckCart] = useState(false);
   const [checkFavorite, setCheckFavorite] = useState(false);
   const [checkOnStudy, setCheckOnStudy] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
+  const [lectures, setLectures] = useState([]);
   const navigate = useNavigate();
+
   useEffect(() => {
-    // Hàm gọi API kiểm tra giỏ hàng
-    const checkCartStatus = async () => {
+    const fetchStatusesAndLectures = async () => {
       try {
-        const response = await axios.get(
-          `http://localhost:8080/api/student/cart/check/${userId}/${courseId}`
-        );
-        setCheckCart(response.data); // Lưu kết quả true/false
-      } catch (error) {
-        console.error("Error checking cart:", error);
+        const [cartResponse, favoriteResponse, studyResponse, lecturesResponse] =
+          await Promise.all([
+            axios.get(
+              `http://localhost:8080/api/student/cart/check/${userId}/${courseId}`
+            ),
+            axios.get(
+              `http://localhost:8080/api/student/wishlist/check/${userId}/${courseId}`
+            ),
+            axios.get(
+              `http://localhost:8080/api/student/enrollments/check/${userId}/${courseId}`
+            ),
+            axios.get(
+              `http://localhost:8080/api/student/lectures/${courseId}`
+            ),
+          ]);
+
+        setCheckCart(cartResponse.data);
+        setCheckFavorite(favoriteResponse.data);
+        setCheckOnStudy(studyResponse.data);
+        setLectures(lecturesResponse.data);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+        setError("Không thể tải dữ liệu, vui lòng thử lại sau.");
       }
     };
 
-    // Hàm gọi API kiểm tra danh sách yêu thích
-    const checkFavoriteStatus = async () => {
-      try {
-        const response = await axios.get(
-          `http://localhost:8080/api/student/wishlist/check/${userId}/${courseId}`
-        );
-        setCheckFavorite(response.data); // Lưu kết quả true/false
-      } catch (error) {
-        console.error("Error checking wishlist:", error);
-      }
-    };
+    if (userId && courseId) {
+      fetchStatusesAndLectures();
+    } else {
+      setError("Không tìm thấy mã người dùng hoặc mã khóa học.");
+    }
+  }, [userId, courseId]);
 
-    // Hàm gọi API kiểm tra danh sách đã đăng ký
-    const checkOnStudyStatus = async () => {
-      try {
-        const response = await axios.get(
-          `http://localhost:8080/api/student/enrollments/check/${userId}/${courseId}`
-        );
-        setCheckOnStudy(response.data); // Lưu kết quả true/false
-      } catch (error) {
-        console.error("Error checking enrollments:", error);
-      }
-    };
-
-    // Gọi cả ba API khi component được render
-    checkCartStatus();
-    checkFavoriteStatus();
-    checkOnStudyStatus();
-  }, [userId, courseId]); // Chỉ chạy khi studentId hoặc courseId thay đổi
-  const onGoToCart = () => {
-    navigate(`/student/cart`);
-  };
-  const onStartLearning = () => {
-    navigate(`/student/list-my-course`);
-  };
-  // Hàm thay đổi trạng thái yêu thích và gửi yêu cầu đến API
   const handleFavoriteToggle = async () => {
-    setCheckFavorite(!checkFavorite); // Đảo trạng thái yêu thích
-    // Gửi request đến API để thêm vào wishlist
+    setCheckFavorite(!checkFavorite);
+
     const requestData = {
-      userId: userId,
-      courseId: courseId,
-      createdAt: new Date(), // Thời gian tạo wishlist
+      userId,
+      courseId,
+      createdAt: new Date(),
     };
 
     try {
-      const response = await fetch(
+      const response = await axios.post(
         "http://localhost:8080/api/student/add-wishlist",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(requestData),
-        }
+        requestData
       );
 
-      if (response.ok) {
-        if (checkFavorite) {
-          toast.success("Xóa khỏi Wishlist thành công");
-        } else {
-          toast.success("Thêm vào Wishlist thành công");
-        }
+      if (response.status === 200) {
+        toast.success(
+          checkFavorite
+            ? "Xóa khỏi Wishlist thành công"
+            : "Thêm vào Wishlist thành công"
+        );
       } else {
-        throw new Error("Đã xảy ra lỗi khi thêm vào wishlist");
+        throw new Error("Không thể cập nhật danh sách yêu thích.");
       }
     } catch (err) {
-      toast.error("Thực hiện thất bại");
+      console.error("Error updating wishlist:", err);
+      toast.error("Thực hiện thất bại.");
     }
   };
 
-  return (
-    <div className="bg-white p-6 rounded shadow-lg text-center max-w-xs w-full lg:sticky lg:top-24 lg:mr-4 z-10 border-2 border-red-500 ml-[70px]">
-      {/* Thumbnail */}
-      <img src={thumbnail} alt="Preview" className="w-full mb-4 rounded-lg" />
+  const onGoToCart = () => {
+    navigate(`/student/cart`);
+  };
 
-      {/* Price */}
-      <div className="text-3xl font-bold text-gray-800 mb-4">đ {new Intl.NumberFormat("vi-VN").format(price)}</div>
+  const onStartLearning = () => {
+    navigate(`/student/list-my-course`);
+  };
+
+  return (
+    <div
+      className="bg-white p-6 rounded shadow-lg text-center max-w-[500px] w-full border-2 border-red-500"
+      style={{
+        position: "sticky",
+        top: "100px", // Cố định tại vị trí cách đầu trang 100px khi cuộn
+      }}
+    >
+      {/* Thumbnail */}
+      <img
+        src={thumbnail}
+        alt="Preview"
+        className="w-full h-auto mb-4 rounded-lg"
+      />
+
+      {/* Nút xem trước bài giảng */}
+      <button
+        onClick={() => setShowPreview(true)}
+        className="text-blue-500 underline mb-4 text-sm hover:text-blue-700"
+      >
+        Xem trước khóa học
+      </button>
+
+      {/* Modal danh sách bài giảng miễn phí */}
+      {showPreview && (
+        <ListLectureFree
+          onClose={() => setShowPreview(false)}
+          lectures={lectures}
+        />
+      )}
+
+      {/* Giá tiền */}
+      <div className="text-3xl font-bold text-gray-800 mb-4">
+        đ {new Intl.NumberFormat("vi-VN").format(price || 0)}
+      </div>
 
       {/* Add to Cart Button and Heart Icon */}
       <div className="flex items-center justify-between mb-4">
-        {/* Nếu đã đăng ký học */}
         {checkOnStudy ? (
           <button
-            onClick={onStartLearning} // Gọi hàm khi người dùng nhấn "Học ngay"
+            onClick={onStartLearning}
             className="bg-blue-600 text-white py-2 px-4 rounded-lg font-semibold text-lg w-full hover:bg-blue-700"
           >
             Học ngay
           </button>
         ) : (
           <>
-            {/* Nếu có trong giỏ hàng */}
             {checkCart ? (
               <button
-                onClick={onGoToCart} // Gọi hàm để chuyển đến giỏ hàng
+                onClick={onGoToCart}
                 className="bg-green-600 text-white py-2 px-4 rounded-lg font-semibold text-lg w-full mr-2 hover:bg-green-700"
               >
                 Chuyển đến giỏ hàng
               </button>
             ) : (
-              // Nếu không có trong giỏ hàng, hiển thị nút Thêm vào giỏ hàng
               <button
                 onClick={onAddToCart}
                 className="bg-purple-600 text-white py-2 px-4 rounded-lg font-semibold text-lg w-full mr-2 hover:bg-purple-700"
@@ -139,7 +159,6 @@ const CourseMedia = ({
               </button>
             )}
 
-            {/* Biểu tượng trái tim (danh sách yêu thích) */}
             <div
               onClick={handleFavoriteToggle}
               className="cursor-pointer w-10 h-10 flex items-center justify-center border-2 border-gray-600 rounded-lg bg-white"
@@ -154,11 +173,11 @@ const CourseMedia = ({
         )}
       </div>
 
-      {/* Course Details */}
+      {/* Chi tiết khóa học */}
       <div className="text-left text-gray-700">
         <p className="font-semibold mb-2">Khóa học này bao gồm:</p>
         <ul className="space-y-1 mb-4 text-sm">
-          {resourceDescription && resourceDescription.length > 0 ? (
+          {resourceDescription.length > 0 ? (
             resourceDescription.map((item, index) => (
               <li key={index} className="text-gray-600">
                 ✅ {item}
@@ -170,7 +189,6 @@ const CourseMedia = ({
         </ul>
       </div>
 
-      {/* Error Message */}
       {error && <p className="text-red-500 text-sm">{error}</p>}
     </div>
   );
