@@ -100,7 +100,7 @@ const Dashboard = () => {
 
         <CardDataStats
           title="Total Money"
-          total={`$${salesData.totalSales.toLocaleString()}`}
+          total={`${salesData.totalSales.toLocaleString()} VND`}
         >
           <FaDollarSign className="text-primary dark:text-white" size={22} />
         </CardDataStats>
