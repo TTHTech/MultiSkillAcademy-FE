@@ -71,6 +71,9 @@ const CartItems = () => {
 
       // Thông báo thành công
       toast.success("Khóa học đã được xóa khỏi giỏ hàng!");
+      setTimeout(function() {
+        window.location.reload();
+    }, 2000);
     } catch (err) {
       console.error(err);
       setError("Có lỗi xảy ra khi xóa khóa học.");
@@ -91,10 +94,12 @@ const CartItems = () => {
           },
         }
       );
-
       // Cập nhật UI sau khi chuyển thành công
       setCartItems(cartItems.filter((item) => item.courseId !== courseId));
       toast.success(response.data); // Thông báo từ backend
+      setTimeout(function() {
+        window.location.reload();
+    }, 2000);
     } catch (err) {
       console.error(err);
 

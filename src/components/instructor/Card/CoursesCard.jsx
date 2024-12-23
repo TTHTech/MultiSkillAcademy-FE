@@ -336,11 +336,10 @@ const CourseCard = ({
 
         <div className="mt-3 flex items-center">
           <div className="text-lg font-semibold text-indigo-700">
-            {price ? `${price} VND` : "Price not available"}
+            {price ? `${new Intl.NumberFormat("vi-VN").format(price)} VND` : "Price not available"}
           </div>
         </div>
       </div>
-
       {showDetails && (
         <div
           className={`absolute inset-0 border border-gray-300 shadow-xl p-6 flex flex-col justify-between z-20 opacity-95 transition-opacity duration-300 ease-in-out rounded-lg 
@@ -370,7 +369,7 @@ const CourseCard = ({
               <FaStar color="#FFD700" className="text-xs" />
             </div>
             <p className="text-gray-600 text-lg font-semibold">
-              Price: {price ? `${price} VND` : "Price not available"}
+              Price: {price ? `${new Intl.NumberFormat("vi-VN").format(price)} VND` : "Price not available"}
             </p>
           </div>
           {renderButtons()}

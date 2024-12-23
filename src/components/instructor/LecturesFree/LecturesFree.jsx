@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import Swal from "sweetalert2";
 
 const LecturesFreeComponent = ({ courseId }) => {
   const [lectures, setLectures] = useState([]);
@@ -54,7 +55,17 @@ const LecturesFreeComponent = ({ courseId }) => {
       alert("Please fill in all fields");
       return;
     }
-
+    const swalResult = await Swal.fire({
+      title: "Confirmation",
+      text: "Bạn có chắc chắn muốn tạo bài học này ?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Yes",
+      cancelButtonText: "No",
+    });
+    if (swalResult.isDismissed) {
+      return;
+    }
     try {
       const response = await axios.post(
         `http://localhost:8080/api/instructor/lectures-free`,
@@ -71,6 +82,12 @@ const LecturesFreeComponent = ({ courseId }) => {
       setLectures([...lectures, response.data]);
       setNewLecture({ title: "", videoUrl: "" });
       setIsAdding(false); // Đóng form thêm
+      await Swal.fire({
+        title: "Confirmation",
+        text: "Thêm bài học thành công",
+        icon: "success",
+        confirmButtonText: "Yes",
+      });
     } catch (error) {
       console.error("Error adding lecture:", error);
     }
@@ -82,7 +99,17 @@ const LecturesFreeComponent = ({ courseId }) => {
       alert("Please fill in all fields");
       return;
     }
-
+    const swalResult = await Swal.fire({
+      title: "Confirmation",
+      text: "Bạn có chắc chắn muốn lưu bài học này ?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Yes",
+      cancelButtonText: "No",
+    });
+    if (swalResult.isDismissed) {
+      return;
+    }
     try {
       const response = await axios.put(
         `http://localhost:8080/api/instructor/lectures-free`,
@@ -99,6 +126,12 @@ const LecturesFreeComponent = ({ courseId }) => {
         )
       );
       setEditLecture(null); // Thoát chế độ chỉnh sửa
+      await Swal.fire({
+        title: "Confirmation",
+        text: "Sửa bài học thành công",
+        icon: "success",
+        confirmButtonText: "Yes",
+      });
     } catch (error) {
       console.error("Error updating lecture:", error);
     }
@@ -106,6 +139,17 @@ const LecturesFreeComponent = ({ courseId }) => {
 
   // Delete a lecture
   const handleDeleteLecture = async (id) => {
+    const swalResult = await Swal.fire({
+      title: "Confirmation",
+      text: "Bạn có chắc chắn muốn xóa bài học này ?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Yes",
+      cancelButtonText: "No",
+    });
+    if (swalResult.isDismissed) {
+      return;
+    }
     try {
       await axios.delete(
         `http://localhost:8080/api/instructor/lectures-free/${id}`,
@@ -116,6 +160,12 @@ const LecturesFreeComponent = ({ courseId }) => {
         }
       );
       setLectures(lectures.filter((lecture) => lecture.id !== id));
+      await Swal.fire({
+        title: "Confirmation",
+        text: "Xóa bài học thành công",
+        icon: "success",
+        confirmButtonText: "Yes",
+      });
     } catch (error) {
       console.error("Error deleting lecture:", error);
     }
@@ -259,9 +309,9 @@ const LecturesFreeComponent = ({ courseId }) => {
                   Watch Video
                 </a>
               </div>
-              <div className="mt-4 sm:mt-0 sm:ml-4 flex space-x-2">
+              <div className="mt-4 sm:mt-0 sm:ml-4 flex space-x-4">
                 <button
-                  className="bg-yellow-500 text-white px-4 py-2 rounded-md hover:bg-yellow-600"
+                  className="bg-yellow-400 text-white px-6 py-3 rounded-md hover:bg-yellow-500 transition-all duration-300 ease-in-out transform hover:scale-105"
                   onClick={() => {
                     setEditLecture(lecture);
                     setIsAdding(false);
@@ -270,8 +320,9 @@ const LecturesFreeComponent = ({ courseId }) => {
                   Edit
                 </button>
                 <button
-                  className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600"
-                  onClick={() => {handleDeleteLecture(lecture.id);
+                  className="bg-red-500 text-white px-6 py-3 rounded-md hover:bg-red-600 transition-all duration-300 ease-in-out transform hover:scale-105"
+                  onClick={() => {
+                    handleDeleteLecture(lecture.id);
                     setIsAdding(false);
                     setEditLecture(null);
                   }}
