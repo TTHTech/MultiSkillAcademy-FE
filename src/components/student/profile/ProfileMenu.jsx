@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const DEFAULT_PROFILE_IMAGE =
   "https://cdn3.vectorstock.com/i/1000x1000/51/87/student-avatar-user-profile-icon-vector-47025187.jpg"; // Default profile image if none is provided
@@ -10,7 +11,7 @@ const ProfileMenu = () => {
   const [profileImage, setProfileImage] = useState(DEFAULT_PROFILE_IMAGE);
   const [userName, setUserName] = useState("User");
   const [userEmail, setUserEmail] = useState("");
-
+  const navigate = useNavigate();
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
@@ -63,7 +64,9 @@ const ProfileMenu = () => {
       setIsMenuOpen(false);
     }, 300); // Adding a slight delay before closing the menu
   };
-
+  const clickCart = () => {
+    navigate("/student/cart");
+  };
   return (
     <div
       className="relative"
@@ -110,36 +113,39 @@ const ProfileMenu = () => {
 
           {/* Menu Items */}
           <Link
-            to="/study"
+            to="/student/list-my-course"
             className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
           >
             Học tập
           </Link>
-          <div className="relative block px-4 py-2 text-gray-700 hover:bg-gray-100 flex items-center">
+          <div
+            className="relative block px-4 py-2 text-gray-700 hover:bg-gray-100 flex items-center"
+            onClick={clickCart}
+          >
             <span>Giỏ hàng của tôi</span>
             <span className="ml-auto bg-purple-600 text-white text-xs font-semibold rounded-full px-2 py-0.5">
               1
             </span>
           </div>
           <Link
-            to="/wishlist"
+            to="/student/wishlist"
             className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
           >
             Mong muốn
           </Link>
 
-          <Link
+          {/* <Link
             to="/notifications"
             className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
           >
             Thông báo
-          </Link>
-          <Link
+          </Link> */}
+          {/* <Link
             to="/messages"
             className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
           >
             Tin nhắn
-          </Link>
+          </Link> */}
 
           <hr className="my-2" />
 
@@ -153,23 +159,23 @@ const ProfileMenu = () => {
             </span>
           </div>
           <Link
-            to="/public-profile"
+            to="/student/profile"
             className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
           >
             Hồ sơ công khai
           </Link>
           <Link
-            to="/edit-profile"
+            to="/student/profile"
             className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
           >
             Chỉnh sửa hồ sơ
           </Link>
-          <Link
+          {/* <Link
             to="/help"
             className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
           >
             Trợ giúp và Hỗ trợ
-          </Link>
+          </Link> */}
 
           <hr className="my-2" />
 
