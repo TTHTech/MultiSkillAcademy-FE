@@ -43,46 +43,40 @@ const WishlistCard = ({ course, onDelete }) => {
   };
   return (
     <div
-      className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-transform hover:scale-105 duration-300 w-64"
+      className="bg-white rounded-lg shadow-lg hover:shadow-xl transition-all transform hover:scale-105 duration-300"
       onClick={handleCardClick}
     >
-      {/* Phần hình ảnh và tiêu đề */}
-      <div className="relative h-40 overflow-hidden">
+      {/* Hình ảnh và tiêu đề */}
+      <div className="relative h-[14rem] overflow-hidden">
         <img
           src={course.images[0]}
           alt={course.title}
           className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
         />
-        {/* Hiệu ứng gradient che phần dưới */}
         <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent opacity-80"></div>
-        {/* Tiêu đề khóa học */}
         <h2 className="absolute bottom-3 left-3 text-white text-base font-semibold line-clamp-2">
           {course.title}
         </h2>
-        {/* Đánh giá */}
-        <span className="absolute top-2 right-2 bg-yellow-500 text-white px-2 py-1 text-xs font-semibold rounded-full flex items-center shadow-sm">
+        <span className="absolute top-2 right-2 bg-yellow-500 text-white px-2 py-1 text-xs font-semibold rounded-full shadow-md flex items-center">
           <FaStar className="mr-1 text-white" /> {course.rating} ★
         </span>
       </div>
 
-      {/* Nội dung chi tiết khóa học */}
-      <div className="p-4">
-        {/* Mô tả ngắn */}
-        <p className="text-gray-600 text-xs mb-3 line-clamp-2">
+      {/* Nội dung */}
+      <div className="p-5">
+        <p className="text-gray-600 text-sm mb-3 line-clamp-2">
           {course.description}
         </p>
 
-        {/* Thông tin thời lượng và giá */}
         <div className="flex items-center justify-between text-gray-700 mb-4">
-          <div className="flex items-center text-blue-600 text-xs font-medium">
+          <div className="flex items-center text-blue-600 text-sm font-medium">
             <FaClock className="mr-1 text-sm" /> {course.duration}
           </div>
-          <div className="flex items-center text-green-600 text-sm font-bold">
-            {new Intl.NumberFormat("vi-VN").format(course.price)}
+          <div className="flex items-center text-green-600 text-base font-bold">
+            {new Intl.NumberFormat("vi-VN").format(course.price)}₫
           </div>
         </div>
 
-        {/* Nút Xóa */}
         <button
           className="w-full bg-red-500 text-white py-2 rounded-md font-medium hover:bg-red-600 transition-colors duration-200 flex items-center justify-center shadow-sm"
           onClick={handleDelete}
