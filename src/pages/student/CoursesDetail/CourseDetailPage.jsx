@@ -77,7 +77,7 @@ const CourseDetailPage = () => {
   if (!courseData) return <p>Không tìm thấy khóa học.</p>;
 
   return (
-    <div className="w-full h-full min-h-screen bg-gray-100 overflow-y-auto mt-[30px] ml-[20px]">
+    <div className="w-full h-full min-h-screen bg-gray-100 overflow-y-auto mt-[30px] ">
       <NavBar />
       <div className="container mx-auto max-w-[1600px] px-8 py-8 lg:flex lg:gap-8 lg:pr-16">
         {/* Nội dung bên trái */}
