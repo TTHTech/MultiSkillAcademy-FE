@@ -4,10 +4,11 @@ import { useNavigate } from "react-router-dom";
 import { FaGoogle, FaFacebookF } from "react-icons/fa";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+
 const COVER_IMAGE =
   "https://phunugioi.com/wp-content/uploads/2020/02/mau-background-dep.jpg";
 const BACKGROUND_IMAGE =
-  "https://toigingiuvedep.vn/wp-content/uploads/2021/02/background-may-dep-cho-khai-giang.jpg"; // Đường dẫn ảnh (đặt ảnh trong thư mục public nếu dùng React)
+  "https://toigingiuvedep.vn/wp-content/uploads/2021/02/background-may-dep-cho-khai-giang.jpg";
 
 const LoginForm = () => {
   const [username, setUsername] = useState("");
@@ -29,16 +30,13 @@ const LoginForm = () => {
 
       const { token, userId, email: userEmail, role } = response.data;
 
-      // Lưu thông tin vào localStorage
       localStorage.setItem("token", token);
       localStorage.setItem("userId", userId);
       localStorage.setItem("email", userEmail);
       localStorage.setItem("role", role);
 
-      // Thông báo thành công
       toast.success("Login successful!");
 
-      // Điều hướng dựa trên vai trò người dùng
       if (role === "ROLE_STUDENT") {
         navigate("/student/home");
       } else if (role === "ROLE_INSTRUCTOR") {
@@ -51,7 +49,6 @@ const LoginForm = () => {
       }
     } catch (error) {
       if (error.response && error.response.status === 401) {
-        // setError("Invalid username or password.");
         toast.error("Invalid username or password.");
       } else if (error.response && error.response.status === 403) {
         setError("Account not verified. Please verify your OTP.");
@@ -69,7 +66,6 @@ const LoginForm = () => {
 
   return (
     <div className="w-full h-screen flex">
-      {/* Phần bên trái - hình ảnh */}
       <div className="w-1/2 h-full relative flex items-center justify-center bg-gray-100">
         <img
           src={COVER_IMAGE}
@@ -85,15 +81,13 @@ const LoginForm = () => {
             today!
           </p>
         </div>
-        <div className="absolute inset-0 bg-black opacity-50"></div>{" "}
-        {/* Lớp mờ trên hình */}
+        <div className="absolute inset-0 bg-black opacity-50"></div>
       </div>
 
-      {/* Phần bên phải - form đăng nhập */}
       <div
         className="w-1/2 h-full bg-white flex flex-col justify-center p-16"
         style={{
-          backgroundImage: `url(${BACKGROUND_IMAGE})`, // Đặt ảnh nền
+          backgroundImage: `url(${BACKGROUND_IMAGE})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}
@@ -139,7 +133,7 @@ const LoginForm = () => {
             </div>
             <p
               className="text-sm text-indigo-600 cursor-pointer"
-              onClick={() => navigate("/forgot-password")} // Chuyển hướng khi nhấn vào "Forgot Password?"
+              onClick={() => navigate("/forgot-password")}
             >
               Forgot Password?
             </p>
@@ -190,7 +184,7 @@ const LoginForm = () => {
 
         <div className="w-full text-center mt-4">
           <p className="text-sm text-gray-600">
-            Don't have an account?{" "}
+            Don't have an account? {" "}
             <span
               className="text-indigo-600 cursor-pointer"
               onClick={() => navigate("/register")}

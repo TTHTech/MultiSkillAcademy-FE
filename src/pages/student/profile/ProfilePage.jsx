@@ -8,7 +8,7 @@ const ProfilePage = () => {
   const [activeTab, setActiveTab] = useState("info"); // Tab mặc định là "Thông tin"
 
   return (
-    <div className="w-full h-full min-h-screen bg-white overflow-y-auto mt-[100px]">
+    <div className="w-full h-full min-h-screen bg-white overflow-y-auto mt-[90px]">
       <NavBar />
       <div className="container mx-auto p-6 bg-white">
         <h1 className="text-4xl font-bold text-gray-900 mb-4 pb-4">Quản lý Hồ Sơ</h1>

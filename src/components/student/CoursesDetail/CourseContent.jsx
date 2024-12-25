@@ -21,7 +21,7 @@ const CourseContent = ({ content }) => {
   const sectionsToDisplay = showAll ? content : content.slice(0, 3); // Chỉ lấy 3 section đầu nếu chưa bấm "Xem thêm"
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-lg mt-8">
+    <div className="bg-white p-6 rounded-lg shadow-lg mt-8 ">
       <h2 className="text-3xl font-bold text-gray-900 mb-6">Nội dung khóa học</h2>
       <ul className="space-y-6">
         {sectionsToDisplay.map((section, index) => (

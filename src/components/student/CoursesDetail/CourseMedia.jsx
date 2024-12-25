@@ -7,9 +7,8 @@ import ListLectureFree from "./ListLectureFree";
 
 const CourseMedia = ({
   price,
-  thumbnail = "default-thumbnail.jpg", // Fallback cho thumbnail
+  thumbnail = "default-thumbnail.jpg",
   onAddToCart,
-  onBuyNow,
   resourceDescription = [],
 }) => {
   const userId = Number(localStorage.getItem("userId"));
@@ -98,28 +97,35 @@ const CourseMedia = ({
 
   return (
     <div
-      className="bg-white p-6 rounded shadow-lg text-center max-w-[500px] w-full border-2 border-red-500"
+      className="bg-white p-6 rounded-lg shadow-xl text-center max-w-[500px] w-full border border-gray-300 ml-[30px]"
       style={{
         position: "sticky",
-        top: "100px", // Cố định tại vị trí cách đầu trang 100px khi cuộn
+        top: "100px", // Fixed at 100px from the top when scrolling
       }}
     >
       {/* Thumbnail */}
-      <img
-        src={thumbnail}
-        alt="Preview"
-        className="w-full h-auto mb-4 rounded-lg"
-      />
+      <div className="relative mb-6">
+        <img
+          src={thumbnail}
+          alt="Preview"
+          className="w-full h-auto rounded-lg shadow-md border-4 border-gray-200 hover:shadow-2xl transition-transform duration-300 transform hover:scale-105"
+        />
+      </div>
 
-      {/* Nút xem trước bài giảng */}
+     
+
+      {/* Preview Lectures Button */}
       <button
         onClick={() => setShowPreview(true)}
-        className="text-blue-500 underline mb-4 text-sm hover:text-blue-700"
+        className="text-blue-600 font-medium underline hover:text-blue-800 transition-colors mb-6"
       >
         Xem trước khóa học
       </button>
-
-      {/* Modal danh sách bài giảng miễn phí */}
+       {/* Price */}
+       <div className="text-4xl font-extrabold text-gray-900 mb-6">
+        {new Intl.NumberFormat("vi-VN").format(price || 0)} VND
+     </div>
+      {/* Modal for Free Lecture Previews */}
       {showPreview && (
         <ListLectureFree
           onClose={() => setShowPreview(false)}
@@ -127,17 +133,12 @@ const CourseMedia = ({
         />
       )}
 
-      {/* Giá tiền */}
-      <div className="text-3xl font-bold text-gray-800 mb-4">
-        đ {new Intl.NumberFormat("vi-VN").format(price || 0)}
-      </div>
-
-      {/* Add to Cart Button and Heart Icon */}
-      <div className="flex items-center justify-between mb-4">
+      {/* Buttons for Cart and Wishlist */}
+      <div className="flex items-center justify-between mb-6">
         {checkOnStudy ? (
           <button
             onClick={onStartLearning}
-            className="bg-blue-600 text-white py-2 px-4 rounded-lg font-semibold text-lg w-full hover:bg-blue-700"
+            className="bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold text-lg hover:bg-blue-700 w-full"
           >
             Học ngay
           </button>
@@ -146,14 +147,14 @@ const CourseMedia = ({
             {checkCart ? (
               <button
                 onClick={onGoToCart}
-                className="bg-green-600 text-white py-2 px-4 rounded-lg font-semibold text-lg w-full mr-2 hover:bg-green-700"
+                className="bg-green-500 text-white py-3 px-6 rounded-lg font-semibold text-lg hover:bg-green-600 w-full mr-4"
               >
                 Chuyển đến giỏ hàng
               </button>
             ) : (
               <button
                 onClick={onAddToCart}
-                className="bg-purple-600 text-white py-2 px-4 rounded-lg font-semibold text-lg w-full mr-2 hover:bg-purple-700"
+                className="bg-purple-500 text-white py-3 px-6 rounded-lg font-semibold text-lg hover:bg-purple-600 w-full mr-4"
               >
                 Thêm vào giỏ hàng
               </button>
@@ -161,26 +162,26 @@ const CourseMedia = ({
 
             <div
               onClick={handleFavoriteToggle}
-              className="cursor-pointer w-10 h-10 flex items-center justify-center border-2 border-gray-600 rounded-lg bg-white"
+              className="cursor-pointer w-12 h-12 flex items-center justify-center border border-gray-300 rounded-full bg-white shadow hover:shadow-lg"
             >
               {checkFavorite ? (
-                <AiFillHeart className="text-red-500 text-xl" />
+                <AiFillHeart className="text-red-500 text-2xl" />
               ) : (
-                <AiOutlineHeart className="text-gray-600 text-xl" />
+                <AiOutlineHeart className="text-gray-500 text-2xl" />
               )}
             </div>
           </>
         )}
       </div>
 
-      {/* Chi tiết khóa học */}
+      {/* Course Details */}
       <div className="text-left text-gray-700">
-        <p className="font-semibold mb-2">Khóa học này bao gồm:</p>
-        <ul className="space-y-1 mb-4 text-sm">
+        <p className="font-semibold mb-3 text-lg">Khóa học này bao gồm:</p>
+        <ul className="space-y-2 mb-4">
           {resourceDescription.length > 0 ? (
             resourceDescription.map((item, index) => (
-              <li key={index} className="text-gray-600">
-                ✅ {item}
+              <li key={index} className="text-gray-600 flex items-center">
+                <span className="mr-2">✅</span>{item}
               </li>
             ))
           ) : (
