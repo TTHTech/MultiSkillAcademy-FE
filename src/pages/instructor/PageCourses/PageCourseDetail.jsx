@@ -15,7 +15,8 @@ import ButtonBack from "../../../components/instructor/BackButton/BackButton";
 import axios from "axios";
 import moment from "moment";
 import Swal from "sweetalert2";
-
+import CourseDetails from "./EditableList";
+import LecturesFree from "../../../components/instructor/LecturesFree/LecturesFree"
 const PageCourseDetail = () => {
   const [open, setOpen] = useState(true);
   const { id } = useParams();
@@ -61,6 +62,15 @@ const PageCourseDetail = () => {
     content_type: "Video",
     duration: "",
   });
+  const [showCourseDetails, setShowCourseDetails] = useState(false);
+
+  const handleEditDescriptionClick = () => {
+    setShowCourseDetails(true);
+  };
+
+  const handleCloseCourseDetails = () => {
+    setShowCourseDetails(false);
+  };
   const [addingLecture, setAddingLecture] = useState(null);
   const [newLecture, setNewLecture] = useState({
     title: "",
@@ -593,7 +603,7 @@ const PageCourseDetail = () => {
         alert("Failed to add image. Please try again.");
       }
       if (uploadedImageUrl) {
-        setImages((prevImages) => [...prevImages, uploadedImageUrl]); 
+        setImages((prevImages) => [...prevImages, uploadedImageUrl]);
       }
     }
   };
@@ -734,7 +744,6 @@ const PageCourseDetail = () => {
       <Sidebar open={open} setOpen={setOpen} />
       <div className="container mx-auto p-4">
         <ButtonBack />
-
         <div className="bg-white shadow-md rounded-lg p-6 mb-8">
           <h1 className="text-3xl font-bold text-gray-800 mb-6">
             Course Details
@@ -747,7 +756,7 @@ const PageCourseDetail = () => {
                 <img
                   src={images[currentImageIndex] || "default-image.jpg"}
                   alt={course?.title || "Course image"}
-                  className="w-full h-60 object-cover rounded-lg mb-6"
+                  className="w-full h-auto max-h-[500px] object-contain rounded-lg mb-6"
                 />
 
                 {/* Nút thêm ảnh */}
@@ -795,6 +804,7 @@ const PageCourseDetail = () => {
               </>
             )}
           </div>
+
           {isEditing ? (
             <div className="space-y-6">
               <h2 className="text-2xl font-semibold text-gray-800 mb-4">
@@ -889,12 +899,12 @@ const PageCourseDetail = () => {
                     className="block text-gray-700 mb-2"
                     htmlFor="duration"
                   >
-                    Duration (hours)
+                    Duration
                   </label>
                   <input
                     id="duration"
                     name="duration"
-                    type="number"
+                    type="text"
                     value={course.duration}
                     onChange={handleChange}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -966,7 +976,7 @@ const PageCourseDetail = () => {
                 Language: {course.language}
               </div>
               <div className="text-gray-600 text-sm mb-2">
-                Duration: {course.duration} hours
+                Duration: {course.duration}
               </div>
               <div className="text-gray-600 text-sm mb-2">
                 Category: {course.category}
@@ -988,9 +998,15 @@ const PageCourseDetail = () => {
             </div>
           )}
         </div>
-
+        <div className="mb-4">
+          <CourseDetails />
+        </div>
+        <div className="mb-4">
+          <LecturesFree courseId={id}/>
+        </div>
+        
         <div className="bg-white shadow-md rounded-lg p-6">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+          <h2 className="text-3xl font-bold text-blue-600 mb-6 text-center">
             Sections & Lectures
           </h2>
 
@@ -1199,7 +1215,7 @@ const PageCourseDetail = () => {
                     </label>
                     <input
                       id="LectureDuration"
-                      type="number"
+                      type="text"
                       name="duration"
                       value={newLecture.duration}
                       onChange={handleChangeNewLecture}
@@ -1381,7 +1397,7 @@ const PageCourseDetail = () => {
                         </label>
                         <input
                           id="LectureDuration"
-                          type="number"
+                          type="text"
                           name="duration"
                           value={editedLecture.duration}
                           onChange={(e) =>
@@ -1442,7 +1458,7 @@ const PageCourseDetail = () => {
                           </a>
                         )}
                         <p className="text-gray-600">
-                          Duration: {lecture.duration} mins
+                          Duration: {lecture.duration} 
                         </p>
                         <div className="flex justify-end space-x-4 mt-2">
                           <button

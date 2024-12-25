@@ -7,23 +7,26 @@ import WelcomeSection from "../../../components/student/home/WelcomeSection";
 import FeaturedCourses from "../../../components/student/home/FeaturedCourses";
 import SuggestedCoursesSection from "../../../components/student/home/SuggestedCoursesSection";
 import RecommendedCoursesSection from "../../../components/student/home/RecommendedCoursesSection";
-
+import TopPythonCoursesSection from "../../../components/student/home/TopPythonCoursesSection"; // Import mới
+import TopMusicCoursesSection from "../../../components/student/home/TopMusicCoursesSection";
 import RecommendedTopics from "../../../components/student/home/RecommendedTopics";
+
 import Footer from "../../../components/student/common/Footer";
-import TopPythonCoursesSection from "../../../components/student/home/TopPythonCoursesSection";
 
 const StudentHomePage = () => {
   return (
-    <div className="w-full h-full min-h-screen bg-gray-50 overflow-y-auto">
+    <div className="w-full h-full min-h-screen bg-white overflow-y-auto">
       <TopBanner />
       <NavBar />
-      <HeroSection />
       <WelcomeSection />
-      <FeaturedCourses />
+      <HeroSection />
+      
+  
       <SuggestedCoursesSection />
       <RecommendedCoursesSection />
       <TopPythonCoursesSection /> {/* Thêm component TopWebCoursesSection mới */}
-      <RecommendedTopics />
+      <TopMusicCoursesSection/>
+     
       <Footer />
     </div>
   );

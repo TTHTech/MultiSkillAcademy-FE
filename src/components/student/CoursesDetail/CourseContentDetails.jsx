@@ -1,44 +1,30 @@
-import React, { useState } from 'react';
+import React from "react";
+import { FaBook, FaExclamationTriangle } from "react-icons/fa";
 
 const CourseContentDetails = ({ contentDetails }) => {
-  const [expandedSections, setExpandedSections] = useState({});
-
-  const toggleSection = (index) => {
-    setExpandedSections((prev) => ({
-      ...prev,
-      [index]: !prev[index],
-    }));
-  };
-
   return (
     <div className="bg-white p-6 rounded shadow-lg mt-4">
-      <h2 className="text-2xl font-bold text-gray-900 mb-4">Nội dung bài học</h2>
+      <h2 className="text-2xl font-bold text-gray-900 mb-4">Nội dung Bài Học</h2>
 
-      <ul className="space-y-6 text-gray-800">
-        {contentDetails.map((section, index) => (
-          <li key={index} className="flex flex-col items-start">
-            <h3
-              onClick={() => toggleSection(index)}
-              className="text-xl font-semibold text-gray-800 mb-2 cursor-pointer"
+      {/* Kiểm tra và hiển thị nội dung khóa học */}
+      {contentDetails && contentDetails.length > 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          {contentDetails.map((content, index) => (
+            <div
+              key={index}
+              className="text-gray-800 border border-gray-300 p-4 rounded-lg hover:shadow-lg hover:border-gray-500 flex items-center space-x-3"
             >
-              {section.title} ({section.lectures.length} bài giảng)
-              <span className="ml-2">
-                {expandedSections[index] ? '▲' : '▼'}
-              </span>
-            </h3>
-
-            {expandedSections[index] && (
-              <ul className="pl-4 list-disc space-y-1">
-                {section.lectures.map((lecture, lectureIndex) => (
-                  <li key={lectureIndex} className="text-gray-700">
-                    {lecture}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </li>
-        ))}
-      </ul>
+              <FaBook className="text-blue-600" />
+              <p>{content}</p>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="flex items-center text-gray-600">
+          <FaExclamationTriangle className="text-yellow-500 mr-2" />
+          <p>Không có nội dung khóa học để hiển thị.</p>
+        </div>
+      )}
     </div>
   );
 };

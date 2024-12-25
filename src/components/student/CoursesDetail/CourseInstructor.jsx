@@ -1,4 +1,3 @@
-// src/components/student/CoursesDetail/CourseInstructor.jsx
 import React, { useState } from 'react';
 
 const CourseInstructor = ({ instructor }) => {
@@ -19,7 +18,7 @@ const CourseInstructor = ({ instructor }) => {
       {/* Instructor Header */}
       <div className="flex items-center mb-4">
         <img 
-          src={instructor.image} 
+          src={instructor.image || "https://i1.sndcdn.com/artworks-9IsXLBkEVnMfN6qy-vlBoxg-t500x500.jpg"} // Ảnh mặc định nếu không có ảnh
           alt="Instructor" 
           className="w-16 h-16 rounded-full mr-4" 
         />
@@ -41,7 +40,7 @@ const CourseInstructor = ({ instructor }) => {
 
       {/* Instructor Description with "Read More" Toggle */}
       <p className="text-gray-700">
-        {isExpanded ? instructor.description : `${truncatedDescription}...`}
+   
         {instructor.description.length > 150 && (
           <button 
             onClick={toggleDescription} 

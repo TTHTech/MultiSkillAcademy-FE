@@ -1,66 +1,58 @@
+import React, { useState } from "react";
 import { motion } from "framer-motion";
-
-import Header from "../../components/admin/common/Header";
-import StatCard from "../../components/admin/common/StatCard";
-import { CreditCard, DollarSign, ShoppingCart, TrendingUp } from "lucide-react";
-import SalesOverviewChart from "../../components/admin/sales/SalesOverviewChart";
-import SalesByCategoryChart from "../../components/admin/sales/SalesByCategoryChart";
-import DailySalesTrend from "../../components/admin/sales/DailySalesTrend";
-
-const salesStats = {
-  totalRevenue: "$1,234,567",
-  averageOrderValue: "$78.90",
-  conversionRate: "3.45%",
-  salesGrowth: "12.3%",
-};
+import { Table, User, Star } from "lucide-react";
+import OverviewCards from "../../components/admin/overview/OverviewCards";
+import SalesTable from "../../components/admin/sales/SalesTable";
+import SalesInstructorTable from "../../components/admin/sales/SalesInstructorTable";
+import ReviewTable from "../../components/admin/sales/ReviewTable"; // Import the ReviewTable component
 
 const SalesPage = () => {
+  const [activeTab, setActiveTab] = useState("salesTable");
+
   return (
-    <div className="flex-1 overflow-auto relative z-10">
-      <Header title="Sales Dashboard" />
+    <div className="flex-1 relative z-10 overflow-auto">
+      <header className="bg-gray-800 py-4 px-6 shadow-lg">
+        <h1 className="text-xl text-white font-bold">Sales Management</h1>
+      </header>
 
       <main className="max-w-7xl mx-auto py-6 px-4 lg:px-8">
-        {/* SALES STATS */}
-        <motion.div
-          className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1 }}
-        >
-          <StatCard
-            name="Total Revenue"
-            icon={DollarSign}
-            value={salesStats.totalRevenue}
-            color="#6366F1"
-          />
-          <StatCard
-            name="Avg. Order Value"
-            icon={ShoppingCart}
-            value={salesStats.averageOrderValue}
-            color="#10B981"
-          />
-          <StatCard
-            name="Conversion Rate"
-            icon={TrendingUp}
-            value={salesStats.conversionRate}
-            color="#F59E0B"
-          />
-          <StatCard
-            name="Sales Growth"
-            icon={CreditCard}
-            value={salesStats.salesGrowth}
-            color="#EF4444"
-          />
-        </motion.div>
+        <OverviewCards />
 
-        <SalesOverviewChart />
+        <div className="flex justify-center space-x-8 mt-8">
+          <button
+            className={`flex items-center px-6 py-3 rounded-lg font-semibold shadow-lg transition-transform transform hover:scale-105 ${
+              activeTab === "salesTable" ? "bg-blue-600 text-white" : "bg-gray-700 text-gray-300"
+            }`}
+            onClick={() => setActiveTab("salesTable")}
+          >
+            <Table className="mr-2" size={20} /> Sales Table
+          </button>
+          <button
+            className={`flex items-center px-6 py-3 rounded-lg font-semibold shadow-lg transition-transform transform hover:scale-105 ${
+              activeTab === "salesInstructorTable" ? "bg-blue-600 text-white" : "bg-gray-700 text-gray-300"
+            }`}
+            onClick={() => setActiveTab("salesInstructorTable")}
+          >
+            <User className="mr-2" size={20} /> Sales by Instructor
+          </button>
+          <button
+            className={`flex items-center px-6 py-3 rounded-lg font-semibold shadow-lg transition-transform transform hover:scale-105 ${
+              activeTab === "reviewTable" ? "bg-blue-600 text-white" : "bg-gray-700 text-gray-300"
+            }`}
+            onClick={() => setActiveTab("reviewTable")}
+          >
+            <Star className="mr-2" size={20} /> Reviews
+          </button>
+        </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          <SalesByCategoryChart />
-          <DailySalesTrend />
+        <div className="mt-8">
+          {activeTab === "salesTable" && <SalesTable />}
+          {activeTab === "salesInstructorTable" && <SalesInstructorTable />}
+          {activeTab === "reviewTable" && <ReviewTable />} {/* Add the ReviewTable component */}
         </div>
       </main>
     </div>
   );
 };
+
 export default SalesPage;

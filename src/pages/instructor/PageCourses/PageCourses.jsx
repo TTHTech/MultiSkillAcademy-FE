@@ -1,20 +1,26 @@
 import { useState, useEffect } from "react";
 import Sidebar from "../../../components/instructor/Sidebar/Sidebar";
-import ListCard from "../../../components/instructor/Card/ListCoursesCard"
-import { FaArrowUp } from 'react-icons/fa';
+import ListCard from "../../../components/instructor/Card/ListCoursesCard";
 import { Link } from "react-router-dom";
+
+const userId = localStorage.getItem("userId");
 
 const PageCourses = () => {
     const [open, setOpen] = useState(true);
-    const [showPending, setShowPending] = useState(true);
-    const [showApproved, setShowApproved] = useState(true);
-    const [showUnsent, setShowUnsent] = useState(true); 
+    const [activeTab, setActiveTab] = useState("pending");
     const [courses, setCourses] = useState([]);
+
+    const [pendingPage, setPendingPage] = useState(1);
+    const [approvedPage, setApprovedPage] = useState(1);
+    const [unsentPage, setUnsentPage] = useState(1);
+    const [declinedPage, setDeclinedPage] = useState(1);  // New state for declined courses
+
+    const coursesPerPage = 8;
 
     useEffect(() => {
         const fetchCourses = async () => {
             try {
-                const response = await fetch('http://localhost:8080/api/instructor/1', {
+                const response = await fetch(`http://localhost:8080/api/instructor/${userId}`, {
                     method: "GET",
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -23,27 +29,55 @@ const PageCourses = () => {
                 const data = await response.json();
                 setCourses(data);
             } catch (error) {
-                console.error("Error fetching courses: ", error);
+                console.error("Error fetching courses:", error);
             }
         };
         fetchCourses();
     }, []);
 
     const filterCourses = (status) => {
-        return courses.filter(course => {
-            if (status === "pending") {
-                return !course.status || course.status === "Unknown";
-            } else if (status === "approved") {
-                return ["Active", "Processing", "Inactive"].includes(course.status);
-            } else if (status === "Unsent") {
-                return course.status === "Unsent"; 
-            }
+        return courses.filter((course) => {
+            if (status === "pending") return !course.status || course.status === "Pending";
+            if (status === "approved") return ["Active", "Processing", "Inactive"].includes(course.status);
+            if (status === "unsent") return course.status === "Unsent";
+            if (status === "declined") return course.status === "Declined";  // Filter for declined courses
             return false;
         });
     };
-    const pendingCourses = filterCourses("pending");
-    const approvedCourses = filterCourses("approved");
-    const unsentCourses = filterCourses("Unsent");
+
+    const paginateCourses = (courseList, page) => {
+        const startIndex = (page - 1) * coursesPerPage;
+        const endIndex = startIndex + coursesPerPage;
+        return courseList.slice(startIndex, endIndex);
+    };
+
+    const tabs = [
+        { key: "pending", label: "Courses Chưa Duyệt" },
+        { key: "approved", label: "Courses Đã Duyệt" },
+        { key: "unsent", label: "Courses Chưa Gửi" },
+        { key: "declined", label: "Courses Bị Từ Chối" }, // New tab for declined courses
+    ];
+
+    const courseLists = {
+        pending: filterCourses("pending"),
+        approved: filterCourses("approved"),
+        unsent: filterCourses("unsent"),
+        declined: filterCourses("declined"),  // Declined courses filter
+    };
+
+    const pages = {
+        pending: pendingPage,
+        approved: approvedPage,
+        unsent: unsentPage,
+        declined: declinedPage,  // Declined courses page state
+    };
+
+    const setPages = {
+        pending: setPendingPage,
+        approved: setApprovedPage,
+        unsent: setUnsentPage,
+        declined: setDeclinedPage,  // Declined courses page setter
+    };
 
     return (
         <section className={`flex-1 m-4 p-4 duration-300 font-semibold text-xl text-gray-900 ${open ? "ml-72" : "ml-16"} bg-gradient-to-b from-gray-100 to-blue-100`}>
@@ -51,77 +85,60 @@ const PageCourses = () => {
 
             <div className="space-y-6">
                 <div>
-                    <Link to="/courses/addCourses">
-                        <button className="font-poppins bg-gradient-to-b from-red-200 to-blue-200 text-black px-4 py-2 rounded-lg shadow-md hover:from-green-300 hover:to-blue-300 focus:outline-none transition duration-300">
+                    <Link to="/instructor/courses/addCourses">
+                        <button className="font-poppins bg-gradient-to-b from-indigo-500 to-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:from-green-400 hover:to-blue-400 focus:outline-none transition-all duration-300">
                             <span>Thêm Courses</span>
                         </button>
                     </Link>
                 </div>
 
-                <div className="bg-blue-100 p-4 rounded-lg shadow-md">
-                    <button
-                        className="flex items-center justify-between w-full text-blue-600 bg-blue-100 hover:bg-gray-100 rounded-lg px-4 py-2 font-medium"
-                        onClick={() => setShowPending(prev => !prev)}
-                        aria-expanded={showPending}
-                    >
-                        <span>Courses Chưa Duyệt</span>
-                        <span className={`transition-transform duration-300 ${showPending ? "rotate-180" : ""}`}>
-                            <FaArrowUp />
-                        </span>
-                    </button>
-                    {showPending && (
-                        <div className="mt-4">
-                            {pendingCourses.length > 0 ? (
-                                <ListCard courses={pendingCourses} />
-                            ) : (
-                                <p className="text-center text-gray-500">Không có khóa học chờ duyệt</p>
-                            )}
-                        </div>
-                    )}
+                {/* Tabs */}
+                <div className="flex justify-center space-x-6 py-4">
+                    {tabs.map((tab) => (
+                        <button
+                            key={tab.key}
+                            onClick={() => setActiveTab(tab.key)}
+                            className={`px-6 py-3 rounded-full font-medium text-lg transition-all duration-300 ${
+                                activeTab === tab.key
+                                    ? "bg-blue-600 text-white shadow-xl"
+                                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                            }`}
+                        >
+                            {tab.label}
+                        </button>
+                    ))}
                 </div>
 
-                <div className="bg-green-100 p-4 rounded-lg shadow-md">
-                    <button
-                        className="flex items-center justify-between w-full text-green-600 bg-green-100 hover:bg-gray-100 rounded-lg px-4 py-2 font-medium"
-                        onClick={() => setShowApproved(prev => !prev)}
-                        aria-expanded={showApproved}
-                    >
-                        <span>Courses Đã Duyệt</span>
-                        <span className={`transition-transform duration-300 ${showApproved ? "rotate-180" : ""}`}>
-                            <FaArrowUp />
-                        </span>
-                    </button>
-                    {showApproved && (
-                        <div className="mt-4">
-                            {approvedCourses.length > 0 ? (
-                                <ListCard courses={approvedCourses} />
-                            ) : (
-                                <p className="text-center text-gray-500">Không có khóa học đã duyệt</p>
-                            )}
-                        </div>
-                    )}
-                </div>
-
-                <div className="bg-gray-200 p-4 rounded-lg shadow-md">
-                    <button
-                        className="flex items-center justify-between w-full text-gray-600 bg-gray-200 hover:bg-gray-100 rounded-lg px-4 py-2 font-medium"
-                        onClick={() => setShowUnsent(prev => !prev)}
-                        aria-expanded={showUnsent}
-                    >
-                        <span>Courses Chưa Gửi</span>
-                        <span className={`transition-transform duration-300 ${showUnsent ? "rotate-180" : ""}`}>
-                            <FaArrowUp />
-                        </span>
-                    </button>
-                    {showUnsent && (
-                        <div className="mt-4">
-                            {unsentCourses.length > 0 ? (
-                                <ListCard courses={unsentCourses} />
-                            ) : (
-                                <p className="text-center text-gray-500">Không có khóa học chưa gửi</p>
-                            )}
-                        </div>
-                    )}
+                {/* Courses List */}
+                <div className="mt-6">
+                    {tabs.map((tab) => (
+                        activeTab === tab.key && (
+                            <div key={tab.key} className="bg-white p-6 rounded-lg shadow-md space-y-4">
+                                {courseLists[tab.key].length > 0 ? (
+                                    <>
+                                        <ListCard courses={paginateCourses(courseLists[tab.key], pages[tab.key])} />
+                                        <div className="flex justify-center space-x-3 mt-6">
+                                            {[...Array(Math.ceil(courseLists[tab.key].length / coursesPerPage))].map((_, index) => (
+                                                <button
+                                                    key={index}
+                                                    onClick={() => setPages[tab.key](index + 1)}
+                                                    className={`px-4 py-2 rounded-full text-lg font-semibold transition-all duration-300 ${
+                                                        pages[tab.key] === index + 1
+                                                            ? "bg-blue-600 text-white"
+                                                            : "bg-gray-200 text-gray-700 hover:bg-blue-300"
+                                                    }`}
+                                                >
+                                                    {index + 1}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </>
+                                ) : (
+                                    <p className="text-center text-gray-500">Không có khóa học</p>
+                                )}
+                            </div>
+                        )
+                    ))}
                 </div>
             </div>
         </section>

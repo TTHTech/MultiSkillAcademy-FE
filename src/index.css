@@ -1,6 +1,21 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 body {
-    @apply font-open-sans bg-gradient-to-b from-gray-100 to-blue-100;
-  }
+    @apply font-open-sans bg-gradient-to-b from-gray-100 to-gray-100;
+}
+
+/* Thêm phần CSS để ẩn thanh cuộn */
+.flex-1 {
+  overflow-y: scroll;
+}
+
+.flex-1::-webkit-scrollbar {
+  width: 0px;
+  height: 0px;
+}
+
+.flex-1 {
+  scrollbar-width: none; /* Firefox */
+}

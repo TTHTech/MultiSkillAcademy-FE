@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Search, Camera } from "lucide-react";
 
-const ITEMS_PER_PAGE = 5;
+const ITEMS_PER_PAGE = 10;
 
 // Hàm tạo màu ngẫu nhiên cho avatar
 const getRandomColor = () => {
@@ -86,26 +86,38 @@ const UsersTable = () => {
         const confirmed = window.confirm("Are you sure you want to delete this user?");
         if (confirmed) {
             try {
-                const token = localStorage.getItem("token"); // Lấy token từ localStorage
+                const token = localStorage.getItem("token");
                 const response = await fetch(`http://localhost:8080/api/admin/students/${userId}`, {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json',
-                        Authorization: `Bearer ${token}`, // Sử dụng token từ localStorage
+                        Authorization: `Bearer ${token}`,
                     },
                 });
+    
                 if (!response.ok) {
                     throw new Error('Failed to delete user');
                 }
+    
+                // Cập nhật lại danh sách người dùng sau khi xóa
                 const updatedUsers = users.filter((user) => user.id !== userId);
                 setUsers(updatedUsers);
                 setFilteredUsers(updatedUsers);
+                
+                // Cập nhật lại trạng thái "active" nếu cần thiết
+                // Ví dụ: nếu có trường hợp nào người dùng bị xóa nhưng chưa được cập nhật trạng thái đúng
+                setFilteredUsers((prevUsers) => 
+                    prevUsers.map((user) => ({
+                        ...user,
+                        active: user.id === userId ? false : user.active
+                    }))
+                );
             } catch (error) {
                 console.error(error);
             }
         }
     };
-
+    
     // Xử lý lưu thông tin sau khi chỉnh sửa
     const handleSave = async () => {
         const formData = new FormData();
@@ -205,7 +217,7 @@ const UsersTable = () => {
             transition={{ delay: 0.2 }}
         >
             <div className='flex justify-between items-center mb-6'>
-                <h2 className='text-xl font-semibold text-gray-100'>Users</h2>
+                <h2 className='text-xl font-semibold text-gray-100'>Students</h2>
                 <div className='relative'>
                     <input
                         type='text'
@@ -248,7 +260,7 @@ const UsersTable = () => {
 
                     {/* Hiển thị tất cả các thông tin chi tiết */}
                     <div className='mb-4'>
-                        <label className='text-gray-400'>First Name:</label>
+                        <label className='text-white'>First Name:</label>
                         <input
                             type='text'
                             name='firstName'
@@ -259,7 +271,7 @@ const UsersTable = () => {
                     </div>
 
                     <div className='mb-4'>
-                        <label className='text-gray-400'>Last Name:</label>
+                        <label className='text-white'>Last Name:</label>
                         <input
                             type='text'
                             name='lastName'
@@ -270,7 +282,7 @@ const UsersTable = () => {
                     </div>
 
                     <div className='mb-4'>
-                        <label className='text-gray-400'>Email:</label>
+                        <label className='text-white'>Email:</label>
                         <input
                             type='email'
                             name='email'
@@ -281,7 +293,7 @@ const UsersTable = () => {
                     </div>
 
                     <div className='mb-4'>
-                        <label className='text-gray-400'>Phone Number:</label>
+                        <label className='text-white'>Phone Number:</label>
                         <input
                             type='text'
                             name='phoneNumber'
@@ -292,7 +304,7 @@ const UsersTable = () => {
                     </div>
 
                     <div className='mb-4'>
-                        <label className='text-gray-400'>Address:</label>
+                        <label className='text-white'>Address:</label>
                         <input
                             type='text'
                             name='address'
@@ -303,7 +315,7 @@ const UsersTable = () => {
                     </div>
 
                     <div className='mb-4'>
-                        <label className='text-gray-400'>Bio:</label>
+                        <label className='text-white'>Bio:</label>
                         <textarea
                             name='bio'
                             value={editingUser.bio}
@@ -313,7 +325,7 @@ const UsersTable = () => {
                     </div>
 
                     <div className='mb-4'>
-                        <label className='text-gray-400'>Date of Birth:</label>
+                        <label className='text-white'>Date of Birth:</label>
                         <input
                             type='date'
                             name='dateOfBirth'
@@ -324,7 +336,7 @@ const UsersTable = () => {
                     </div>
 
                     <div className='mb-4'>
-                        <label className='text-gray-400'>Role:</label>
+                        <label className='text-white'>Role:</label>
                         <select
                             name='role'
                             value={editingUser.role}
@@ -337,7 +349,7 @@ const UsersTable = () => {
                     </div>
 
                     <div className='mb-4'>
-                        <label className='text-gray-400'>Status:</label>
+                        <label className='text-white'>Status:</label>
                         <select
                             name='active' // Sử dụng trường active
                             value={editingUser.active ? "true" : "false"} // Sử dụng giá trị active
@@ -370,28 +382,28 @@ const UsersTable = () => {
                     <table className='min-w-full divide-y divide-gray-700'>
                         <thead>
                             <tr>
-                                <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>
+                                <th className='px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider'>
                                     Avatar
                                 </th>
-                                <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>
+                                <th className='px-6 py-3 text-left text-xs font-medium text-white  uppercase tracking-wider'>
                                     First Name
                                 </th>
-                                <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>
+                                <th className='px-6 py-3 text-left text-xs font-medium text-white  uppercase tracking-wider'>
                                     Last Name
                                 </th>
-                                <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>
+                                <th className='px-6 py-3 text-left text-xs font-medium text-white  uppercase tracking-wider'>
                                     Email
                                 </th>
-                                <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>
+                                <th className='px-6 py-3 text-left text-xs font-medium text-white  uppercase tracking-wider'>
                                     Phone
                                 </th>
-                                <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>
+                                <th className='px-6 py-3 text-left text-xs font-medium text-white  uppercase tracking-wider'>
                                     Address
                                 </th>
-                                <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>
+                                <th className='px-6 py-3 text-left text-xs font-medium text-white  uppercase tracking-wider'>
                                     Status
                                 </th>
-                                <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>
+                                <th className='px-6 py-3 text-left text-xs font-medium text-white  uppercase tracking-wider'>
                                     Actions
                                 </th>
                             </tr>
@@ -423,21 +435,21 @@ const UsersTable = () => {
 
 
                                     <td className='px-6 py-4 whitespace-nowrap'>
-                                        <div className='text-sm font-medium text-gray-100'>{user.firstName}</div>
+                                        <div className='text-sm font-medium text-white'>{user.firstName}</div>
                                     </td>
                                     <td className='px-6 py-4 whitespace-nowrap'>
-                                        <div className='text-sm font-medium text-gray-100'>{user.lastName}</div>
+                                        <div className='text-sm font-medium text-white'>{user.lastName}</div>
                                     </td>
                                     <td className='px-6 py-4 whitespace-nowrap'>
-                                        <div className='text-sm text-gray-300'>{user.email}</div>
+                                        <div className='text-sm text-white'>{user.email}</div>
                                     </td>
 
                                     <td className='px-6 py-4 whitespace-nowrap'>
-                                        <div className='text-sm text-gray-300'>{user.phoneNumber}</div>
+                                        <div className='text-sm text-white'>{user.phoneNumber}</div>
                                     </td>
 
                                     <td className='px-6 py-4'>
-                                        <div className='text-sm text-gray-300 overflow-hidden text-ellipsis whitespace-nowrap max-w-[120px]'>
+                                        <div className='text-sm text-white overflow-hidden text-ellipsis whitespace-nowrap max-w-[120px]'>
                                             {user.address}
                                         </div>
                                     </td>
@@ -446,8 +458,8 @@ const UsersTable = () => {
                                         <span
                                             className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                                                 user.active === true || user.active === 1
-                                                    ? "bg-green-800 text-green-100"
-                                                    : "bg-red-800 text-red-100"
+                                                    ? "bg-yellow-500 text-black"
+                                                    : "bg-red-500 text-white"
                                             }`}
                                         >
                                             {user.active === true || user.active === 1 ? "Active" : "Inactive"}
@@ -462,7 +474,7 @@ const UsersTable = () => {
                                             Edit
                                         </button>
                                         <button
-                                            className='text-red-400 hover:text-red-300'
+                                            className='text-red-500 hover:text-red-300'
                                             onClick={() => handleDelete(user.id)}
                                         >
                                             Delete
@@ -480,7 +492,7 @@ const UsersTable = () => {
                                 key={index + 1}
                                 onClick={() => handlePageChange(index + 1)}
                                 className={`px-4 py-2 mx-1 rounded-lg ${
-                                    currentPage === index + 1 ? "bg-blue-500 text-white" : "bg-gray-700 text-gray-300"
+                                    currentPage === index + 1 ? "bg-yellow-500 text-white" : "bg-gray-700 text-gray-300"
                                 }`}
                             >
                                 {index + 1}

@@ -1,26 +1,28 @@
 import { useState } from "react";
-import { Camera } from "lucide-react"; // Import icon Camera
+import { Camera } from "lucide-react";
+import { toast } from "react-toastify"; // Import toast
+import "react-toastify/dist/ReactToastify.css"; // Import css cho Toast
 
 const CreateUserForm = () => {
   const [newUser, setNewUser] = useState({
-    username: "", // Thêm trường username
+    username: "",
     firstName: "",
     lastName: "",
     email: "",
     password: "",
-    confirmPassword: "", // Chỉ kiểm tra phía client
-    role: "ROLE_STUDENT", // Mặc định là Student, có thể thay đổi qua select
+    confirmPassword: "",
+    role: "ROLE_STUDENT",
     phoneNumber: "",
     address: "",
     bio: "",
     dateOfBirth: "",
-    active: "true", // Mặc định trạng thái là Active
-    profileImage: "", // Lưu ảnh đại diện
+    active: "true",
+    profileImage: "",
   });
 
-  const [passwordError, setPasswordError] = useState(""); // Để lưu lỗi liên quan đến mật khẩu
+  const [passwordError, setPasswordError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [responseMessage, setResponseMessage] = useState("");
+  const [responseMessage, setResponseMessage] = useState(""); // Khai báo state cho responseMessage
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -30,23 +32,18 @@ const CreateUserForm = () => {
     });
   };
 
-  // Xử lý khi người dùng tải lên ảnh đại diện
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setNewUser({ ...newUser, profileImage: file }); // Lưu file ảnh, không cần dùng base64
+      setNewUser({ ...newUser, profileImage: file });
     }
   };
 
-  // Hàm gọi API để tạo người dùng mới
   const onCreateUser = async (userData) => {
-    setLoading(true); // Bắt đầu trạng thái loading
+    setLoading(true);
     const formData = new FormData();
-
-    // Thêm các thông tin về user vào FormData
     formData.append("user", JSON.stringify(userData));
 
-    // Nếu có file ảnh, thêm vào formData
     if (newUser.profileImage) {
       formData.append("profileImage", newUser.profileImage);
     }
@@ -55,35 +52,41 @@ const CreateUserForm = () => {
       const response = await fetch("http://localhost:8080/api/admin/users?role=" + userData.role, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`, // Nếu có token
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
-        body: formData, // Dùng FormData cho multipart request
+        body: formData,
       });
 
       if (response.ok) {
         const data = await response.json();
-        setResponseMessage("User created successfully: " + data.firstName);
+        setResponseMessage(`User created successfully: ${data.firstName}`); // Cập nhật responseMessage
+        toast.success(`User created successfully: ${data.firstName}`);
       } else {
         const errorData = await response.json();
-        setResponseMessage("Error: " + errorData.message);
+        setResponseMessage(`Error: ${errorData.message}`); // Cập nhật responseMessage với thông báo lỗi
+        toast.error(`Error: ${errorData.message}`);
       }
     } catch (error) {
-      setResponseMessage("Error: " + error.message);
+      setResponseMessage(`Error: ${error.message}`); // Cập nhật responseMessage nếu có lỗi
+      toast.error(`Error: ${error.message}`);
     } finally {
-      setLoading(false); // Kết thúc trạng thái loading
+      setLoading(false);
     }
   };
 
-  // Xử lý khi nhấn "Create Account"
   const handleCreateUser = () => {
+    if (!newUser.username || !newUser.email || !newUser.password) {
+      toast.error("Please fill in all required fields: Username, Email, Password.");
+      return;
+    }
     if (newUser.password !== newUser.confirmPassword) {
       setPasswordError("Passwords do not match");
+      toast.error("Passwords do not match");
       return;
     }
 
-    // Tạo dữ liệu user nhưng không bao gồm `confirmPassword`
     const userData = {
-      username: newUser.username, // Thêm username
+      username: newUser.username,
       firstName: newUser.firstName,
       lastName: newUser.lastName,
       email: newUser.email,
@@ -96,26 +99,24 @@ const CreateUserForm = () => {
       active: newUser.active,
     };
 
-    // Gọi API để tạo người dùng mới
     onCreateUser(userData);
 
-    // Reset form sau khi tạo
     setNewUser({
-      username: "", // Reset username
+      username: "",
       firstName: "",
       lastName: "",
       email: "",
       password: "",
       confirmPassword: "",
-      role: "ROLE_STUDENT", // Reset về mặc định
+      role: "ROLE_STUDENT",
       phoneNumber: "",
       address: "",
       bio: "",
       dateOfBirth: "",
-      active: "true", // Reset trạng thái Active
-      profileImage: "", // Reset ảnh đại diện
+      active: "true",
+      profileImage: "",
     });
-    setPasswordError(""); // Reset lỗi
+    setPasswordError("");
   };
 
   return (
@@ -143,7 +144,7 @@ const CreateUserForm = () => {
       <div className="flex justify-center mb-4">
         <label className="flex items-center cursor-pointer">
           <Camera className="text-gray-300 mr-2" />
-          <span className="text-gray-300">Upload Profile Image</span>
+          <span className="text-white">Upload Profile Image</span>
           <input
             type="file"
             accept="image/*"
@@ -155,7 +156,7 @@ const CreateUserForm = () => {
 
       {/* Các trường thông tin khác */}
       <div className="mb-4">
-        <label className="text-gray-400">Username:</label>
+        <label className="text-white">Username:</label>
         <input
           type="text"
           name="username"
@@ -166,7 +167,7 @@ const CreateUserForm = () => {
       </div>
 
       <div className="mb-4">
-        <label className="text-gray-400">First Name:</label>
+        <label className="text-white">First Name:</label>
         <input
           type="text"
           name="firstName"
@@ -177,7 +178,7 @@ const CreateUserForm = () => {
       </div>
 
       <div className="mb-4">
-        <label className="text-gray-400">Last Name:</label>
+        <label className="text-white">Last Name:</label>
         <input
           type="text"
           name="lastName"
@@ -188,7 +189,7 @@ const CreateUserForm = () => {
       </div>
 
       <div className="mb-4">
-        <label className="text-gray-400">Email:</label>
+        <label className="text-white">Email:</label>
         <input
           type="email"
           name="email"
@@ -199,7 +200,7 @@ const CreateUserForm = () => {
       </div>
 
       <div className="mb-4">
-        <label className="text-gray-400">Password:</label>
+        <label className="text-white">Password:</label>
         <input
           type="password"
           name="password"
@@ -210,7 +211,7 @@ const CreateUserForm = () => {
       </div>
 
       <div className="mb-4">
-        <label className="text-gray-400">Confirm Password:</label>
+        <label className="text-white">Confirm Password:</label>
         <input
           type="password"
           name="confirmPassword"
@@ -222,7 +223,7 @@ const CreateUserForm = () => {
       </div>
 
       <div className="mb-4">
-        <label className="text-gray-400">Phone Number:</label>
+        <label className="text-white">Phone Number:</label>
         <input
           type="text"
           name="phoneNumber"
@@ -233,7 +234,7 @@ const CreateUserForm = () => {
       </div>
 
       <div className="mb-4">
-        <label className="text-gray-400">Address:</label>
+        <label className="text-white">Address:</label>
         <input
           type="text"
           name="address"
@@ -244,7 +245,7 @@ const CreateUserForm = () => {
       </div>
 
       <div className="mb-4">
-        <label className="text-gray-400">Bio:</label>
+        <label className="text-white">Bio:</label>
         <textarea
           name="bio"
           value={newUser.bio}
@@ -254,7 +255,7 @@ const CreateUserForm = () => {
       </div>
 
       <div className="mb-4">
-        <label className="text-gray-400">Date of Birth:</label>
+        <label className="text-white">Date of Birth:</label>
         <input
           type="date"
           name="dateOfBirth"
@@ -265,7 +266,7 @@ const CreateUserForm = () => {
       </div>
 
       <div className="mb-4">
-        <label className="text-gray-400">Role:</label>
+        <label className="text-white">Role:</label>
         <select
           name="role"
           value={newUser.role}

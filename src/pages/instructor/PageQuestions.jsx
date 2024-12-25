@@ -3,6 +3,7 @@ import Sidebar from "../../components/instructor/Sidebar/Sidebar";
 import QuestionTable from "../../components/instructor/QuestionsAndAnswers/TableQ&A";
 import Swal from "sweetalert2";
 
+const userId = Number(localStorage.getItem("userId"));
 const CoursesWithUsersQA = () => {
   const [open, setOpen] = useState(true);
   const [courses, setCourses] = useState([]);
@@ -11,7 +12,7 @@ const CoursesWithUsersQA = () => {
     const fetchCourses = async () => {
       try {
         const response = await fetch(
-          "http://localhost:8080/api/instructor/1",
+          `http://localhost:8080/api/instructor/${userId}`,
           {
             method: "GET",
             headers: {
@@ -20,7 +21,7 @@ const CoursesWithUsersQA = () => {
           }
         );
         const data = await response.json();
-        setInstructor(1);
+        setInstructor(userId);
         setCourses(data);
       } catch (error) {
         console.error("Error fetching courses: ", error);
@@ -35,7 +36,7 @@ const CoursesWithUsersQA = () => {
     const fetchQuestions = async () => {
       try {
         const response = await fetch(
-          "http://localhost:8080/api/instructor/questions/1",
+          `http://localhost:8080/api/instructor/questions/${userId}`,
           {
             method: "GET",
             headers: {

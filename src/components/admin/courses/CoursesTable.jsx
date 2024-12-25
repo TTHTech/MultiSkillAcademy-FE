@@ -1,7 +1,11 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Search } from "lucide-react";
-
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/swiper-bundle.css"; // Đường dẫn chính xác hơn
+import { FaUserCircle, FaBook, FaTools, FaClipboardList } from "react-icons/fa";
 // Số lượng khóa học hiển thị mỗi trang
 const ITEMS_PER_PAGE = 10;
 
@@ -17,17 +21,21 @@ const CoursesTable = () => {
   const fetchCourses = async () => {
     setLoading(true);
     try {
-      const response = await fetch("http://localhost:8080/api/admin/courses/unknown", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`, // Sử dụng token nếu cần
-        },
-      });
+      const response = await fetch(
+        "http://localhost:8080/api/admin/courses/pending",
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to fetch courses.");
       }
 
       const data = await response.json();
+      console.log("Fetched courses:", data); // Xem cấu trúc dữ liệu trả về
       setCourses(data); // Lưu trữ dữ liệu khóa học vào state
       setLoading(false);
     } catch (error) {
@@ -40,6 +48,10 @@ const CoursesTable = () => {
   useEffect(() => {
     fetchCourses();
   }, []);
+
+  if (courses.length === 0) {
+    // toast.info("No courses available.");
+  }
 
   // Lọc khóa học theo từ khóa tìm kiếm
   const filteredCourses = courses.filter(
@@ -65,41 +77,91 @@ const CoursesTable = () => {
 
   // Gọi API để chấp nhận khóa học và chuyển trạng thái thành 'Active'
   const handleAccept = async (courseId) => {
+    if (!courseId) {
+      console.error("Course ID is undefined");
+      return;
+    }
+
     try {
-      const response = await fetch(`http://localhost:8080/api/admin/courses/${courseId}/status`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem("token")}`, // Token xác thực nếu cần
-        },
-        // Gửi một object JSON hợp lệ
-        body: JSON.stringify({ status: "Active" }),  
-      });
-  
+      const response = await fetch(
+        `http://localhost:8080/api/admin/courses/${courseId}/status`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify({ status: "Active" }),
+        }
+      );
+
       if (!response.ok) {
         throw new Error("Failed to update course status.");
       }
-  
-      alert("Course status updated to Active");
-      // Gọi lại hàm fetchCourses để làm mới danh sách
+
+      toast.success("Course accepted successfully!");
+
+      // Cập nhật lại danh sách ngay lập tức
+      setCourses((prevCourses) =>
+        prevCourses.map((course) =>
+          course.courseId === courseId
+            ? { ...course, status: "Active" }
+            : course
+        )
+      );
+
+      // Đóng modal
+      setEditingCourse(null);
     } catch (error) {
       console.error("Error updating course status:", error);
-      alert("Failed to update course status");
+      toast.error(`Error: ${error.message}`);
     }
   };
-  
-  
 
-  const handleReject = (courseId) => {
-    console.log(`Rejected course with ID: ${courseId}`);
+  const handleReject = async (courseId) => {
+    if (!courseId) {
+      console.error("Course ID is undefined");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `http://localhost:8080/api/admin/courses/${courseId}/status`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify({ status: "Declined" }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to update course status.");
+      }
+
+      toast.success("Course rejected successfully!");
+
+      // Cập nhật lại danh sách ngay lập tức
+      setCourses((prevCourses) =>
+        prevCourses.map((course) =>
+          course.courseId === courseId
+            ? { ...course, status: "Declined" }
+            : course
+        )
+      );
+
+      // Đóng modal
+      setEditingCourse(null);
+    } catch (error) {
+      console.error("Error updating course status:", error);
+      toast.error(`Error: ${error.message}`);
+    }
   };
 
   const handleView = (course) => {
     setEditingCourse(course); // Hiển thị chi tiết khóa học
-  };
-
-  const handleSave = () => {
-    setEditingCourse(null); // Đóng form sau khi lưu
   };
 
   const handlePageChange = (page) => {
@@ -116,203 +178,305 @@ const CoursesTable = () => {
 
   return (
     <motion.div
-      className='bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-700 mb-8'
+      className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-700 mb-8"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.2 }}
     >
-      <div className='flex justify-between items-center mb-6'>
-        <h2 className='text-xl font-semibold text-gray-100'>Courses Unknown Approval</h2>
-        <div className='relative'>
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-xl font-semibold text-gray-100">
+          Courses Pending Review and Approval
+        </h2>
+        <div className="relative">
           <input
-            type='text'
-            placeholder='Search courses...'
-            className='bg-gray-700 text-white placeholder-gray-400 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500'
+            type="text"
+            placeholder="Search courses..."
+            className="bg-gray-700 text-white placeholder-gray-400 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             onChange={handleSearch}
             value={searchTerm}
           />
-          <Search className='absolute left-3 top-2.5 text-gray-400' size={18} />
+          <Search className="absolute left-3 top-2.5 text-gray-400" size={18} />
         </div>
       </div>
 
       {editingCourse ? (
         // Form chi tiết khóa học
-        <div className='bg-gray-700 p-4 rounded-lg'>
+        <div className="bg-gray-700 p-4 rounded-lg">
           {/* Ảnh khóa học */}
           <div className="flex justify-center mb-4">
-            <img 
-              src={editingCourse.images[0]} 
-              alt={editingCourse.title} 
-              className="w-100 h-100 object-cover rounded-lg" 
-            />
+            <Swiper
+              spaceBetween={10} // Khoảng cách giữa các slide
+              slidesPerView={1} // Hiển thị 1 ảnh mỗi lần
+              // navigation={true} // Hiển thị nút mũi tên điều hướng
+              loop={true} // Cho phép vòng lặp (quay lại ảnh đầu tiên khi đi qua ảnh cuối)
+              className="w-full h-[500px]" // Cập nhật kích thước cho Swiper (mở rộng chiều rộng)
+            >
+              {editingCourse.imageUrls &&
+                editingCourse.imageUrls.map((image, index) => (
+                  <SwiperSlide key={index}>
+                    <div className="w-full h-full overflow-hidden rounded-lg">
+                      {" "}
+                      {/* Sử dụng w-full và h-full để phóng to */}
+                      <img
+                        src={image}
+                        alt={`Course Image ${index + 1}`}
+                        className="w-full h-full object-cover" // Đảm bảo hình ảnh chiếm toàn bộ không gian của div
+                      />
+                    </div>
+                  </SwiperSlide>
+                ))}
+            </Swiper>
           </div>
 
-          <h3 className='text-lg font-semibold text-gray-100 mb-4'>Course Details</h3>
+          <h3 className="text-lg font-semibold text-gray-100 mb-4">
+            Course Details
+          </h3>
 
           {/* Hiển thị thông tin chi tiết của khóa học */}
-          <div className='mb-4'>
-            <label className='text-gray-400'>Name:</label>
+          <div className="mb-4">
+            <label className="text-gray-400">Name:</label>
             <input
-              type='text'
-              name='name'
+              type="text"
+              name="name"
               value={editingCourse.title}
-              className='w-full p-2 bg-gray-600 text-white rounded-lg'
+              className="w-full p-2 bg-gray-600 text-white rounded-lg"
               readOnly
             />
           </div>
 
-          <div className='mb-4'>
-            <label className='text-gray-400'>Instructor:</label>
+          <div className="mb-4">
+            <label className="text-gray-400">Instructor:</label>
             <input
-              type='text'
-              name='instructorName'
-              value={editingCourse.instructorName}
-              className='w-full p-2 bg-gray-600 text-white rounded-lg'
+              type="text"
+              name="instructorName"
+              value={`${editingCourse.instructorFirstName} ${editingCourse.instructorLastName}`}
+              className="w-full p-2 bg-gray-600 text-white rounded-lg"
               readOnly
             />
           </div>
 
-          <div className='mb-4'>
-            <label className='text-gray-400'>Category:</label>
+          <div className="mb-4">
+            <label className="text-gray-400">Category:</label>
             <input
-              type='text'
-              name='category'
+              type="text"
+              name="category"
               value={editingCourse.categoryName}
-              className='w-full p-2 bg-gray-600 text-white rounded-lg'
+              className="w-full p-2 bg-gray-600 text-white rounded-lg"
               readOnly
             />
           </div>
 
-          <div className='mb-4'>
-            <label className='text-gray-400'>Description:</label>
+          <div className="mb-4">
+            <label className="text-gray-400">Description:</label>
             <textarea
-              name='description'
+              name="description"
               value={editingCourse.description}
-              className='w-full p-2 bg-gray-600 text-white rounded-lg'
+              className="w-full p-2 bg-gray-600 text-white rounded-lg"
               readOnly
             />
           </div>
 
-          <div className='mb-4'>
-            <label className='text-gray-400'>Price:</label>
+          <div className="mb-4">
+            <label className="text-gray-400">Price:</label>
             <input
-              type='text'
-              name='price'
+              type="text"
+              name="price"
               value={`$${editingCourse.price}`}
-              className='w-full p-2 bg-gray-600 text-white rounded-lg'
+              className="w-full p-2 bg-gray-600 text-white rounded-lg"
               readOnly
             />
           </div>
 
-          <div className='mb-4'>
-            <label className='text-gray-400'>Duration:</label>
+          <div className="mb-4">
+            <label className="text-gray-400">Duration:</label>
             <input
-              type='text'
-              name='duration'
+              type="text"
+              name="duration"
               value={editingCourse.duration}
-              className='w-full p-2 bg-gray-600 text-white rounded-lg'
+              className="w-full p-2 bg-gray-600 text-white rounded-lg"
               readOnly
             />
           </div>
 
-          <div className='mb-4'>
-            <label className='text-gray-400'>Language:</label>
+          <div className="mb-4">
+            <label className="text-gray-400">Language:</label>
             <input
-              type='text'
-              name='language'
+              type="text"
+              name="language"
               value={editingCourse.language}
-              className='w-full p-2 bg-gray-600 text-white rounded-lg'
+              className="w-full p-2 bg-gray-600 text-white rounded-lg"
               readOnly
             />
           </div>
 
-          <div className='mb-4'>
-            <label className='text-gray-400'>Rating:</label>
+          <div className="mb-4">
+            <label className="text-gray-400">Rating:</label>
             <input
-              type='text'
-              name='rating'
+              type="text"
+              name="rating"
               value={editingCourse.rating}
-              className='w-full p-2 bg-gray-600 text-white rounded-lg'
+              className="w-full p-2 bg-gray-600 text-white rounded-lg"
               readOnly
             />
           </div>
 
-          <div className='flex justify-end'>
-            <button
-              className='bg-green-500 text-white px-4 py-2 rounded-lg mr-2'
-              onClick={() => handleAccept(editingCourse.courseId)}  // Gọi API cập nhật trạng thái
-            >
-              Accept
-            </button>
-            <button
-              className='bg-red-500 text-white px-4 py-2 rounded-lg mr-2'
-              onClick={() => handleReject(editingCourse.courseId)}
-            >
-              Reject
-            </button>
-            <button
-              className='bg-gray-500 text-white px-4 py-2 rounded-lg'
-              onClick={handleSave}
-            >
-              Close
-            </button>
+          <div className="mb-4">
+            <label className="text-gray-400">Level:</label>
+            <input
+              type="text"
+              name="level"
+              value={editingCourse.level}
+              className="w-full p-2 bg-gray-600 text-white rounded-lg"
+              readOnly
+            />
           </div>
+
+          <div className="mb-4">
+            <label className="text-gray-400">Level:</label>
+            <input
+              type="text"
+              name="level"
+              value={editingCourse.level}
+              className="w-full p-2 bg-gray-600 text-white rounded-lg"
+              readOnly
+            />
+          </div>
+          <div className="mb-4">
+            <label className="text-gray-400">Target Audience:</label>
+            <ul className="w-full p-2 bg-gray-600 text-white rounded-lg">
+              {editingCourse.targetAudience &&
+                editingCourse.targetAudience.map((audience, idx) => (
+                  <li key={idx} className="flex items-center gap-2">
+                    <FaUserCircle /> <span>{audience}</span>
+                  </li>
+                ))}
+            </ul>
+          </div>
+
+          <div className="mb-4">
+            <label className="text-gray-400">Course Content:</label>
+            <ul className="w-full p-2 bg-gray-600 text-white rounded-lg">
+              {editingCourse.courseContent &&
+                editingCourse.courseContent.map((content, idx) => (
+                  <li key={idx} className="flex items-center gap-2">
+                    <FaBook /> <span>{content}</span>
+                  </li>
+                ))}
+            </ul>
+          </div>
+
+          <div className="mb-4">
+            <label className="text-gray-400">Resources:</label>
+            <ul className="w-full p-2 bg-gray-600 text-white rounded-lg">
+              {editingCourse.resourceDescription &&
+                editingCourse.resourceDescription.map((resource, idx) => (
+                  <li key={idx} className="flex items-center gap-2">
+                    <FaTools /> <span>{resource}</span>
+                  </li>
+                ))}
+            </ul>
+          </div>
+
+          <div className="mb-4">
+            <label className="text-gray-400">Requirements:</label>
+            <ul className="w-full p-2 bg-gray-600 text-white rounded-lg">
+              {editingCourse.requirements &&
+                editingCourse.requirements.map((requirement, idx) => (
+                  <li key={idx} className="flex items-center gap-2">
+                    <FaClipboardList /> <span>{requirement}</span>
+                  </li>
+                ))}
+            </ul>
+          </div>
+          <button
+            className="bg-green-500 text-white px-4 py-2 rounded-lg mr-2"
+            onClick={() => {
+              if (!editingCourse || !editingCourse.courseId) {
+                console.error("Course ID is undefined");
+                return;
+              }
+              handleAccept(editingCourse.courseId);
+            }}
+          >
+            Accept
+          </button>
+
+          <button
+            className="bg-red-500 text-white px-4 py-2 rounded-lg mr-2"
+            onClick={() => {
+              if (!editingCourse || !editingCourse.courseId) {
+                console.error("Course ID is undefined");
+                return;
+              }
+              handleReject(editingCourse.courseId);
+            }}
+          >
+            Reject
+          </button>
+
+          <button
+            className="bg-gray-500 text-white px-4 py-2 rounded-lg"
+            onClick={() => setEditingCourse(null)}
+          >
+            Cancel
+          </button>
         </div>
       ) : (
-        // Bảng hiển thị danh sách khóa học
-        <div className='overflow-x-auto'>
-          <table className='min-w-full divide-y divide-gray-700'>
-            <thead>
-              <tr>
-                <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>Name</th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>Instructor</th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>Category</th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>Price</th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>Status</th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>Actions</th>
+        <table className="table-auto w-full text-left text-gray-100">
+          <thead>
+            <tr className="border-b bg-gray-700">
+              <th className="py-2 px-4">ID</th>
+              <th className="py-2 px-4">Name</th>
+              <th className="py-2 px-4">Duration</th>
+              <th className="py-2 px-4">Category</th>
+              <th className="py-2 px-4">Price</th>
+              <th className="py-2 px-4">Status</th>
+              <th className="py-2 px-4">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {currentCourses.map((course, index) => (
+              <tr key={course.id} className="border-b bg-gray-800">
+                <td className="py-2 px-4">{index + 1}</td>
+                <td className="py-2 px-4">{course.title}</td>
+                <td className="py-2 px-4">{course.duration}</td>
+                <td className="py-2 px-4">{course.categoryName}</td>
+                <td className="py-2 px-4">${course.price}</td>
+                <td className="py-2 px-4 text-yellow-500">{course.status}</td>
+                <td className="py-2 px-4">
+                  <button
+                    className="bg-blue-500 text-white px-3 py-1 rounded-lg"
+                    onClick={() => handleView(course)}
+                  >
+                    View
+                  </button>
+                </td>
               </tr>
-            </thead>
-
-            <tbody className='divide-y divide-gray-700'>
-              {currentCourses.map((course) => (
-                <motion.tr
-                  key={course.courseId}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <td className='px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-100'>{course.title}</td>
-                  <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-300'>{course.instructorName}</td>
-                  <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-300'>{course.categoryName}</td>
-                  <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-300'>${course.price.toFixed(2)}</td>
-                  <td className='px-6 py-4 whitespace-nowrap text-sm text-yellow-400'>{course.status}</td>
-                  <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-300'>
-                    <button
-                      className='text-blue-400 hover:text-blue-300 mr-2'
-                      onClick={() => handleView(course)}
-                    >
-                      View
-                    </button>
-                  </td>
-                </motion.tr>
-              ))}
-            </tbody>
-          </table>
-
-          {/* Phân trang */}
-          <div className="flex justify-center mt-4">
-            {Array.from({ length: totalPages }, (_, index) => (
-              <button
-                key={index + 1}
-                onClick={() => handlePageChange(index + 1)}
-                className={`px-4 py-2 mx-1 rounded-lg ${currentPage === index + 1 ? "bg-blue-500 text-white" : "bg-gray-700 text-gray-300"}`}
-              >
-                {index + 1}
-              </button>
             ))}
-          </div>
-        </div>
+          </tbody>
+        </table>
       )}
+
+      {/* Pagination */}
+      <div className="flex justify-between mt-4">
+        <button
+          className="bg-yellow-500 text-white px-4 py-2 rounded-lg"
+          onClick={() => handlePageChange(Math.max(currentPage - 1, 1))}
+        >
+          Prev
+        </button>
+        <span className="self-center text-gray-400">
+          Page {currentPage} of {totalPages}
+        </span>
+        <button
+          className="bg-red-500 text-white px-4 py-2 rounded-lg"
+          onClick={() =>
+            handlePageChange(Math.min(currentPage + 1, totalPages))
+          }
+        >
+          Next
+        </button>
+      </div>
     </motion.div>
   );
 };
