@@ -4,6 +4,8 @@ import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import 'react-toastify/dist/ReactToastify.css';
 
+const BACKGROUND_IMAGE = "https://toigingiuvedep.vn/wp-content/uploads/2021/02/background-may-dep-cho-khai-giang.jpg";
+
 const ResetPassForm = () => {
   const [email, setEmail] = useState('');
   const [otp, setOtp] = useState('');
@@ -36,9 +38,12 @@ const ResetPassForm = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-opacity-70 bg-transparent">
-      <div className="bg-white p-8 rounded-md shadow-lg w-96">
-        <h2 className="text-2xl font-semibold text-center mb-6 text-gray-800">Reset Password</h2>
+    <div
+      className="flex justify-center items-center min-h-screen bg-cover bg-center"
+      style={{ backgroundImage: `url(${BACKGROUND_IMAGE})` }}
+    >
+      <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md">
+        <h2 className="text-3xl font-semibold text-center mb-6 text-indigo-600">Reset Password</h2>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="form-group">
             <label htmlFor="email" className="text-sm font-medium text-gray-700">Email</label>
