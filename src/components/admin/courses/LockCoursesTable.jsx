@@ -9,7 +9,7 @@ import { FaUserCircle, FaBook, FaTools, FaClipboardList } from "react-icons/fa";
 // Số lượng khóa học hiển thị mỗi trang
 const ITEMS_PER_PAGE = 10;
 
-const ClockCoursesTable = () => {
+const LockCoursesTable = () => {
   const [courses, setCourses] = useState([]); // Lưu trữ danh sách khóa học lấy từ API
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1); // Lưu trữ trang hiện tại
@@ -458,4 +458,4 @@ const ClockCoursesTable = () => {
   );
 };
 
-export default ClockCoursesTable;
+export default LockCoursesTable;
