@@ -24,6 +24,7 @@ const CourseCard = ({
   const [showDetails, setShowDetails] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [courseStatus, setCourseStatus] = useState(status);
+  const userId = Number(localStorage.getItem("userId"));
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -34,7 +35,84 @@ const CourseCard = ({
 
   const handleMouseEnter = () => setShowDetails(true);
   const handleMouseLeave = () => setShowDetails(false);
+  const [instructor, setInstructor] = useState(null);
+  const [ setError] = useState(null);
+  const [ setLoading] = useState(true);
+  
+  const handleComposeEmail = async () => {
+    const email = "tthoai2401.learn@gmail.com"; 
+    const subject = `Xác nhận phục hồi khóa học bị khóa ${courseId}`;
+    const body = `ĐƠN XIN XEM XÉT PHỤC HỒI HOẠT ĐỘNG CHO KHÓA HỌC\n
+    THÔNG TIN KHÓA HỌC\n
+    - ID KHÓA HỌC: ${courseId}\n
+    - TÊN KHÓA HỌC: "${title.toUpperCase()}"\n
+    - TÊN GIẢNG VIÊN: ${instructor.firstName.toUpperCase()} ${instructor.lastName.toUpperCase()}\n
+    - Email: ${instructor.email} \n
+    - SỐ ĐIỆN THOẠI: ${instructor.phoneNumber} \n
+    LÝ DO:\n
+    - \n
+    - \n
+    VUI LÒNG XỬ LÝ SỚM. XIN CHÂN THÀNH CẢM ƠN!`;
+    const loginUrl = `https://accounts.google.com/AccountChooser?Email=${instructor.email}`;
+    const composeUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${email}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    await Swal.fire({
+      title: "Chú ý",
+      text: "Bạn nên dùng email đã đăng ký để được Admin ưu tiên.",
+      icon: "warning",
+      confirmButtonText: "Yes",
+    });
+    const swalResult = await Swal.fire({
+      title: "Xác nhận đăng nhập",
+      text: `Bạn đã đăng nhập email ? \nNên sử dụng email này "${instructor.email}" để được ưu tiêntiên.`,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Tiếp tục",
+      cancelButtonText: "Hủy",
+    });
+  
+    if (swalResult.isDismissed) {
+      return;
+    }
+  
+    if (swalResult.isConfirmed) {
+      window.open(composeUrl, "_blank");
+    } else {
+      window.open(loginUrl, "_blank");
+      setTimeout(() => {
+        window.open(composeUrl, "_blank");
+      }, 3000); 
+    }
+  };
+  useEffect(() => {
+    const fetchInstructor = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) throw new Error("No token found, please login first.");
 
+        const response = await fetch(
+          `http://localhost:8080/api/instructor/user/${userId}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (!response.ok) throw new Error("Failed to fetch instructor data");
+
+        const data = await response.json();
+        setInstructor(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchInstructor();
+  }, [userId]);
   const renderStars = () =>
     Array.from({ length: 5 }, (_, index) => (
       <FaStar
@@ -197,7 +275,7 @@ const CourseCard = ({
               onClick={(event) => {
                 event.preventDefault();
                 event.stopPropagation();
-                handleChangeStatus(event);
+                handleComposeEmail(event);
               }}
             >
               <FaUndo className="w-4 h-4 mr-1" />
