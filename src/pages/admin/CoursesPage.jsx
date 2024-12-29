@@ -5,7 +5,7 @@ import Header from "../../components/admin/common/Header";
 import OverviewCards from "../../components/admin/courses/OverviewCards";
 import ProductsTable from "../../components/admin/courses/CoursesTable";
 import AcceptedCoursesTable from "../../components/admin/courses/AcceptedCoursesTable";
-import ClockCoursesTable from "../../components/admin/courses/ClockCoursesTable";
+import LockCoursesTable from "../../components/admin/courses/LockCoursesTable";
 
 const ProductsPage = () => {
   const [activeTab, setActiveTab] = useState("productsTable");
@@ -40,14 +40,14 @@ const ProductsPage = () => {
             }`}
             onClick={() => setActiveTab("clockCoursesTable")}
           >
-            <Clock className="mr-2" size={20} /> Clock Courses
+            <Clock className="mr-2" size={20} /> Lock Courses
           </button>
         </div>
 
         <div className="mt-8">
           {activeTab === "productsTable" && <ProductsTable />}
           {activeTab === "acceptedCoursesTable" && <AcceptedCoursesTable />}
-          {activeTab === "clockCoursesTable" && <ClockCoursesTable />}
+          {activeTab === "clockCoursesTable" && <LockCoursesTable />}
         </div>
       </main>
     </div>
