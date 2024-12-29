@@ -44,6 +44,11 @@ import ResultPage from "./pages/student/quiz/ResultPage";
 import SearchCoursePage from "./pages/student/search/SearchCoursePage";
 import PageViewScores from "./pages/instructor/PageViewScores";
 import CertificateGenerator from "./components/student/certificate/Certificate.jsx";
+import LoginForm from "./components/auth/LoginForm.jsx";
+import RegisterForm from "./components/auth/RegisterForm.jsx";
+import OtpVerificationForm from "./components/auth/OtpVerificationForm.jsx";
+import ForgotPassForm from "./components/auth/ForgotPassForm.jsx";
+import ResetPassForm from "./components/auth/ResetPassForm.jsx";
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [role, setRole] = useState("");
@@ -53,20 +58,19 @@ function App() {
   useEffect(() => {
     const token = localStorage.getItem("token");
     const userRole = localStorage.getItem("role");
-
-    if (
-      !token &&
-      location.pathname !== "/login" &&
-      location.pathname !== "/register" &&
-      location.pathname !== "/verify-otp" &&
-      location.pathname !== "/forgot-password"
-    ) {
+  
+    // Các trang không yêu cầu xác thực
+    const noAuthPages = ["/login", "/register", "/verify-otp", "/forgot-password", "/reset-password"];
+  
+    // Nếu không có token và không phải các trang không yêu cầu xác thực, chuyển hướng về login
+    if (!token && !noAuthPages.includes(location.pathname)) {
       navigate("/login");
     } else if (token) {
       setIsLoggedIn(true);
       setRole(userRole);
     }
   }, [navigate, location.pathname]);
+  
 
   // Kiểm tra xem trang hiện tại có phải là trang admin không
   const isAdminLayout =
@@ -109,12 +113,12 @@ function App() {
 
         {/* Routes */}
         <Routes>
-          <Route path="/login" element={<LoginPage />} />
+          <Route path="/login" element={<LoginForm />} />
           <Route path="/logout" element={<Logout />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/verify-otp" element={<OtpVerificationPage />} />
-          <Route path="/forgot-password" element={<ForgotPassPage />} />
-          <Route path="/reset-password" element={<ResetPassPage />} />
+          <Route path="/register" element={<RegisterForm />} />
+          <Route path="/verify-otp" element={<OtpVerificationForm/>} />
+          <Route path="/forgot-password" element={<ForgotPassForm />} />
+          <Route path="/reset-password" element={<ResetPassForm />} />
           <Route path="/student/quiz/:id" element={<QuizPage />} />
           <Route path="/certificate" element={<CertificateGenerator />} />
           <Route path="/search" element={<SearchCoursePage />} />

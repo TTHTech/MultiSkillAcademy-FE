@@ -112,6 +112,9 @@ const ReviewTable = () => {
     setTotalPages(Math.ceil(filtered.length / reviewsPerPage));
     setCurrentPage(1);
   };
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
 
   const indexOfLastReview = currentPage * reviewsPerPage;
   const indexOfFirstReview = indexOfLastReview - reviewsPerPage;
@@ -282,24 +285,174 @@ const ReviewTable = () => {
         </tbody>
       </table>
 
-      <div className="flex justify-between items-center mt-6">
-        <button
-          onClick={prevPage}
-          disabled={currentPage === 1}
-          className="bg-gray-700 text-white rounded-lg py-2 px-4"
-        >
-          Prev
-        </button>
-        <span className="text-white">{`Page ${currentPage} of ${totalPages}`}</span>
-        <button
-          onClick={nextPage}
-          disabled={currentPage === totalPages}
-          className="bg-gray-700 text-white rounded-lg py-2 px-4"
-        >
-          Next
-        </button>
+      <div className="flex justify-between mt-4">
+      <button
+        className="bg-yellow-500 text-white px-4 py-2 rounded-lg"
+        onClick={() => handlePageChange(Math.max(currentPage - 1, 1))}
+        disabled={currentPage === 1}
+      >
+        Prev
+      </button>
+
+      <div className="flex items-center">
+        {(() => {
+          const pages = [];
+
+          if (totalPages <= 13) {
+            // Hiển thị tất cả các trang nếu tổng số trang <= 13
+            for (let i = 1; i <= totalPages; i++) {
+              pages.push(
+                <button
+                  key={i}
+                  onClick={() => handlePageChange(i)}
+                  className={`px-4 py-2 mx-1 rounded-lg ${
+                    currentPage === i
+                      ? "bg-yellow-500 text-white"
+                      : "bg-gray-700 text-gray-300"
+                  }`}
+                >
+                  {i}
+                </button>
+              );
+            }
+          } else {
+            // Hiển thị 10 trang đầu và 3 trang cuối, với logic động
+            if (currentPage <= 10) {
+              for (let i = 1; i <= 10; i++) {
+                pages.push(
+                  <button
+                    key={i}
+                    onClick={() => handlePageChange(i)}
+                    className={`px-4 py-2 mx-1 rounded-lg ${
+                      currentPage === i
+                        ? "bg-yellow-500 text-white"
+                        : "bg-gray-700 text-gray-300"
+                    }`}
+                  >
+                    {i}
+                  </button>
+                );
+              }
+              pages.push(
+                <span key="dots-end" className="px-4 py-2">
+                  ...
+                </span>
+              );
+              for (let i = totalPages - 2; i <= totalPages; i++) {
+                pages.push(
+                  <button
+                    key={i}
+                    onClick={() => handlePageChange(i)}
+                    className={`px-4 py-2 mx-1 rounded-lg ${
+                      currentPage === i
+                        ? "bg-yellow-500 text-white"
+                        : "bg-gray-700 text-gray-300"
+                    }`}
+                  >
+                    {i}
+                  </button>
+                );
+              }
+            } else if (currentPage > 10 && currentPage <= totalPages - 10) {
+              pages.push(
+                <button
+                  key={1}
+                  onClick={() => handlePageChange(1)}
+                  className={`px-4 py-2 mx-1 rounded-lg bg-gray-700 text-gray-300`}
+                >
+                  1
+                </button>
+              );
+              pages.push(
+                <span key="dots-start" className="px-4 py-2">
+                  ...
+                </span>
+              );
+
+              for (let i = currentPage - 4; i <= currentPage + 4; i++) {
+                pages.push(
+                  <button
+                    key={i}
+                    onClick={() => handlePageChange(i)}
+                    className={`px-4 py-2 mx-1 rounded-lg ${
+                      currentPage === i
+                        ? "bg-yellow-500 text-white"
+                        : "bg-gray-700 text-gray-300"
+                    }`}
+                  >
+                    {i}
+                  </button>
+                );
+              }
+
+              pages.push(
+                <span key="dots-end" className="px-4 py-2">
+                  ...
+                </span>
+              );
+              for (let i = totalPages - 2; i <= totalPages; i++) {
+                pages.push(
+                  <button
+                    key={i}
+                    onClick={() => handlePageChange(i)}
+                    className={`px-4 py-2 mx-1 rounded-lg ${
+                      currentPage === i
+                        ? "bg-yellow-500 text-white"
+                        : "bg-gray-700 text-gray-300"
+                    }`}
+                  >
+                    {i}
+                  </button>
+                );
+              }
+            } else {
+              pages.push(
+                <button
+                  key={1}
+                  onClick={() => handlePageChange(1)}
+                  className={`px-4 py-2 mx-1 rounded-lg bg-gray-700 text-gray-300`}
+                >
+                  1
+                </button>
+              );
+              pages.push(
+                <span key="dots-start" className="px-4 py-2">
+                  ...
+                </span>
+              );
+
+              for (let i = totalPages - 12; i <= totalPages; i++) {
+                pages.push(
+                  <button
+                    key={i}
+                    onClick={() => handlePageChange(i)}
+                    className={`px-4 py-2 mx-1 rounded-lg ${
+                      currentPage === i
+                        ? "bg-yellow-500 text-white"
+                        : "bg-gray-700 text-gray-300"
+                    }`}
+                  >
+                    {i}
+                  </button>
+                );
+              }
+            }
+          }
+
+          return pages;
+        })()}
       </div>
 
+      <button
+        className="bg-red-500 text-white px-4 py-2 rounded-lg"
+        onClick={() =>
+          handlePageChange(Math.min(currentPage + 1, totalPages))
+        }
+        disabled={currentPage === totalPages}
+      >
+        Next
+      </button>
+    </div>
       <div className="flex items-center justify-end gap-4 mt-4 mb-4">
         <select
           value={exportOption}

@@ -3,6 +3,8 @@ import axios from "axios";
 import { toast } from "react-toastify"; // Import toast
 import "react-toastify/dist/ReactToastify.css"; // Import Toast CSS
 
+const BACKGROUND_IMAGE = "https://toigingiuvedep.vn/wp-content/uploads/2021/02/background-may-dep-cho-khai-giang.jpg";
+
 const OtpVerificationForm = () => {
   const [otp, setOtp] = useState(new Array(6).fill("")); // Mảng để lưu 6 số OTP
   const [error, setError] = useState(null);
@@ -40,15 +42,17 @@ const OtpVerificationForm = () => {
         }, 1500); 
       }
     } catch (error) {
-   
       setError("Invalid OTP. Please try again.");
       toast.error("Invalid OTP. Please try again.");
     }
   };
 
   return (
-    <div className="flex items-center justify-center h-screen bg-white"> {/* Đặt nền màu trắng */}
-      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md"> {/* Nền của hộp form cũng màu trắng */}
+    <div
+      className="flex items-center justify-center h-screen bg-cover bg-center"
+      style={{ backgroundImage: `url(${BACKGROUND_IMAGE})` }}
+    >
+      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
         <h2 className="text-3xl font-bold text-center mb-6 text-indigo-600">Verify OTP</h2>
         <p className="text-gray-600 text-center mb-4">Enter the 6-digit code sent to your email.</p>
         
