@@ -122,7 +122,7 @@ const CourseMedia = ({
         Xem trước khóa học
       </button>
        {/* Price */}
-       <div className="text-4xl font-extrabold text-gray-900 mb-6">
+       <div className="text-4xl font-bold text-gray-900 mb-6">
         {new Intl.NumberFormat("vi-VN").format(price || 0)} VND
      </div>
       {/* Modal for Free Lecture Previews */}
