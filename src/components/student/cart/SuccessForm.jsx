@@ -47,7 +47,8 @@ const SuccessForm = () => {
   }, []);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-green-400 via-blue-500 to-purple-600 mt-[100px]">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-green-400 via-blue-500 to-purple-600 mt-[100px] relative">
+      <div className="absolute inset-0 -z-10 bg-gradient-to-r from-green-400 via-blue-500 to-purple-600"></div>
       <div className="bg-white p-10 rounded-3xl shadow-2xl w-full max-w-lg text-center relative overflow-hidden border-4 border-dashed border-green-400">
         <h1 className="text-4xl font-extrabold text-green-700 mb-6 animate-pulse">Thanh toán thành công!</h1>
         <p className="text-lg text-gray-700 mb-8">Cảm ơn bạn đã thực hiện giao dịch với chúng tôi. Chúc bạn có những trải nghiệm tuyệt vời!</p>
