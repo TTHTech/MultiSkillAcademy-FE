@@ -1,7 +1,8 @@
 # ✨ SMART LEARNING - ReactJS ✨
 
 ## 📆 **Website Bán Khóa Học**
-**Tên dự án**: Smart Learning
+**Tên dự án**: Smart Learning.
+
 **Công nghệ sử dụng**: ReactJS, Framer Motion, Tailwind CSS  
 **Chức năng chính**:  
 
