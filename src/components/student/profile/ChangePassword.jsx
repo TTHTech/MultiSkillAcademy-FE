@@ -112,7 +112,7 @@ const ChangePassword = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-12">
+    <div className="max-w-md mx-auto mt-8">
       <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
         <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-6">
           <div className="flex items-center gap-3 text-white">
