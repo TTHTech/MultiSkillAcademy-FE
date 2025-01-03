@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   FaChevronDown,
   FaChevronRight,
@@ -6,8 +6,9 @@ import {
   FaRegCircle,
   FaFileAlt,
   FaTrophy,
+  FaGraduationCap
 } from "react-icons/fa";
-import { MdDownload } from "react-icons/md";
+import { motion, AnimatePresence } from "framer-motion";
 import Swal from "sweetalert2";
 
 const CourseSidebar = ({
@@ -19,33 +20,30 @@ const CourseSidebar = ({
   calculateCompletedLectures,
   progressCourses,
 }) => {
-  const [openSections, setOpenSections] = useState({}); // Trạng thái mở rộng các section
+  const [openSections, setOpenSections] = useState({});
+  const [isHovered, setIsHovered] = useState(null);
 
-  if (!course) return <div>Loading...</div>;
+  if (!course) {
+    return (
+      <div className="w-full h-[800px] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
 
   const { sections } = course;
 
-  // Toggle mở rộng/thu gọn section
-  const toggleSection = (sectionIndex) => {
-    setOpenSections((prev) => ({
-      ...prev,
-      [sectionIndex]: !prev[sectionIndex],
-    }));
-  };
-
-  // Tính tổng thời gian từ chuỗi "min" và "sec"
   const parseDuration = (duration) => {
     if (typeof duration === "string") {
       const minuteMatch = duration.match(/(\d+)\s*min/);
       const secondMatch = duration.match(/(\d+)\s*sec/);
       const minutes = minuteMatch ? parseInt(minuteMatch[1], 10) : 0;
       const seconds = secondMatch ? parseInt(secondMatch[1], 10) : 0;
-      return minutes * 60 + seconds; // Tổng thời gian tính bằng giây
+      return minutes * 60 + seconds;
     }
     return 0;
   };
 
-  // Tính tổng thời gian cho section
   const calculateSectionTime = (lectures) => {
     const totalSeconds = lectures.reduce((sum, lecture) => {
       return sum + parseDuration(lecture.duration);
@@ -55,12 +53,11 @@ const CourseSidebar = ({
     const minutes = Math.floor((totalSeconds % 3600) / 60);
     const seconds = totalSeconds % 60;
 
-    return `${hours > 0 ? `${hours} giờ ` : ""}${
-      minutes > 0 ? `${minutes} phút ` : ""
-    }${seconds > 0 ? `${seconds} giây` : ""}`.trim();
+    return `${hours > 0 ? `${hours}h ` : ""}${minutes > 0 ? `${minutes}m ` : ""}${
+      seconds > 0 ? `${seconds}s` : ""
+    }`.trim();
   };
 
-  // Tính tổng tiến độ
   const totalLectures = sections.reduce(
     (total, section) => total + section.lectures.length,
     0
@@ -73,7 +70,6 @@ const CourseSidebar = ({
 
   const progressPercentage = (completedLectures / totalLectures) * 100;
 
-  // Xử lý khi nhấn nhận chứng chỉ
   const handleCertificateClick = () => {
     const queryParams = new URLSearchParams({
       courseName: course.title,
@@ -81,124 +77,166 @@ const CourseSidebar = ({
     window.open(`/certificate?${queryParams}`, "_blank");
   };
 
+  const toggleSection = (sectionIndex) => {
+    setOpenSections((prev) => ({
+      ...prev,
+      [sectionIndex]: !prev[sectionIndex],
+    }));
+  };
+
   return (
-    <div className="w-full max-w-xs bg-gray-50 shadow-md rounded-lg mt-4 p-4 overflow-y-auto h-[800px] mt-[90px]"
-    style={{
-      scrollbarWidth: "none" /* Firefox */,
-      msOverflowStyle: "none" /* IE và Edge */,
-    }}
-    >
-      {/* Tiêu đề Sidebar */}
-      <h2 className="text-xl font-bold mb-4 text-gray-800">Nội dung khóa học</h2>
+    <div className="w-full max-w-xs bg-white shadow-lg rounded-xl p-6 overflow-hidden h-[800px] mt-[90px]">
+      <div className="overflow-y-auto h-full pr-2 hide-scrollbar">
+        {/* Header */}
+        <div className="mb-6">
+          <div className="flex items-center space-x-2 mb-4">
+            <FaGraduationCap className="text-blue-600 text-xl" />
+            <h2 className="text-xl font-bold text-gray-800">Nội dung khóa học</h2>
+          </div>
 
-      {/* Tiến độ học tập */}
-      <div className="mb-4">
-        <div className="text-gray-500 text-sm flex justify-between mb-2">
-          <span>Tiến độ:</span>
-          <span>
-            {completedLectures} / {totalLectures} bài học
-          </span>
-        </div>
-        {/* Progress Bar */}
-        <div className="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
-          <div
-            className="bg-blue-500 h-2.5"
-            style={{
-              width: `${progressPercentage}%`,
-              maxWidth: "100%",
-            }}
-          ></div>
-        </div>
-      </div>
-
-      {/* Danh sách Section và Lectures */}
-      {sections.map((section, sectionIndex) => {
-        const isOpen = openSections[sectionIndex];
-        const totalDuration = calculateSectionTime(section.lectures);
-
-        return (
-          <div key={sectionIndex} className="mb-4">
-            {/* Tiêu đề Section */}
-            <div
-              className="flex justify-between items-center cursor-pointer bg-gray-100 px-3 py-2 rounded-md hover:bg-gray-200 transition"
-              onClick={() => toggleSection(sectionIndex)}
-            >
-              <div>
-                <h3 className="font-semibold text-gray-800">{section.title}</h3>
-                <p className="text-sm text-gray-500">
-                  {section.lectures.filter((l) => l.watched).length} /{" "}
-                  {section.lectures.length} | {totalDuration}
-                </p>
-              </div>
-              <span className="text-gray-500">
-                {isOpen ? <FaChevronDown /> : <FaChevronRight />}
+          {/* Progress Section */}
+          <div className="bg-gray-50 p-4 rounded-lg">
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-sm font-medium text-gray-600">Tiến độ học tập</span>
+              <span className="text-sm font-medium text-blue-600">
+                {completedLectures}/{totalLectures}
               </span>
             </div>
-
-            {/* Danh sách Bài học */}
-            {isOpen && (
-              <div className="mt-2 space-y-2 pl-4">
-                {section.lectures.map((lecture, index) => {
-                  const watched = lecture.watched || false;
-
-                  return (
-                    <div
-                      key={lecture.lecture_id}
-                      className={`flex justify-between items-center p-2 rounded-md cursor-pointer hover:bg-gray-50 transition ${
-                        selectedLecture?.lecture_id === lecture.lecture_id
-                          ? "bg-green-100 border-l-4 border-blue-500"
-                          : ""
-                      }`}
-                      onClick={() => {
-                        if (
-                          index === 0 ||
-                          watched ||
-                          (index > 0 && section.lectures[index - 1]?.watched)
-                        ) {
-                          handleLectureClick(lecture);
-                        } else {
-                          Swal.fire({
-                            title: "Thông báo",
-                            text: "Bạn cần hoàn thành bài học trước để mở khóa bài học này.",
-                            icon: "warning",
-                          });
-                        }
-                      }}
-                    >
-                      <div className="flex items-center space-x-2">
-                        <div className="text-green-500">
-                          {watched ? <FaCheckCircle /> : <FaRegCircle />}
-                        </div>
-                        <span className={`text-sm text-gray-800`}>
-                          {lecture.title}
-                        </span>
-                      </div>
-                      {/* Thời lượng */}
-                      <div className="text-gray-500 text-xs flex items-center space-x-1">
-                        <FaFileAlt />
-                        <span>{calculateSectionTime([lecture])}</span>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
+            <div className="relative h-2 bg-gray-200 rounded-full overflow-hidden">
+              <motion.div
+                initial={{ width: 0 }}
+                animate={{ width: `${progressPercentage}%` }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
+                className="absolute h-full bg-blue-500 rounded-full"
+              />
+            </div>
+            <p className="text-xs text-gray-500 mt-2 text-center">
+              {progressPercentage.toFixed(0)}% hoàn thành
+            </p>
           </div>
-        );
-      })}
-
-      {/* Nút nhận chứng chỉ */}
-      {progressCourses >= 100 && (
-        <div className="flex items-center justify-center mt-6">
-          <button
-            onClick={handleCertificateClick}
-            className="flex items-center bg-gray-900 text-white px-4 py-2 rounded-full shadow-md hover:bg-gray-800 transition"
-          >
-            <FaTrophy className="text-purple-400 mr-2" size={20} />
-            Nhận giấy chứng nhận
-          </button>
         </div>
-      )}
+
+        {/* Sections List */}
+        <div className="space-y-4">
+          {sections.map((section, sectionIndex) => {
+            const isOpen = openSections[sectionIndex];
+            const totalDuration = calculateSectionTime(section.lectures);
+
+            return (
+              <div
+                key={sectionIndex}
+                className="bg-gray-50 rounded-lg overflow-hidden"
+              >
+                <motion.button
+                  onClick={() => toggleSection(sectionIndex)}
+                  className="w-full px-4 py-3 flex justify-between items-center hover:bg-gray-100 transition-colors duration-200"
+                  whileHover={{ scale: 1.01 }}
+                  whileTap={{ scale: 0.99 }}
+                >
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-gray-800 text-left">
+                      {section.title}
+                    </h3>
+                    <p className="text-sm text-gray-500">
+                      {section.lectures.filter((l) => l.watched).length}/{section.lectures.length} bài |{" "}
+                      {totalDuration}
+                    </p>
+                  </div>
+                  <motion.div
+                    animate={{ rotate: isOpen ? 180 : 0 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <FaChevronDown className="text-gray-400" />
+                  </motion.div>
+                </motion.button>
+
+                <AnimatePresence>
+                  {isOpen && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <div className="px-4 py-2 space-y-1">
+                        {section.lectures.map((lecture, index) => {
+                          const watched = lecture.watched || false;
+                          const isSelected = selectedLecture?.lecture_id === lecture.lecture_id;
+                          const isAvailable = index === 0 || watched || (index > 0 && section.lectures[index - 1]?.watched);
+
+                          return (
+                            <motion.div
+                              key={lecture.lecture_id}
+                              className={`relative rounded-lg ${
+                                isSelected
+                                  ? "bg-blue-50 border-l-4 border-blue-500"
+                                  : "hover:bg-gray-100"
+                              } ${!isAvailable ? "opacity-60" : ""}`}
+                              whileHover={{ scale: isAvailable ? 1.01 : 1 }}
+                              whileTap={{ scale: isAvailable ? 0.99 : 1 }}
+                            >
+                              <button
+                                onClick={() => {
+                                  if (isAvailable) {
+                                    handleLectureClick(lecture);
+                                  } else {
+                                    Swal.fire({
+                                      title: "Chưa thể truy cập",
+                                      text: "Vui lòng hoàn thành bài học trước để mở khóa bài này.",
+                                      icon: "warning",
+                                      confirmButtonText: "Đã hiểu",
+                                      confirmButtonColor: "#3B82F6"
+                                    });
+                                  }
+                                }}
+                                className="w-full p-3 flex items-center justify-between text-left"
+                              >
+                                <div className="flex items-center space-x-3">
+                                  {watched ? (
+                                    <FaCheckCircle className="text-green-500" />
+                                  ) : (
+                                    <FaRegCircle className="text-gray-400" />
+                                  )}
+                                  <span className={`text-sm ${isSelected ? "text-blue-700" : "text-gray-700"}`}>
+                                    {lecture.title}
+                                  </span>
+                                </div>
+                                <div className="flex items-center space-x-2 text-xs text-gray-500">
+                                  <FaFileAlt />
+                                  <span>{calculateSectionTime([lecture])}</span>
+                                </div>
+                              </button>
+                            </motion.div>
+                          );
+                        })}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Certificate Button */}
+        {progressCourses >= 100 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mt-6 px-4"
+          >
+            <motion.button
+              onClick={handleCertificateClick}
+              className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-200 flex items-center justify-center space-x-2"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <FaTrophy className="text-yellow-300" size={20} />
+              <span className="font-medium">Nhận chứng chỉ</span>
+            </motion.button>
+          </motion.div>
+        )}
+      </div>
     </div>
   );
 };
