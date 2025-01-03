@@ -1,5 +1,5 @@
 import React from 'react';
-import { Star, Clock, BookOpen, Users, Tag } from 'lucide-react';
+import { Star, Clock, BookOpen, Users, Tag, Play, Award } from 'lucide-react';
 
 const defaultCourse = {
   title: 'Khóa học chưa có tên',
@@ -21,54 +21,70 @@ const RatingStars = ({ rating = 0, reviewsCount = 0 }) => (
       {[...Array(5)].map((_, index) => (
         <Star
           key={index}
-          size={18}
+          size={16}
           className={`${
             index < rating 
               ? "fill-yellow-400 text-yellow-400" 
-              : "fill-gray-200 text-gray-200"
+              : "fill-gray-100 text-gray-100"
           } transition-colors duration-200`}
         />
       ))}
     </div>
-    <span className="text-sm font-medium text-gray-600">
+    <span className="text-sm font-semibold text-gray-700">
       {rating.toFixed(1)}
     </span>
     <span className="text-sm text-gray-400">
-      ({reviewsCount} đánh giá)
+      ({reviewsCount.toLocaleString('vi-VN')} đánh giá)
     </span>
   </div>
 );
 
-const Badge = ({ icon: Icon, children = '' }) => (
-  <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium bg-blue-50 text-blue-700 border border-blue-100">
-    <Icon size={14} />
-    <span>{children}</span>
-  </div>
-);
+const Badge = ({ icon: Icon, children = '', variant = 'default' }) => {
+  const variants = {
+    default: 'bg-blue-50 text-blue-700 border-blue-100',
+    success: 'bg-green-50 text-green-700 border-green-100',
+    warning: 'bg-orange-50 text-orange-700 border-orange-100'
+  };
 
-const PriceTag = ({ price = 0, discountedPrice }) => (
-  <div className="space-y-1 text-right">
-    <div className="bg-gradient-to-r from-blue-50 to-blue-100 px-5 py-3 rounded-xl shadow-sm">
-      <p className="text-2xl font-bold text-blue-800">
-        {price.toLocaleString('vi-VN')} VND
+  return (
+    <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium border ${variants[variant]}`}>
+      <Icon size={14} />
+      <span>{children}</span>
+    </div>
+  );
+};
+
+const PriceTag = ({ price = 0, discountedPrice, onEnroll }) => (
+  <div className="space-y-3">
+    <div className="bg-gradient-to-br from-blue-50 via-white to-blue-50 px-6 py-4 rounded-2xl shadow-sm border border-blue-100">
+      <p className="text-2xl font-bold text-blue-900">
+        {price.toLocaleString('vi-VN')}đ
       </p>
       {discountedPrice && (
-        <p className="text-sm text-gray-500 line-through">
-          {discountedPrice.toLocaleString('vi-VN')} VND
-        </p>
+        <div className="flex items-center gap-2 mt-1">
+          <p className="text-sm text-gray-500 line-through">
+            {discountedPrice.toLocaleString('vi-VN')}đ
+          </p>
+          <span className="text-xs font-medium text-red-500">
+            -{Math.round(((discountedPrice - price) / discountedPrice) * 100)}%
+          </span>
+        </div>
       )}
     </div>
-    <button className="w-full px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200">
+    <button 
+      onClick={onEnroll}
+      className="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-medium rounded-xl transition-all duration-200 transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+    >
       Đăng ký ngay
     </button>
   </div>
 );
 
 const StatBadge = ({ icon: Icon, value, label }) => (
-  <div className="flex items-center gap-2 text-gray-600">
+  <div className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors">
     <Icon size={16} className="text-gray-400" />
     <span className="text-sm">
-      <span className="font-medium">{value}</span> {label}
+      <span className="font-semibold">{value.toLocaleString('vi-VN')}</span> {label}
     </span>
   </div>
 );
@@ -91,24 +107,28 @@ const CourseCard = ({ course = defaultCourse, onEnroll }) => {
   } = { ...defaultCourse, ...course };
 
   return (
-    <div className="group relative bg-white p-6 rounded-2xl shadow-lg border border-gray-200 hover:shadow-2xl transition-all duration-300 w-full max-w-6xl">
-      {/* Gradient Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-white to-blue-50/50 opacity-80 rounded-2xl -z-10" />
+    <div className="group relative bg-white p-7 rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 w-full max-w-6xl">
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 via-white to-purple-50/30 opacity-80 rounded-2xl -z-10" />
       
       <div className="flex gap-8">
         {/* Course Image */}
         <div className="w-1/4 flex-shrink-0">
-          <div className="relative overflow-hidden rounded-xl shadow-md aspect-square">
+          <div className="relative overflow-hidden rounded-xl shadow-md aspect-[4/3]">
             <img
               src={imageUrls[0] || defaultCourse.imageUrls[0]}
               alt={title}
-              className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
+              className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
             />
             {discountedPrice && (
-              <div className="absolute top-3 left-3 bg-red-500 text-white text-sm font-bold px-3 py-1 rounded-full">
+              <div className="absolute top-3 left-3 bg-gradient-to-r from-red-500 to-pink-500 text-white text-sm font-bold px-3 py-1.5 rounded-full shadow-sm">
                 Giảm {Math.round(((discountedPrice - price) / discountedPrice) * 100)}%
               </div>
             )}
+            <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <div className="absolute inset-0 flex items-center justify-center">
+                <Play className="w-12 h-12 text-white opacity-80" />
+              </div>
+            </div>
           </div>
         </div>
 
@@ -119,11 +139,11 @@ const CourseCard = ({ course = defaultCourse, onEnroll }) => {
               {title}
             </h2>
             
-            <div className="mt-3 flex flex-wrap items-center gap-3">
-              <Badge icon={BookOpen}>{level}</Badge>
-              <Badge icon={Clock}>{duration}</Badge>
+            <div className="mt-4 flex flex-wrap items-center gap-3">
+              <Badge icon={Award} variant="success">{level}</Badge>
+              <Badge icon={Clock} variant="warning">{duration}</Badge>
               <div className="h-4 w-px bg-gray-200" />
-              <div className="flex gap-4">
+              <div className="flex gap-6">
                 <StatBadge icon={Users} value={studentsCount} label="học viên" />
                 <StatBadge icon={BookOpen} value={lessonsCount} label="bài học" />
               </div>
@@ -131,9 +151,15 @@ const CourseCard = ({ course = defaultCourse, onEnroll }) => {
           </div>
 
           <div className="space-y-3">
-            <p className="text-gray-700">
-              <span className="font-medium">Giảng viên:</span>{' '}
-              {instructorFirstName} {instructorLastName}
+            <p className="text-gray-700 flex items-center gap-2">
+              <img 
+                src={`https://ui-avatars.com/api/?name=${instructorFirstName}+${instructorLastName}&background=random`}
+                alt={`${instructorFirstName} ${instructorLastName}`}
+                className="w-6 h-6 rounded-full"
+              />
+              <span className="font-medium hover:text-blue-600 transition-colors cursor-pointer">
+                {instructorFirstName} {instructorLastName}
+              </span>
             </p>
             <RatingStars rating={rating} reviewsCount={reviewsCount} />
             <p className="text-gray-600 line-clamp-2 leading-relaxed">
@@ -143,12 +169,21 @@ const CourseCard = ({ course = defaultCourse, onEnroll }) => {
 
           <div className="flex items-center gap-2 text-sm text-gray-500">
             <Tag size={14} />
-            <span>TypeScript, React, NextJS</span>
+            <div className="flex gap-2">
+              {['TypeScript', 'React', 'NextJS'].map((tag, index) => (
+                <span 
+                  key={index}
+                  className="hover:text-blue-600 cursor-pointer transition-colors"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
           </div>
         </div>
 
         {/* Price Section */}
-        <div className="w-1/4 flex-shrink-0 flex items-start justify-end">
+        <div className="w-1/4 flex-shrink-0">
           <PriceTag 
             price={price} 
             discountedPrice={discountedPrice}
@@ -157,8 +192,8 @@ const CourseCard = ({ course = defaultCourse, onEnroll }) => {
         </div>
       </div>
 
-      {/* Hover Effect Overlay */}
-      <div className="absolute inset-0 rounded-2xl border-2 border-transparent group-hover:border-blue-200 transition-colors duration-300" />
+      {/* Hover Effect */}
+      <div className="absolute inset-0 rounded-2xl border-2 border-transparent group-hover:border-blue-100 transition-all duration-300" />
     </div>
   );
 };

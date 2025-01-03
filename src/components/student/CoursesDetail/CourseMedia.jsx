@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
+import { AiFillHeart, AiOutlineHeart, AiOutlinePlayCircle } from "react-icons/ai";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -26,18 +26,10 @@ const CourseMedia = ({
       try {
         const [cartResponse, favoriteResponse, studyResponse, lecturesResponse] =
           await Promise.all([
-            axios.get(
-              `http://localhost:8080/api/student/cart/check/${userId}/${courseId}`
-            ),
-            axios.get(
-              `http://localhost:8080/api/student/wishlist/check/${userId}/${courseId}`
-            ),
-            axios.get(
-              `http://localhost:8080/api/student/enrollments/check/${userId}/${courseId}`
-            ),
-            axios.get(
-              `http://localhost:8080/api/student/lectures/${courseId}`
-            ),
+            axios.get(`http://localhost:8080/api/student/cart/check/${userId}/${courseId}`),
+            axios.get(`http://localhost:8080/api/student/wishlist/check/${userId}/${courseId}`),
+            axios.get(`http://localhost:8080/api/student/enrollments/check/${userId}/${courseId}`),
+            axios.get(`http://localhost:8080/api/student/lectures/${courseId}`),
           ]);
 
         setCheckCart(cartResponse.data);
@@ -87,110 +79,116 @@ const CourseMedia = ({
     }
   };
 
-  const onGoToCart = () => {
-    navigate(`/student/cart`);
-  };
-
-  const onStartLearning = () => {
-    navigate(`/student/list-my-course`);
-  };
+  const onGoToCart = () => navigate(`/student/cart`);
+  const onStartLearning = () => navigate(`/student/list-my-course`);
 
   return (
-    <div
-      className="bg-white p-6 rounded-lg shadow-xl text-center max-w-[500px] w-full border border-gray-300 ml-[30px]"
-      style={{
-        position: "sticky",
-        top: "100px", // Fixed at 100px from the top when scrolling
-      }}
-    >
+    <div className="bg-white rounded-2xl shadow-lg border border-gray-100 max-w-[400px] w-full sticky top-[100px] overflow-hidden">
       {/* Thumbnail */}
-      <div className="relative mb-6">
+      <div className="relative group">
         <img
           src={thumbnail}
-          alt="Preview"
-          className="w-full h-auto rounded-lg shadow-md border-4 border-gray-200 hover:shadow-2xl transition-transform duration-300 transform hover:scale-105"
+          alt="Course Preview"
+          className="w-full aspect-video object-cover transition-transform duration-300 group-hover:scale-105"
         />
+        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+          <button
+            onClick={() => setShowPreview(true)}
+            className="flex flex-col items-center transform translate-y-4 group-hover:translate-y-0 transition-all duration-300"
+          >
+            <AiOutlinePlayCircle className="text-white text-5xl mb-2" />
+            <span className="text-white font-medium">Xem trước khóa học</span>
+          </button>
+        </div>
       </div>
 
-     
+      <div className="p-6">
+        {/* Price */}
+        <div className="text-center mb-6">
+          <div className="text-3xl font-bold text-gray-900">
+            {new Intl.NumberFormat("vi-VN").format(price || 0)} VND
+          </div>
+          <p className="text-sm text-gray-500 mt-1">
+            Hoàn tiền trong 30 ngày nếu không hài lòng
+          </p>
+        </div>
 
-      {/* Preview Lectures Button */}
-      <button
-        onClick={() => setShowPreview(true)}
-        className="text-blue-600 font-medium underline hover:text-blue-800 transition-colors mb-6"
-      >
-        Xem trước khóa học
-      </button>
-       {/* Price */}
-       <div className="text-4xl font-bold text-gray-900 mb-6">
-        {new Intl.NumberFormat("vi-VN").format(price || 0)} VND
-     </div>
-      {/* Modal for Free Lecture Previews */}
+        {/* Action Buttons */}
+        <div className="flex items-center gap-4 mb-6">
+          {checkOnStudy ? (
+            <button
+              onClick={onStartLearning}
+              className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 rounded-xl font-semibold text-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg hover:shadow-xl"
+            >
+              Học ngay
+            </button>
+          ) : (
+            <>
+              <button
+                onClick={checkCart ? onGoToCart : onAddToCart}
+                className={`flex-1 py-3 rounded-xl font-semibold text-lg transition-all duration-300 shadow-lg hover:shadow-xl ${
+                  checkCart
+                    ? "bg-gradient-to-r from-green-500 to-green-600 text-white hover:from-green-600 hover:to-green-700"
+                    : "bg-gradient-to-r from-purple-500 to-purple-600 text-white hover:from-purple-600 hover:to-purple-700"
+                }`}
+              >
+                {checkCart ? "Chuyển đến giỏ hàng" : "Thêm vào giỏ hàng"}
+              </button>
+
+              <button
+                onClick={handleFavoriteToggle}
+                className="w-12 h-12 flex items-center justify-center rounded-xl bg-gray-50 hover:bg-gray-100 border border-gray-200 transition-all duration-300 group"
+              >
+                {checkFavorite ? (
+                  <AiFillHeart className="text-2xl text-red-500 group-hover:scale-110 transition-transform" />
+                ) : (
+                  <AiOutlineHeart className="text-2xl text-gray-400 group-hover:text-red-500 group-hover:scale-110 transition-all" />
+                )}
+              </button>
+            </>
+          )}
+        </div>
+
+        {/* Course Details */}
+        <div className="bg-gray-50 rounded-xl p-4">
+          <h3 className="font-semibold text-gray-900 mb-4">
+            Khóa học này bao gồm:
+          </h3>
+          <ul className="space-y-3">
+            {resourceDescription.length > 0 ? (
+              resourceDescription.map((item, index) => (
+                <li 
+                  key={index} 
+                  className="flex items-start gap-3 text-gray-600 hover:text-gray-900 transition-colors group"
+                >
+                  <span className="w-5 h-5 rounded bg-green-100 text-green-600 flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:bg-green-200 transition-colors">
+                    ✓
+                  </span>
+                  <span>{item}</span>
+                </li>
+              ))
+            ) : (
+              <li className="text-gray-500 italic text-center py-4">
+                Chưa có thông tin về tài nguyên khóa học
+              </li>
+            )}
+          </ul>
+        </div>
+
+        {error && (
+          <div className="mt-4 p-3 bg-red-50 text-red-600 rounded-lg text-sm">
+            {error}
+          </div>
+        )}
+      </div>
+
+      {/* Preview Modal */}
       {showPreview && (
         <ListLectureFree
           onClose={() => setShowPreview(false)}
           lectures={lectures}
         />
       )}
-
-      {/* Buttons for Cart and Wishlist */}
-      <div className="flex items-center justify-between mb-6">
-        {checkOnStudy ? (
-          <button
-            onClick={onStartLearning}
-            className="bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold text-lg hover:bg-blue-700 w-full"
-          >
-            Học ngay
-          </button>
-        ) : (
-          <>
-            {checkCart ? (
-              <button
-                onClick={onGoToCart}
-                className="bg-green-500 text-white py-3 px-6 rounded-lg font-semibold text-lg hover:bg-green-600 w-full mr-4"
-              >
-                Chuyển đến giỏ hàng
-              </button>
-            ) : (
-              <button
-                onClick={onAddToCart}
-                className="bg-purple-500 text-white py-3 px-6 rounded-lg font-semibold text-lg hover:bg-purple-600 w-full mr-4"
-              >
-                Thêm vào giỏ hàng
-              </button>
-            )}
-
-            <div
-              onClick={handleFavoriteToggle}
-              className="cursor-pointer w-12 h-12 flex items-center justify-center border border-gray-300 rounded-full bg-white shadow hover:shadow-lg"
-            >
-              {checkFavorite ? (
-                <AiFillHeart className="text-red-500 text-2xl" />
-              ) : (
-                <AiOutlineHeart className="text-gray-500 text-2xl" />
-              )}
-            </div>
-          </>
-        )}
-      </div>
-
-      {/* Course Details */}
-      <div className="text-left text-gray-700">
-        <p className="font-semibold mb-3 text-lg">Khóa học này bao gồm:</p>
-        <ul className="space-y-2 mb-4">
-          {resourceDescription.length > 0 ? (
-            resourceDescription.map((item, index) => (
-              <li key={index} className="text-gray-600 flex items-center">
-                <span className="mr-2">✅</span>{item}
-              </li>
-            ))
-          ) : (
-            <li className="text-gray-600">Không có tài nguyên nào.</li>
-          )}
-        </ul>
-      </div>
-
-      {error && <p className="text-red-500 text-sm">{error}</p>}
     </div>
   );
 };
