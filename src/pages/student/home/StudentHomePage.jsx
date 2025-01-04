@@ -26,7 +26,7 @@ const StudentHomePage = () => {
       <RecommendedCoursesSection />
       <TopPythonCoursesSection /> {/* Thêm component TopWebCoursesSection mới */}
       <TopMusicCoursesSection/>
-     
+     < RecommendedTopics/>
       <Footer />
     </div>
   );
