@@ -16,7 +16,7 @@ const Navbar = () => {
   const [cartItemCount, setCartItemCount] = useState(0);
   const navigate = useNavigate();
 
-  // Fetch categories
+  // Existing useEffect and functions remain the same
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -31,7 +31,6 @@ const Navbar = () => {
     fetchCategories();
   }, []);
 
-  // Fetch cart item count
   useEffect(() => {
     const fetchCartItemCount = async () => {
       try {
@@ -55,7 +54,6 @@ const Navbar = () => {
     fetchCartItemCount();
   }, []);
 
-  // Handle category menu open/close
   const handleMouseOver = () => {
     clearTimeout(timeoutRef.current);
     setMenuOpen(true);
@@ -67,7 +65,6 @@ const Navbar = () => {
     }, 1000);
   };
 
-  // Fetch suggestions with debounce
   const fetchSuggestions = debounce(async (query) => {
     if (!query.trim()) {
       setSuggestions([]);
@@ -99,61 +96,62 @@ const Navbar = () => {
       alert("Vui lòng nhập từ khóa tìm kiếm");
       return;
     }
-    setSuggestions([]); // Ẩn danh sách gợi ý khi bấm Enter
+    setSuggestions([]);
     navigate(`/search?query=${encodeURIComponent(searchQuery)}`);
   };
 
   const handleSearchChange = (e) => {
     const query = e.target.value;
     setSearchQuery(query);
-    fetchSuggestions(query); // Gọi hàm gợi ý
+    fetchSuggestions(query);
   };
 
   const handleSuggestionClick = (suggestion) => {
     setSearchQuery(suggestion);
-    setSuggestions([]); // Ẩn danh sách gợi ý khi chọn một mục
+    setSuggestions([]);
     navigate(`/search?query=${encodeURIComponent(suggestion)}`);
   };
 
   return (
-    <nav className="fixed top-0 left-0 w-full bg-gradient-to-r from-yellow-50 to-purple-100 shadow-md z-50">
-      <div className="container mx-auto px-4 py-3 flex items-center justify-between ">
+    <nav className="fixed top-0 left-0 w-full bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50 shadow-lg backdrop-blur-sm z-50">
+      <div className="container mx-auto px-6 py-4 flex items-center justify-between">
         {/* Logo and Categories */}
         <div
-          className="flex items-center space-x-4 relative"
+          className="flex items-center space-x-6 relative"
           onMouseEnter={handleMouseOver}
           onMouseLeave={handleMouseOut}
         >
-          <Link to="/student/home">
+          <Link to="/student/home" className="transform hover:scale-105 transition-all duration-300">
             <img
               src="https://firebasestorage.googleapis.com/v0/b/appgallery-30bf7.appspot.com/o/images%2FIronix-fotor-2024112911327.png?alt=media&token=47065fe1-64a1-449c-8cb1-4f91b96484ec"
               alt="Logo"
-              className="w-16 hover:scale-110 transition-transform duration-300"
+              className="w-16"
             />
           </Link>
-          <button className="text-gray-600 text-lg font-semibold focus:outline-none hover:text-blue-500">
-            Thể loại
+          <button className="text-gray-700 text-lg font-medium hover:text-blue-600 transition-colors duration-300 flex items-center gap-2">
+            <span>Thể loại</span>
+            <i className="fas fa-chevron-down text-sm transition-transform duration-300"></i>
           </button>
 
           {isMenuOpen && (
             <div
-              className="absolute top-full left-0 w-64 bg-white shadow-lg py-4 mt-2 rounded-md z-10"
+              className="absolute top-full left-0 w-72 bg-white shadow-xl rounded-xl py-4 mt-4 transform transition-all duration-300 border border-gray-100"
               onMouseEnter={handleMouseOver}
               onMouseLeave={handleMouseOut}
             >
-              <div className="grid grid-cols-1 gap-2 px-4">
+              <div className="grid grid-cols-1 gap-1">
                 {categories.length > 0 ? (
                   categories.map((category, index) => (
                     <Link
                       key={index}
                       to={`/category/${category.categoryId}`}
-                      className="text-gray-700 hover:text-blue-500 py-1 px-2 block transition duration-200"
+                      className="text-gray-600 hover:text-blue-600 hover:bg-blue-50 py-2 px-6 transition-all duration-200 flex items-center gap-2 group"
                     >
-                      {category.name}
+                      <span className="group-hover:translate-x-1 transition-transform duration-200">{category.name}</span>
                     </Link>
                   ))
                 ) : (
-                  <div className="text-gray-500 px-4">Không có danh mục</div>
+                  <div className="text-gray-500 px-6 py-2">Không có danh mục</div>
                 )}
               </div>
             </div>
@@ -162,42 +160,54 @@ const Navbar = () => {
 
         {/* Search Bar */}
         <div className="flex-grow mx-8">
-          <form onSubmit={handleSearchSubmit}>
-            <div className="relative w-full">
+          <form onSubmit={handleSearchSubmit} className="relative">
+            <div className="relative">
               <input
                 type="text"
-                placeholder="Tìm kiếm khóa học"
-                className="w-full px-5 py-3 text-sm border border-gray-300 rounded-full shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                placeholder="Tìm kiếm khóa học..."
+                className="w-full px-6 py-3 text-gray-700 bg-white/90 border border-gray-200 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 placeholder-gray-400"
                 value={searchQuery}
                 onChange={handleSearchChange}
               />
               <button
                 type="submit"
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-blue-500 text-white w-10 h-10 flex items-center justify-center rounded-full hover:bg-blue-600 shadow-md transition"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-gradient-to-r from-blue-500 to-purple-500 text-white w-10 h-10 flex items-center justify-center rounded-full hover:shadow-lg transition-all duration-300 group"
               >
-                <i className="fas fa-search text-lg"></i>
+                <i className="fas fa-search text-lg group-hover:scale-110 transition-transform duration-300"></i>
               </button>
+
               {loadingSuggestions && (
-                <div className="absolute bg-white text-gray-500 px-4 py-2 rounded-md shadow-md left-0 w-full">
-                  Đang tải...
+                <div className="absolute top-full left-0 w-full bg-white rounded-lg shadow-lg mt-2 p-4 border border-gray-100">
+                  <div className="flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+                    <span className="ml-2 text-gray-500">Đang tải...</span>
+                  </div>
                 </div>
               )}
+
               {suggestions.length > 0 && (
-                <ul className="absolute bg-white border mt-2 rounded-lg shadow-md z-10 max-h-48 overflow-y-auto w-full scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
+                <ul className="absolute top-full left-0 w-full bg-white rounded-lg shadow-lg mt-2 max-h-60 overflow-y-auto border border-gray-100 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
                   {suggestions.map((suggestion, index) => (
                     <li
                       key={index}
-                      className="px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-500 cursor-pointer transition duration-200"
+                      className="px-6 py-3 hover:bg-blue-50 cursor-pointer transition-colors duration-200 text-gray-700 hover:text-blue-600"
                       onClick={() => handleSuggestionClick(suggestion)}
                     >
-                      {suggestion}
+                      <div className="flex items-center gap-2">
+                        <i className="fas fa-search text-gray-400"></i>
+                        <span>{suggestion}</span>
+                      </div>
                     </li>
                   ))}
                 </ul>
               )}
+
               {suggestionsError && !loadingSuggestions && (
-                <div className="px-4 py-2 text-gray-500">
-                  Không có gợi ý nào phù hợp
+                <div className="absolute top-full left-0 w-full bg-white rounded-lg shadow-lg mt-2 p-4 text-gray-500 border border-gray-100">
+                  <div className="flex items-center gap-2">
+                    <i className="fas fa-info-circle text-blue-500"></i>
+                    <span>Không có gợi ý nào phù hợp</span>
+                  </div>
                 </div>
               )}
             </div>
@@ -205,40 +215,41 @@ const Navbar = () => {
         </div>
 
         {/* Cart and Profile */}
-        <div className="flex items-center space-x-6">
-          <div className="flex items-center space-x-6">
-            {/* Learning Section */}
-            <a
-              href="/student/list-my-course"
-              className="flex items-center space-x-2 text-gray-600 hover:text-blue-500 transition duration-200"
-            >
-              <i className="fas fa-book text-xl"></i>
-              <span className="hidden sm:inline">Học tập</span>
-            </a>
+        <div className="flex items-center space-x-8">
+          {/* Learning Section */}
+          <a
+            href="/student/list-my-course"
+            className="flex items-center space-x-2 text-gray-600 hover:text-blue-600 transition-all duration-300 group"
+          >
+            <i className="fas fa-book text-xl group-hover:scale-110 transition-transform duration-300"></i>
+            <span className="hidden sm:inline font-medium">Học tập</span>
+          </a>
 
-            {/* Cart Section */}
-            <Link
-              to="/student/cart"
-              className="relative text-gray-600 hover:text-blue-500 transition duration-200 flex items-center"
-            >
-              <i className="fas fa-shopping-cart text-xl"></i>
-              {cartItemCount > 0 && (
-                <span className="absolute top-[-8px] right-[-8px] bg-purple-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-md">
-                  {cartItemCount}
-                </span>
-              )}
-            </Link>
+          {/* Cart Section */}
+          <Link
+            to="/student/cart"
+            className="relative text-gray-600 hover:text-blue-600 transition-all duration-300 group"
+          >
+            <i className="fas fa-shopping-cart text-xl group-hover:scale-110 transition-transform duration-300"></i>
+            {cartItemCount > 0 && (
+              <span className="absolute -top-2 -right-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-lg transform transition-transform duration-300 group-hover:scale-110">
+                {cartItemCount}
+              </span>
+            )}
+          </Link>
 
-            {/* Wishlist Section */}
-            <a
-              href="/student/wishlist"
-              className="text-gray-600 hover:text-blue-500 transition duration-200 flex items-center"
-            >
-              <i className="fas fa-heart text-xl"></i>
-            </a>
+          {/* Wishlist Section */}
+          <a
+            href="/student/wishlist"
+            className="text-gray-600 hover:text-blue-600 transition-all duration-300 group"
+          >
+            <i className="fas fa-heart text-xl group-hover:scale-110 transition-transform duration-300"></i>
+          </a>
+
+          {/* Profile Menu */}
+          <div className="ml-2">
+            <ProfileMenu />
           </div>
-
-          <ProfileMenu />
         </div>
       </div>
     </nav>
