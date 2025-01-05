@@ -49,6 +49,8 @@ import RegisterForm from "./components/auth/RegisterForm.jsx";
 import OtpVerificationForm from "./components/auth/OtpVerificationForm.jsx";
 import ForgotPassForm from "./components/auth/ForgotPassForm.jsx";
 import ResetPassForm from "./components/auth/ResetPassForm.jsx";
+import QuestionTable from "./pages/instructor/PageQuestions/PageQuestions.jsx";
+import Questions from "./components/instructor/QuestionsAndAnswers/Questions.jsx";
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [role, setRole] = useState("");
@@ -173,6 +175,9 @@ function App() {
               <Route path="/instructor/sales" element={<PageSales />} />
               <Route path="/instructor/tests" element={<Test />} />
               <Route path="/instructor/scores" element={<PageViewScores />} />
+              <Route path="/instructor/questiontable" element={<QuestionTable />} />
+              <Route path="/instructor/listquestions" element={<Questions />} />
+
             </>
           )}
         </Routes>
