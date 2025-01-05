@@ -168,7 +168,7 @@ const ProfileInfo = () => {
   );
 
   return (
-    <div className="max-w-4xl mx-auto mt-[80px]">
+    <div className="max-w-4xl mx-auto mt-[80px] mb-[60px]">
       {error && (
         <Alert variant="destructive" className="mb-6">
           <AlertDescription>{error}</AlertDescription>
