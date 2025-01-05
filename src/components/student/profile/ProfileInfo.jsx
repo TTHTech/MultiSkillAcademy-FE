@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Camera, Loader2, Save, X, Edit3 } from "lucide-react";
+import { Camera, Loader2, Save, X, Edit3, User, Mail, Phone, Calendar, MapPin } from "lucide-react";
 
 const Alert = ({ variant = "default", children }) => (
   <div className={`p-4 rounded-lg ${
@@ -22,26 +22,33 @@ const LoadingSpinner = () => (
   </div>
 );
 
-const InputField = ({ label, value, onChange, type = "text", disabled = false }) => (
+const InputField = ({ label, value, onChange, type = "text", disabled = false, icon: Icon }) => (
   <div className="space-y-2">
     <label className="block text-sm font-medium text-gray-700">{label}</label>
-    {type === "textarea" ? (
-      <textarea
-        value={value || ""}
-        onChange={onChange}
-        disabled={disabled}
-        className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
-        rows={3}
-      />
-    ) : (
-      <input
-        type={type}
-        value={value || ""}
-        onChange={onChange}
-        disabled={disabled}
-        className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
-      />
-    )}
+    <div className="relative">
+      {Icon && (
+        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <Icon className="h-5 w-5 text-gray-400" />
+        </div>
+      )}
+      {type === "textarea" ? (
+        <textarea
+          value={value || ""}
+          onChange={onChange}
+          disabled={disabled}
+          className={`w-full p-3 ${Icon ? 'pl-10' : ''} border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500 transition-shadow duration-200`}
+          rows={3}
+        />
+      ) : (
+        <input
+          type={type}
+          value={value || ""}
+          onChange={onChange}
+          disabled={disabled}
+          className={`w-full p-3 ${Icon ? 'pl-10' : ''} border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500 transition-shadow duration-200`}
+        />
+      )}
+    </div>
   </div>
 );
 
@@ -135,7 +142,6 @@ const ProfileInfo = () => {
           method: 'PUT',
           headers: { 
             Authorization: `Bearer ${token}`,
-            // Không set Content-Type khi gửi FormData để browser tự xử lý
           },
           body: formDataToSend
         }
@@ -149,9 +155,7 @@ const ProfileInfo = () => {
         ...updatedProfile
       }));
       
-      // Fetch lại profile để lấy URL ảnh mới
       fetchProfile();
-
       setIsEditing(false);
       setError(null);
     } catch (err) {
@@ -168,30 +172,33 @@ const ProfileInfo = () => {
   );
 
   return (
-    <div className="max-w-4xl mx-auto mt-[80px] mb-[60px]">
+    <div className="max-w-4xl mx-auto mt-[80px] mb-[60px] px-4">
       {error && (
         <Alert variant="destructive" className="mb-6">
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
 
-      <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-        <div className="relative h-32 bg-gradient-to-r from-blue-500 to-blue-600">
+      <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
+        {/* Header Banner */}
+        <div className="relative h-40 bg-gradient-to-r from-blue-600 to-blue-400">
           <div className="absolute -bottom-16 left-8">
-            <div className="relative">
-              <img
-                src={formData.image 
-                  ? URL.createObjectURL(formData.image)
-                  : profile?.profileImage || "/default-avatar.png"
-                }
-                alt="Profile"
-                onError={(e) => {
-                  e.target.src = "/default-avatar.png";
-                }}
-                className="w-32 h-32 rounded-2xl object-cover border-4 border-white shadow-lg"
-              />
+            <div className="relative group">
+              <div className="w-32 h-32 rounded-2xl overflow-hidden border-4 border-white shadow-lg bg-white">
+                <img
+                  src={formData.image 
+                    ? URL.createObjectURL(formData.image)
+                    : profile?.profileImage || "/api/placeholder/400/320"
+                  }
+                  alt="Profile"
+                  onError={(e) => {
+                    e.target.src = "/api/placeholder/400/320";
+                  }}
+                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                />
+              </div>
               {isEditing && (
-                <label className="absolute bottom-2 right-2 p-2 bg-white rounded-full shadow-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                <label className="absolute bottom-2 right-2 p-2 bg-white rounded-full shadow-lg cursor-pointer hover:bg-gray-50 transition-all duration-200 hover:scale-105">
                   <Camera className="h-5 w-5 text-gray-600" />
                   <input
                     type="file"
@@ -203,10 +210,12 @@ const ProfileInfo = () => {
               )}
             </div>
           </div>
+
+          {/* Action Buttons */}
           {!isEditing ? (
             <button
               onClick={() => setIsEditing(true)}
-              className="absolute top-4 right-4 flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg backdrop-blur-sm transition-colors"
+              className="absolute top-4 right-4 flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg backdrop-blur-sm transition-all duration-200 hover:scale-105"
             >
               <Edit3 className="h-4 w-4" />
               Chỉnh sửa
@@ -215,14 +224,20 @@ const ProfileInfo = () => {
             <div className="absolute top-4 right-4 flex items-center gap-2">
               <button
                 onClick={handleUpdate}
-                className="flex items-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors"
+                className="flex items-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-all duration-200 hover:scale-105"
               >
                 <Save className="h-4 w-4" />
-                Lưu
+                Lưu thay đổi
               </button>
               <button
-                onClick={() => setIsEditing(false)}
-                className="flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg backdrop-blur-sm transition-colors"
+                onClick={() => {
+                  setIsEditing(false);
+                  setFormData({
+                    ...profile,
+                    image: null
+                  });
+                }}
+                className="flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg backdrop-blur-sm transition-all duration-200 hover:scale-105"
               >
                 <X className="h-4 w-4" />
                 Hủy
@@ -231,20 +246,24 @@ const ProfileInfo = () => {
           )}
         </div>
 
+        {/* Profile Content */}
         <div className="p-8 pt-20">
           <div className="grid grid-cols-2 gap-6">
+            {/* Username Section */}
             <div className="col-span-2">
-              <div className="p-4 bg-gray-50 rounded-lg space-y-2">
-                <p className="text-sm font-medium text-gray-600">Tên đăng nhập</p>
-                <p className="text-lg text-gray-900">{profile?.username || 'Chưa có thông tin'}</p>
+              <div className="p-4 bg-blue-50 rounded-lg space-y-2">
+                <p className="text-sm font-medium text-blue-600">Tên đăng nhập</p>
+                <p className="text-lg font-semibold text-gray-900">{profile?.username || 'Chưa có thông tin'}</p>
               </div>
             </div>
 
+            {/* Form Fields */}
             <InputField
               label="Họ"
               value={isEditing ? formData.lastName : profile?.lastName}
               onChange={e => setFormData(prev => ({ ...prev, lastName: e.target.value }))}
               disabled={!isEditing}
+              icon={User}
             />
 
             <InputField
@@ -252,12 +271,14 @@ const ProfileInfo = () => {
               value={isEditing ? formData.firstName : profile?.firstName}
               onChange={e => setFormData(prev => ({ ...prev, firstName: e.target.value }))}
               disabled={!isEditing}
+              icon={User}
             />
 
             <InputField
               label="Email"
               value={profile?.email}
               disabled={true}
+              icon={Mail}
             />
 
             <InputField
@@ -266,6 +287,7 @@ const ProfileInfo = () => {
               onChange={e => setFormData(prev => ({ ...prev, phone: e.target.value }))}
               disabled={!isEditing}
               type="tel"
+              icon={Phone}
             />
 
             <InputField
@@ -274,6 +296,7 @@ const ProfileInfo = () => {
               onChange={e => setFormData(prev => ({ ...prev, dateOfBirth: e.target.value }))}
               disabled={!isEditing}
               type="date"
+              icon={Calendar}
             />
 
             <div className="col-span-2">
@@ -283,6 +306,7 @@ const ProfileInfo = () => {
                 onChange={e => setFormData(prev => ({ ...prev, address: e.target.value }))}
                 disabled={!isEditing}
                 type="textarea"
+                icon={MapPin}
               />
             </div>
           </div>

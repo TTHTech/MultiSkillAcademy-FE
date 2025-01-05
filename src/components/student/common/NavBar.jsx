@@ -4,6 +4,7 @@ import axios from "axios";
 import debounce from "lodash.debounce";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import ProfileMenu from "../../../components/student/profile/ProfileMenu";
+import NotificationList from "../../../components/student/notification/NotificationList";
 
 const Navbar = () => {
   const [isMenuOpen, setMenuOpen] = useState(false);
@@ -13,8 +14,10 @@ const Navbar = () => {
   const [suggestionsError, setSuggestionsError] = useState(false);
   const [loadingSuggestions, setLoadingSuggestions] = useState(false);
   const timeoutRef = useRef(null);
+  const notificationTimeoutRef = useRef(null);
   const [cartItemCount, setCartItemCount] = useState(0);
-  const [notificationCount, setNotificationCount] = useState(5); // Giả định số thông báo
+  const [notificationCount, setNotificationCount] = useState(5);
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -62,7 +65,18 @@ const Navbar = () => {
   const handleMouseOut = () => {
     timeoutRef.current = setTimeout(() => {
       setMenuOpen(false);
-    }, 1000);
+    }, 300);
+  };
+
+  const handleNotificationMouseOver = () => {
+    clearTimeout(notificationTimeoutRef.current);
+    setIsNotificationOpen(true);
+  };
+
+  const handleNotificationMouseOut = () => {
+    notificationTimeoutRef.current = setTimeout(() => {
+      setIsNotificationOpen(false);
+    }, 300);
   };
 
   const fetchSuggestions = debounce(async (query) => {
@@ -186,7 +200,7 @@ const Navbar = () => {
               )}
 
               {suggestions.length > 0 && (
-                <ul className="absolute top-full left-0 w-full bg-white rounded-lg shadow-lg mt-2 max-h-60 overflow-y-auto border border-gray-100 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+                <ul className="absolute top-full left-0 w-full bg-white rounded-lg shadow-lg mt-2 max-h-60 overflow-y-auto border border-gray-100">
                   {suggestions.map((suggestion, index) => (
                     <li
                       key={index}
@@ -217,13 +231,13 @@ const Navbar = () => {
         {/* Cart, Notifications, Chat, and Profile */}
         <div className="flex items-center space-x-8">
           {/* Learning Section */}
-          <a
-            href="/student/list-my-course"
+          <Link
+            to="/student/list-my-course"
             className="flex items-center space-x-2 text-gray-600 hover:text-blue-600 transition-all duration-300 group"
           >
             <i className="fas fa-book text-xl group-hover:scale-110 transition-transform duration-300"></i>
             <span className="hidden sm:inline font-medium">Học tập</span>
-          </a>
+          </Link>
 
           {/* Cart Section */}
           <Link
@@ -239,25 +253,34 @@ const Navbar = () => {
           </Link>
 
           {/* Wishlist Section */}
-          <a
-            href="/student/wishlist"
+          <Link
+            to="/student/wishlist"
             className="text-gray-600 hover:text-blue-600 transition-all duration-300 group"
           >
             <i className="fas fa-heart text-xl group-hover:scale-110 transition-transform duration-300"></i>
-          </a>
+          </Link>
 
           {/* Notifications Section */}
-          <Link
-            to="/student/notifications"
-            className="relative text-gray-600 hover:text-blue-600 transition-all duration-300 group"
+          <div 
+            className="relative"
+            onMouseEnter={handleNotificationMouseOver}
+            onMouseLeave={handleNotificationMouseOut}
           >
-            <i className="fas fa-bell text-xl group-hover:scale-110 transition-transform duration-300"></i>
-            {notificationCount > 0 && (
-              <span className="absolute -top-2 -right-2 bg-gradient-to-r from-yellow-500 to-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-lg transform transition-transform duration-300 group-hover:scale-110">
-                {notificationCount}
-              </span>
-            )}
-          </Link>
+            <Link
+              to="/student/notification"
+              className="relative text-gray-600 hover:text-blue-600 transition-all duration-300 group"
+            >
+              <i className="fas fa-bell text-xl group-hover:scale-110 transition-transform duration-300"></i>
+              {notificationCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-gradient-to-r from-yellow-500 to-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-lg transform transition-transform duration-300 group-hover:scale-110">
+                  {notificationCount}
+                </span>
+              )}
+            </Link>
+
+            {/* Using the NotificationList component */}
+            <NotificationList isOpen={isNotificationOpen} />
+          </div>
 
           {/* Chat Section */}
           <Link

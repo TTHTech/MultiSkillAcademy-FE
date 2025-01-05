@@ -51,6 +51,7 @@ import ForgotPassForm from "./components/auth/ForgotPassForm.jsx";
 import ResetPassForm from "./components/auth/ResetPassForm.jsx";
 import QuestionTable from "./pages/instructor/PageQuestions/PageQuestions.jsx";
 import Questions from "./components/instructor/QuestionsAndAnswers/Questions.jsx";
+import NotificationList from "./components/student/notification/NotificationList.jsx";
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [role, setRole] = useState("");
@@ -148,7 +149,7 @@ function App() {
               <Route path="/student/home" element={<StudentHomePage />} />
               <Route path="/student/cart" element={<CartPage />} />
               <Route path="/student/list-my-course" element={<MyCoursesPage />} />
-             
+              <Route path="/student/notification" element={<NotificationList/>} />
               <Route path="/student/profile" element={<ProfilePage />} />
               <Route path="/category/:categoryId" element={<CategoryStudentPage />} />
               <Route path="/student/study/:progress/:id" element={<CourseViewerPage />} />
