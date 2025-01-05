@@ -105,10 +105,6 @@ const SuggestedCoursesSection = () => {
         <div
           ref={scrollContainer}
           className="flex gap-6 overflow-hidden scroll-smooth pb-4"
-          style={{
-            maskImage: 'linear-gradient(to right, transparent, black 2%, black 98%, transparent)',
-            WebkitMaskImage: 'linear-gradient(to right, transparent, black 2%, black 98%, transparent)'
-          }}
         >
           {courses.map((course, index) => (
             <Link
