@@ -19,7 +19,31 @@ const NotificationList = ({ isOpen }) => {
       isRead: true
     },
     {
-      id: 3, 
+      id: 4, 
+      message: "Thông báo hệ thống: Bảo trì lúc 10:00 AM.",
+      time: "5 giờ trước",
+      isRead: false
+    },
+    {
+      id: 5, 
+      message: "Thông báo hệ thống: Bảo trì lúc 10:00 AM.",
+      time: "5 giờ trước",
+      isRead: false
+    },
+    {
+      id: 6, 
+      message: "Thông báo hệ thống: Bảo trì lúc 10:00 AM.",
+      time: "5 giờ trước",
+      isRead: false
+    },
+    {
+      id: 7, 
+      message: "Thông báo hệ thống: Bảo trì lúc 10:00 AM.",
+      time: "5 giờ trước",
+      isRead: false
+    },
+    {
+      id: 8, 
       message: "Thông báo hệ thống: Bảo trì lúc 10:00 AM.",
       time: "5 giờ trước",
       isRead: false
@@ -27,7 +51,7 @@ const NotificationList = ({ isOpen }) => {
   ];
 
   return (
-    <div className="absolute right-0 top-full mt-3 w-80 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50">
+    <div className="absolute right-0 top-full mt-3 w-80 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50 ">
       {/* Header */}
       <div className="flex justify-between items-center px-4 py-3 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-gray-100">
         <div className="flex items-center gap-2">
@@ -40,7 +64,7 @@ const NotificationList = ({ isOpen }) => {
       </div>
 
       {/* Notifications List */}
-      <div className="max-h-[400px] overflow-y-auto divide-y divide-gray-100">
+      <div className="max-h-[400px] overflow-y-auto divide-y divide-gray-100 thin=">
         {mockNotifications.map((notification) => (
           <Link
             to="/notification"
