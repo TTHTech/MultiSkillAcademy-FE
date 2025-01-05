@@ -14,9 +14,9 @@ const Navbar = () => {
   const [loadingSuggestions, setLoadingSuggestions] = useState(false);
   const timeoutRef = useRef(null);
   const [cartItemCount, setCartItemCount] = useState(0);
+  const [notificationCount, setNotificationCount] = useState(5); // Giả định số thông báo
   const navigate = useNavigate();
 
-  // Existing useEffect and functions remain the same
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -214,7 +214,7 @@ const Navbar = () => {
           </form>
         </div>
 
-        {/* Cart and Profile */}
+        {/* Cart, Notifications, Chat, and Profile */}
         <div className="flex items-center space-x-8">
           {/* Learning Section */}
           <a
@@ -245,6 +245,27 @@ const Navbar = () => {
           >
             <i className="fas fa-heart text-xl group-hover:scale-110 transition-transform duration-300"></i>
           </a>
+
+          {/* Notifications Section */}
+          <Link
+            to="/student/notifications"
+            className="relative text-gray-600 hover:text-blue-600 transition-all duration-300 group"
+          >
+            <i className="fas fa-bell text-xl group-hover:scale-110 transition-transform duration-300"></i>
+            {notificationCount > 0 && (
+              <span className="absolute -top-2 -right-2 bg-gradient-to-r from-yellow-500 to-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-lg transform transition-transform duration-300 group-hover:scale-110">
+                {notificationCount}
+              </span>
+            )}
+          </Link>
+
+          {/* Chat Section */}
+          <Link
+            to="/student/chat"
+            className="text-gray-600 hover:text-blue-600 transition-all duration-300 group"
+          >
+            <i className="fas fa-comments text-xl group-hover:scale-110 transition-transform duration-300"></i>
+          </Link>
 
           {/* Profile Menu */}
           <div className="ml-2">
