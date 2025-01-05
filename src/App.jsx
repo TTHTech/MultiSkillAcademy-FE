@@ -52,6 +52,7 @@ import ResetPassForm from "./components/auth/ResetPassForm.jsx";
 import QuestionTable from "./pages/instructor/PageQuestions/PageQuestions.jsx";
 import Questions from "./components/instructor/QuestionsAndAnswers/Questions.jsx";
 import NotificationList from "./components/student/notification/NotificationList.jsx";
+import ChatPage from "./pages/student/chat/ChatPage.jsx";
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [role, setRole] = useState("");
@@ -154,7 +155,7 @@ function App() {
               <Route path="/category/:categoryId" element={<CategoryStudentPage />} />
               <Route path="/student/study/:progress/:id" element={<CourseViewerPage />} />
               <Route path="/student/wishlist" element={<Wishlist />} />
-             
+              <Route path="/student/chat" element={<ChatPage />} />
               <Route path="/student/Success" element={<SuccessPage />} />
               <Route path="/student/payment/success" element={<SuccessPage />} />
               <Route path="/student/result" element={<ResultPage />} />
