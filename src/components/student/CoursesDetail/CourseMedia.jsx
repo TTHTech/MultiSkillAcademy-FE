@@ -83,7 +83,7 @@ const CourseMedia = ({
   const onStartLearning = () => navigate(`/student/list-my-course`);
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg border border-gray-100 max-w-[400px] w-full sticky top-[100px] overflow-hidden">
+    <div className="bg-white rounded-md shadow-lg border border-gray-100 max-w-[400px] w-full sticky top-[100px] overflow-hidden">
       {/* Thumbnail */}
       <div className="relative group">
         <img
@@ -118,7 +118,7 @@ const CourseMedia = ({
           {checkOnStudy ? (
             <button
               onClick={onStartLearning}
-              className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 rounded-xl font-semibold text-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg hover:shadow-xl"
+              className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 rounded-md font-semibold text-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg hover:shadow-xl"
             >
               Học ngay
             </button>
@@ -126,7 +126,7 @@ const CourseMedia = ({
             <>
               <button
                 onClick={checkCart ? onGoToCart : onAddToCart}
-                className={`flex-1 py-3 rounded-xl font-semibold text-lg transition-all duration-300 shadow-lg hover:shadow-xl ${
+                className={`flex-1 py-3 rounded-md font-semibold text-lg transition-all duration-300 shadow-lg hover:shadow-xl ${
                   checkCart
                     ? "bg-gradient-to-r from-green-500 to-green-600 text-white hover:from-green-600 hover:to-green-700"
                     : "bg-gradient-to-r from-purple-500 to-purple-600 text-white hover:from-purple-600 hover:to-purple-700"
@@ -137,7 +137,7 @@ const CourseMedia = ({
 
               <button
                 onClick={handleFavoriteToggle}
-                className="w-12 h-12 flex items-center justify-center rounded-xl bg-gray-50 hover:bg-gray-100 border border-gray-200 transition-all duration-300 group"
+                className="w-12 h-12 flex items-center justify-center rounded-md bg-gray-50 hover:bg-gray-100 border border-gray-200 transition-all duration-300 group"
               >
                 {checkFavorite ? (
                   <AiFillHeart className="text-2xl text-red-500 group-hover:scale-110 transition-transform" />
@@ -150,7 +150,7 @@ const CourseMedia = ({
         </div>
 
         {/* Course Details */}
-        <div className="bg-gray-50 rounded-xl p-4">
+        <div className="bg-gray-50 rounded-md p-4">
           <h3 className="font-semibold text-gray-900 mb-4">
             Khóa học này bao gồm:
           </h3>
