@@ -64,7 +64,7 @@ const CourseQuestionsTable = () => {
     setCurrentPage((prev) => Math.min(prev + 1, totalPages));
   const goToPreviousPage = () =>
     setCurrentPage((prev) => Math.max(prev - 1, 1));
-  
+
   const handleRowClick = (course) => {
     setSelectedCourse(course);
     setIsModalOpen(true);
@@ -169,8 +169,12 @@ const CourseQuestionsTable = () => {
           </table>
         </div>
         {isModalOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 w-full max-w-2xl shadow-lg">
+          <div
+            className={`fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 transition-all duration-300 ${
+              open ? "pl-72" : "pl-16"
+            }`}
+          >
+            <div className="bg-white rounded-lg p-6 w-full max-w-[60vw] shadow-lg max-h-[80vh] overflow-y-auto">
               <h2 className="text-2xl font-bold text-blue-700 mb-4">
                 Questions for {selectedCourse.courseName}
               </h2>
@@ -186,6 +190,7 @@ const CourseQuestionsTable = () => {
             </div>
           </div>
         )}
+
         <div className="flex items-center justify-between mt-6">
           <button
             onClick={goToPreviousPage}
