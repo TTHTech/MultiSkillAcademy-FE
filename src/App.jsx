@@ -26,7 +26,6 @@ import PageDashboard from "./pages/instructor/PageDashboard";
 import PageCourses from "./pages/instructor/PageCourses/PageCourses";
 import PagneCourseDetail from "./pages/instructor/PageCourses/PageCourseDetail";
 import PageAdd from "./pages/instructor/PageCourses/PageCoursesAdd";
-import PageQuestions from "./pages/instructor/PageQuestions";
 import StudentList from "./pages/instructor/PageStudents";
 import CourseViewerPage from "./pages/student/content/CourseViewerPage.jsx";
 import CategoryPage from "./pages/admin/CategoryPage";
@@ -49,8 +48,7 @@ import RegisterForm from "./components/auth/RegisterForm.jsx";
 import OtpVerificationForm from "./components/auth/OtpVerificationForm.jsx";
 import ForgotPassForm from "./components/auth/ForgotPassForm.jsx";
 import ResetPassForm from "./components/auth/ResetPassForm.jsx";
-import QuestionTable from "./pages/instructor/PageQuestions/PageQuestions.jsx";
-import Questions from "./components/instructor/QuestionsAndAnswers/Questions.jsx";
+import PageQuestions from "./pages/instructor/PageQuestions/PageQuestions.jsx";
 import NotificationList from "./components/student/notification/NotificationList.jsx";
 import ChatPage from "./pages/student/chat/ChatPage.jsx";
 function App() {
@@ -172,14 +170,11 @@ function App() {
               <Route path="/instructor/courses/:id" element={<PagneCourseDetail />} />
               <Route path="/instructor/courses/addCourses" element={<PageAdd />} />
               <Route path="/instructor/review" element={<PageReview />} />
-              <Route path="/instructor/questions" element={<PageQuestions />} />
               <Route path="/instructor/students" element={<StudentList />} />
               <Route path="/instructor/sales" element={<PageSales />} />
               <Route path="/instructor/tests" element={<Test />} />
               <Route path="/instructor/scores" element={<PageViewScores />} />
-              <Route path="/instructor/questiontable" element={<QuestionTable />} />
-              <Route path="/instructor/listquestions" element={<Questions />} />
-
+              <Route path="/instructor/questions" element={<PageQuestions />} />
             </>
           )}
         </Routes>
