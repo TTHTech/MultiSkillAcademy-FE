@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import { Star, ChevronLeft, ChevronRight, Trophy } from 'lucide-react';
+import { Star, ChevronLeft, ChevronRight, Trophy, Flame } from 'lucide-react';
 import { motion } from "framer-motion";
 
 const SuggestedCoursesSection = () => {
@@ -17,7 +17,9 @@ const SuggestedCoursesSection = () => {
         const shuffledCourses = response.data.sort(() => 0.5 - Math.random());
         const updatedCourses = shuffledCourses.map(course => ({
           ...course,
-          originalPrice: 500000 // Set original price to 500000 for all courses
+          originalPrice: 500000, // Set original price to 500000 for all courses
+          discount: 30, // Set default discount to 30%
+          tag: course.rating >= 4.5 ? 'Bestseller' : 'Hot' // Add tag based on rating
         }));
         setCourses(updatedCourses);
       } catch (error) {
@@ -181,11 +183,28 @@ const SuggestedCoursesSection = () => {
                   className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-300"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                {course.isNew && (
-                  <span className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-                    Mới
+                <div className="absolute top-2 left-2 flex gap-2">
+                  {course.isNew && (
+                    <span className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                      Mới
+                    </span>
+                  )}
+                  <span className={`flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-full ${
+                    course.tag === 'Bestseller' ? 'bg-yellow-500 text-white' : 'bg-orange-500 text-white'
+                  }`}>
+                    {course.tag === 'Bestseller' ? (
+                      <Trophy className="w-3 h-3" />
+                    ) : (
+                      <Flame className="w-3 h-3" />
+                    )}
+                    {course.tag}
                   </span>
-                )}
+                </div>
+                <div className="absolute top-2 right-2">
+                  <span className="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                    -{course.discount}%
+                  </span>
+                </div>
               </div>
 
               {/* Course Content */}
@@ -208,19 +227,14 @@ const SuggestedCoursesSection = () => {
                   <span className="text-gray-500 ml-2">({course.reviews || course.numberReview})</span>
                 </div>
 
-                {/* Price and Button */}
-                <div className="flex items-center justify-between">
-                  <div>
-                    <span className="text-sm line-through text-gray-500 mr-2">
-                      đ{course.originalPrice?.toLocaleString("vi-VN")}
-                    </span>
-                    <span className="text-xl font-bold text-indigo-600">
-                      đ{course.price.toLocaleString("vi-VN")}
-                    </span>
-                  </div>
-                  <button className="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-lg font-medium transition-colors duration-300 hover:bg-indigo-100">
-                    Chi tiết
-                  </button>
+                {/* Price */}
+                <div>
+                  <span className="text-sm line-through text-gray-500 mr-2">
+                    đ{course.originalPrice?.toLocaleString("vi-VN")}
+                  </span>
+                  <span className="text-xl font-bold text-indigo-600">
+                    đ{(course.originalPrice * (1 - course.discount / 100)).toLocaleString("vi-VN")}
+                  </span>
                 </div>
               </div>
             </Link>
