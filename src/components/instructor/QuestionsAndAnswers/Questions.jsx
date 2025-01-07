@@ -8,6 +8,7 @@ const DetailQuestions = ({ courseId }) => {
   const [expandedQuestionId, setExpandedQuestionId] = useState(null);
   const token = localStorage.getItem("token");
   const userId = Number(localStorage.getItem("userId"));
+  const [refresh, setRefresh] = useState(false);
 
   useEffect(() => {
     const fetchQuestions = async () => {
@@ -28,7 +29,8 @@ const DetailQuestions = ({ courseId }) => {
       }
     };
     fetchQuestions();
-  }, [courseId, token, questions]);
+  }, [courseId, token, refresh]);
+  const triggerRefresh = () => setRefresh((prev) => !prev);
 
   const handleDeleteQuestion = async (questionsId) => {
     const swalResult = await Swal.fire({
@@ -52,9 +54,7 @@ const DetailQuestions = ({ courseId }) => {
           },
         }
       );
-      setQuestions((prevQuestions) =>
-        prevQuestions.filter((question) => question.questionsId !== questionsId)
-      );
+      triggerRefresh();
       await Swal.fire({
         title: "Confirmation",
         text: "Xóa câu hỏi thành công",
@@ -93,18 +93,7 @@ const DetailQuestions = ({ courseId }) => {
         },
         body: JSON.stringify(newAnswer),
       });
-
-      setQuestions((prevQuestions) =>
-        prevQuestions.map((question) =>
-          question.questionsId === expandedQuestionId
-            ? {
-                ...question,
-                listAnswers: [...question.listAnswers, newAnswer],
-                totalAnswers: question.totalAnswers + 1,
-              }
-            : question
-        )
-      );
+      triggerRefresh();
       await Swal.fire({
         title: "Confirmation",
         text: "Thêm câu trả lời thành công",
@@ -138,18 +127,7 @@ const DetailQuestions = ({ courseId }) => {
           },
         }
       );
-      setQuestions((prevQuestions) =>
-        prevQuestions.map((question) =>
-          question.questionsId === questionsId
-            ? {
-                ...question,
-                listAnswers: question.listAnswers.filter(
-                  (answer) => answer.answersId !== answersId
-                ),
-              }
-            : question
-        )
-      );
+      triggerRefresh();
       await Swal.fire({
         title: "Confirmation",
         text: "Xóa câu trả lời thành công",
@@ -178,8 +156,6 @@ const DetailQuestions = ({ courseId }) => {
     if (swalResult.isDismissed) {
       return;
     }
-
-
     fetch(`http://localhost:8080/api/instructor/evaluateAnswer/${answersId}`, {
       method: "PUT",
       headers: {
@@ -212,6 +188,7 @@ const DetailQuestions = ({ courseId }) => {
           confirmButtonText: "Yes",
         });
       });
+      triggerRefresh();
   };
   if (loading) {
     return <div className="text-center text-lg mt-10">Loading...</div>;

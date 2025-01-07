@@ -492,7 +492,7 @@ const MainContent = ({
           )}
           {selectedTab === 1 && (
             <div>
-              <h3 className="text-2xl font-semibold ml-8 mt-8">Hỏi Đáp</h3>
+              {/* <h3 className="text-2xl font-semibold ml-8 mt-8">Hỏi Đáp</h3> */}
               <QuestionsAndAnswers courseId={id} />
             </div>
           )}
