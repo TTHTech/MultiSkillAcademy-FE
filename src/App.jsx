@@ -26,7 +26,6 @@ import PageDashboard from "./pages/instructor/PageDashboard";
 import PageCourses from "./pages/instructor/PageCourses/PageCourses";
 import PagneCourseDetail from "./pages/instructor/PageCourses/PageCourseDetail";
 import PageAdd from "./pages/instructor/PageCourses/PageCoursesAdd";
-import PageQuestions from "./pages/instructor/PageQuestions";
 import StudentList from "./pages/instructor/PageStudents";
 import CourseViewerPage from "./pages/student/content/CourseViewerPage.jsx";
 import CategoryPage from "./pages/admin/CategoryPage";
@@ -44,6 +43,14 @@ import ResultPage from "./pages/student/quiz/ResultPage";
 import SearchCoursePage from "./pages/student/search/SearchCoursePage";
 import PageViewScores from "./pages/instructor/PageViewScores";
 import CertificateGenerator from "./components/student/certificate/Certificate.jsx";
+import LoginForm from "./components/auth/LoginForm.jsx";
+import RegisterForm from "./components/auth/RegisterForm.jsx";
+import OtpVerificationForm from "./components/auth/OtpVerificationForm.jsx";
+import ForgotPassForm from "./components/auth/ForgotPassForm.jsx";
+import ResetPassForm from "./components/auth/ResetPassForm.jsx";
+import PageQuestions from "./pages/instructor/PageQuestions/PageQuestions.jsx";
+import NotificationList from "./components/student/notification/NotificationList.jsx";
+import ChatPage from "./pages/student/chat/ChatPage.jsx";
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [role, setRole] = useState("");
@@ -53,20 +60,19 @@ function App() {
   useEffect(() => {
     const token = localStorage.getItem("token");
     const userRole = localStorage.getItem("role");
-
-    if (
-      !token &&
-      location.pathname !== "/login" &&
-      location.pathname !== "/register" &&
-      location.pathname !== "/verify-otp" &&
-      location.pathname !== "/forgot-password"
-    ) {
+  
+    // Các trang không yêu cầu xác thực
+    const noAuthPages = ["/login", "/register", "/verify-otp", "/forgot-password", "/reset-password"];
+  
+    // Nếu không có token và không phải các trang không yêu cầu xác thực, chuyển hướng về login
+    if (!token && !noAuthPages.includes(location.pathname)) {
       navigate("/login");
     } else if (token) {
       setIsLoggedIn(true);
       setRole(userRole);
     }
   }, [navigate, location.pathname]);
+  
 
   // Kiểm tra xem trang hiện tại có phải là trang admin không
   const isAdminLayout =
@@ -109,12 +115,12 @@ function App() {
 
         {/* Routes */}
         <Routes>
-          <Route path="/login" element={<LoginPage />} />
+          <Route path="/login" element={<LoginForm />} />
           <Route path="/logout" element={<Logout />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/verify-otp" element={<OtpVerificationPage />} />
-          <Route path="/forgot-password" element={<ForgotPassPage />} />
-          <Route path="/reset-password" element={<ResetPassPage />} />
+          <Route path="/register" element={<RegisterForm />} />
+          <Route path="/verify-otp" element={<OtpVerificationForm/>} />
+          <Route path="/forgot-password" element={<ForgotPassForm />} />
+          <Route path="/reset-password" element={<ResetPassForm />} />
           <Route path="/student/quiz/:id" element={<QuizPage />} />
           <Route path="/certificate" element={<CertificateGenerator />} />
           <Route path="/search" element={<SearchCoursePage />} />
@@ -142,12 +148,12 @@ function App() {
               <Route path="/student/home" element={<StudentHomePage />} />
               <Route path="/student/cart" element={<CartPage />} />
               <Route path="/student/list-my-course" element={<MyCoursesPage />} />
-             
+              <Route path="/student/notification" element={<NotificationList/>} />
               <Route path="/student/profile" element={<ProfilePage />} />
               <Route path="/category/:categoryId" element={<CategoryStudentPage />} />
               <Route path="/student/study/:progress/:id" element={<CourseViewerPage />} />
               <Route path="/student/wishlist" element={<Wishlist />} />
-             
+              <Route path="/student/chat" element={<ChatPage />} />
               <Route path="/student/Success" element={<SuccessPage />} />
               <Route path="/student/payment/success" element={<SuccessPage />} />
               <Route path="/student/result" element={<ResultPage />} />
@@ -164,11 +170,11 @@ function App() {
               <Route path="/instructor/courses/:id" element={<PagneCourseDetail />} />
               <Route path="/instructor/courses/addCourses" element={<PageAdd />} />
               <Route path="/instructor/review" element={<PageReview />} />
-              <Route path="/instructor/questions" element={<PageQuestions />} />
               <Route path="/instructor/students" element={<StudentList />} />
               <Route path="/instructor/sales" element={<PageSales />} />
               <Route path="/instructor/tests" element={<Test />} />
               <Route path="/instructor/scores" element={<PageViewScores />} />
+              <Route path="/instructor/questions" element={<PageQuestions />} />
             </>
           )}
         </Routes>

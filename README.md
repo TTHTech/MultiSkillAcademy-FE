@@ -1,7 +1,8 @@
 # ✨ SMART LEARNING - ReactJS ✨
 
 ## 📆 **Website Bán Khóa Học**
-**Tên dự án**: Smart Learning
+**Tên dự án**: Smart Learning.
+
 **Công nghệ sử dụng**: ReactJS, Framer Motion, Tailwind CSS  
 **Chức năng chính**:  
 
@@ -450,7 +451,7 @@ http://localhost:5173
         
 
 
- ```
+```
 🚨 **Lưu Ý**:  
 - Đảm bảo cài đặt đúng phiên bản Node.js.  
 - Nếu gặp lỗi, kiểm tra lại phiên bản của các thư viện và môi trường.

@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import { Star, ChevronLeft, ChevronRight, Clock, Users, Trophy } from 'lucide-react';
 
-const TopMusicCoursesSection = () => {
+const TopMarketingCoursesSection = () => {
   const [courses, setCourses] = useState([]);
   const [categoryName, setCategoryName] = useState("");
   const [loading, setLoading] = useState(true);
@@ -12,7 +12,7 @@ const TopMusicCoursesSection = () => {
   const [isRightVisible, setIsRightVisible] = useState(true);
   const scrollContainer = useRef(null);
 
-  const categoryId = "CAT010"; // ID danh mục
+  const categoryId = "CAT008"; // ID danh mục
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -197,4 +197,4 @@ const TopMusicCoursesSection = () => {
   );
 };
 
-export default TopMusicCoursesSection;
+export default TopMarketingCoursesSection;

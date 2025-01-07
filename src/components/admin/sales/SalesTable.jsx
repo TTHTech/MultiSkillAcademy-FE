@@ -74,10 +74,24 @@ const SalesTable = () => {
   const handleSearch = (e) => {
     const term = e.target.value.toLowerCase();
     setSearchTerm(term);
-    filterCourses(term, categoryFilter, revenueFilter, reviewFilter, salesFilter, statusFilter);
+    filterCourses(
+      term,
+      categoryFilter,
+      revenueFilter,
+      reviewFilter,
+      salesFilter,
+      statusFilter
+    );
   };
 
-  const filterCourses = (searchTerm, category, revenue, review, sales, status) => {
+  const filterCourses = (
+    searchTerm,
+    category,
+    revenue,
+    review,
+    sales,
+    status
+  ) => {
     let filtered = courses.filter(
       (course) =>
         course.courseId.toLowerCase().includes(searchTerm) ||
@@ -89,21 +103,24 @@ const SalesTable = () => {
     }
 
     if (revenue) {
-      filtered = revenue === "low" 
-        ? filtered.sort((a, b) => a.totalRevenue - b.totalRevenue)
-        : filtered.sort((a, b) => b.totalRevenue - a.totalRevenue);
+      filtered =
+        revenue === "low"
+          ? filtered.sort((a, b) => a.totalRevenue - b.totalRevenue)
+          : filtered.sort((a, b) => b.totalRevenue - a.totalRevenue);
     }
 
     if (review) {
-      filtered = review === "low"
-        ? filtered.sort((a, b) => a.averageReviews - b.averageReviews)
-        : filtered.sort((a, b) => b.averageReviews - a.averageReviews);
+      filtered =
+        review === "low"
+          ? filtered.sort((a, b) => a.averageReviews - b.averageReviews)
+          : filtered.sort((a, b) => b.averageReviews - a.averageReviews);
     }
 
     if (sales) {
-      filtered = sales === "low"
-        ? filtered.sort((a, b) => a.totalSales - b.totalSales)
-        : filtered.sort((a, b) => b.totalSales - a.totalSales);
+      filtered =
+        sales === "low"
+          ? filtered.sort((a, b) => a.totalSales - b.totalSales)
+          : filtered.sort((a, b) => b.totalSales - a.totalSales);
     }
 
     if (status) {
@@ -117,7 +134,10 @@ const SalesTable = () => {
 
   const indexOfLastCourse = currentPage * coursesPerPage;
   const indexOfFirstCourse = indexOfLastCourse - coursesPerPage;
-  const currentCourses = filteredCourses.slice(indexOfFirstCourse, indexOfLastCourse);
+  const currentCourses = filteredCourses.slice(
+    indexOfFirstCourse,
+    indexOfLastCourse
+  );
 
   const nextPage = () => {
     if (currentPage < totalPages) {
@@ -133,11 +153,19 @@ const SalesTable = () => {
 
   const handleExportPDF = () => {
     const doc = new jsPDF();
-    const tableColumns = ["ID", "Title", "Revenue", "Average Review", "Review Count", "Total Sales", "Status"];
+    const tableColumns = [
+      "ID",
+      "Title",
+      "Revenue",
+      "Average Review",
+      "Review Count",
+      "Total Sales",
+      "Status",
+    ];
     let tableData = [];
 
     if (exportOption === "all") {
-      tableData = courses.map(course => [
+      tableData = courses.map((course) => [
         course.courseId,
         course.title,
         course.totalRevenue,
@@ -147,7 +175,7 @@ const SalesTable = () => {
         course.courseStatus,
       ]);
     } else {
-      tableData = currentCourses.map(course => [
+      tableData = currentCourses.map((course) => [
         course.courseId,
         course.title,
         course.totalRevenue,
@@ -165,27 +193,30 @@ const SalesTable = () => {
 
     doc.save("sales_table.pdf");
   };
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
 
   const handleExportExcel = () => {
     const tableData =
       exportOption === "all"
         ? courses.map((course) => ({
-            "ID": course.courseId,
-            "Title": course.title,
-            "Revenue": course.totalRevenue,
+            ID: course.courseId,
+            Title: course.title,
+            Revenue: course.totalRevenue,
             "Average Review": course.averageReviews,
             "Review Count": course.reviewCount,
             "Total Sales": course.totalSales,
-            "Status": course.courseStatus,
+            Status: course.courseStatus,
           }))
         : currentCourses.map((course) => ({
-            "ID": course.courseId,
-            "Title": course.title,
-            "Revenue": course.totalRevenue,
+            ID: course.courseId,
+            Title: course.title,
+            Revenue: course.totalRevenue,
             "Average Review": course.averageReviews,
             "Review Count": course.reviewCount,
             "Total Sales": course.totalSales,
-            "Status": course.courseStatus,
+            Status: course.courseStatus,
           }));
 
     const worksheet = XLSX.utils.json_to_sheet(tableData);
@@ -212,7 +243,10 @@ const SalesTable = () => {
               value={searchTerm}
               onChange={handleSearch}
             />
-            <Search className="absolute left-3 top-2.5 text-gray-400" size={18} />
+            <Search
+              className="absolute left-3 top-2.5 text-gray-400"
+              size={18}
+            />
           </div>
 
           <div className="flex gap-4 items-center">
@@ -220,7 +254,14 @@ const SalesTable = () => {
               value={categoryFilter}
               onChange={(e) => {
                 setCategoryFilter(e.target.value);
-                filterCourses(searchTerm, e.target.value, revenueFilter, reviewFilter, salesFilter, statusFilter);
+                filterCourses(
+                  searchTerm,
+                  e.target.value,
+                  revenueFilter,
+                  reviewFilter,
+                  salesFilter,
+                  statusFilter
+                );
               }}
               className="bg-gray-700 text-white placeholder-gray-400 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
@@ -237,7 +278,14 @@ const SalesTable = () => {
               value={revenueFilter}
               onChange={(e) => {
                 setRevenueFilter(e.target.value);
-                filterCourses(searchTerm, categoryFilter, e.target.value, reviewFilter, salesFilter, statusFilter);
+                filterCourses(
+                  searchTerm,
+                  categoryFilter,
+                  e.target.value,
+                  reviewFilter,
+                  salesFilter,
+                  statusFilter
+                );
               }}
               className="bg-gray-700 text-white placeholder-gray-400 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
@@ -250,7 +298,14 @@ const SalesTable = () => {
               value={reviewFilter}
               onChange={(e) => {
                 setReviewFilter(e.target.value);
-                filterCourses(searchTerm, categoryFilter, revenueFilter, e.target.value, salesFilter, statusFilter);
+                filterCourses(
+                  searchTerm,
+                  categoryFilter,
+                  revenueFilter,
+                  e.target.value,
+                  salesFilter,
+                  statusFilter
+                );
               }}
               className="bg-gray-700 text-white placeholder-gray-400 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
@@ -263,7 +318,14 @@ const SalesTable = () => {
               value={salesFilter}
               onChange={(e) => {
                 setSalesFilter(e.target.value);
-                filterCourses(searchTerm, categoryFilter, revenueFilter, reviewFilter, e.target.value, statusFilter);
+                filterCourses(
+                  searchTerm,
+                  categoryFilter,
+                  revenueFilter,
+                  reviewFilter,
+                  e.target.value,
+                  statusFilter
+                );
               }}
               className="bg-gray-700 text-white placeholder-gray-400 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
@@ -276,7 +338,14 @@ const SalesTable = () => {
               value={statusFilter}
               onChange={(e) => {
                 setStatusFilter(e.target.value);
-                filterCourses(searchTerm, categoryFilter, revenueFilter, reviewFilter, salesFilter, e.target.value);
+                filterCourses(
+                  searchTerm,
+                  categoryFilter,
+                  revenueFilter,
+                  reviewFilter,
+                  salesFilter,
+                  e.target.value
+                );
               }}
               className="bg-gray-700 text-white placeholder-gray-400 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
@@ -309,25 +378,184 @@ const SalesTable = () => {
               <td className="py-3 px-6">{course.averageReviews}</td>
               <td className="py-3 px-6">{course.reviewCount}</td>
               <td className="py-3 px-6">{course.totalSales}</td>
-              <td className="py-3 px-6">{course.courseStatus}</td>
+              <td
+                className={`py-3 px-6 font-roboto ${
+                  course.courseStatus === "Active"
+                    ? "text-yellow-300"
+                    : "text-red-500"
+                }`}
+              >
+                {course.courseStatus}
+              </td>
             </tr>
           ))}
         </tbody>
       </table>
 
-      <div className="flex justify-between items-center mt-6">
+      <div className="flex justify-between mt-4">
         <button
-          onClick={prevPage}
+          className="bg-yellow-500 text-white px-4 py-2 rounded-lg"
+          onClick={() => handlePageChange(Math.max(currentPage - 1, 1))}
           disabled={currentPage === 1}
-          className="bg-gray-700 text-white rounded-lg py-2 px-4"
         >
           Prev
         </button>
-        <span className="text-white">{`Page ${currentPage} of ${totalPages}`}</span>
+
+        <div className="flex items-center">
+          {(() => {
+            const pages = [];
+
+            if (totalPages <= 13) {
+              // Hiển thị tất cả các trang nếu tổng số trang <= 13
+              for (let i = 1; i <= totalPages; i++) {
+                pages.push(
+                  <button
+                    key={i}
+                    onClick={() => handlePageChange(i)}
+                    className={`px-4 py-2 mx-1 rounded-lg ${
+                      currentPage === i
+                        ? "bg-yellow-500 text-white"
+                        : "bg-gray-700 text-gray-300"
+                    }`}
+                  >
+                    {i}
+                  </button>
+                );
+              }
+            } else {
+              // Hiển thị 10 trang đầu và 3 trang cuối, với logic động
+              if (currentPage <= 10) {
+                for (let i = 1; i <= 10; i++) {
+                  pages.push(
+                    <button
+                      key={i}
+                      onClick={() => handlePageChange(i)}
+                      className={`px-4 py-2 mx-1 rounded-lg ${
+                        currentPage === i
+                          ? "bg-yellow-500 text-white"
+                          : "bg-gray-700 text-gray-300"
+                      }`}
+                    >
+                      {i}
+                    </button>
+                  );
+                }
+                pages.push(
+                  <span key="dots-end" className="px-4 py-2">
+                    ...
+                  </span>
+                );
+                for (let i = totalPages - 2; i <= totalPages; i++) {
+                  pages.push(
+                    <button
+                      key={i}
+                      onClick={() => handlePageChange(i)}
+                      className={`px-4 py-2 mx-1 rounded-lg ${
+                        currentPage === i
+                          ? "bg-yellow-500 text-white"
+                          : "bg-gray-700 text-gray-300"
+                      }`}
+                    >
+                      {i}
+                    </button>
+                  );
+                }
+              } else if (currentPage > 10 && currentPage <= totalPages - 10) {
+                pages.push(
+                  <button
+                    key={1}
+                    onClick={() => handlePageChange(1)}
+                    className={`px-4 py-2 mx-1 rounded-lg bg-gray-700 text-gray-300`}
+                  >
+                    1
+                  </button>
+                );
+                pages.push(
+                  <span key="dots-start" className="px-4 py-2">
+                    ...
+                  </span>
+                );
+
+                for (let i = currentPage - 4; i <= currentPage + 4; i++) {
+                  pages.push(
+                    <button
+                      key={i}
+                      onClick={() => handlePageChange(i)}
+                      className={`px-4 py-2 mx-1 rounded-lg ${
+                        currentPage === i
+                          ? "bg-yellow-500 text-white"
+                          : "bg-gray-700 text-gray-300"
+                      }`}
+                    >
+                      {i}
+                    </button>
+                  );
+                }
+
+                pages.push(
+                  <span key="dots-end" className="px-4 py-2">
+                    ...
+                  </span>
+                );
+                for (let i = totalPages - 2; i <= totalPages; i++) {
+                  pages.push(
+                    <button
+                      key={i}
+                      onClick={() => handlePageChange(i)}
+                      className={`px-4 py-2 mx-1 rounded-lg ${
+                        currentPage === i
+                          ? "bg-yellow-500 text-white"
+                          : "bg-gray-700 text-gray-300"
+                      }`}
+                    >
+                      {i}
+                    </button>
+                  );
+                }
+              } else {
+                pages.push(
+                  <button
+                    key={1}
+                    onClick={() => handlePageChange(1)}
+                    className={`px-4 py-2 mx-1 rounded-lg bg-gray-700 text-gray-300`}
+                  >
+                    1
+                  </button>
+                );
+                pages.push(
+                  <span key="dots-start" className="px-4 py-2">
+                    ...
+                  </span>
+                );
+
+                for (let i = totalPages - 12; i <= totalPages; i++) {
+                  pages.push(
+                    <button
+                      key={i}
+                      onClick={() => handlePageChange(i)}
+                      className={`px-4 py-2 mx-1 rounded-lg ${
+                        currentPage === i
+                          ? "bg-yellow-500 text-white"
+                          : "bg-gray-700 text-gray-300"
+                      }`}
+                    >
+                      {i}
+                    </button>
+                  );
+                }
+              }
+            }
+
+            return pages;
+          })()}
+        </div>
+
         <button
-          onClick={nextPage}
+          className="bg-red-500 text-white px-4 py-2 rounded-lg"
+          onClick={() =>
+            handlePageChange(Math.min(currentPage + 1, totalPages))
+          }
           disabled={currentPage === totalPages}
-          className="bg-gray-700 text-white rounded-lg py-2 px-4"
         >
           Next
         </button>

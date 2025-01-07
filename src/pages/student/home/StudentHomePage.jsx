@@ -10,12 +10,12 @@ import RecommendedCoursesSection from "../../../components/student/home/Recommen
 import TopPythonCoursesSection from "../../../components/student/home/TopPythonCoursesSection"; // Import mới
 import TopMusicCoursesSection from "../../../components/student/home/TopMusicCoursesSection";
 import RecommendedTopics from "../../../components/student/home/RecommendedTopics";
-
+import TopMarketingCoursesSection from "../../../components/student/home/TopMarketingCoursesSection";
 import Footer from "../../../components/student/common/Footer";
 
 const StudentHomePage = () => {
   return (
-    <div className="w-full h-full min-h-screen bg-white overflow-y-auto">
+    <div className="w-full h-full min-h-screen bg-[#F5F6F8] overflow-y-auto">
       <TopBanner />
       <NavBar />
       <WelcomeSection />
@@ -26,7 +26,8 @@ const StudentHomePage = () => {
       <RecommendedCoursesSection />
       <TopPythonCoursesSection /> {/* Thêm component TopWebCoursesSection mới */}
       <TopMusicCoursesSection/>
-     
+      <TopMarketingCoursesSection />
+     < RecommendedTopics/>
       <Footer />
     </div>
   );

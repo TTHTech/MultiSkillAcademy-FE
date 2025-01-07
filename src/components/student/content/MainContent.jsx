@@ -4,7 +4,176 @@ import QuestionsAndAnswers from "../../../pages/student/courses/QuestionAndAnswe
 import TabComment from "../../student/content/TabComment";
 import TabListTest from "./TabListTest";
 import Swal from "sweetalert2";
-import { FaClock, FaChartLine } from "react-icons/fa";
+import { FaClock, FaChartLine, FaPause, FaPlay, FaBackward, FaForward, FaVolumeMute, FaVolumeUp, FaCompress, FaExpand } from "react-icons/fa";
+
+const CustomVideoPlayer = ({ videoRef, selectedLecture, handleSeeking, handleTimeUpdate, handleVideoEnd }) => {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [volume, setVolume] = useState(1);
+  const [playbackRate, setPlaybackRate] = useState(1);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const playerRef = useRef(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (video) {
+      video.addEventListener('play', () => setIsPlaying(true));
+      video.addEventListener('pause', () => setIsPlaying(false));
+      video.addEventListener('timeupdate', () => setCurrentTime(video.currentTime));
+      video.addEventListener('loadedmetadata', () => setDuration(video.duration));
+      
+      video.volume = volume;
+      video.playbackRate = playbackRate;
+    }
+  }, [volume, playbackRate]);
+
+  const formatTime = (time) => {
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+  };
+
+  const togglePlay = () => {
+    if (videoRef.current.paused) {
+      videoRef.current.play();
+    } else {
+      videoRef.current.pause();
+    }
+  };
+
+  const handleSkip = (seconds) => {
+    if (videoRef.current) {
+      videoRef.current.currentTime += seconds;
+    }
+  };
+
+  const handleVolumeChange = (e) => {
+    const value = parseFloat(e.target.value);
+    setVolume(value);
+    if (videoRef.current) {
+      videoRef.current.volume = value;
+    }
+  };
+
+  const handlePlaybackRateChange = (rate) => {
+    setPlaybackRate(rate);
+    if (videoRef.current) {
+      videoRef.current.playbackRate = rate;
+    }
+  };
+
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      playerRef.current.requestFullscreen();
+      setIsFullscreen(true);
+    } else {
+      document.exitFullscreen();
+      setIsFullscreen(false);
+    }
+  };
+
+  return (
+    <div ref={playerRef} className="relative w-full h-full bg-black group">
+      {/* Video Title Overlay */}
+      <div className="absolute top-0 left-0 right-0 p-4 bg-gradient-to-b from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
+        <h3 className="text-white text-lg font-medium truncate">
+          {selectedLecture.title}
+        </h3>
+      </div>
+
+      <video
+        ref={videoRef}
+        className="w-full h-full cursor-pointer"
+        onClick={togglePlay}
+        onTimeUpdate={handleTimeUpdate}
+        onSeeking={handleSeeking}
+        onEnded={handleVideoEnd}
+      >
+        <source src={selectedLecture.video_url} type="video/mp4" />
+      </video>
+
+      {/* Video Controls */}
+      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        {/* Progress Bar */}
+        <div className="relative w-full h-1.5 bg-gray-600/40 cursor-pointer mb-4 rounded-full group/progress">
+          <div 
+            className="absolute h-full bg-red-600 rounded-full"
+            style={{ width: `${(currentTime / duration) * 100}%` }}
+          />
+          <input
+            type="range"
+            min="0"
+            max={duration || 0}
+            value={currentTime}
+            onChange={(e) => {
+              const time = parseFloat(e.target.value);
+              videoRef.current.currentTime = time;
+            }}
+            className="absolute w-full h-full opacity-0 cursor-pointer"
+          />
+        </div>
+
+        {/* Controls */}
+        <div className="flex items-center justify-between text-white">
+          <div className="flex items-center space-x-4">
+            <button onClick={togglePlay} className="hover:text-red-500 transition-colors duration-200 p-1.5 hover:bg-white/10 rounded-full">
+              {isPlaying ? <FaPause size={18} /> : <FaPlay size={18} />}
+            </button>
+            <button onClick={() => handleSkip(-10)} className="hover:text-red-500 transition-colors duration-200 p-1.5 hover:bg-white/10 rounded-full">
+              <FaBackward size={18} />
+            </button>
+            <button onClick={() => handleSkip(10)} className="hover:text-red-500 transition-colors duration-200 p-1.5 hover:bg-white/10 rounded-full">
+              <FaForward size={18} />
+            </button>
+            
+            {/* Volume Control */}
+            <div className="flex items-center space-x-2 group/volume">
+              <button onClick={() => setVolume(volume === 0 ? 1 : 0)} className="hover:text-red-500 transition-colors duration-200 p-1.5 hover:bg-white/10 rounded-full">
+                {volume === 0 ? <FaVolumeMute size={18} /> : <FaVolumeUp size={18} />}
+              </button>
+              <div className="w-0 overflow-hidden group-hover/volume:w-20 transition-all duration-300">
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.1"
+                  value={volume}
+                  onChange={handleVolumeChange}
+                  className="w-20 accent-red-600"
+                />
+              </div>
+            </div>
+
+            {/* Playback Speed Control */}
+            <div className="flex items-center space-x-2">
+              <span className="text-sm font-medium">Tốc độ:</span>
+              {[0.5, 1, 1.5, 2].map((rate) => (
+                <button
+                  key={rate}
+                  onClick={() => handlePlaybackRateChange(rate)}
+                  className={`px-2 py-1 rounded-full ${playbackRate === rate ? 'bg-red-500 text-white' : 'bg-white text-red-500'} hover:bg-red-500 hover:text-white transition-colors duration-200`}
+                >
+                  {rate}x
+                </button>
+              ))}
+            </div>
+
+            {/* Time Display */}
+            <span className="text-sm font-medium text-gray-300">
+              {formatTime(currentTime)} / {formatTime(duration)}
+            </span>
+          </div>
+
+          <button onClick={toggleFullscreen} className="hover:text-red-500 transition-colors duration-200 p-1.5 hover:bg-white/10 rounded-full">
+            {isFullscreen ? <FaCompress size={18} /> : <FaExpand size={18} />}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const MainContent = ({
   selectedLecture,
   setSelectedLecture,
@@ -238,31 +407,13 @@ const MainContent = ({
             {selectedLecture.content_type.toLowerCase() === "video" &&
               selectedLecture.video_url && (
                 <div className="w-full md:w-[1370px] md:h-[500px]  border-black rounded-lg shadow-lg">
-                  <video
-                    key={selectedLecture.lecture_id}
-                    ref={videoRef}
-                    controls
-                    className="w-full h-full"
-                    autoPlay
-                    onLoadedMetadata={() => {
-                      const savedTime = handleVideoState(
-                        "restore",
-                        selectedLecture.lecture_id
-                      );
-                      if (videoRef.current && savedTime) {
-                        videoRef.current.currentTime = savedTime; // Đặt lại tiến trình đã xem
-                      }
-                    }}
-                    onSeeking={handleSeeking} // Kiểm tra khi tua video
-                    onTimeUpdate={handleTimeUpdate} // Cập nhật tiến độ
-                    onEnded={() => {
-                      handleVideoState("save", selectedLecture.lecture_id, 0);
-                      handleVideoEnd();
-                    }}
-                  >
-                    <source src={selectedLecture.video_url} type="video/mp4" />
-                    Trình duyệt của bạn không hỗ trợ video.
-                  </video>
+                  <CustomVideoPlayer
+                    videoRef={videoRef}
+                    selectedLecture={selectedLecture}
+                    handleSeeking={handleSeeking}
+                    handleTimeUpdate={handleTimeUpdate}
+                    handleVideoEnd={handleVideoEnd}
+                  />
                 </div>
               )}
             {selectedLecture.content_type.toLowerCase() === "pdf" &&

@@ -11,7 +11,7 @@ const SalesPage = () => {
 
   return (
     <div className="flex-1 relative z-10 overflow-auto">
-      <header className="bg-gray-800 py-4 px-6 shadow-lg">
+      <header className="bg-gray-700 py-4 px-6 shadow-lg">
         <h1 className="text-xl text-white font-bold">Sales Management</h1>
       </header>
 

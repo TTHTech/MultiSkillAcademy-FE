@@ -1,112 +1,167 @@
 import React, { useState } from "react";
-import axios from "axios";
-import { toast } from "react-toastify";
+import { Eye, EyeOff, Lock, Key, RefreshCw } from "lucide-react";
+
+const Alert = ({ variant = "default", children }) => (
+  <div className={`p-4 rounded-lg mb-4 ${
+    variant === "destructive" ? "bg-red-100 text-red-800" : "bg-green-100 text-green-800"
+  }`}>
+    <p className="text-sm font-medium">{children}</p>
+  </div>
+);
+
+const PasswordInput = ({ label, value, onChange, placeholder }) => {
+  const [showPassword, setShowPassword] = useState(false);
+
+  return (
+    <div className="space-y-2">
+      <label className="block text-sm font-medium text-gray-700">{label}</label>
+      <div className="relative">
+        <div className="absolute inset-y-0 left-0 flex items-center pl-3">
+          <Lock className="h-5 w-5 text-gray-400" />
+        </div>
+        <input
+          type={showPassword ? "text" : "password"}
+          value={value}
+          onChange={onChange}
+          className="w-full pl-10 pr-10 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          placeholder={placeholder}
+          required
+        />
+        <button
+          type="button"
+          className="absolute inset-y-0 right-0 flex items-center pr-3"
+          onClick={() => setShowPassword(!showPassword)}
+        >
+          {showPassword ? (
+            <EyeOff className="h-5 w-5 text-gray-400" />
+          ) : (
+            <Eye className="h-5 w-5 text-gray-400" />
+          )}
+        </button>
+      </div>
+    </div>
+  );
+};
 
 const ChangePassword = () => {
-  const [oldPassword, setOldPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [formData, setFormData] = useState({
+    oldPassword: "",
+    newPassword: "",
+    confirmPassword: ""
+  });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
+
+  const validatePasswords = () => {
+    if (formData.newPassword.length < 8) {
+      setError("Mật khẩu mới phải có ít nhất 8 ký tự");
+      return false;
+    }
+    if (formData.newPassword !== formData.confirmPassword) {
+      setError("Mật khẩu mới không khớp");
+      return false;
+    }
+    return true;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validatePasswords()) return;
 
-    // Check if passwords match
-    if (newPassword !== confirmPassword) {
-      toast.error("Mật khẩu mới không khớp.");
-      return;
-    }
+    setLoading(true);
+    setError(null);
+    setSuccess(null);
 
     try {
-      setLoading(true);
-
       const token = localStorage.getItem("token");
       const userId = localStorage.getItem("userId");
-
+      
       if (!token || !userId) {
-        toast.error("Không tìm thấy token hoặc userId trong localStorage.");
-        return;
+        throw new Error("Không tìm thấy thông tin xác thực");
       }
 
-      // Make the API call to change the password with userId
-      const response = await axios.post(
-        `http://localhost:8080/api/auth/change-password/${userId}`, // API URL based on your endpoint
+      const response = await fetch(
+        `http://localhost:8080/api/auth/change-password/${userId}`,
         {
-          currentPassword: oldPassword,
-          newPassword: newPassword,
-          confirmPassword: confirmPassword,
-        },
-        {
+          method: "POST",
           headers: {
-            Authorization: `Bearer ${token}`, // Bearer token for authentication
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json"
           },
+          body: JSON.stringify({
+            currentPassword: formData.oldPassword,
+            newPassword: formData.newPassword,
+            confirmPassword: formData.confirmPassword
+          })
         }
       );
 
-      if (response.status === 200) {
-        toast.success("Mật khẩu đã được thay đổi.");
-      } else {
-        toast.error(response.data || "Đổi mật khẩu không thành công.");
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.message || "Đổi mật khẩu không thành công");
       }
+
+      setSuccess("Mật khẩu đã được thay đổi thành công");
+      setFormData({ oldPassword: "", newPassword: "", confirmPassword: "" });
     } catch (err) {
-      setError("Có lỗi xảy ra khi thay đổi mật khẩu.");
-      toast.error("Có lỗi xảy ra khi thay đổi mật khẩu.");
+      setError(err.message);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md max-w-lg mx-auto mt-[50px]">
-      <h2 className="text-2xl font-semibold text-gray-800 mb-6">Đổi Mật Khẩu</h2>
-      {error && <p className="text-red-600 mb-4">{error}</p>}
-
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Mật khẩu cũ</label>
-          <input
-            type="password"
-            className="w-full px-4 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600"
-            value={oldPassword}
-            onChange={(e) => setOldPassword(e.target.value)}
-            required
-            placeholder="Nhập mật khẩu cũ"
-          />
+    <div className="max-w-md mx-auto mt-8">
+      <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+        <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-6">
+          <div className="flex items-center gap-3 text-white">
+            <Key className="h-6 w-6" />
+            <h2 className="text-xl font-semibold">Đổi Mật Khẩu</h2>
+          </div>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Mật khẩu mới</label>
-          <input
-            type="password"
-            className="w-full px-4 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            required
-            placeholder="Nhập mật khẩu mới"
-          />
-        </div>
+        <div className="p-6">
+          {error && <Alert variant="destructive">{error}</Alert>}
+          {success && <Alert>{success}</Alert>}
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Xác nhận mật khẩu mới</label>
-          <input
-            type="password"
-            className="w-full px-4 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            required
-            placeholder="Nhập lại mật khẩu mới"
-          />
-        </div>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <PasswordInput
+              label="Mật khẩu hiện tại"
+              value={formData.oldPassword}
+              onChange={(e) => setFormData(prev => ({ ...prev, oldPassword: e.target.value }))}
+              placeholder="Nhập mật khẩu hiện tại"
+            />
 
-        <button
-          type="submit"
-          className="w-full bg-purple-600 text-white py-2 rounded-md mt-4 hover:bg-purple-700 focus:ring-2 focus:ring-purple-600"
-          disabled={loading}
-        >
-          {loading ? "Đang xử lý..." : "Đổi Mật Khẩu"}
-        </button>
-      </form>
+            <PasswordInput
+              label="Mật khẩu mới"
+              value={formData.newPassword}
+              onChange={(e) => setFormData(prev => ({ ...prev, newPassword: e.target.value }))}
+              placeholder="Nhập mật khẩu mới (tối thiểu 8 ký tự)"
+            />
+
+            <PasswordInput
+              label="Xác nhận mật khẩu mới"
+              value={formData.confirmPassword}
+              onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
+              placeholder="Nhập lại mật khẩu mới"
+            />
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg transition-colors duration-200"
+            >
+              {loading ? (
+                <RefreshCw className="h-5 w-5 animate-spin" />
+              ) : (
+                <Key className="h-5 w-5" />
+              )}
+              {loading ? "Đang xử lý..." : "Đổi Mật Khẩu"}
+            </button>
+          </form>
+        </div>
+      </div>
     </div>
   );
 };
