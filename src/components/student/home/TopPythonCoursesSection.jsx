@@ -1,10 +1,13 @@
 import React, { useRef, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import { Star, ChevronLeft, ChevronRight, Clock, Users, Trophy } from 'lucide-react';
+import { Star, ChevronLeft, ChevronRight, Trophy, Flame, FileCode, Loader2 } from 'lucide-react';
+import { motion } from "framer-motion";
 
 const TopPythonCoursesSection = () => {
   const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [isLeftVisible, setIsLeftVisible] = useState(false);
   const [isRightVisible, setIsRightVisible] = useState(true);
   const scrollContainer = useRef(null);
@@ -12,11 +15,22 @@ const TopPythonCoursesSection = () => {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
+        setLoading(true);
         const response = await axios.get("http://localhost:8080/api/student/courses/python");
         const shuffledCourses = response.data.sort(() => 0.5 - Math.random());
-        setCourses(shuffledCourses);
-      } catch (error) {
-        console.error("Failed to fetch courses", error);
+        const updatedCourses = shuffledCourses.map(course => ({
+          ...course,
+          originalPrice: course.price || 500000,
+          discount: 30,
+          tag: course.rating >= 4.5 ? 'Bestseller' : 'Hot',
+          isNew: course.createdAt && new Date(course.createdAt) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+        }));
+        setCourses(updatedCourses);
+      } catch (err) {
+        setError("Không thể tải dữ liệu khóa học Python.");
+        console.error("Failed to fetch Python courses", err);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -39,8 +53,23 @@ const TopPythonCoursesSection = () => {
     }
   }, []);
 
-  const courseWidth = 250; // Updated width to fit 6 courses
-  const visibleCourses = 6; // Adjusted number of visible courses
+  useEffect(() => {
+    const autoScroll = setInterval(() => {
+      if (scrollContainer.current) {
+        const { scrollLeft, scrollWidth, clientWidth } = scrollContainer.current;
+        if (scrollLeft + clientWidth >= scrollWidth) {
+          scrollContainer.current.scrollTo({ left: 0, behavior: "smooth" });
+        } else {
+          scrollContainer.current.scrollBy({ left: 300, behavior: "smooth" });
+        }
+      }
+    }, 3000);
+
+    return () => clearInterval(autoScroll);
+  }, []);
+
+  const courseWidth = 300;
+  const visibleCourses = 4;
   const scrollAmount = courseWidth * visibleCourses;
 
   const scrollLeft = () => {
@@ -61,27 +90,93 @@ const TopPythonCoursesSection = () => {
     }
   };
 
+  const renderStars = (rating) => {
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 >= 0.5;
+    const stars = [];
+
+    for (let i = 0; i < 5; i++) {
+      if (i < fullStars) {
+        stars.push(
+          <Star
+            key={i}
+            className="w-5 h-5 text-yellow-400"
+            fill="currentColor"
+            strokeWidth={1.5}
+          />
+        );
+      } else if (i === fullStars && hasHalfStar) {
+        stars.push(
+          <div key={i} className="relative">
+            <Star className="w-5 h-5 text-gray-300" fill="none" strokeWidth={1.5} />
+            <div className="absolute inset-0 overflow-hidden w-1/2">
+              <Star className="w-5 h-5 text-yellow-400" fill="currentColor" strokeWidth={1.5} />
+            </div>
+          </div>
+        );
+      } else {
+        stars.push(
+          <Star
+            key={i}
+            className="w-5 h-5 text-gray-300"
+            fill="none"
+            strokeWidth={1.5}
+          />
+        );
+      }
+    }
+    return stars;
+  };
+
+  if (loading) {
+    return (
+      <section className="py-12 px-6 bg-gradient-to-r from-yellow-50 to-orange-50">
+        <div className="max-w-[1500px] mx-auto flex justify-center items-center min-h-[400px]">
+          <div className="flex flex-col items-center gap-4">
+            <Loader2 className="w-8 h-8 text-yellow-600 animate-spin" />
+            <p className="text-gray-600">Đang tải khóa học Python...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="py-12 px-6 bg-gradient-to-r from-yellow-50 to-orange-50">
+        <div className="max-w-[1500px] mx-auto">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
+            {error}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
-    <section className="py-12 px-6 bg-gradient-to-r from-gray-50 to-gray-100">
+    <section className="py-12 px-6 bg-gradient-to-r from-yellow-50 to-orange-50">
       <div className="max-w-[1500px] mx-auto">
         {/* Section Header */}
         <div className="flex items-center justify-between mb-8">
-          <div>
-            <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Khóa học được đề xuất
-            </h2>
-            <p className="text-gray-600 mt-2">
-              Các khoá học Python phổ biến và được đánh giá cao
-            </p>
+          <div className="flex items-start gap-4">
+            <FileCode className="w-12 h-12 text-yellow-600 mt-1" />
+            <div>
+              <h2 className="text-4xl font-extrabold bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent">
+                Phổ Biến Về Python
+              </h2>
+              <p className="text-gray-700 mt-2 font-medium">
+                Khám phá các khóa học Python hàng đầu từ các chuyên gia lập trình
+              </p>
+            </div>
           </div>
-          
+
           <div className="flex gap-2">
             <button
               onClick={scrollLeft}
-              className={`p-3 rounded-full transition-all duration-300 ${
+              className={`p-3 rounded-md transition-all duration-300 ${
                 isLeftVisible
-                  ? 'bg-white shadow-lg hover:shadow-xl text-gray-800'
-                  : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                  ? 'bg-white shadow-lg hover:shadow-xl text-gray-800 hover:bg-yellow-50'
+                  : 'bg-gray-200 text-gray-400 cursor-not-allowed'
               }`}
               disabled={!isLeftVisible}
             >
@@ -89,10 +184,10 @@ const TopPythonCoursesSection = () => {
             </button>
             <button
               onClick={scrollRight}
-              className={`p-3 rounded-full transition-all duration-300 ${
+              className={`p-3 rounded-md transition-all duration-300 ${
                 isRightVisible
-                  ? 'bg-white shadow-lg hover:shadow-xl text-gray-800'
-                  : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                  ? 'bg-white shadow-lg hover:shadow-xl text-gray-800 hover:bg-yellow-50'
+                  : 'bg-gray-200 text-gray-400 cursor-not-allowed'
               }`}
               disabled={!isRightVisible}
             >
@@ -102,76 +197,84 @@ const TopPythonCoursesSection = () => {
         </div>
 
         {/* Courses Container */}
-        <div
+        <motion.div
           ref={scrollContainer}
-          className="flex gap-6 overflow-hidden scroll-smooth pb-4"
-          style={{
-            maskImage: 'linear-gradient(to right, transparent, black 2%, black 98%, transparent)',
-            WebkitMaskImage: 'linear-gradient(to right, transparent, black 2%, black 98%, transparent)'
-          }}
+          className="flex gap-4 overflow-hidden scroll-smooth pb-4"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
         >
           {courses.map((course, index) => (
             <Link
               to={`/course/${course.courseId}`}
               key={index}
-              className="flex-none w-[250px] bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group"
+              className="flex-none w-[300px] bg-white rounded-md shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group"
             >
               {/* Course Image */}
-              <div className="relative h-[150px] overflow-hidden">
+              <div className="relative h-[180px] overflow-hidden">
                 <img
                   src={course.imageUrls?.[0] || "default-image-url.jpg"}
                   alt={course.title}
                   className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-300"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="absolute top-2 left-2 flex gap-2">
+                  {course.isNew && (
+                    <span className="bg-yellow-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                      Mới
+                    </span>
+                  )}
+                  <span className={`flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-full ${
+                    course.tag === 'Bestseller' ? 'bg-yellow-500 text-white' : 'bg-orange-500 text-white'
+                  }`}>
+                    {course.tag === 'Bestseller' ? (
+                      <Trophy className="w-3 h-3" />
+                    ) : (
+                      <Flame className="w-3 h-3" />
+                    )}
+                    {course.tag}
+                  </span>
+                </div>
+                <div className="absolute top-2 right-2">
+                  <span className="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                    -{course.discount}%
+                  </span>
+                </div>
               </div>
 
               {/* Course Content */}
-              <div className="p-6">
+              <div className="p-4">
                 {/* Title */}
-                <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2 min-h-[56px]">
+                <h3 className="text-lg font-semibold text-gray-900 mb-1 line-clamp-2">
                   {course.title}
                 </h3>
 
                 {/* Instructor */}
-                <p className="text-gray-600 mb-4 flex items-center gap-2">
-                  <Trophy className="w-4 h-4 text-purple-500" />
+                <p className="text-gray-600 mb-2 flex items-center gap-2 text-sm">
+                  <FileCode className="w-4 h-4 text-yellow-600" />
                   <span>{course.instructorFirstName} {course.instructorLastName}</span>
                 </p>
 
                 {/* Stats */}
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-1">
-                    <Star className="w-5 h-5 text-yellow-400 fill-current" />
-                    <span className="font-bold text-gray-900">{course.rating}</span>
-                    <span className="text-gray-500">({course.reviews || course.numberReview})</span>
-                  </div>
-
-                  <div className="flex items-center gap-4 text-gray-500 text-sm">
-                    <div className="flex items-center gap-1">
-                      <Clock className="w-4 h-4" />
-                      <span>6h</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Users className="w-4 h-4" />
-                      <span>1.2k</span>
-                    </div>
-                  </div>
+                <div className="flex items-center mb-2">
+                  <span className="text-gray-900 font-bold text-lg mr-2">{course.rating.toFixed(1)}</span>
+                  <div className="flex gap-1">{renderStars(course.rating)}</div>
+                  <span className="text-gray-500 ml-2">({course.reviews || course.numberReview})</span>
                 </div>
 
-                {/* Price and Button */}
-                <div className="flex items-center justify-between">
-                  <span className="text-2xl font-bold text-blue-600">
-                    đ{course.price.toLocaleString("vi-VN")}
+                {/* Price */}
+                <div className="flex items-baseline gap-2">
+                  <span className="text-sm line-through text-gray-500">
+                    đ{course.originalPrice?.toLocaleString("vi-VN")}
                   </span>
-                  <button className="px-4 py-2 bg-blue-50 text-blue-600 rounded-lg font-medium transition-colors duration-300 hover:bg-blue-100">
-                    Chi tiết
-                  </button>
+                  <span className="text-xl font-bold text-yellow-600">
+                    đ{(course.originalPrice * (1 - course.discount / 100)).toLocaleString("vi-VN")}
+                  </span>
                 </div>
               </div>
             </Link>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );
