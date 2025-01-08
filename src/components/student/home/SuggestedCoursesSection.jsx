@@ -1,11 +1,13 @@
 import React, { useRef, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import { Star, ChevronLeft, ChevronRight, Trophy, Flame } from 'lucide-react';
+import { Star, ChevronLeft, ChevronRight, Trophy, Flame, Sparkles, Loader2 } from 'lucide-react';
 import { motion } from "framer-motion";
 
 const SuggestedCoursesSection = () => {
   const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [isLeftVisible, setIsLeftVisible] = useState(false);
   const [isRightVisible, setIsRightVisible] = useState(true);
   const scrollContainer = useRef(null);
@@ -13,53 +15,84 @@ const SuggestedCoursesSection = () => {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
+        setLoading(true);
         const response = await axios.get("http://localhost:8080/api/student/courses/active");
         const shuffledCourses = response.data.sort(() => 0.5 - Math.random());
-        const updatedCourses = shuffledCourses.map(course => ({
-          ...course,
-          originalPrice: 500000, // Set original price to 500000 for all courses
-          discount: 30, // Set default discount to 30%
-          tag: course.rating >= 4.5 ? 'Bestseller' : 'Hot' // Add tag based on rating
-        }));
+        const updatedCourses = shuffledCourses.map(course => {
+          const originalPrice = course.price || 500000;
+          const discount = course.discount || 30;
+          const discountedPrice = originalPrice * (1 - (discount / 100));
+
+          return {
+            ...course,
+            originalPrice,
+            discount,
+            discountedPrice,
+            tag: course.rating >= 4.5 ? 'Bestseller' : 'Hot',
+            isNew: course.createdAt && new Date(course.createdAt) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+          };
+        });
         setCourses(updatedCourses);
-      } catch (error) {
-        console.error("Failed to fetch courses", error);
+        
+        // Check scroll buttons visibility after courses are loaded
+        setTimeout(() => {
+          checkScroll();
+        }, 100);
+      } catch (err) {
+        setError("Không thể tải dữ liệu khóa học được đề xuất.");
+        console.error("Failed to fetch suggested courses", err);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchCourses();
   }, []);
 
-  useEffect(() => {
-    const checkScroll = () => {
-      if (scrollContainer.current) {
-        const { scrollLeft, scrollWidth, clientWidth } = scrollContainer.current;
-        setIsLeftVisible(scrollLeft > 0);
-        setIsRightVisible(scrollLeft < scrollWidth - clientWidth - 10);
-      }
-    };
+  const checkScroll = () => {
+    if (scrollContainer.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollContainer.current;
+      setIsLeftVisible(scrollLeft > 0);
+      setIsRightVisible(scrollLeft < scrollWidth - clientWidth - 1);
+    }
+  };
 
+  useEffect(() => {
     const container = scrollContainer.current;
     if (container) {
       container.addEventListener('scroll', checkScroll);
+      // Initial check
+      checkScroll();
       return () => container.removeEventListener('scroll', checkScroll);
     }
-  }, []);
+  }, [courses]);
 
   useEffect(() => {
-    const autoScroll = setInterval(() => {
-      if (scrollContainer.current) {
-        const { scrollLeft, scrollWidth, clientWidth } = scrollContainer.current;
-        if (scrollLeft + clientWidth >= scrollWidth) {
-          scrollContainer.current.scrollTo({ left: 0, behavior: "smooth" });
-        } else {
-          scrollContainer.current.scrollBy({ left: 300, behavior: "smooth" });
+    let autoScrollInterval;
+    
+    const startAutoScroll = () => {
+      autoScrollInterval = setInterval(() => {
+        if (scrollContainer.current) {
+          const { scrollLeft, scrollWidth, clientWidth } = scrollContainer.current;
+          if (scrollLeft + clientWidth >= scrollWidth) {
+            scrollContainer.current.scrollTo({ left: 0, behavior: "smooth" });
+          } else {
+            scrollContainer.current.scrollBy({ left: 300, behavior: "smooth" });
+          }
         }
-      }
-    }, 3000);
+      }, 3000);
+    };
 
-    return () => clearInterval(autoScroll);
-  }, []);
+    if (courses.length > 0) {
+      startAutoScroll();
+    }
+
+    return () => {
+      if (autoScrollInterval) {
+        clearInterval(autoScrollInterval);
+      }
+    };
+  }, [courses]);
 
   const courseWidth = 300;
   const visibleCourses = 4;
@@ -67,8 +100,12 @@ const SuggestedCoursesSection = () => {
 
   const scrollLeft = () => {
     if (scrollContainer.current) {
-      scrollContainer.current.scrollBy({
-        left: -scrollAmount,
+      const newScrollLeft = Math.max(
+        scrollContainer.current.scrollLeft - scrollAmount,
+        0
+      );
+      scrollContainer.current.scrollTo({
+        left: newScrollLeft,
         behavior: "smooth",
       });
     }
@@ -76,8 +113,12 @@ const SuggestedCoursesSection = () => {
 
   const scrollRight = () => {
     if (scrollContainer.current) {
-      scrollContainer.current.scrollBy({
-        left: scrollAmount,
+      const newScrollLeft = Math.min(
+        scrollContainer.current.scrollLeft + scrollAmount,
+        scrollContainer.current.scrollWidth - scrollContainer.current.clientWidth
+      );
+      scrollContainer.current.scrollTo({
+        left: newScrollLeft,
         behavior: "smooth",
       });
     }
@@ -121,18 +162,46 @@ const SuggestedCoursesSection = () => {
     return stars;
   };
 
+  if (loading) {
+    return (
+      <section className="py-12 px-6 bg-gradient-to-r from-green-50 to-teal-50">
+        <div className="max-w-[1500px] mx-auto flex justify-center items-center min-h-[400px]">
+          <div className="flex flex-col items-center gap-4">
+            <Loader2 className="w-8 h-8 text-green-600 animate-spin" />
+            <p className="text-gray-600">Đang tải khóa học được đề xuất...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="py-12 px-6 bg-gradient-to-r from-green-50 to-teal-50">
+        <div className="max-w-[1500px] mx-auto">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
+            {error}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
-    <section className="py-12 px-6 bg-gradient-to-r from-indigo-50 to-blue-50">
+    <section className="py-12 px-6 bg-gradient-to-r from-green-50 to-teal-50">
       <div className="max-w-[1500px] mx-auto">
         {/* Section Header */}
         <div className="flex items-center justify-between mb-8">
-          <div>
-            <h2 className="text-4xl font-extrabold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-              Khóa học được đề xuất
-            </h2>
-            <p className="text-gray-700 mt-2 font-medium">
-              Dựa trên đánh giá và lượt đăng ký từ học viên
-            </p>
+          <div className="flex items-start gap-4">
+            <Sparkles className="w-12 h-12 text-green-600 mt-1" />
+            <div>
+              <h2 className="text-4xl font-extrabold bg-gradient-to-r from-green-600 to-teal-600 bg-clip-text text-transparent">
+                Khóa học được đề xuất
+              </h2>
+              <p className="text-gray-700 mt-2 font-medium">
+                Dựa trên đánh giá và lượt đăng ký từ học viên
+              </p>
+            </div>
           </div>
 
           <div className="flex gap-2">
@@ -140,7 +209,7 @@ const SuggestedCoursesSection = () => {
               onClick={scrollLeft}
               className={`p-3 rounded-md transition-all duration-300 ${
                 isLeftVisible
-                  ? 'bg-white shadow-lg hover:shadow-xl text-gray-800'
+                  ? 'bg-white shadow-lg hover:shadow-xl text-gray-800 hover:bg-green-50'
                   : 'bg-gray-200 text-gray-400 cursor-not-allowed'
               }`}
               disabled={!isLeftVisible}
@@ -151,7 +220,7 @@ const SuggestedCoursesSection = () => {
               onClick={scrollRight}
               className={`p-3 rounded-md transition-all duration-300 ${
                 isRightVisible
-                  ? 'bg-white shadow-lg hover:shadow-xl text-gray-800'
+                  ? 'bg-white shadow-lg hover:shadow-xl text-gray-800 hover:bg-green-50'
                   : 'bg-gray-200 text-gray-400 cursor-not-allowed'
               }`}
               disabled={!isRightVisible}
@@ -164,10 +233,16 @@ const SuggestedCoursesSection = () => {
         {/* Courses Container */}
         <motion.div
           ref={scrollContainer}
-          className="flex gap-4 overflow-hidden scroll-smooth pb-4"
+          className="flex gap-4 overflow-x-auto overflow-y-hidden scroll-smooth pb-4 hide-scrollbar"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
+          onScroll={checkScroll}
+          style={{
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
+            WebkitOverflowScrolling: 'touch'
+          }}
         >
           {courses.map((course, index) => (
             <Link
@@ -185,7 +260,7 @@ const SuggestedCoursesSection = () => {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 <div className="absolute top-2 left-2 flex gap-2">
                   {course.isNew && (
-                    <span className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                    <span className="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">
                       Mới
                     </span>
                   )}
@@ -216,7 +291,7 @@ const SuggestedCoursesSection = () => {
 
                 {/* Instructor */}
                 <p className="text-gray-600 mb-2 flex items-center gap-2 text-sm">
-                  <Trophy className="w-4 h-4 text-purple-500" />
+                  <Sparkles className="w-4 h-4 text-green-600" />
                   <span>{course.instructorFirstName} {course.instructorLastName}</span>
                 </p>
 
@@ -228,12 +303,12 @@ const SuggestedCoursesSection = () => {
                 </div>
 
                 {/* Price */}
-                <div>
-                  <span className="text-sm line-through text-gray-500 mr-2">
+                <div className="flex items-baseline gap-2">
+                  <span className="text-sm line-through text-gray-500">
                     đ{course.originalPrice?.toLocaleString("vi-VN")}
                   </span>
-                  <span className="text-xl font-bold text-indigo-600">
-                    đ{(course.originalPrice * (1 - course.discount / 100)).toLocaleString("vi-VN")}
+                  <span className="text-xl font-bold text-green-600">
+                    đ{course.discountedPrice.toLocaleString("vi-VN")}
                   </span>
                 </div>
               </div>
