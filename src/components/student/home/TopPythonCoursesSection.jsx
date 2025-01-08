@@ -18,14 +18,26 @@ const TopPythonCoursesSection = () => {
         setLoading(true);
         const response = await axios.get("http://localhost:8080/api/student/courses/python");
         const shuffledCourses = response.data.sort(() => 0.5 - Math.random());
-        const updatedCourses = shuffledCourses.map(course => ({
-          ...course,
-          originalPrice: course.price || 500000,
-          discount: 30,
-          tag: course.rating >= 4.5 ? 'Bestseller' : 'Hot',
-          isNew: course.createdAt && new Date(course.createdAt) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
-        }));
+        const updatedCourses = shuffledCourses.map(course => {
+          const originalPrice = course.price || 500000;
+          const discount = course.discount || 30;
+          const discountedPrice = Math.floor(originalPrice * (1 - (discount / 100)));
+
+          return {
+            ...course,
+            originalPrice,
+            discount,
+            discountedPrice,
+            tag: course.rating >= 4.5 ? 'Bestseller' : 'Hot',
+            isNew: course.createdAt && new Date(course.createdAt) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+          };
+        });
         setCourses(updatedCourses);
+        
+        // Check scroll buttons visibility after courses are loaded
+        setTimeout(() => {
+          checkScroll();
+        }, 100);
       } catch (err) {
         setError("Không thể tải dữ liệu khóa học Python.");
         console.error("Failed to fetch Python courses", err);
@@ -37,36 +49,50 @@ const TopPythonCoursesSection = () => {
     fetchCourses();
   }, []);
 
-  useEffect(() => {
-    const checkScroll = () => {
-      if (scrollContainer.current) {
-        const { scrollLeft, scrollWidth, clientWidth } = scrollContainer.current;
-        setIsLeftVisible(scrollLeft > 0);
-        setIsRightVisible(scrollLeft < scrollWidth - clientWidth - 10);
-      }
-    };
+  const checkScroll = () => {
+    if (scrollContainer.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollContainer.current;
+      setIsLeftVisible(scrollLeft > 0);
+      setIsRightVisible(scrollLeft < scrollWidth - clientWidth - 1);
+    }
+  };
 
+  useEffect(() => {
     const container = scrollContainer.current;
     if (container) {
       container.addEventListener('scroll', checkScroll);
+      // Initial check
+      checkScroll();
       return () => container.removeEventListener('scroll', checkScroll);
     }
-  }, []);
+  }, [courses]);
 
   useEffect(() => {
-    const autoScroll = setInterval(() => {
-      if (scrollContainer.current) {
-        const { scrollLeft, scrollWidth, clientWidth } = scrollContainer.current;
-        if (scrollLeft + clientWidth >= scrollWidth) {
-          scrollContainer.current.scrollTo({ left: 0, behavior: "smooth" });
-        } else {
-          scrollContainer.current.scrollBy({ left: 300, behavior: "smooth" });
+    let autoScrollInterval;
+    
+    const startAutoScroll = () => {
+      autoScrollInterval = setInterval(() => {
+        if (scrollContainer.current) {
+          const { scrollLeft, scrollWidth, clientWidth } = scrollContainer.current;
+          if (scrollLeft + clientWidth >= scrollWidth) {
+            scrollContainer.current.scrollTo({ left: 0, behavior: "smooth" });
+          } else {
+            scrollContainer.current.scrollBy({ left: 300, behavior: "smooth" });
+          }
         }
-      }
-    }, 3000);
+      }, 3000);
+    };
 
-    return () => clearInterval(autoScroll);
-  }, []);
+    if (courses.length > 0) {
+      startAutoScroll();
+    }
+
+    return () => {
+      if (autoScrollInterval) {
+        clearInterval(autoScrollInterval);
+      }
+    };
+  }, [courses]);
 
   const courseWidth = 300;
   const visibleCourses = 4;
@@ -74,8 +100,12 @@ const TopPythonCoursesSection = () => {
 
   const scrollLeft = () => {
     if (scrollContainer.current) {
-      scrollContainer.current.scrollBy({
-        left: -scrollAmount,
+      const newScrollLeft = Math.max(
+        scrollContainer.current.scrollLeft - scrollAmount,
+        0
+      );
+      scrollContainer.current.scrollTo({
+        left: newScrollLeft,
         behavior: "smooth",
       });
     }
@@ -83,8 +113,12 @@ const TopPythonCoursesSection = () => {
 
   const scrollRight = () => {
     if (scrollContainer.current) {
-      scrollContainer.current.scrollBy({
-        left: scrollAmount,
+      const newScrollLeft = Math.min(
+        scrollContainer.current.scrollLeft + scrollAmount,
+        scrollContainer.current.scrollWidth - scrollContainer.current.clientWidth
+      );
+      scrollContainer.current.scrollTo({
+        left: newScrollLeft,
         behavior: "smooth",
       });
     }
@@ -199,10 +233,16 @@ const TopPythonCoursesSection = () => {
         {/* Courses Container */}
         <motion.div
           ref={scrollContainer}
-          className="flex gap-4 overflow-hidden scroll-smooth pb-4"
+          className="flex gap-4 overflow-x-auto overflow-y-hidden scroll-smooth pb-4 hide-scrollbar"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
+          onScroll={checkScroll}
+          style={{
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
+            WebkitOverflowScrolling: 'touch'
+          }}
         >
           {courses.map((course, index) => (
             <Link
@@ -265,10 +305,10 @@ const TopPythonCoursesSection = () => {
                 {/* Price */}
                 <div className="flex items-baseline gap-2">
                   <span className="text-sm line-through text-gray-500">
-                    đ{course.originalPrice?.toLocaleString("vi-VN")}
+                    đ{Math.floor(course.originalPrice).toLocaleString("vi-VN")}
                   </span>
                   <span className="text-xl font-bold text-yellow-600">
-                    đ{(course.originalPrice * (1 - course.discount / 100)).toLocaleString("vi-VN")}
+                    đ{course.discountedPrice.toLocaleString("vi-VN")}
                   </span>
                 </div>
               </div>

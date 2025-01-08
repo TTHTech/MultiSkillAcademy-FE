@@ -42,13 +42,14 @@ const getResourceIcon = (description) => {
 };
 
 const CourseMedia = ({
-  price = 249000,
+  price,
   thumbnail = "default-thumbnail.jpg",
   onAddToCart,
   resourceDescription = [],
 }) => {
-  const originalPrice = 500000;
-  const discountPercent = 87;
+  // Tính giá sau giảm giá
+  const discount = 30; // Mặc định giảm giá 30%
+  const discountedPrice = Math.floor(price * (1 - discount / 100));
   const daysLeft = 3;
   
   const userId = Number(localStorage.getItem("userId"));
@@ -151,15 +152,15 @@ const CourseMedia = ({
         <div className="mb-6">
           <div className="flex items-center gap-2 mb-2">
             <span className="text-3xl font-bold text-gray-900">
-              đ{price.toLocaleString('vi-VN')}
+              đ{discountedPrice.toLocaleString('vi-VN')}
             </span>
             <span className="text-lg text-gray-500 line-through">
-              đ{originalPrice.toLocaleString('vi-VN')}
+              đ{price.toLocaleString('vi-VN')}
             </span>
           </div>
           <div className="flex items-center gap-2 mb-2">
             <span className="text-red-500 font-semibold">
-              Giảm {discountPercent}%
+              Giảm {discount}%
             </span>
           </div>
           <div className="flex items-center gap-2 text-red-500">
