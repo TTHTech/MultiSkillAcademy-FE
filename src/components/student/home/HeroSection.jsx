@@ -26,7 +26,7 @@ const slides = [
   {
     title: "Học mọi lúc, mọi nơi vô cùng tiện ích",
     description: "Chúng tôi cung cấp các khóa học trực tuyến với nội dung chất lượng, phù hợp với lịch trình của từng học viên. Chủ động nâng cao kỹ năng và kiến thức không giới hạn.",
-    image: "https://topicanative.edu.vn/wp-content/uploads/2020/06/hoc-tieng-anh-online-o-dau-hieu-qua-2.jpg",
+    image: "https://blog.commlabindia.com/hubfs/Imported_Blog_Media/integrating-ilt-initiatives-with-elearning-1.jpg",
     badge: "Trending"
   },
   {
