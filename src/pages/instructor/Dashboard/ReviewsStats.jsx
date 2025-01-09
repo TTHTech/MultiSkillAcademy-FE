@@ -70,19 +70,19 @@ const ChartThree = ({ data }) => {
         <div className="flex items-center space-x-2">
           <div className="w-3 h-3 rounded-full bg-[#FFC107]"></div>
           <p className="text-sm font-medium text-black dark:text-white">
-            Total Reviews <span className="font-normal">{data.totalReview || 0}%</span>
+            Total <span className="font-normal">{data.totalReview || 0}</span>
           </p>
         </div>
         <div className="flex items-center space-x-2">
           <div className="w-3 h-3 rounded-full bg-[#FF9800]"></div>
           <p className="text-sm font-medium text-black dark:text-white">
-            Good Reviews <span className="font-normal">{data.reviewGood || 0}%</span>
+            Good Reviews <span className="font-normal">{data.reviewGood || 0}</span>
           </p>
         </div>
         <div className="flex items-center space-x-2">
           <div className="w-3 h-3 rounded-full bg-[#FF5722]"></div>
           <p className="text-sm font-medium text-black dark:text-white">
-            Bad Reviews <span className="font-normal">{data.reviewBad || 0}%</span>
+            Bad Reviews <span className="font-normal">{data.reviewBad || 0}</span>
           </p>
         </div>
       </div>

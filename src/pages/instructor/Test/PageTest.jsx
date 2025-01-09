@@ -115,7 +115,6 @@ const TestList = () => {
           </button>
         </div>
 
-        {/* Add Test Form */}
         {showAddTestForm && (
           <AddTestForm
             onClose={() => setShowAddTestForm(false)}
@@ -123,8 +122,6 @@ const TestList = () => {
             courses={courses}
           />
         )}
-
-        {/* Course Filter */}
         <div className="grid gap-6 sm:grid-cols-2">
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -142,8 +139,6 @@ const TestList = () => {
               ))}
             </select>
           </div>
-
-          {/* Test Search */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
               Tìm bài kiểm tra:
@@ -157,20 +152,15 @@ const TestList = () => {
           </div>
         </div>
 
-        {/* Test List */}
         <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {filteredTests.map((test) => {
-            // Kiểm tra nếu bài test có câu hỏi bị liệt
             const hasInvalidQuestions = test.questions.some((q) => {
               const correctAnswersCount = q.answers.filter(
                 (a) => a.isCorrect
               ).length;
               return correctAnswersCount === 0 || correctAnswersCount > 1;
             });
-
-            // Màu nền bài test
             const testBgColor = hasInvalidQuestions ? "bg-red-100" : "bg-white";
-
             return (
               <div
                 key={test.id}
@@ -192,8 +182,6 @@ const TestList = () => {
             );
           })}
         </div>
-
-        {/* Test Details Modal */}
         <TestDetailsModal
           test={selectedTest}
           onClose={() => setSelectedTest(null)}

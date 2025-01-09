@@ -193,13 +193,13 @@ const QuestionsAndAnswers = ({ courseId }) => {
             className="px-4 py-2 bg-gray-500 text-white rounded-lg"
             onClick={() => setNewQuestionText("")}
           >
-            Hủy
+            Clear
           </button>
           <button
             className="px-4 py-2 bg-blue-500 text-white rounded-lg"
             onClick={confirmAddQuestion}
           >
-            Gửi
+            Send
           </button>
         </div>
       </div>
@@ -254,23 +254,24 @@ const QuestionsAndAnswers = ({ courseId }) => {
                     className="w-8 h-8 rounded-full object-cover"
                   />
                   <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-gray-800 capitalize flex justify-between items-center">
-                      {answer.userName}
-                      {userID == answer.userId && (
-                        <p
-                          onClick={() =>
-                            handleDeleteAnswer(
-                              question.questionsId,
-                              answer.answersId
-                            )
-                          }
-                          className="text-red-500 cursor-pointer"
-                          style={{ marginLeft: "auto" }}
-                        >
-                          Delete
-                        </p>
+                  <h3 className="text-lg font-semibold text-gray-800 capitalize flex justify-between items-center">
+                    <span className="text-sm text-gray-800">
+                      {answer.userName} 
+                      {answer.isInstructor == 1 && (
+                        <span className="text-blue-500 font-bold"> (Giảng viên)</span>
                       )}
-                    </h3>
+                    </span>
+                    {userID == answer.userId && (
+                      <span
+                        onClick={() =>
+                          handleDeleteAnswer(question.questionsId, answer.answersId)
+                        }
+                        className="text-red-500 cursor-pointer ml-auto"
+                      >
+                        Delete
+                      </span>
+                    )}
+                  </h3>
                     <p className="text-gray-600 text-sm mt-1">
                       {answer.answersText}
                     </p>
@@ -303,13 +304,13 @@ const QuestionsAndAnswers = ({ courseId }) => {
                     className="px-4 py-2 bg-gray-500 text-white rounded-lg"
                     onClick={() => setNewAnswerText("")}
                   >
-                    Hủy
+                    Clear
                   </button>
                   <button
                     className="px-4 py-2 bg-blue-500 text-white rounded-lg"
                     onClick={() => confirmAddAnswer(question.questionsId)}
                   >
-                    Gửi
+                    Send
                   </button>
                 </div>
               </div>
