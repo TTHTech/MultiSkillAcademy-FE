@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
+import { Loader2, Clock, FileText, ChevronLeft } from "lucide-react";
 import StudentScores from "./ViewListTestScores";
 
 const TabListTest = () => {
-  const [tests, setTests] = useState([]); // Danh sách bài kiểm tra
-  const [selectedTest, setSelectedTest] = useState(null); // Bài kiểm tra được chọn
-  const [loading, setLoading] = useState(true); // Trạng thái tải dữ liệu
-  const [error, setError] = useState(null); // Thông báo lỗi
-  const { id } = useParams(); // Lấy ID khóa học từ URL
-  const navigate = useNavigate(); // Hook để điều hướng
+  const [tests, setTests] = useState([]);
+  const [selectedTest, setSelectedTest] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const { id } = useParams();
+  const navigate = useNavigate();
 
-  // Fetch danh sách bài kiểm tra khi component được mount
   useEffect(() => {
     const fetchTests = async () => {
       try {
@@ -30,71 +30,103 @@ const TabListTest = () => {
     fetchTests();
   }, [id]);
 
-  // Xử lý chọn bài kiểm tra
   const handleSelectTest = (test) => {
     setSelectedTest(test);
   };
 
-  // Xử lý quay lại danh sách bài kiểm tra
   const handleBackToList = () => {
     setSelectedTest(null);
   };
 
-  if (loading) return <p className="text-center text-gray-500">Đang tải dữ liệu...</p>;
-  if (error)
+  if (loading) {
     return (
-      <p className="text-center text-red-500 font-semibold">
-        {error}
-      </p>
+      <div className="flex items-center justify-center min-h-[300px]">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+        <span className="ml-3 text-lg text-gray-600 font-medium">
+          Đang tải dữ liệu...
+        </span>
+      </div>
     );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-red-50 border border-red-200 rounded-lg p-4 max-w-2xl mx-auto mt-8">
+        <p className="text-center text-red-600 font-medium flex items-center justify-center">
+          <span className="mr-2">⚠️</span>
+          {error}
+        </p>
+      </div>
+    );
+  }
 
   return (
-    <div className="p-6 max-w-4xl mx-auto mb-[50px]">
-      {/* Danh sách bài kiểm tra */}
+    <div className="p-6 max-w-5xl mx-auto mb-12">
       {!selectedTest ? (
-        <ul className="space-y-6">
-          {tests.map((test) => (
-            <li
-              key={test.id}
-              className="bg-white shadow-lg rounded-xl p-6 border border-gray-300 transition-transform transform hover:scale-105 hover:shadow-2xl cursor-pointer"
-              onClick={() => handleSelectTest(test)}
-            >
-              <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
-                <h3 className="text-2xl font-semibold text-blue-600 mb-2 md:mb-0">
-                  {test.title}
-                </h3>
-                <div className="mt-2 md:mt-0 flex space-x-6 items-center">
-                  <p className="text-lg text-green-600 font-medium">
-                    Thời gian:{" "}
-                    <span className="text-gray-800">{test.duration} phút</span>
-                  </p>
-                  <p className="text-lg text-gray-700">
-                    Số câu hỏi:{" "}
-                    <span className="font-semibold text-gray-900">
-                      {test.questionCount}
-                    </span>
-                  </p>
+        <>
+          <h1 className="text-2xl font-bold text-gray-800 mb-6">
+            Danh sách bài kiểm tra
+          </h1>
+          <div className="grid gap-6">
+            {tests.map((test) => (
+              <div
+                key={test.id}
+                className="bg-white rounded-xl p-6 shadow-md border border-gray-100 
+                         hover:shadow-lg hover:border-blue-100 transition-all duration-300 
+                         cursor-pointer transform hover:-translate-y-1"
+                onClick={() => handleSelectTest(test)}
+              >
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                  <div className="flex-1">
+                    <h3 className="text-xl font-semibold text-blue-600 mb-2">
+                      {test.title}
+                    </h3>
+                    <div className="flex flex-wrap gap-6">
+                      <div className="flex items-center text-gray-600">
+                        <Clock className="w-5 h-5 mr-2 text-green-500" />
+                        <span className="font-medium">
+                          {test.duration} phút
+                        </span>
+                      </div>
+                      <div className="flex items-center text-gray-600">
+                        <FileText className="w-5 h-5 mr-2 text-blue-500" />
+                        <span className="font-medium">
+                          {test.questionCount} câu hỏi
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="md:self-center">
+                    <button className="px-4 py-2 text-blue-600 bg-blue-50 rounded-lg 
+                                   hover:bg-blue-100 transition-colors duration-200 
+                                   font-medium text-sm">
+                      Xem chi tiết
+                    </button>
+                  </div>
                 </div>
               </div>
-            </li>
-          ))}
-        </ul>
+            ))}
+          </div>
+        </>
       ) : (
-        // Xem chi tiết bài kiểm tra đã chọn
-        <div className="bg-white rounded-xl p-6 shadow-lg">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-3xl font-bold text-blue-600">
+        <div className="bg-white rounded-xl p-8 shadow-lg border border-gray-100">
+          <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-100">
+            <h2 className="text-2xl font-bold text-gray-800">
               {selectedTest.title}
             </h2>
             <button
               onClick={handleBackToList}
-              className="px-4 py-2 bg-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-400"
+              className="flex items-center px-4 py-2 text-gray-600 bg-gray-100 
+                       rounded-lg hover:bg-gray-200 transition-colors duration-200 
+                       font-medium"
             >
+              <ChevronLeft className="w-4 h-4 mr-1" />
               Quay lại
             </button>
           </div>
-          {/* Gọi component xem chi tiết điểm số */}
-          <StudentScores test={selectedTest} navigate={navigate} />
+          <div className="bg-gray-50 rounded-lg p-6">
+            <StudentScores test={selectedTest} navigate={navigate} />
+          </div>
         </div>
       )}
     </div>
