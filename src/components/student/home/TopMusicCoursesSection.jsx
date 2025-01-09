@@ -1,7 +1,8 @@
 import React, { useRef, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import { Star, ChevronLeft, ChevronRight, Clock, Users, Trophy } from 'lucide-react';
+import { Star, ChevronLeft, ChevronRight, Trophy, Flame, Music2, Loader2 } from 'lucide-react';
+import { motion } from "framer-motion";
 
 const TopMusicCoursesSection = () => {
   const [courses, setCourses] = useState([]);
@@ -12,7 +13,7 @@ const TopMusicCoursesSection = () => {
   const [isRightVisible, setIsRightVisible] = useState(true);
   const scrollContainer = useRef(null);
 
-  const categoryId = "CAT010"; // ID danh mục
+  const categoryId = "CAT010";
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -20,12 +21,33 @@ const TopMusicCoursesSection = () => {
         const response = await axios.get(
           `http://localhost:8080/api/student/courses/category/${categoryId}`
         );
-        const { categoryName, courses } = response.data;
+        const { categoryName, courses: fetchedCourses } = response.data;
+        
+        const enhancedCourses = fetchedCourses.map(course => {
+          const originalPrice = course.price || 500000;
+          const discount = course.discount || 30;
+          const discountedPrice = originalPrice * (1 - (discount / 100));
+
+          return {
+            ...course,
+            originalPrice,
+            discount,
+            discountedPrice,
+            tag: course.rating >= 4.5 ? 'Bestseller' : 'Hot',
+            isNew: course.createdAt && new Date(course.createdAt) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+          };
+        });
+
         setCategoryName(categoryName);
-        setCourses(courses);
+        setCourses(enhancedCourses);
+        
+        // Check scroll buttons visibility after courses are loaded
+        setTimeout(() => {
+          checkScroll();
+        }, 100);
       } catch (err) {
-        setError("Không thể tải dữ liệu các khóa học được đề xuất.");
-        console.error("Failed to fetch courses for category", err);
+        setError("Không thể tải dữ liệu khóa học âm nhạc.");
+        console.error("Failed to fetch music courses", err);
       } finally {
         setLoading(false);
       }
@@ -34,30 +56,63 @@ const TopMusicCoursesSection = () => {
     fetchCourses();
   }, []);
 
-  useEffect(() => {
-    const checkScroll = () => {
-      if (scrollContainer.current) {
-        const { scrollLeft, scrollWidth, clientWidth } = scrollContainer.current;
-        setIsLeftVisible(scrollLeft > 0);
-        setIsRightVisible(scrollLeft < scrollWidth - clientWidth - 10);
-      }
-    };
+  const checkScroll = () => {
+    if (scrollContainer.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollContainer.current;
+      setIsLeftVisible(scrollLeft > 0);
+      setIsRightVisible(scrollLeft < scrollWidth - clientWidth - 1);
+    }
+  };
 
+  useEffect(() => {
     const container = scrollContainer.current;
     if (container) {
       container.addEventListener('scroll', checkScroll);
+      // Initial check
+      checkScroll();
       return () => container.removeEventListener('scroll', checkScroll);
     }
   }, [courses]);
 
-  const courseWidth = 250; // Updated width to fit 6 courses
-  const visibleCourses = 6; // Adjusted number of visible courses
+  useEffect(() => {
+    let autoScrollInterval;
+    
+    const startAutoScroll = () => {
+      autoScrollInterval = setInterval(() => {
+        if (scrollContainer.current) {
+          const { scrollLeft, scrollWidth, clientWidth } = scrollContainer.current;
+          if (scrollLeft + clientWidth >= scrollWidth) {
+            scrollContainer.current.scrollTo({ left: 0, behavior: "smooth" });
+          } else {
+            scrollContainer.current.scrollBy({ left: 300, behavior: "smooth" });
+          }
+        }
+      }, 3000);
+    };
+
+    if (courses.length > 0) {
+      startAutoScroll();
+    }
+
+    return () => {
+      if (autoScrollInterval) {
+        clearInterval(autoScrollInterval);
+      }
+    };
+  }, [courses]);
+
+  const courseWidth = 300;
+  const visibleCourses = 4;
   const scrollAmount = courseWidth * visibleCourses;
 
   const scrollLeft = () => {
     if (scrollContainer.current) {
-      scrollContainer.current.scrollBy({
-        left: -scrollAmount,
+      const newScrollLeft = Math.max(
+        scrollContainer.current.scrollLeft - scrollAmount,
+        0
+      );
+      scrollContainer.current.scrollTo({
+        left: newScrollLeft,
         behavior: "smooth",
       });
     }
@@ -65,37 +120,104 @@ const TopMusicCoursesSection = () => {
 
   const scrollRight = () => {
     if (scrollContainer.current) {
-      scrollContainer.current.scrollBy({
-        left: scrollAmount,
+      const newScrollLeft = Math.min(
+        scrollContainer.current.scrollLeft + scrollAmount,
+        scrollContainer.current.scrollWidth - scrollContainer.current.clientWidth
+      );
+      scrollContainer.current.scrollTo({
+        left: newScrollLeft,
         behavior: "smooth",
       });
     }
   };
 
+  const renderStars = (rating) => {
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 >= 0.5;
+    const stars = [];
+
+    for (let i = 0; i < 5; i++) {
+      if (i < fullStars) {
+        stars.push(
+          <Star
+            key={i}
+            className="w-5 h-5 text-yellow-400"
+            fill="currentColor"
+            strokeWidth={1.5}
+          />
+        );
+      } else if (i === fullStars && hasHalfStar) {
+        stars.push(
+          <div key={i} className="relative">
+            <Star className="w-5 h-5 text-gray-300" fill="none" strokeWidth={1.5} />
+            <div className="absolute inset-0 overflow-hidden w-1/2">
+              <Star className="w-5 h-5 text-yellow-400" fill="currentColor" strokeWidth={1.5} />
+            </div>
+          </div>
+        );
+      } else {
+        stars.push(
+          <Star
+            key={i}
+            className="w-5 h-5 text-gray-300"
+            fill="none"
+            strokeWidth={1.5}
+          />
+        );
+      }
+    }
+    return stars;
+  };
+
+  if (loading) {
+    return (
+      <section className="py-12 px-6 bg-gradient-to-r from-pink-50 to-rose-50">
+        <div className="max-w-[1500px] mx-auto flex justify-center items-center min-h-[400px]">
+          <div className="flex flex-col items-center gap-4">
+            <Loader2 className="w-8 h-8 text-rose-600 animate-spin" />
+            <p className="text-gray-600">Đang tải khóa học âm nhạc...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="py-12 px-6 bg-gradient-to-r from-pink-50 to-rose-50">
+        <div className="max-w-[1500px] mx-auto">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
+            {error}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
-    <section className="py-12 px-6 bg-gradient-to-r from-gray-50 to-gray-100">
+    <section className="py-12 px-6 bg-gradient-to-r from-pink-50 to-rose-50">
       <div className="max-w-[1500px] mx-auto">
         {/* Section Header */}
         <div className="flex items-center justify-between mb-8">
-          <div>
-            <h2
-              className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent cursor-pointer"
-              onClick={() => console.log(`Navigate to category/${categoryId}`)}
-            >
-              Khóa học được đề xuất
-            </h2>
-            <p className="text-gray-600 mt-2">
-              Được đề xuất cho bạn dựa trên danh mục {categoryName && `: ${categoryName}`}
-            </p>
+          <div className="flex items-start gap-4">
+            <Music2 className="w-12 h-12 text-rose-500 mt-1" />
+            <div>
+              <h2 className="text-4xl font-extrabold bg-gradient-to-r from-rose-600 to-pink-600 bg-clip-text text-transparent">
+                Âm Nhạc và Nghệ Thuật
+              </h2>
+              <p className="text-gray-700 mt-2 font-medium">
+                Khám phá các khóa học âm nhạc hàng đầu từ các nghệ sĩ chuyên nghiệp
+              </p>
+            </div>
           </div>
 
           <div className="flex gap-2">
             <button
               onClick={scrollLeft}
-              className={`p-3 rounded-full transition-all duration-300 ${
+              className={`p-3 rounded-md transition-all duration-300 ${
                 isLeftVisible
-                  ? 'bg-white shadow-lg hover:shadow-xl text-gray-800'
-                  : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                  ? 'bg-white shadow-lg hover:shadow-xl text-gray-800 hover:bg-rose-50'
+                  : 'bg-gray-200 text-gray-400 cursor-not-allowed'
               }`}
               disabled={!isLeftVisible}
             >
@@ -103,10 +225,10 @@ const TopMusicCoursesSection = () => {
             </button>
             <button
               onClick={scrollRight}
-              className={`p-3 rounded-full transition-all duration-300 ${
+              className={`p-3 rounded-md transition-all duration-300 ${
                 isRightVisible
-                  ? 'bg-white shadow-lg hover:shadow-xl text-gray-800'
-                  : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                  ? 'bg-white shadow-lg hover:shadow-xl text-gray-800 hover:bg-rose-50'
+                  : 'bg-gray-200 text-gray-400 cursor-not-allowed'
               }`}
               disabled={!isRightVisible}
             >
@@ -115,83 +237,91 @@ const TopMusicCoursesSection = () => {
           </div>
         </div>
 
-        {/* Loading/Error Message */}
-        {loading && <p className="text-center text-gray-500">Đang tải...</p>}
-        {error && <p className="text-center text-red-500">{error}</p>}
-
         {/* Courses Container */}
-        {!loading && !error && (
-          <div
-            ref={scrollContainer}
-            className="flex gap-6 overflow-hidden scroll-smooth pb-4"
-            style={{
-              maskImage: 'linear-gradient(to right, transparent, black 2%, black 98%, transparent)',
-              WebkitMaskImage: 'linear-gradient(to right, transparent, black 2%, black 98%, transparent)'
-            }}
-          >
-            {courses.map((course, index) => (
-              <Link
-                to={`/course/${course.courseId}`}
-                key={index}
-                className="flex-none w-[250px] bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group"
-              >
-                {/* Course Image */}
-                <div className="relative h-[150px] overflow-hidden">
-                  <img
-                    src={course.imageUrls?.[0] || "default-image-url.jpg"}
-                    alt={course.title}
-                    className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-300"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                </div>
-
-                {/* Course Content */}
-                <div className="p-6">
-                  {/* Title */}
-                  <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2 min-h-[56px]">
-                    {course.title}
-                  </h3>
-
-                  {/* Instructor */}
-                  <p className="text-gray-600 mb-4 flex items-center gap-2">
-                    <Trophy className="w-4 h-4 text-purple-500" />
-                    <span>{course.instructorFirstName} {course.instructorLastName}</span>
-                  </p>
-
-                  {/* Stats */}
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-1">
-                      <Star className="w-5 h-5 text-yellow-400 fill-current" />
-                      <span className="font-bold text-gray-900">{course.rating}</span>
-                      <span className="text-gray-500">({course.reviews || course.numberReview})</span>
-                    </div>
-
-                    <div className="flex items-center gap-4 text-gray-500 text-sm">
-                      <div className="flex items-center gap-1">
-                        <Clock className="w-4 h-4" />
-                        <span>6h</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Users className="w-4 h-4" />
-                        <span>1.2k</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Price and Button */}
-                  <div className="flex items-center justify-between">
-                    <span className="text-2xl font-bold text-blue-600">
-                      đ{course.price.toLocaleString("vi-VN")}
+        <motion.div
+          ref={scrollContainer}
+          className="flex gap-4 overflow-x-auto overflow-y-hidden scroll-smooth pb-4 hide-scrollbar"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+          onScroll={checkScroll}
+          style={{
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
+            WebkitOverflowScrolling: 'touch'
+          }}
+        >
+          {courses.map((course, index) => (
+            <Link
+              to={`/course/${course.courseId}`}
+              key={index}
+              className="flex-none w-[300px] bg-white rounded-md shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group"
+            >
+              {/* Course Image */}
+              <div className="relative h-[180px] overflow-hidden">
+                <img
+                  src={course.imageUrls?.[0] || "default-image-url.jpg"}
+                  alt={course.title}
+                  className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-300"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="absolute top-2 left-2 flex gap-2">
+                  {course.isNew && (
+                    <span className="bg-rose-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                      Mới
                     </span>
-                    <button className="px-4 py-2 bg-blue-50 text-blue-600 rounded-lg font-medium transition-colors duration-300 hover:bg-blue-100">
-                      Chi tiết
-                    </button>
-                  </div>
+                  )}
+                  <span className={`flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-full ${
+                    course.tag === 'Bestseller' ? 'bg-yellow-500 text-white' : 'bg-orange-500 text-white'
+                  }`}>
+                    {course.tag === 'Bestseller' ? (
+                      <Trophy className="w-3 h-3" />
+                    ) : (
+                      <Flame className="w-3 h-3" />
+                    )}
+                    {course.tag}
+                  </span>
                 </div>
-              </Link>
-            ))}
-          </div>
-        )}
+                <div className="absolute top-2 right-2">
+                  <span className="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                    -{course.discount}%
+                  </span>
+                </div>
+              </div>
+
+              {/* Course Content */}
+              <div className="p-4">
+                {/* Title */}
+                <h3 className="text-lg font-semibold text-gray-900 mb-1 line-clamp-2">
+                  {course.title}
+                </h3>
+
+                {/* Instructor */}
+                <p className="text-gray-600 mb-2 flex items-center gap-2 text-sm">
+                  <Music2 className="w-4 h-4 text-rose-500" />
+                  <span>{course.instructorFirstName} {course.instructorLastName}</span>
+                </p>
+
+                {/* Stats */}
+                <div className="flex items-center mb-2">
+                  <span className="text-gray-900 font-bold text-lg mr-2">{course.rating.toFixed(1)}</span>
+                  <div className="flex gap-1">{renderStars(course.rating)}</div>
+                  <span className="text-gray-500 ml-2">({course.reviews || course.numberReview})</span>
+                </div>
+
+                {/* Price */}
+                <div className="flex items-baseline gap-2">
+                  <span className="text-sm line-through text-gray-500">
+                    đ{course.originalPrice?.toLocaleString("vi-VN")}
+                  </span>
+                  <span className="text-xl font-bold text-rose-600">
+                    đ{course.discountedPrice.toLocaleString("vi-VN")}
+                  </span>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </motion.div>
       </div>
     </section>
   );

@@ -1,25 +1,30 @@
 import React, { useRef, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import { Star, ChevronLeft, ChevronRight, Trophy, Flame, FileCode, Loader2 } from 'lucide-react';
+import { Star, ChevronLeft, ChevronRight, Trophy, Flame, Palette, Loader2 } from 'lucide-react';
 import { motion } from "framer-motion";
 
-const TopPythonCoursesSection = () => {
+const TopDesignCoursesSection = () => {
   const [courses, setCourses] = useState([]);
+  const [categoryName, setCategoryName] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [isLeftVisible, setIsLeftVisible] = useState(false);
   const [isRightVisible, setIsRightVisible] = useState(true);
   const scrollContainer = useRef(null);
 
+  const categoryId = "CAT007";
+
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        setLoading(true);
-        const response = await axios.get("http://localhost:8080/api/student/courses/python");
-        const shuffledCourses = response.data.sort(() => 0.5 - Math.random());
-        const updatedCourses = shuffledCourses.map(course => {
-          const originalPrice = course.price || 500000;
+        const response = await axios.get(
+          `http://localhost:8080/api/student/courses/category/${categoryId}`
+        );
+        const { categoryName, courses: fetchedCourses } = response.data;
+        
+        const enhancedCourses = fetchedCourses.map(course => {
+          const originalPrice = Math.floor(course.price || 500000);
           const discount = course.discount || 30;
           const discountedPrice = Math.floor(originalPrice * (1 - (discount / 100)));
 
@@ -32,15 +37,17 @@ const TopPythonCoursesSection = () => {
             isNew: course.createdAt && new Date(course.createdAt) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
           };
         });
-        setCourses(updatedCourses);
+
+        setCategoryName(categoryName);
+        setCourses(enhancedCourses);
         
         // Check scroll buttons visibility after courses are loaded
         setTimeout(() => {
           checkScroll();
         }, 100);
       } catch (err) {
-        setError("Không thể tải dữ liệu khóa học Python.");
-        console.error("Failed to fetch Python courses", err);
+        setError("Không thể tải dữ liệu khóa học thiết kế.");
+        console.error("Failed to fetch design courses", err);
       } finally {
         setLoading(false);
       }
@@ -164,11 +171,11 @@ const TopPythonCoursesSection = () => {
 
   if (loading) {
     return (
-      <section className="py-12 px-6 bg-gradient-to-r from-yellow-50 to-orange-50">
+      <section className="py-12 px-6 bg-gradient-to-r from-purple-50 to-violet-50">
         <div className="max-w-[1500px] mx-auto flex justify-center items-center min-h-[400px]">
           <div className="flex flex-col items-center gap-4">
-            <Loader2 className="w-8 h-8 text-yellow-600 animate-spin" />
-            <p className="text-gray-600">Đang tải khóa học Python...</p>
+            <Loader2 className="w-8 h-8 text-purple-600 animate-spin" />
+            <p className="text-gray-600">Đang tải khóa học thiết kế...</p>
           </div>
         </div>
       </section>
@@ -177,7 +184,7 @@ const TopPythonCoursesSection = () => {
 
   if (error) {
     return (
-      <section className="py-12 px-6 bg-gradient-to-r from-yellow-50 to-orange-50">
+      <section className="py-12 px-6 bg-gradient-to-r from-purple-50 to-violet-50">
         <div className="max-w-[1500px] mx-auto">
           <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
             {error}
@@ -188,18 +195,18 @@ const TopPythonCoursesSection = () => {
   }
 
   return (
-    <section className="py-12 px-6 bg-gradient-to-r from-yellow-50 to-orange-50">
+    <section className="py-12 px-6 bg-gradient-to-r from-purple-50 to-violet-50">
       <div className="max-w-[1500px] mx-auto">
         {/* Section Header */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-start gap-4">
-            <FileCode className="w-12 h-12 text-yellow-600 mt-1" />
+            <Palette className="w-12 h-12 text-purple-500 mt-1" />
             <div>
-              <h2 className="text-4xl font-extrabold bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent">
-                Phổ Biến Về Python
+              <h2 className="text-4xl font-extrabold bg-gradient-to-r from-purple-600 to-violet-600 bg-clip-text text-transparent">
+                Thiết Kế & Sáng Tạo
               </h2>
               <p className="text-gray-700 mt-2 font-medium">
-                Khám phá các khóa học Python hàng đầu từ các chuyên gia lập trình
+                Khám phá các khóa học thiết kế từ các chuyên gia sáng tạo hàng đầu
               </p>
             </div>
           </div>
@@ -209,7 +216,7 @@ const TopPythonCoursesSection = () => {
               onClick={scrollLeft}
               className={`p-3 rounded-md transition-all duration-300 ${
                 isLeftVisible
-                  ? 'bg-white shadow-lg hover:shadow-xl text-gray-800 hover:bg-yellow-50'
+                  ? 'bg-white shadow-lg hover:shadow-xl text-gray-800 hover:bg-purple-50'
                   : 'bg-gray-200 text-gray-400 cursor-not-allowed'
               }`}
               disabled={!isLeftVisible}
@@ -220,7 +227,7 @@ const TopPythonCoursesSection = () => {
               onClick={scrollRight}
               className={`p-3 rounded-md transition-all duration-300 ${
                 isRightVisible
-                  ? 'bg-white shadow-lg hover:shadow-xl text-gray-800 hover:bg-yellow-50'
+                  ? 'bg-white shadow-lg hover:shadow-xl text-gray-800 hover:bg-purple-50'
                   : 'bg-gray-200 text-gray-400 cursor-not-allowed'
               }`}
               disabled={!isRightVisible}
@@ -260,7 +267,7 @@ const TopPythonCoursesSection = () => {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 <div className="absolute top-2 left-2 flex gap-2">
                   {course.isNew && (
-                    <span className="bg-yellow-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                    <span className="bg-purple-500 text-white text-xs font-bold px-2 py-1 rounded-full">
                       Mới
                     </span>
                   )}
@@ -291,7 +298,7 @@ const TopPythonCoursesSection = () => {
 
                 {/* Instructor */}
                 <p className="text-gray-600 mb-2 flex items-center gap-2 text-sm">
-                  <FileCode className="w-4 h-4 text-yellow-600" />
+                  <Palette className="w-4 h-4 text-purple-500" />
                   <span>{course.instructorFirstName} {course.instructorLastName}</span>
                 </p>
 
@@ -307,7 +314,7 @@ const TopPythonCoursesSection = () => {
                   <span className="text-sm line-through text-gray-500">
                     đ{Math.floor(course.originalPrice).toLocaleString("vi-VN")}
                   </span>
-                  <span className="text-xl font-bold text-yellow-600">
+                  <span className="text-xl font-bold text-purple-600">
                     đ{course.discountedPrice.toLocaleString("vi-VN")}
                   </span>
                 </div>
@@ -320,4 +327,4 @@ const TopPythonCoursesSection = () => {
   );
 };
 
-export default TopPythonCoursesSection;
+export default TopDesignCoursesSection;

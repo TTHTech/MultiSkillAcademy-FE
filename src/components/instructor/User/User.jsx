@@ -101,7 +101,7 @@ const InstructorProfile = () => {
     const { name, value } = e.target;
     setInstructor({ ...instructor, [name]: value });
   };
-  
+
   const handleChangePassword = async () => {
     if (!currentPassword || !newPassword || !confirmNewPassword) {
       await Swal.fire({
@@ -133,7 +133,11 @@ const InstructorProfile = () => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ currentPassword, newPassword, confirmPassword: confirmNewPassword }),
+          body: JSON.stringify({
+            currentPassword,
+            newPassword,
+            confirmPassword: confirmNewPassword,
+          }),
         }
       );
 
@@ -181,77 +185,80 @@ const InstructorProfile = () => {
     <div className="rounded-lg p-6">
       {isChangingPassword ? (
         <div className="p-6 bg-white rounded-lg shadow-lg max-w-md mx-auto">
-      <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">
-        Change Password
-      </h2>
-      <div className="space-y-6">
-        <div>
-          <label
-            htmlFor="currentPassword"
-            className="text-gray-700 font-medium"
-          >
-            Current Password
-          </label>
-          <input
-            type="password"
-            name="currentPassword"
-            id="currentPassword"
-            placeholder="Enter your current password"
-            value={currentPassword}
-            onChange={(e) => setCurrentPassword(e.target.value)}
-            className="w-full p-4 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300 ease-in-out"
-          />
-        </div>
+          <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">
+            Change Password
+          </h2>
+          <div className="space-y-6">
+            <div>
+              <label
+                htmlFor="currentPassword"
+                className="text-gray-700 font-medium"
+              >
+                Current Password
+              </label>
+              <input
+                type="password"
+                name="currentPassword"
+                id="currentPassword"
+                placeholder="Enter your current password"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                className="w-full p-4 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300 ease-in-out"
+              />
+            </div>
 
-        <div>
-          <label htmlFor="newPassword" className="text-gray-700 font-medium">
-            New Password
-          </label>
-          <input
-            type="password"
-            name="newPassword"
-            id="newPassword"
-            placeholder="Enter a new password"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            className="w-full p-4 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300 ease-in-out"
-          />
-        </div>
+            <div>
+              <label
+                htmlFor="newPassword"
+                className="text-gray-700 font-medium"
+              >
+                New Password
+              </label>
+              <input
+                type="password"
+                name="newPassword"
+                id="newPassword"
+                placeholder="Enter a new password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                className="w-full p-4 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300 ease-in-out"
+              />
+            </div>
 
-        <div>
-          <label
-            htmlFor="confirmNewPassword"
-            className="text-gray-700 font-medium"
-          >
-            Confirm New Password
-          </label>
-          <input
-            type="password"
-            name="confirmNewPassword"
-            id="confirmNewPassword"
-            placeholder="Confirm your new password"
-            value={confirmNewPassword}
-            onChange={(e) => setConfirmNewPassword(e.target.value)}
-            className="w-full p-4 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300 ease-in-out"
-          />
-        </div>
-      </div>
+            <div>
+              <label
+                htmlFor="confirmNewPassword"
+                className="text-gray-700 font-medium"
+              >
+                Confirm New Password
+              </label>
+              <input
+                type="password"
+                name="confirmNewPassword"
+                id="confirmNewPassword"
+                placeholder="Confirm your new password"
+                value={confirmNewPassword}
+                onChange={(e) => setConfirmNewPassword(e.target.value)}
+                className="w-full p-4 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300 ease-in-out"
+              />
+            </div>
+          </div>
 
-      <div className="mt-8 flex justify-end space-x-6">
-        <button
-          onClick={handleChangePassword}
-          className="px-8 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 transition duration-300 ease-in-out"
-        >
-          Save
-        </button>
-        <button
-          onClick={() => setIsChangingPassword(false)}
-          className="px-8 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-400 transition duration-300 ease-in-out"
-        >
-          Cancel
-        </button>
-      </div>
-    </div>
+          <div className="mt-8 flex justify-end space-x-6">
+            <button
+              onClick={handleChangePassword}
+              className="px-8 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 transition duration-300 ease-in-out"
+            >
+              Save
+            </button>
+            <button
+              onClick={() => setIsChangingPassword(false)}
+              className="px-8 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-400 transition duration-300 ease-in-out"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
       ) : isEditing ? (
         <div className="p-6 bg-white rounded-lg shadow-lg">
           <h2 className="text-2xl font-semibold text-gray-900 mb-6">
@@ -358,56 +365,79 @@ const InstructorProfile = () => {
           </div>
         </div>
       ) : (
-        <div className="max-w-md mx-auto bg-white shadow-md rounded-lg p-6 border border-gray-200">
-          <h2 className="text-2xl font-bold text-gray-700 mb-6 text-center">
-            Profile Details
-          </h2>
-          <div className="flex flex-col items-center">
-            <img
-              src={instructor.profileImage || "https://via.placeholder.com/150"}
-              alt="Avatar"
-              className="w-32 h-32 object-cover rounded-full border-4 border-blue-500 mb-4"
-            />
-            <div className="w-full">
-              <p className="text-gray-700 font-medium mb-2">
-                <span className="font-semibold">Name:</span>{" "}
-                {`${instructor.firstName} ${instructor.lastName}`}
-              </p>
-              <p className="text-gray-700 font-medium mb-2">
-                <span className="font-semibold">Email:</span> {instructor.email}
-              </p>
-              <p className="text-gray-700 font-medium mb-2">
-                <span className="font-semibold">Phone:</span>{" "}
-                {instructor.phoneNumber}
-              </p>
-              <p className="text-gray-700 font-medium mb-2">
-                <span className="font-semibold">Address:</span>{" "}
-                {instructor.address}
-              </p>
-              <p className="text-gray-700 font-medium mb-2">
-                <span className="font-semibold">Bio:</span> {instructor.bio}
-              </p>
-              <p className="text-gray-700 font-medium mb-2">
-                <span className="font-semibold">Date of Birth:</span>{" "}
-                {instructor.dateOfBirth
-                  ? new Date(instructor.dateOfBirth).toLocaleDateString("en-GB")
-                  : ""}
-              </p>
-              <p className="text-gray-700 font-medium mb-2">
-                <span className="font-semibold">Status:</span>{" "}
-                {instructor.active ? "Active" : "Inactive"}
-              </p>
+        <div className="bg-gray-100 flex items-center justify-center">
+          <div className="w-full max-w-5xl bg-white shadow-lg rounded-lg p-8 border border-gray-200">
+            {/* Tiêu đề */}
+            <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">
+              Profile Details
+            </h2>
+
+            {/* Nội dung */}
+            <div className="flex flex-col lg:flex-row items-center lg:items-start lg:space-x-8">
+              {/* Hình ảnh */}
+              <div className="flex-shrink-0 mb-8 lg:mb-0">
+                <img
+                  src={
+                    instructor.profileImage || "https://via.placeholder.com/200"
+                  }
+                  alt="Avatar"
+                  className="w-48 h-48 object-cover rounded-full border-4 border-blue-500 shadow-md"
+                />
+              </div>
+
+              {/* Thông tin chi tiết */}
+              <div className="flex-1 space-y-4">
+                <p className="text-gray-700 font-medium">
+                  <span className="font-semibold">Name:</span>{" "}
+                  {`${instructor.firstName} ${instructor.lastName}`}
+                </p>
+                <p className="text-gray-700 font-medium">
+                  <span className="font-semibold">Email:</span>{" "}
+                  {instructor.email}
+                </p>
+                <p className="text-gray-700 font-medium">
+                  <span className="font-semibold">Phone:</span>{" "}
+                  {instructor.phoneNumber}
+                </p>
+                <p className="text-gray-700 font-medium">
+                  <span className="font-semibold">Address:</span>{" "}
+                  {instructor.address}
+                </p>
+                <p className="text-gray-700 font-medium">
+                  <span className="font-semibold">Bio:</span> {instructor.bio}
+                </p>
+                <p className="text-gray-700 font-medium">
+                  <span className="font-semibold">Date of Birth:</span>{" "}
+                  {instructor.dateOfBirth
+                    ? new Date(instructor.dateOfBirth).toLocaleDateString(
+                        "en-GB"
+                      )
+                    : "N/A"}
+                </p>
+                <p className="text-gray-700 font-medium">
+                  <span className="font-semibold">Status:</span>{" "}
+                  <span
+                    className={`${
+                      instructor.active ? "text-green-500" : "text-red-500"
+                    } font-semibold`}
+                  >
+                    {instructor.active ? "Active" : "Inactive"}
+                  </span>
+                </p>
+              </div>
             </div>
-            <div className="mt-6 flex justify-end space-x-4">
+
+            {/* Nút hành động */}
+            <div className="mt-10 flex justify-center space-x-6">
               <button
                 onClick={() => setIsEditing(true)}
-                className="bg-blue-500 text-white px-6 py-2 rounded-lg shadow hover:bg-blue-600"
+                className="px-6 py-3 bg-blue-500 text-white rounded-lg shadow-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 transition duration-300"
               >
                 Edit Profile
               </button>
               <button
                 onClick={() => setIsChangingPassword(true)}
-                className="bg-green-500 text-white px-6 py-2 rounded-lg shadow hover:bg-green-600"
+                className="px-6 py-3 bg-green-500 text-white rounded-lg shadow-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 transition duration-300"
               >
                 Change Password
               </button>
