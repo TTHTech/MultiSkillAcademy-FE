@@ -13,7 +13,7 @@ import {
   LogOut 
 } from 'lucide-react';
 
-const DEFAULT_PROFILE_IMAGE = "https://cdn3.vectorstock.com/i/1000x1000/51/87/student-avatar-user-profile-icon-vector-47025187.jpg";
+const DEFAULT_PROFILE_IMAGE = "https://lh3.googleusercontent.com/IUCQIQksFr7qJDlXK43uhIUwvDt_tpLSNiumv8bFESGLs6wekNyBDdNMyzeFwqgTe-l5vG6RSMvnUek=w544-h544-l90-rj";
 
 const MenuItem = ({ to, icon: Icon, label, badge, onClick, className = "" }) => (
   <Link
