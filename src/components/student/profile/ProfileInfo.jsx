@@ -192,7 +192,7 @@ const ProfileInfo = () => {
                   }
                   alt="Profile"
                   onError={(e) => {
-                    e.target.src = "/api/placeholder/400/320";
+                    e.target.src = "https://lh3.googleusercontent.com/IUCQIQksFr7qJDlXK43uhIUwvDt_tpLSNiumv8bFESGLs6wekNyBDdNMyzeFwqgTe-l5vG6RSMvnUek=w544-h544-l90-rj";
                   }}
                   className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                 />
