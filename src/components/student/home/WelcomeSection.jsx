@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { UserCircle } from 'lucide-react';
 
-const DEFAULT_PROFILE_IMAGE = "/api/placeholder/400/400";
+const DEFAULT_PROFILE_IMAGE = "https://lh3.googleusercontent.com/IUCQIQksFr7qJDlXK43uhIUwvDt_tpLSNiumv8bFESGLs6wekNyBDdNMyzeFwqgTe-l5vG6RSMvnUek=w544-h544-l90-rj";
 
 const WelcomeSection = () => {
   const [profileData, setProfileData] = useState({
