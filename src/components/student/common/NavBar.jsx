@@ -137,7 +137,7 @@ const Navbar = () => {
         >
           <Link to="/student/home" className="transform hover:scale-105 transition-all duration-300">
             <img
-              src="https://firebasestorage.googleapis.com/v0/b/appgallery-30bf7.appspot.com/o/images%2FIronix-fotor-2024112911327.png?alt=media&token=47065fe1-64a1-449c-8cb1-4f91b96484ec"
+              src="https://firebasestorage.googleapis.com/v0/b/appgallery-30bf7.appspot.com/o/images%2FIronix.png?alt=media&token=53c29853-9052-43a4-95b4-b4cfd3ee2efa"
               alt="Logo"
               className="w-16"
             />
