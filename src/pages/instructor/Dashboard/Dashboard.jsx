@@ -91,46 +91,45 @@ const Dashboard = () => {
       <h1 className="text-3xl font-bold text-gray-800 mb-6">
         Instructor Profile
       </h1>
-
       {/* Cards Section */}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-8">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4 2xl:gap-8">
         <CardDataStats title="Total Courses" total={courseData.totalCourses}>
-          <ImBook className="text-primary dark:text-white" size={22} />
+          <ImBook className="text-blue-500" size={28} />
         </CardDataStats>
 
         <CardDataStats
           title="Total Money"
           total={`${salesData.totalSales.toLocaleString()} VND`}
         >
-          <FaDollarSign className="text-primary dark:text-white" size={22} />
+          <FaDollarSign className="text-green-500" size={28} />
         </CardDataStats>
 
         <CardDataStats title="Total Reviews" total={reviewData.totalReview}>
-          <FaStar className="text-primary dark:text-white" size={22} />
+          <FaStar className="text-yellow-500" size={28} />
         </CardDataStats>
 
         <CardDataStats title="Total Students" total={studentData.totalStudent}>
-          <PiStudentFill className="text-primary dark:text-white" size={22} />
+          <PiStudentFill className="text-purple-500" size={28} />
         </CardDataStats>
       </div>
 
       {/* User Section */}
-      <div className="flex-1 mt-6">
+      <div className="">
         <User />
       </div>
 
       {/* Stats Section */}
-      <div className="mt-4 grid grid-cols-12 gap-4 md:mt-6 md:gap-6 2xl:mt-7.5 2xl:gap-7.5">
-        <div className="col-span-12 md:col-span-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="p-6 rounded-lg ">
           <CourseStats data={courseData} />
         </div>
-        <div className="col-span-12 md:col-span-6">
+        <div className="p-6 rounded-lg">
           <ReviewsStats data={reviewData} />
         </div>
       </div>
 
       {/* Sales Chart */}
-      <div className="mt-4">
+      <div className="p-6 rounded-lg">
         <SalesStats data={salesData} />
       </div>
     </div>
