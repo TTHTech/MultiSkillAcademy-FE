@@ -122,13 +122,7 @@ const CourseContent = ({ content = [] }) => {
           </div>
         </div>
 
-        {/* Progress bar */}
-        <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
-          <div 
-            className="h-full bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full"
-            style={{ width: '0%' }}  // Có thể thay đổi dựa trên tiến độ học
-          />
-        </div>
+       
       </div>
 
       {/* Course sections */}
