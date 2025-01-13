@@ -295,7 +295,7 @@ const App = () => {
     >
       <Sidebar open={open} setOpen={setOpen} />
       <div className="container mx-auto p-4">
-        <ButtonBack />
+        {/* <ButtonBack /> */}
         <div className="bg-white shadow-md rounded-lg p-6 mb-8">
           <h1 className="text-3xl font-bold text-gray-800 mb-6">
             Add New Course
@@ -309,7 +309,7 @@ const App = () => {
                   src={
                     images.length > 0
                       ? images[currentImageIndex]
-                      : "https://via.placeholder.com/600x800"
+                      : "https://placehold.co/100x200"
                   }
                   alt={course?.title || "Course image"}
                   className="w-full h-60 object-cover rounded-lg mb-6"

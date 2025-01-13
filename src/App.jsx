@@ -168,7 +168,7 @@ function App() {
               <Route path="/instructor/dashboard" element={<PageDashboard />} />
               <Route path="/instructor/courses" element={<PageCourses />} />
               <Route path="/instructor/courses/:id" element={<PagneCourseDetail />} />
-              <Route path="/instructor/courses/addCourses" element={<PageAdd />} />
+              <Route path="/instructor/addCourses" element={<PageAdd />} />
               <Route path="/instructor/review" element={<PageReview />} />
               <Route path="/instructor/students" element={<StudentList />} />
               <Route path="/instructor/sales" element={<PageSales />} />
