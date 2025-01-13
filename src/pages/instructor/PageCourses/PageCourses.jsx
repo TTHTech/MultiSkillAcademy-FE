@@ -13,7 +13,7 @@ const PageCourses = () => {
     const [pendingPage, setPendingPage] = useState(1);
     const [approvedPage, setApprovedPage] = useState(1);
     const [unsentPage, setUnsentPage] = useState(1);
-    const [declinedPage, setDeclinedPage] = useState(1);  // New state for declined courses
+    const [declinedPage, setDeclinedPage] = useState(1);  
     const [inactivePage, setInactivePage] = useState(1);
 
     const coursesPerPage = 8;
@@ -41,7 +41,7 @@ const PageCourses = () => {
             if (status === "pending") return !course.status || course.status === "Pending";
             if (status === "approved") return ["Active", "Processing"].includes(course.status);
             if (status === "unsent") return course.status === "Unsent";
-            if (status === "declined") return course.status === "Declined";  // Filter for declined courses
+            if (status === "declined") return course.status === "Declined"; 
             if (status === "inactive") return course.status === "Inactive";
             return false;
         });
@@ -58,7 +58,7 @@ const PageCourses = () => {
         { key: "approved", label: "Courses Đã Duyệt" },
         { key: "inactive", label: "Courses Bị Khóa" },
         { key: "unsent", label: "Courses Chưa Gửi" },
-        { key: "declined", label: "Courses Bị Từ Chối" }, // New tab for declined courses
+        { key: "declined", label: "Courses Bị Từ Chối" }, 
     ];
 
     const courseLists = {
@@ -66,7 +66,7 @@ const PageCourses = () => {
         approved: filterCourses("approved"),
         inactive: filterCourses("inactive"), 
         unsent: filterCourses("unsent"),
-        declined: filterCourses("declined"),  // Declined courses filter
+        declined: filterCourses("declined"),
     };
 
     const pages = {
@@ -74,7 +74,7 @@ const PageCourses = () => {
         approved: approvedPage,
         inactive: inactivePage,
         unsent: unsentPage,
-        declined: declinedPage,  // Declined courses page state
+        declined: declinedPage, 
     };
 
     const setPages = {
@@ -82,7 +82,7 @@ const PageCourses = () => {
         approved: setApprovedPage,
         inactive: setInactivePage, 
         unsent: setUnsentPage,
-        declined: setDeclinedPage,  // Declined courses page setter
+        declined: setDeclinedPage,  
     };
 
     return (
@@ -90,15 +90,14 @@ const PageCourses = () => {
             <Sidebar open={open} setOpen={setOpen} />
 
             <div className="space-y-6">
-                <div>
+                {/* <div>
                     <Link to="/instructor/courses/addCourses">
                         <button className="font-poppins bg-gradient-to-b from-indigo-500 to-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:from-green-400 hover:to-blue-400 focus:outline-none transition-all duration-300">
                             <span>Thêm Courses</span>
                         </button>
                     </Link>
-                </div>
+                </div> */}
 
-                {/* Tabs */}
                 <div className="flex justify-center space-x-6 py-4">
                     {tabs.map((tab) => (
                         <button
