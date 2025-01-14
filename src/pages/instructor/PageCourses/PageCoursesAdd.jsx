@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   FaSave,
   FaTimes,
@@ -29,7 +29,61 @@ const App = () => {
     duration: "",
     image: [],
   });
+  const [categories, setCategories] = useState([]);
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          throw new Error("No token found in localStorage");
+        }
 
+        const response = await fetch(
+          "http://localhost:8080/api/instructor/categories",
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch categories");
+        }
+
+        const data = await response.json();
+        setCategories(data);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+  const languages = [
+    "English",
+    "Vietnamese",
+    "Chinese",
+    "Spanish",
+    "French",
+    "German",
+    "Japanese",
+    "Korean",
+    "Russian",
+    "Portuguese",
+    "Italian",
+    "Arabic",
+    "Hindi",
+    "Bengali",
+    "Swedish",
+    "Dutch",
+    "Greek",
+    "Hebrew",
+    "Turkish",
+    "Thai",
+  ];
   const handleSaveCourse = () => {
     if (
       !course.title ||
@@ -426,14 +480,22 @@ const App = () => {
                 <label className="block text-gray-700 mb-2" htmlFor="language">
                   Language
                 </label>
-                <input
+                <select
                   id="language"
                   name="language"
-                  type="text"
                   value={course.language}
                   onChange={handleChange}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
+                >
+                  <option value="" disabled>
+                    Select a language
+                  </option>
+                  {languages.map((language) => (
+                    <option key={language} value={language}>
+                      {language}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
 
@@ -444,16 +506,23 @@ const App = () => {
               >
                 Category Name
               </label>
-              <input
+              <select
                 id="categoryName"
                 name="categoryName"
-                type="text"
                 value={course.categoryName}
                 onChange={handleChange}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
+              >
+                <option value="" disabled>
+                  Select a category
+                </option>
+                {categories.map((category) => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
+                ))}
+              </select>
             </div>
-
             <div className="mb-6">
               <label className="block text-gray-700 mb-2" htmlFor="duration">
                 Duration (hours)

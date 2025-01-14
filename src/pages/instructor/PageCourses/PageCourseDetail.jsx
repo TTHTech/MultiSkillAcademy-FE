@@ -16,10 +16,32 @@ import axios from "axios";
 import moment from "moment";
 import Swal from "sweetalert2";
 import CourseDetails from "./EditableList";
-import LecturesFree from "../../../components/instructor/LecturesFree/LecturesFree"
+import LecturesFree from "../../../components/instructor/LecturesFree/LecturesFree";
 const PageCourseDetail = () => {
   const [open, setOpen] = useState(true);
   const { id } = useParams();
+  const languages = [
+    "English",
+    "Vietnamese",
+    "Chinese",
+    "Spanish",
+    "French",
+    "German",
+    "Japanese",
+    "Korean",
+    "Russian",
+    "Portuguese",
+    "Italian",
+    "Arabic",
+    "Hindi",
+    "Bengali",
+    "Swedish",
+    "Dutch",
+    "Greek",
+    "Hebrew",
+    "Turkish",
+    "Thai",
+  ];
   useEffect(() => {
     const fetchCourseData = async () => {
       console.log(localStorage.getItem("token"));
@@ -43,7 +65,36 @@ const PageCourseDetail = () => {
         setIsLoading(false); // Tắt trạng thái loading sau khi gọi API
       }
     };
+    const fetchCategories = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          throw new Error("No token found in localStorage");
+        }
 
+        const response = await fetch(
+          "http://localhost:8080/api/instructor/categories",
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch categories");
+        }
+
+        const data = await response.json();
+        setCategories(data);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
+
+    fetchCategories();
     fetchCourseData();
   }, [id]);
 
@@ -62,6 +113,8 @@ const PageCourseDetail = () => {
     content_type: "Video",
     duration: "",
   });
+  const [categories, setCategories] = useState([]);
+
   const [showCourseDetails, setShowCourseDetails] = useState(false);
 
   const handleEditDescriptionClick = () => {
@@ -882,14 +935,22 @@ const PageCourseDetail = () => {
                   >
                     Language
                   </label>
-                  <input
+                  <select
                     id="language"
                     name="language"
-                    type="text"
                     value={course.language}
                     onChange={handleChange}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
+                  >
+                    <option value="" disabled>
+                      Select a language
+                    </option>
+                    {languages.map((language) => (
+                      <option key={language} value={language}>
+                        {language}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
               {/* duration */}
@@ -917,14 +978,22 @@ const PageCourseDetail = () => {
                   >
                     Category
                   </label>
-                  <input
+                  <select
                     id="category"
                     name="category"
-                    type="text"
                     value={course.category}
                     onChange={handleChange}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
+                  >
+                    <option value="" disabled>
+                      Select a category
+                    </option>
+                    {categories.map((category) => (
+                      <option key={category} value={category}>
+                        {category}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
               {/* button Save Cancel */}
@@ -1002,9 +1071,9 @@ const PageCourseDetail = () => {
           <CourseDetails />
         </div>
         <div className="mb-4">
-          <LecturesFree courseId={id}/>
+          <LecturesFree courseId={id} />
         </div>
-        
+
         <div className="bg-white shadow-md rounded-lg p-6">
           <h2 className="text-3xl font-bold text-blue-600 mb-6 text-center">
             Sections & Lectures
@@ -1458,7 +1527,7 @@ const PageCourseDetail = () => {
                           </a>
                         )}
                         <p className="text-gray-600">
-                          Duration: {lecture.duration} 
+                          Duration: {lecture.duration}
                         </p>
                         <div className="flex justify-end space-x-4 mt-2">
                           <button
