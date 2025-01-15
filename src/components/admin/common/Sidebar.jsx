@@ -58,29 +58,29 @@ const MENU_GROUPS = [
             color: "#F59E0B"
           },
           {
-            name: "Unread",
+            name: "Create Notification",
             icon: Mail,
             href: "/admin/add-notification",
             color: "#EF4444"
           },
-          {
-            name: "System",
-            icon: AlertTriangle,
-            href: "/admin/notification/system",
-            color: "#3B82F6"
-          },
-          {
-            name: "Archive",
-            icon: Archive,
-            href: "/admin/notification/archive",
-            color: "#6366f1"
-          },
-          {
-            name: "Settings",
-            icon: Settings,
-            href: "/admin/notification/settings",
-            color: "#8B5CF6"
-          }
+          // {
+          //   name: "System",
+          //   icon: AlertTriangle,
+          //   href: "/admin/notification/system",
+          //   color: "#3B82F6"
+          // },
+          // {
+          //   name: "Archive",
+          //   icon: Archive,
+          //   href: "/admin/notification/archive",
+          //   color: "#6366f1"
+          // },
+          // {
+          //   name: "Settings",
+          //   icon: Settings,
+          //   href: "/admin/notification/settings",
+          //   color: "#8B5CF6"
+          // }
         ]
       }
     ]
@@ -99,12 +99,12 @@ const MENU_GROUPS = [
             href: "/admin/courses",
             color: "#8B5CF6"
           },
-          { 
-            name: "Add Course", 
-            icon: PlusSquare, 
-            href: "/admin/courses/add",
-            color: "#10B981"
-          },
+          // { 
+          //   name: "Add Course", 
+          //   icon: PlusSquare, 
+          //   href: "/admin/courses/add",
+          //   color: "#10B981"
+          // },
           { 
             name: "Course Reviews", 
             icon: MessageSquare, 
