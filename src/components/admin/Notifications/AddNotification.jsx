@@ -1,38 +1,64 @@
 import React, { useState } from 'react';
 import { 
   Bell, 
-  Users, 
-  Clock, 
-  AlertTriangle,
   MessageSquare,
   Send,
   Info,
   X
 } from 'lucide-react';
+import { toast } from 'react-toastify';
 
 const AddNotification = () => {
   const [formData, setFormData] = useState({
     title: '',
     message: '',
-    type: 'default',
-    priority: 'normal',
-    schedule: 'now',
-    scheduledTime: '',
-    targetUsers: 'all'
+    targetType: 'ALL'  // Changed to match enum TargetType
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Form submitted:', formData);
+    
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("No token found, please login first.");
+      }
+
+      const response = await fetch("http://localhost:8080/api/admin/notifications", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(formData)
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to create notification");
+      }
+
+      const data = await response.json();
+      console.log('Notification created:', data);
+      toast.success("Notification sent successfully!");
+      
+      // Reset form
+      setFormData({
+        title: '',
+        message: '',
+        targetType: 'ALL'
+      });
+      
+    } catch (err) {
+      console.error('Error creating notification:', err);
+      toast.error(err.message || "Failed to send notification");
+    }
   };
 
   return (
     <div className="w-[1300px] mx-auto">
-      {/* Main Container */}
       <div className="grid grid-cols-3 gap-6">
         {/* Form Section */}
         <div className="col-span-2 bg-[#1E2432] rounded-xl shadow-xl">
-          {/* Header */}
           <div className="p-6 border-b border-gray-700">
             <div className="flex items-center space-x-3">
               <Bell className="w-6 h-6 text-blue-400" />
@@ -43,7 +69,6 @@ const AddNotification = () => {
             </div>
           </div>
 
-          {/* Form */}
           <form onSubmit={handleSubmit} className="p-6">
             <div className="space-y-6">
               {/* Title & Message */}
@@ -59,6 +84,7 @@ const AddNotification = () => {
                     placeholder="Enter notification title"
                     value={formData.title}
                     onChange={(e) => setFormData({...formData, title: e.target.value})}
+                    required
                   />
                 </div>
                 <div>
@@ -72,84 +98,26 @@ const AddNotification = () => {
                     placeholder="Enter notification message"
                     value={formData.message}
                     onChange={(e) => setFormData({...formData, message: e.target.value})}
+                    required
                   />
                 </div>
               </div>
 
-              {/* Type & Priority */}
-              <div className="grid grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Notification Type
-                  </label>
-                  <select
-                    className="w-full px-4 py-2.5 bg-[#252a3b] border border-gray-700 rounded-lg text-gray-300 focus:outline-none focus:border-blue-500 transition-colors"
-                    value={formData.type}
-                    onChange={(e) => setFormData({...formData, type: e.target.value})}
-                  >
-                    <option value="default">Default</option>
-                    <option value="system">System Update</option>
-                    <option value="alert">Alert</option>
-                    <option value="message">Message</option>
-                    <option value="reminder">Reminder</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Priority Level
-                  </label>
-                  <select
-                    className="w-full px-4 py-2.5 bg-[#252a3b] border border-gray-700 rounded-lg text-gray-300 focus:outline-none focus:border-blue-500 transition-colors"
-                    value={formData.priority}
-                    onChange={(e) => setFormData({...formData, priority: e.target.value})}
-                  >
-                    <option value="normal">Normal</option>
-                    <option value="high">High</option>
-                    <option value="medium">Medium</option>
-                    <option value="low">Low</option>
-                  </select>
-                </div>
-              </div>
-
-              {/* Scheduling & Target Users */}
-              <div className="grid grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Schedule
-                  </label>
-                  <select
-                    className="w-full px-4 py-2.5 bg-[#252a3b] border border-gray-700 rounded-lg text-gray-300 focus:outline-none focus:border-blue-500 transition-colors"
-                    value={formData.schedule}
-                    onChange={(e) => setFormData({...formData, schedule: e.target.value})}
-                  >
-                    <option value="now">Send Immediately</option>
-                    <option value="schedule">Schedule for Later</option>
-                  </select>
-                  {formData.schedule === 'schedule' && (
-                    <input
-                      type="datetime-local"
-                      className="mt-3 w-full px-4 py-2.5 bg-[#252a3b] border border-gray-700 rounded-lg text-gray-300 focus:outline-none focus:border-blue-500 transition-colors"
-                      value={formData.scheduledTime}
-                      onChange={(e) => setFormData({...formData, scheduledTime: e.target.value})}
-                    />
-                  )}
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Target Users
-                  </label>
-                  <select
-                    className="w-full px-4 py-2.5 bg-[#252a3b] border border-gray-700 rounded-lg text-gray-300 focus:outline-none focus:border-blue-500 transition-colors"
-                    value={formData.targetUsers}
-                    onChange={(e) => setFormData({...formData, targetUsers: e.target.value})}
-                  >
-                    <option value="all">All Users</option>
-                    <option value="admin">Administrators</option>
-                    <option value="teachers">Teachers</option>
-                    <option value="students">Students</option>
-                    <option value="custom">Custom Selection</option>
-                  </select>
-                </div>
+              {/* Target Users */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Target Users
+                </label>
+                <select
+                  className="w-full px-4 py-2.5 bg-[#252a3b] border border-gray-700 rounded-lg text-gray-300 focus:outline-none focus:border-blue-500 transition-colors"
+                  value={formData.targetType}
+                  onChange={(e) => setFormData({...formData, targetType: e.target.value})}
+                  required
+                >
+                  <option value="ALL">All Users</option>
+                  <option value="STUDENT">Students</option>
+                  <option value="INSTRUCTOR">Instructors</option>
+                </select>
               </div>
 
               {/* Action Buttons */}
@@ -157,6 +125,13 @@ const AddNotification = () => {
                 <button
                   type="button"
                   className="px-6 py-2.5 text-gray-300 hover:text-white transition-colors flex items-center space-x-2"
+                  onClick={() => {
+                    setFormData({
+                      title: '',
+                      message: '',
+                      targetType: 'ALL'
+                    });
+                  }}
                 >
                   <X className="w-4 h-4" />
                   <span>Cancel</span>
@@ -194,12 +169,7 @@ const AddNotification = () => {
                     {formData.message || 'Notification message will appear here'}
                   </p>
                   <div className="mt-3 flex items-center space-x-3">
-                    <span className="text-xs text-gray-400">Preview time • Now</span>
-                    {formData.priority === 'high' && (
-                      <span className="px-2 py-0.5 text-xs font-medium bg-red-500/10 text-red-400 rounded-full">
-                        High Priority
-                      </span>
-                    )}
+                    <span className="text-xs text-gray-400">To: {formData.targetType}</span>
                   </div>
                 </div>
               </div>
@@ -219,11 +189,11 @@ const AddNotification = () => {
               </li>
               <li className="flex items-start space-x-2">
                 <div className="w-1.5 h-1.5 rounded-full bg-blue-400 mt-1.5"></div>
-                <span>Use high priority sparingly</span>
+                <span>Specify target audience clearly</span>
               </li>
               <li className="flex items-start space-x-2">
                 <div className="w-1.5 h-1.5 rounded-full bg-blue-400 mt-1.5"></div>
-                <span>Schedule notifications during active hours</span>
+                <span>Double check message before sending</span>
               </li>
             </ul>
           </div>
