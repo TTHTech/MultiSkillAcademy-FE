@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import Sidebar from "../../../components/instructor/Sidebar/Sidebar";
 import ListCard from "../../../components/instructor/Card/ListCoursesCard";
-import { Link } from "react-router-dom";
 
 const userId = localStorage.getItem("userId");
 
@@ -88,16 +87,7 @@ const PageCourses = () => {
     return (
         <section className={`flex-1 m-4 p-4 duration-300 font-semibold text-xl text-gray-900 ${open ? "ml-72" : "ml-16"} bg-gradient-to-b from-gray-100 to-blue-100`}>
             <Sidebar open={open} setOpen={setOpen} />
-
             <div className="space-y-6">
-                {/* <div>
-                    <Link to="/instructor/courses/addCourses">
-                        <button className="font-poppins bg-gradient-to-b from-indigo-500 to-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:from-green-400 hover:to-blue-400 focus:outline-none transition-all duration-300">
-                            <span>Thêm Courses</span>
-                        </button>
-                    </Link>
-                </div> */}
-
                 <div className="flex justify-center space-x-6 py-4">
                     {tabs.map((tab) => (
                         <button
@@ -113,8 +103,6 @@ const PageCourses = () => {
                         </button>
                     ))}
                 </div>
-
-                {/* Courses List */}
                 <div className="mt-6">
                     {tabs.map((tab) => (
                         activeTab === tab.key && (
