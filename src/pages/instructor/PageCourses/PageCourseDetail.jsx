@@ -54,15 +54,15 @@ const PageCourseDetail = () => {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
             },
           }
-        ); // Gọi API
+        );
         const data = await response.json();
-        setCourse(data); // Gán dữ liệu từ API vào state course
+        setCourse(data);
         setImages(data.images || []);
         setOriginalCourseData(data);
       } catch (error) {
         console.error("Failed to fetch course data:", error);
       } finally {
-        setIsLoading(false); // Tắt trạng thái loading sau khi gọi API
+        setIsLoading(false);
       }
     };
     const fetchCategories = async () => {
@@ -114,16 +114,6 @@ const PageCourseDetail = () => {
     duration: "",
   });
   const [categories, setCategories] = useState([]);
-
-  const [showCourseDetails, setShowCourseDetails] = useState(false);
-
-  const handleEditDescriptionClick = () => {
-    setShowCourseDetails(true);
-  };
-
-  const handleCloseCourseDetails = () => {
-    setShowCourseDetails(false);
-  };
   const [addingLecture, setAddingLecture] = useState(null);
   const [newLecture, setNewLecture] = useState({
     title: "",
@@ -176,7 +166,6 @@ const PageCourseDetail = () => {
       categoryName: course.category,
     };
     try {
-      // Gọi API cập nhật Section
       const response = await fetch(
         `http://localhost:8080/api/instructor/update-course/${course.courseId}`,
         {
@@ -212,10 +201,10 @@ const PageCourseDetail = () => {
     console.log("Course data saved:", course);
     setIsEditing(false);
   };
-  const [originalCourseData, setOriginalCourseData] = useState(null); // Lưu dữ liệu gốc từ API
+  const [originalCourseData, setOriginalCourseData] = useState(null);
   const handleCancel = () => {
     if (originalCourseData) {
-      setCourse(originalCourseData); // Khôi phục lại dữ liệu gốc từ API
+      setCourse(originalCourseData);
     }
     setIsEditing(false);
     setEditingSectionId(null);
@@ -237,7 +226,6 @@ const PageCourseDetail = () => {
       lectures: [],
     };
     try {
-      // Gọi API thêm Section
       const response = await fetch(
         "http://localhost:8080/api/instructor/add-section",
         {
@@ -265,11 +253,6 @@ const PageCourseDetail = () => {
         window.location.reload();
       }
       console.log(result);
-
-      // setCourse((prevCourse) => ({
-      //   ...prevCourse,
-      //   sections: [...prevCourse.sections, newSection],
-      // }));
       setNewSectionTitle("");
     } catch (error) {
       console.error("Error adding section:", error);
@@ -300,7 +283,6 @@ const PageCourseDetail = () => {
     };
 
     try {
-      // Gọi API cập nhật Section
       const response = await fetch(
         `http://localhost:8080/api/instructor/update-section/${section_id}`,
         {
@@ -328,16 +310,6 @@ const PageCourseDetail = () => {
         window.location.reload();
       }
       console.log(result);
-
-      // setCourse((prevCourse) => ({
-      //   ...prevCourse,
-      //   sections: prevCourse.sections.map((section) =>
-      //     section.section_id === section_id
-      //       ? { ...section, title: editedSectionTitle }
-      //       : section
-      //   ),
-      // }));
-
       setEditingSectionId(null);
     } catch (error) {
       console.error("Error updating section:", error);
@@ -361,7 +333,6 @@ const PageCourseDetail = () => {
     }
 
     try {
-      // Gọi API xóa Section
       const response = await fetch(
         `http://localhost:8080/api/instructor/delete-section/${section_id}`,
         {
@@ -618,7 +589,7 @@ const PageCourseDetail = () => {
   const handleAddImage = async (event) => {
     const file = event.target.files[0];
     if (file) {
-      setCurrentImageIndex(images.length); // Chuyển sang ảnh mới
+      setCurrentImageIndex(images.length);
       const uploadedImageUrl = await uploadImage(file);
       try {
         const addImage = {
@@ -764,21 +735,21 @@ const PageCourseDetail = () => {
   const uploadImage = async (file) => {
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("upload_preset", "ImageUploat"); // Thay thế với upload preset của bạn
-    formData.append("cloud_name", "due2txjv1"); // Thay thế với cloud name của bạn
+    formData.append("upload_preset", "ImageUploat");
+    formData.append("cloud_name", "due2txjv1");
 
     try {
       const response = await axios.post(
         "https://api.cloudinary.com/v1_1/due2txjv1/image/upload",
         formData
       );
-      return response.data.secure_url; // Trả về URL ảnh đã upload
+      return response.data.secure_url;
     } catch (error) {
-      console.error("Error uploading the image", error.response.data); // Hiển thị thông báo lỗi chi tiết
+      console.error("Error uploading the image", error.response.data);
       alert(
         `Error uploading the image: ${JSON.stringify(error.response.data)}`
-      ); // Hiển thị thông báo lỗi cho người dùng
-      return null; // Trả về null nếu có lỗi
+      );
+      return null;
     }
   };
   if (isLoading) {
@@ -803,16 +774,13 @@ const PageCourseDetail = () => {
           </h1>
 
           <div className="relative mb-6">
-            {/* Hiển thị ảnh hiện tại */}
             {images.length >= 0 && (
               <>
                 <img
-                  src={images[currentImageIndex] || "default-image.jpg"}
+                  src={images[currentImageIndex] || "https://placehold.co/600x200"}
                   alt={course?.title || "Course image"}
                   className="w-full h-auto max-h-[500px] object-contain rounded-lg mb-6"
                 />
-
-                {/* Nút thêm ảnh */}
                 <label className="absolute top-2 left-2 bg-gray-700 text-white p-2 rounded-full shadow-md hover:bg-gray-800 transition-colors cursor-pointer">
                   <FaPlus />
                   <input
@@ -823,7 +791,6 @@ const PageCourseDetail = () => {
                   />
                 </label>
 
-                {/* Nút xóa ảnh */}
                 <button
                   onClick={handleDeleteImage}
                   className="absolute top-2 right-2 bg-red-700 text-white p-2 rounded-full shadow-md hover:bg-red-800 transition-colors"
@@ -831,15 +798,12 @@ const PageCourseDetail = () => {
                   <FaTimes />
                 </button>
 
-                {/* Nút sửa ảnh */}
                 <button
                   onClick={handleEditImage}
                   className="absolute top-2 right-10 bg-gray-700 text-white p-2 rounded-full shadow-md hover:bg-gray-800 transition-colors"
                 >
                   <FaEdit />
                 </button>
-
-                {/* Nút chuyển ảnh trước */}
                 <button
                   onClick={handlePreviousImage}
                   className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-gray-700 text-white p-2 rounded-full shadow-md hover:bg-gray-800 transition-colors"
@@ -847,7 +811,6 @@ const PageCourseDetail = () => {
                   <FaArrowLeft />
                 </button>
 
-                {/* Nút chuyển ảnh sau */}
                 <button
                   onClick={handleNextImage}
                   className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-gray-700 text-white p-2 rounded-full shadow-md hover:bg-gray-800 transition-colors"
@@ -864,7 +827,6 @@ const PageCourseDetail = () => {
                 Edit Course
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                {/* title */}
                 <div>
                   <label className="block text-gray-700 mb-2" htmlFor="title">
                     Title
@@ -878,7 +840,6 @@ const PageCourseDetail = () => {
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
-                {/* price */}
                 <div>
                   <label className="block text-gray-700 mb-2" htmlFor="price">
                     Price (VND)
@@ -889,11 +850,19 @@ const PageCourseDetail = () => {
                     type="number"
                     value={course.price}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    disabled={["Active", "Inactive", "Processing"].includes(
+                      course.status
+                    )}
+                    className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none ${
+                      ["Active", "Inactive", "Processing"].includes(
+                        course.status
+                      )
+                        ? "bg-gray-200 cursor-not-allowed"
+                        : "focus:ring-2 focus:ring-blue-500"
+                    }`}
                   />
                 </div>
               </div>
-              {/* description */}
               <div className="mb-6">
                 <label
                   className="block text-gray-700 mb-2"
@@ -910,7 +879,6 @@ const PageCourseDetail = () => {
                   rows="6"
                 />
               </div>
-              {/* level */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <div>
                   <label className="block text-gray-700 mb-2" htmlFor="level">
@@ -953,7 +921,6 @@ const PageCourseDetail = () => {
                   </select>
                 </div>
               </div>
-              {/* duration */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <div>
                   <label

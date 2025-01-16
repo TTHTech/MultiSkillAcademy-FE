@@ -12,6 +12,7 @@ import { MdOutlineReviews } from "react-icons/md";
 import { FaCircleDollarToSlot } from "react-icons/fa6";
 import { GrScorecard } from "react-icons/gr";
 import { BiBookAdd } from "react-icons/bi";
+import { GiBookshelf } from "react-icons/gi";
 
 const Sidebar = ({ open, setOpen }) => {
   const location = useLocation();
@@ -20,6 +21,7 @@ const Sidebar = ({ open, setOpen }) => {
     { name: "Sales", link: "/instructor/sales", icon: FaCircleDollarToSlot },
     // { name: "Dashboard", link: "/instructor/dashboard", icon: MdOutlineDashboard },
     { name: "Courses", link: "/instructor/courses", icon: ImBook },
+    { name: "Search Course", link: "/instructor/search", icon: GiBookshelf },
     { name: "Add New Courses", link: "/instructor/addCourses", icon: BiBookAdd },
     { name: "Review", link: "/instructor/review", icon: MdOutlineReviews },
     { name: "Test", link: "/instructor/tests", icon: LuFileSignature },

@@ -53,7 +53,7 @@ import NotificationList from "./components/student/notification/NotificationList
 import ChatPage from "./pages/student/chat/ChatPage.jsx";
 import NotificationPage from "./pages/admin/NotificationPage";
 import AddNotificationPage from "./pages/admin/AddNotificationPage";
-
+import PageSearchCourse from "./pages/instructor/PageSearchCourse/PageSearchCourse.jsx";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -183,6 +183,7 @@ function App() {
                 <Route path="/instructor/tests" element={<Test />} />
                 <Route path="/instructor/scores" element={<PageViewScores />} />
                 <Route path="/instructor/questions" element={<PageQuestions />} />
+                <Route path="/instructor/search" element={<PageSearchCourse />} />
               </>
             )}
           </Routes>
