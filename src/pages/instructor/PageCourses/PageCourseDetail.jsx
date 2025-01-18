@@ -12,6 +12,7 @@ import {
 import { useParams } from "react-router-dom";
 import Sidebar from "../../../components/instructor/Sidebar/Sidebar";
 import ButtonBack from "../../../components/instructor/BackButton/BackButton";
+import Navbar from "../../../components/instructor/Navbar/NavbarDetailCourse";
 import axios from "axios";
 import moment from "moment";
 import Swal from "sweetalert2";
@@ -767,17 +768,21 @@ const PageCourseDetail = () => {
     >
       <Sidebar open={open} setOpen={setOpen} />
       <div className="container mx-auto p-4">
-        <ButtonBack />
+        <Navbar/>
         <div className="bg-white shadow-md rounded-lg p-6 mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-6">
+          <h1
+            className="text-3xl font-bold text-gray-800 mb-6"
+            id="course-details"
+          >
             Course Details
           </h1>
-
           <div className="relative mb-6">
             {images.length >= 0 && (
               <>
                 <img
-                  src={images[currentImageIndex] || "https://placehold.co/600x200"}
+                  src={
+                    images[currentImageIndex] || "https://placehold.co/600x200"
+                  }
                   alt={course?.title || "Course image"}
                   className="w-full h-auto max-h-[500px] object-contain rounded-lg mb-6"
                 />
@@ -1034,15 +1039,18 @@ const PageCourseDetail = () => {
             </div>
           )}
         </div>
-        <div className="mb-4">
+        <div className="mb-4" id="description">
           <CourseDetails />
         </div>
-        <div className="mb-4">
+        <div className="mb-4" id="free-lectures">
           <LecturesFree courseId={id} />
         </div>
 
         <div className="bg-white shadow-md rounded-lg p-6">
-          <h2 className="text-3xl font-bold text-blue-600 mb-6 text-center">
+          <h2
+            className="text-3xl font-bold text-blue-600 mb-6 text-center"
+            id="sections-lectures"
+          >
             Sections & Lectures
           </h2>
 

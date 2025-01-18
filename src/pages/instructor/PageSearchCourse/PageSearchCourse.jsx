@@ -44,25 +44,37 @@ const PageSearchCourse = () => {
         if (key === "price") {
           return course[key] <= criteria[key];
         }
-        return course[key]?.toString().toLowerCase().includes(criteria[key].toLowerCase());
+        return course[key]
+          ?.toString()
+          .toLowerCase()
+          .includes(criteria[key].toLowerCase());
       });
     });
     setFilteredCourses(filtered);
   };
-
-  if (loading) return <p>Loading courses...</p>;
-  if (error) return <p>{error}</p>;
-
   return (
     <section
-      className={`m-3 text-xl text-gray-900 font-semibold duration-300 flex-1 bg-gradient-to-b from-gray-100 to-gray-100 shadow-lg rounded-lg min-h-screen ${
+      className={`m-4 p-5 bg-white rounded-lg shadow-xl transition-all duration-300 ${
         open ? "ml-72" : "ml-16"
-      }`}
+      } min-h-screen`}
     >
-      <Sidebar open={open} setOpen={setOpen} />
-      <div className="m-3 text-xl text-gray-900 font-semibold">
-        <FilterCourse onFilter={handleFilter} />
-        <TableCourse courses={filteredCourses} />
+      <div className="flex flex-col space-y-5">
+        <div className="flex justify-between items-center">
+          <Sidebar open={open} setOpen={setOpen} />
+          <div className="flex-1 ml-5">
+            <h2 className="text-3xl font-bold text-gray-800">
+              Search Courses
+            </h2>
+          </div>
+        </div>
+
+        <div className="bg-gray-50 p-4 rounded-lg shadow-sm">
+          <FilterCourse onFilter={handleFilter} />
+        </div>
+
+        <div className="overflow-hidden bg-white rounded-lg shadow-md mt-5">
+          <TableCourse courses={filteredCourses} />
+        </div>
       </div>
     </section>
   );
