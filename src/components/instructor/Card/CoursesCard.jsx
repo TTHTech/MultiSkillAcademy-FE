@@ -36,11 +36,11 @@ const CourseCard = ({
   const handleMouseEnter = () => setShowDetails(true);
   const handleMouseLeave = () => setShowDetails(false);
   const [instructor, setInstructor] = useState(null);
-  const [ setError] = useState(null);
-  const [ setLoading] = useState(true);
-  
+  const [setError] = useState(null);
+  const [setLoading] = useState(true);
+
   const handleComposeEmail = async () => {
-    const email = "tthoai2401.learn@gmail.com"; 
+    const email = "tthoai2401.learn@gmail.com";
     const subject = `Xác nhận phục hồi khóa học bị khóa ${courseId}`;
     const body = `ĐƠN XIN XEM XÉT PHỤC HỒI HOẠT ĐỘNG CHO KHÓA HỌC\n
     THÔNG TIN KHÓA HỌC\n
@@ -54,7 +54,9 @@ const CourseCard = ({
     - \n
     VUI LÒNG XỬ LÝ SỚM. XIN CHÂN THÀNH CẢM ƠN!`;
     const loginUrl = `https://accounts.google.com/AccountChooser?Email=${instructor.email}`;
-    const composeUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${email}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    const composeUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${email}&su=${encodeURIComponent(
+      subject
+    )}&body=${encodeURIComponent(body)}`;
     await Swal.fire({
       title: "Chú ý",
       text: "Bạn nên dùng email đã đăng ký để được Admin ưu tiên.",
@@ -69,18 +71,18 @@ const CourseCard = ({
       confirmButtonText: "Tiếp tục",
       cancelButtonText: "Hủy",
     });
-  
+
     if (swalResult.isDismissed) {
       return;
     }
-  
+
     if (swalResult.isConfirmed) {
       window.open(composeUrl, "_blank");
     } else {
       window.open(loginUrl, "_blank");
       setTimeout(() => {
         window.open(composeUrl, "_blank");
-      }, 3000); 
+      }, 3000);
     }
   };
   useEffect(() => {
@@ -137,7 +139,7 @@ const CourseCard = ({
       case "Declined":
         return <span className="text-purple-500 font-semibold">Declined</span>;
       default:
-        return <span className="text-gray-500 font-semibold">Unknown</span>;
+        return <span className="text-gray-500 font-semibold">Pending</span>;
     }
   };
 
@@ -414,7 +416,11 @@ const CourseCard = ({
 
         <div className="mt-3 flex items-center">
           <div className="text-lg font-semibold text-indigo-700">
-            {price ? `${new Intl.NumberFormat("vi-VN").format(price)} VND` : "Price not available"}
+            {price !== undefined && price !== null
+              ? price === 0
+                ? "Free"
+                : `${new Intl.NumberFormat("vi-VN").format(price)} VND`
+              : "Price not available"}
           </div>
         </div>
       </div>
@@ -447,7 +453,10 @@ const CourseCard = ({
               <FaStar color="#FFD700" className="text-xs" />
             </div>
             <p className="text-gray-600 text-lg font-semibold">
-              Price: {price ? `${new Intl.NumberFormat("vi-VN").format(price)} VND` : "Price not available"}
+              Price:{" "}
+              {price
+                ? `${new Intl.NumberFormat("vi-VN").format(price)} VND`
+                : "Price not available"}
             </p>
           </div>
           {renderButtons()}

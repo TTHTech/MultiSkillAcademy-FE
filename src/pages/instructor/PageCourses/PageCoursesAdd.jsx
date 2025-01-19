@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   FaSave,
   FaTimes,
@@ -8,7 +8,6 @@ import {
   FaArrowRight,
 } from "react-icons/fa";
 import Sidebar from "../../../components/instructor/Sidebar/Sidebar";
-import ButtonBack from "../../../components/instructor/BackButton/BackButton";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Swal from "sweetalert2";
@@ -29,8 +28,62 @@ const App = () => {
     duration: "",
     image: [],
   });
+  const [categories, setCategories] = useState([]);
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          throw new Error("No token found in localStorage");
+        }
 
-  const handleSaveCourse = () => {
+        const response = await fetch(
+          "http://localhost:8080/api/instructor/categories",
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch categories");
+        }
+
+        const data = await response.json();
+        setCategories(data);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+  const languages = [
+    "English",
+    "Vietnamese",
+    "Chinese",
+    "Spanish",
+    "French",
+    "German",
+    "Japanese",
+    "Korean",
+    "Russian",
+    "Portuguese",
+    "Italian",
+    "Arabic",
+    "Hindi",
+    "Bengali",
+    "Swedish",
+    "Dutch",
+    "Greek",
+    "Hebrew",
+    "Turkish",
+    "Thai",
+  ];
+  const handleSaveCourse = async () => {
     if (
       !course.title ||
       !course.price ||
@@ -40,15 +93,35 @@ const App = () => {
       !course.language ||
       !course.duration
     ) {
-      alert("Please fill in all required fields.");
+      await Swal.fire({
+        title: "Missing Fields",
+        text: "Hãy điền đầy đủ thông tin khóa họchọc",
+        icon: "warning",
+        confirmButtonText: "OK",
+      });
       return;
     }
-    handleFinish();
+    if (course.price == 0) {
+      const result = await Swal.fire({
+        title: "Confirmation",
+        text: "Bạn muốn thêm khóa học miễn phí ?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes",
+        cancelButtonText: "No",
+      });
+    
+      if (result.isConfirmed) {
+        handleFinish();
+      } else {
+        return;
+      }
+    }
+    
   };
 
   const handleFinish = async () => {
     try {
-      // Chuẩn bị dữ liệu khóa học
       const addCourse = {
         courseId: "CR0" + Date.now(),
         categoryName: course.categoryName,
@@ -65,8 +138,6 @@ const App = () => {
       };
 
       console.log("Course Data:", addCourse);
-
-      // Gửi yêu cầu POST để thêm khóa học
       const response = await fetch(
         "http://localhost:8080/api/instructor/add-course",
         {
@@ -270,21 +341,20 @@ const App = () => {
   const uploadImage = async (file) => {
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("upload_preset", "ImageUploat"); // Thay thế với upload preset của bạn
-    formData.append("cloud_name", "due2txjv1"); // Thay thế với cloud name của bạn
-
+    formData.append("upload_preset", "ImageUploat");
+    formData.append("cloud_name", "due2txjv1");
     try {
       const response = await axios.post(
         "https://api.cloudinary.com/v1_1/due2txjv1/image/upload",
         formData
       );
-      return response.data.secure_url; // Trả về URL ảnh đã upload
+      return response.data.secure_url;
     } catch (error) {
-      console.error("Error uploading the image", error.response.data); // Hiển thị thông báo lỗi chi tiết
+      console.error("Error uploading the image", error.response.data);
       alert(
         `Error uploading the image: ${JSON.stringify(error.response.data)}`
-      ); // Hiển thị thông báo lỗi cho người dùng
-      return null; // Trả về null nếu có lỗi
+      );
+      return null;
     }
   };
   return (
@@ -295,27 +365,22 @@ const App = () => {
     >
       <Sidebar open={open} setOpen={setOpen} />
       <div className="container mx-auto p-4">
-        {/* <ButtonBack /> */}
         <div className="bg-white shadow-md rounded-lg p-6 mb-8">
           <h1 className="text-3xl font-bold text-gray-800 mb-6">
             Add New Course
           </h1>
           <div className="relative mb-6">
-            {/* Hiển thị ảnh hiện tại */}
-
             {images.length >= 0 && (
               <>
                 <img
                   src={
                     images.length > 0
                       ? images[currentImageIndex]
-                      : "https://placehold.co/100x200"
+                      : "https://placehold.co/6600x200"
                   }
                   alt={course?.title || "Course image"}
                   className="w-full h-60 object-cover rounded-lg mb-6"
                 />
-
-                {/* Nút thêm ảnh */}
                 <label className="absolute top-2 left-2 bg-gray-700 text-white p-2 rounded-full shadow-md hover:bg-gray-800 transition-colors cursor-pointer">
                   <FaPlus />
                   <input
@@ -326,7 +391,6 @@ const App = () => {
                   />
                 </label>
 
-                {/* Nút xóa ảnh */}
                 <button
                   onClick={handleDeleteImage}
                   className="absolute top-2 right-2 bg-red-700 text-white p-2 rounded-full shadow-md hover:bg-red-800 transition-colors"
@@ -334,7 +398,6 @@ const App = () => {
                   <FaTimes />
                 </button>
 
-                {/* Nút sửa ảnh */}
                 <button
                   onClick={handleEditImage}
                   className="absolute top-2 right-10 bg-gray-700 text-white p-2 rounded-full shadow-md hover:bg-gray-800 transition-colors"
@@ -342,7 +405,6 @@ const App = () => {
                   <FaEdit />
                 </button>
 
-                {/* Nút chuyển ảnh trước */}
                 <button
                   onClick={handlePreviousImage}
                   className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-gray-700 text-white p-2 rounded-full shadow-md hover:bg-gray-800 transition-colors"
@@ -350,7 +412,6 @@ const App = () => {
                   <FaArrowLeft />
                 </button>
 
-                {/* Nút chuyển ảnh sau */}
                 <button
                   onClick={handleNextImage}
                   className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-gray-700 text-white p-2 rounded-full shadow-md hover:bg-gray-800 transition-colors"
@@ -426,14 +487,22 @@ const App = () => {
                 <label className="block text-gray-700 mb-2" htmlFor="language">
                   Language
                 </label>
-                <input
+                <select
                   id="language"
                   name="language"
-                  type="text"
                   value={course.language}
                   onChange={handleChange}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
+                >
+                  <option value="" disabled>
+                    Select a language
+                  </option>
+                  {languages.map((language) => (
+                    <option key={language} value={language}>
+                      {language}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
 
@@ -444,19 +513,26 @@ const App = () => {
               >
                 Category Name
               </label>
-              <input
+              <select
                 id="categoryName"
                 name="categoryName"
-                type="text"
                 value={course.categoryName}
                 onChange={handleChange}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
+              >
+                <option value="" disabled>
+                  Select a category
+                </option>
+                {categories.map((category) => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
+                ))}
+              </select>
             </div>
-
             <div className="mb-6">
               <label className="block text-gray-700 mb-2" htmlFor="duration">
-                Duration (hours)
+                Duration
               </label>
               <input
                 id="duration"
