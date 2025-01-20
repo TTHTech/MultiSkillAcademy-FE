@@ -35,7 +35,7 @@ import ForgotPassPage from "./pages/auth/ForgotPassPage";
 import ResetPassPage from "./pages/auth/ResetPassPage";
 import SuccessPage from "./pages/student/cart/SuccessPage";
 import Logout from "./components/auth/Logout.jsx";
-import PageReview from "./pages/instructor/PageReview/PageReview";
+import PageReview from "./pages/instructor/PageReview";
 import PageSales from "./pages/instructor/PageSales";
 import ProfilePage from "./pages/student/profile/ProfilePage.jsx";
 import QuizPage from "./pages/student/quiz/QuizPage";
@@ -53,7 +53,7 @@ import NotificationList from "./components/student/notification/NotificationList
 import ChatPage from "./pages/student/chat/ChatPage.jsx";
 import NotificationPage from "./pages/admin/NotificationPage";
 import AddNotificationPage from "./pages/admin/AddNotificationPage";
-import PageSearchCourse from "./pages/instructor/PageSearchCourse/PageSearchCourse.jsx";
+import AdminChatPage from "./pages/admin/AdminChatPage";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -148,6 +148,7 @@ function App() {
                 <Route path="/admin/review" element={<ReviewPage />} />
                 <Route path="/admin/notification" element={<NotificationPage />} />
                 <Route path="/admin/add-notification" element={<AddNotificationPage />} />
+                <Route path="/admin/chat" element={<AdminChatPage />} />
               </>
             )}
 
@@ -183,7 +184,6 @@ function App() {
                 <Route path="/instructor/tests" element={<Test />} />
                 <Route path="/instructor/scores" element={<PageViewScores />} />
                 <Route path="/instructor/questions" element={<PageQuestions />} />
-                <Route path="/instructor/search" element={<PageSearchCourse />} />
               </>
             )}
           </Routes>
