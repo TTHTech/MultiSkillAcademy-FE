@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import Sidebar from "../../components/instructor/Sidebar/Sidebar";
+import Sidebar from "../../../components/instructor/Sidebar/Sidebar";
 
 const InstructorReviews = () => {
   const [reviews, setReviews] = useState([]);
