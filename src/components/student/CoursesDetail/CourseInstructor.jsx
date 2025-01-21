@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
-import PropTypes from 'prop-types';
-import { 
-  FaStar, 
-  FaUsers, 
-  FaBookReader, 
+import React, { useState } from "react";
+import PropTypes from "prop-types";
+import {
+  FaStar,
+  FaUsers,
+  FaBookReader,
   FaChalkboardTeacher,
   FaLinkedin,
   FaGlobe,
   FaChevronDown,
-  FaChevronUp
-} from 'react-icons/fa';
+  FaChevronUp,
+} from "react-icons/fa";
 
 const StatCard = ({ icon: Icon, label, value }) => (
   <div className="flex items-center gap-3 bg-gray-50 px-4 py-3 rounded-xl hover:bg-gray-100 transition-colors">
@@ -22,12 +22,16 @@ const StatCard = ({ icon: Icon, label, value }) => (
     </div>
   </div>
 );
+import { Link } from "react-router-dom";
 
 const InstructorHeader = ({ instructor }) => (
   <div className="flex items-center gap-6">
     <div className="relative">
       <img
-        src={instructor.image || "https://i1.sndcdn.com/artworks-9IsXLBkEVnMfN6qy-vlBoxg-t500x500.jpg"}
+        src={
+          instructor.image ||
+          "https://i1.sndcdn.com/artworks-9IsXLBkEVnMfN6qy-vlBoxg-t500x500.jpg"
+        }
         alt={instructor.name}
         className="w-24 h-24 rounded-2xl object-cover shadow-md"
       />
@@ -37,9 +41,12 @@ const InstructorHeader = ({ instructor }) => (
     </div>
     <div className="flex-1">
       <div className="flex items-center gap-3 mb-1">
-        <h3 className="text-2xl font-bold text-gray-900">
-          {instructor.name}
-        </h3>
+        <Link to={`/student/profile-instructor/${instructor.id}`}>
+          <h3 className="text-2xl font-bold text-gray-900">
+            {instructor.name}
+          </h3>
+        </Link>
+
         {instructor.verified && (
           <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-lg">
             Đã xác thực
@@ -49,13 +56,19 @@ const InstructorHeader = ({ instructor }) => (
       <p className="text-gray-600 font-medium mb-2">{instructor.title}</p>
       <div className="flex items-center gap-4 text-sm text-gray-500">
         {instructor.website && (
-          <a href={instructor.website} className="flex items-center gap-1 hover:text-blue-600 transition-colors">
+          <a
+            href={instructor.website}
+            className="flex items-center gap-1 hover:text-blue-600 transition-colors"
+          >
             <FaGlobe />
             Website
           </a>
         )}
         {instructor.linkedin && (
-          <a href={instructor.linkedin} className="flex items-center gap-1 hover:text-blue-600 transition-colors">
+          <a
+            href={instructor.linkedin}
+            className="flex items-center gap-1 hover:text-blue-600 transition-colors"
+          >
             <FaLinkedin />
             LinkedIn
           </a>
@@ -77,11 +90,7 @@ const InstructorStats = ({ instructor }) => (
       label="Học viên"
       value={instructor.students.toLocaleString()}
     />
-    <StatCard
-      icon={FaBookReader}
-      label="Khóa học"
-      value={instructor.courses}
-    />
+    <StatCard icon={FaBookReader} label="Khóa học" value={instructor.courses} />
     <StatCard
       icon={FaChalkboardTeacher}
       label="Đánh giá"
@@ -115,18 +124,24 @@ const CourseInstructor = ({ instructor }) => {
       <div className="p-6">
         <div className="relative">
           <p className="text-gray-600 leading-relaxed whitespace-pre-line">
-            {isExpanded ? instructor.description : `${instructor.description.slice(0, 280)}...`}
+            {isExpanded
+              ? instructor.description
+              : `${instructor.description.slice(0, 280)}...`}
           </p>
-          
+
           {instructor.description.length > 280 && (
             <button
               onClick={() => setIsExpanded(!isExpanded)}
               className="mt-4 flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium transition-colors"
             >
               {isExpanded ? (
-                <>Thu gọn <FaChevronUp className="text-sm" /></>
+                <>
+                  Thu gọn <FaChevronUp className="text-sm" />
+                </>
               ) : (
-                <>Xem thêm <FaChevronDown className="text-sm" /></>
+                <>
+                  Xem thêm <FaChevronDown className="text-sm" />
+                </>
               )}
             </button>
           )}

@@ -101,6 +101,7 @@ const CourseDetailPage = () => {
           />
           <CourseInstructor
             instructor={{
+              id: courseData.instructorId,
               name: `${courseData.instructorFirstName} ${courseData.instructorLastName}`,
               title: courseData.instructorTitle || "Giảng viên",
               image:

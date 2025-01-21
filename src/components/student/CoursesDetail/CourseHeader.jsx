@@ -1,16 +1,18 @@
-import React from 'react';
-import { 
-  FaStar, 
-  FaUser, 
-  FaClock, 
+import React from "react";
+import {
+  FaStar,
+  FaUser,
+  FaClock,
   FaCalendarAlt,
   FaPlayCircle,
   FaCertificate,
-  FaUserGraduate
-} from 'react-icons/fa';
+  FaUserGraduate,
+} from "react-icons/fa";
 
 const StatItem = ({ icon: Icon, label, value, color = "text-gray-300" }) => (
-  <div className={`flex items-center gap-2 ${color} hover:text-yellow-400 transition-colors duration-300 group`}>
+  <div
+    className={`flex items-center gap-2 ${color} hover:text-yellow-400 transition-colors duration-300 group`}
+  >
     <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center group-hover:bg-white/20 transition-all">
       <Icon className="text-lg" />
     </div>
@@ -27,12 +29,7 @@ const RatingStars = ({ rating }) => {
     <div className="flex items-center gap-1">
       {[...Array(5)].map((_, index) => {
         if (index < fullStars) {
-          return (
-            <FaStar 
-              key={index}
-              className="text-yellow-400 w-4 h-4"
-            />
-          );
+          return <FaStar key={index} className="text-yellow-400 w-4 h-4" />;
         } else if (index === fullStars && hasHalfStar) {
           return (
             <div key={index} className="relative w-4 h-4">
@@ -43,15 +40,12 @@ const RatingStars = ({ rating }) => {
             </div>
           );
         } else {
-          return (
-            <FaStar 
-              key={index}
-              className="text-gray-600 w-4 h-4"
-            />
-          );
+          return <FaStar key={index} className="text-gray-600 w-4 h-4" />;
         }
       })}
-      <span className="ml-2 font-medium text-yellow-400">{rating.toFixed(1)}</span>
+      <span className="ml-2 font-medium text-yellow-400">
+        {rating.toFixed(1)}
+      </span>
     </div>
   );
 };
@@ -60,7 +54,10 @@ const InstructorAvatar = ({ instructor }) => (
   <div className="flex items-center gap-3">
     <div className="relative">
       <img
-        src={instructor.image || "https://i1.sndcdn.com/artworks-9IsXLBkEVnMfN6qy-vlBoxg-t500x500.jpg"}
+        src={
+          instructor.image ||
+          "https://i1.sndcdn.com/artworks-9IsXLBkEVnMfN6qy-vlBoxg-t500x500.jpg"
+        }
         alt={instructor.name}
         className="w-12 h-12 rounded-lg object-cover border-2 border-white/20"
       />
@@ -80,16 +77,16 @@ const InstructorAvatar = ({ instructor }) => (
   </div>
 );
 
-const CourseHeader = ({ 
-  title, 
-  description, 
-  instructor, 
-  rating, 
-  studentCount, 
+const CourseHeader = ({
+  title,
+  description,
+  instructor,
+  rating,
+  studentCount,
   lastUpdated,
   duration = "20 giờ học",
   lectureCount = "200 bài giảng",
-  certificateType = "Chứng chỉ hoàn thành"
+  certificateType = "Chứng chỉ hoàn thành",
 }) => {
   return (
     <div className="relative mt-[65px]">
@@ -125,20 +122,14 @@ const CourseHeader = ({
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            <StatItem 
-              icon={FaUserGraduate} 
-              value={`${studentCount.toLocaleString()} học viên`} 
+            <StatItem
+              icon={FaUserGraduate}
+              value={`${studentCount.toLocaleString()} học viên`}
             />
-            <StatItem 
-              icon={FaPlayCircle} 
-              value={lectureCount}
-            />
-            <StatItem 
-              icon={FaClock} 
-              value={duration}
-            />
-            <StatItem 
-              icon={FaCertificate} 
+            <StatItem icon={FaPlayCircle} value={lectureCount} />
+            <StatItem icon={FaClock} value={duration} />
+            <StatItem
+              icon={FaCertificate}
               value={certificateType}
               color="text-yellow-400"
             />
@@ -146,7 +137,14 @@ const CourseHeader = ({
 
           <div className="mt-8 flex items-center gap-2 text-gray-400 text-sm">
             <FaCalendarAlt className="text-gray-500" />
-            Cập nhật lần cuối: {lastUpdated}
+            Cập nhật lần cuối:{" "}
+            {new Date(lastUpdated)
+              .toLocaleDateString("vi-VN", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+              })
+              .replace(/\//g, "/")}
           </div>
         </div>
       </div>
