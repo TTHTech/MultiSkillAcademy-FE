@@ -3,10 +3,28 @@ import { useParams } from "react-router-dom";
 import QuestionsAndAnswers from "../../../pages/student/courses/QuestionAndAnswers";
 import TabComment from "../../student/content/TabComment";
 import TabListTest from "./TabListTest";
+import StudyReminder from "./StudyReminder";
 import Swal from "sweetalert2";
-import { FaClock, FaChartLine, FaPause, FaPlay, FaBackward, FaForward, FaVolumeMute, FaVolumeUp, FaCompress, FaExpand } from "react-icons/fa";
+import {
+  FaClock,
+  FaChartLine,
+  FaPause,
+  FaPlay,
+  FaBackward,
+  FaForward,
+  FaVolumeMute,
+  FaVolumeUp,
+  FaCompress,
+  FaExpand,
+} from "react-icons/fa";
 
-const CustomVideoPlayer = ({ videoRef, selectedLecture, handleSeeking, handleTimeUpdate, handleVideoEnd }) => {
+const CustomVideoPlayer = ({
+  videoRef,
+  selectedLecture,
+  handleSeeking,
+  handleTimeUpdate,
+  handleVideoEnd,
+}) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -18,11 +36,15 @@ const CustomVideoPlayer = ({ videoRef, selectedLecture, handleSeeking, handleTim
   useEffect(() => {
     const video = videoRef.current;
     if (video) {
-      video.addEventListener('play', () => setIsPlaying(true));
-      video.addEventListener('pause', () => setIsPlaying(false));
-      video.addEventListener('timeupdate', () => setCurrentTime(video.currentTime));
-      video.addEventListener('loadedmetadata', () => setDuration(video.duration));
-      
+      video.addEventListener("play", () => setIsPlaying(true));
+      video.addEventListener("pause", () => setIsPlaying(false));
+      video.addEventListener("timeupdate", () =>
+        setCurrentTime(video.currentTime)
+      );
+      video.addEventListener("loadedmetadata", () =>
+        setDuration(video.duration)
+      );
+
       video.volume = volume;
       video.playbackRate = playbackRate;
     }
@@ -31,7 +53,7 @@ const CustomVideoPlayer = ({ videoRef, selectedLecture, handleSeeking, handleTim
   const formatTime = (time) => {
     const minutes = Math.floor(time / 60);
     const seconds = Math.floor(time % 60);
-    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
   };
 
   const togglePlay = () => {
@@ -97,7 +119,7 @@ const CustomVideoPlayer = ({ videoRef, selectedLecture, handleSeeking, handleTim
       <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
         {/* Progress Bar */}
         <div className="relative w-full h-1.5 bg-gray-600/40 cursor-pointer mb-4 rounded-full group/progress">
-          <div 
+          <div
             className="absolute h-full bg-red-600 rounded-full"
             style={{ width: `${(currentTime / duration) * 100}%` }}
           />
@@ -117,20 +139,36 @@ const CustomVideoPlayer = ({ videoRef, selectedLecture, handleSeeking, handleTim
         {/* Controls */}
         <div className="flex items-center justify-between text-white">
           <div className="flex items-center space-x-4">
-            <button onClick={togglePlay} className="hover:text-red-500 transition-colors duration-200 p-1.5 hover:bg-white/10 rounded-full">
+            <button
+              onClick={togglePlay}
+              className="hover:text-red-500 transition-colors duration-200 p-1.5 hover:bg-white/10 rounded-full"
+            >
               {isPlaying ? <FaPause size={18} /> : <FaPlay size={18} />}
             </button>
-            <button onClick={() => handleSkip(-10)} className="hover:text-red-500 transition-colors duration-200 p-1.5 hover:bg-white/10 rounded-full">
+            <button
+              onClick={() => handleSkip(-10)}
+              className="hover:text-red-500 transition-colors duration-200 p-1.5 hover:bg-white/10 rounded-full"
+            >
               <FaBackward size={18} />
             </button>
-            <button onClick={() => handleSkip(10)} className="hover:text-red-500 transition-colors duration-200 p-1.5 hover:bg-white/10 rounded-full">
+            <button
+              onClick={() => handleSkip(10)}
+              className="hover:text-red-500 transition-colors duration-200 p-1.5 hover:bg-white/10 rounded-full"
+            >
               <FaForward size={18} />
             </button>
-            
+
             {/* Volume Control */}
             <div className="flex items-center space-x-2 group/volume">
-              <button onClick={() => setVolume(volume === 0 ? 1 : 0)} className="hover:text-red-500 transition-colors duration-200 p-1.5 hover:bg-white/10 rounded-full">
-                {volume === 0 ? <FaVolumeMute size={18} /> : <FaVolumeUp size={18} />}
+              <button
+                onClick={() => setVolume(volume === 0 ? 1 : 0)}
+                className="hover:text-red-500 transition-colors duration-200 p-1.5 hover:bg-white/10 rounded-full"
+              >
+                {volume === 0 ? (
+                  <FaVolumeMute size={18} />
+                ) : (
+                  <FaVolumeUp size={18} />
+                )}
               </button>
               <div className="w-0 overflow-hidden group-hover/volume:w-20 transition-all duration-300">
                 <input
@@ -152,7 +190,11 @@ const CustomVideoPlayer = ({ videoRef, selectedLecture, handleSeeking, handleTim
                 <button
                   key={rate}
                   onClick={() => handlePlaybackRateChange(rate)}
-                  className={`px-2 py-1 rounded-full ${playbackRate === rate ? 'bg-red-500 text-white' : 'bg-white text-red-500'} hover:bg-red-500 hover:text-white transition-colors duration-200`}
+                  className={`px-2 py-1 rounded-full ${
+                    playbackRate === rate
+                      ? "bg-red-500 text-white"
+                      : "bg-white text-red-500"
+                  } hover:bg-red-500 hover:text-white transition-colors duration-200`}
                 >
                   {rate}x
                 </button>
@@ -165,7 +207,10 @@ const CustomVideoPlayer = ({ videoRef, selectedLecture, handleSeeking, handleTim
             </span>
           </div>
 
-          <button onClick={toggleFullscreen} className="hover:text-red-500 transition-colors duration-200 p-1.5 hover:bg-white/10 rounded-full">
+          <button
+            onClick={toggleFullscreen}
+            className="hover:text-red-500 transition-colors duration-200 p-1.5 hover:bg-white/10 rounded-full"
+          >
             {isFullscreen ? <FaCompress size={18} /> : <FaExpand size={18} />}
           </button>
         </div>
@@ -481,6 +526,16 @@ const MainContent = ({
           >
             Bài Kiểm Tra
           </button>
+          <button
+            onClick={() => setSelectedTab(3)}
+            className={`py-2 px-4 ${
+              selectedTab === 3
+                ? "border-b-2 border-blue-500 font-semibold"
+                : "text-gray-600"
+            }`}
+          >
+            Nhắc nhở học tập
+          </button>
         </div>
 
         <div className="mt-2">
@@ -500,6 +555,12 @@ const MainContent = ({
             <div>
               <h3 className="text-2xl font-semibold ml-8 mt-8">Bài Kiểm Tra</h3>
               <TabListTest content="Danh sách bài kiểm tra" />
+            </div>
+          )}
+          {selectedTab === 3 && (
+            <div>
+              <h3 className="text-2xl font-semibold ml-8 mt-8">Nhắc nhở học tập</h3>
+              <StudyReminder content="Nhắc nhở học tập" />
             </div>
           )}
         </div>
