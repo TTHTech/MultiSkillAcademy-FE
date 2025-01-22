@@ -56,6 +56,7 @@ import AddNotificationPage from "./pages/admin/AddNotificationPage";
 import AdminChatPage from "./pages/admin/AdminChatPage";
 import PageProfileInstructor from "./pages/student/ProfileInstructor/PageProfileInstructor";
 import PageSearchCourse from "./pages/instructor/PageSearchCourse/PageSearchCourse";
+import SaleByInstructorPage from "./pages/admin/SaleByInstructorPage.jsx";
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [role, setRole] = useState("");
@@ -150,6 +151,7 @@ function App() {
                 <Route path="/admin/notification" element={<NotificationPage />} />
                 <Route path="/admin/add-notification" element={<AddNotificationPage />} />
                 <Route path="/admin/chat" element={<AdminChatPage />} />
+                <Route path="/admin/sale-by-instructor" element={<SaleByInstructorPage />} />
               </>
             )}
 
