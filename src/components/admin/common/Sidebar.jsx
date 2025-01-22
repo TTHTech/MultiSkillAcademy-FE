@@ -37,6 +37,12 @@ import {
   AlertTriangle,
   Mail,
   Archive,
+  BarChart,
+  Activity,
+  FileText,
+  LayoutDashboard,
+  Clock,
+  LineChart,
 } from "lucide-react";
 import { ChalkboardTeacher } from "phosphor-react";
 
@@ -44,8 +50,63 @@ const MENU_GROUPS = [
   {
     label: "MAIN MENU",
     items: [
-      { name: "Overview", icon: BarChart2, color: "#6366f1", href: "/admin" },
-      { name: "Statistics", icon: TrendingUp, color: "#6EE7B7", href: "/admin/statistics" },
+      {
+        name: "Overview",
+        icon: BarChart2,
+        color: "#6366f1",
+        subItems: [
+          {
+            name: "Dashboard",
+            icon: LayoutDashboard,
+            href: "/admin",
+            color: "#6366f1"
+          },
+          {
+            name: "Quick Stats",
+            icon: LineChart,
+            href: "/admin/quick-stats",
+            color: "#818CF8"
+          },
+          {
+            name: "Recent Activity",
+            icon: Clock,
+            href: "/admin/recent-activity", 
+            color: "#4F46E5"
+          }
+        ]
+      },
+      {
+        name: "Statistics",
+        icon: TrendingUp,
+        color: "#6EE7B7",
+        subItems: [
+          {
+            name: "Sales Table",
+            icon: BarChart,
+            href: "/admin/statistics",
+            color: "#6EE7B7"
+          },
+          {
+            name: "Sale By Instructor",
+            icon: Users,
+            href: "/admin/sale-by-instructor",
+            color: "#34D399"
+          },
+        
+          {
+            name: "Statistics Review",
+            icon: Activity,
+            href: "/admin/statistics/performance",
+            color: "#10B981"
+          },
+          {
+            name: "Reports",
+            icon: FileText,
+            href: "/admin/statistics/reports",
+            color: "#059669"
+          }
+        ]
+      },
       { 
         name: "Notifications", 
         icon: Bell, 
