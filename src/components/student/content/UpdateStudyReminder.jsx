@@ -1,187 +1,283 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from "react";
+import axios from "axios";
+import { useParams } from "react-router-dom";
 
-const CourseEditComponent = ({ courseData }) => {
-    const [course, setCourse] = useState(courseData);
-    const [isEditing, setIsEditing] = useState(false);
+const CreateStudyReminder = ({ Data, closeModal }) => {
+  const [step, setStep] = useState(1);
+  const [formData, setFormData] = useState({
+    content: Data.content,
+    email: Data.email,
+    courseId: Data.courseId,
+    frequency: Data.frequency,
+    time: Data.time,
+    selectedDays: Data.selectedDays,
+    isActive: Data.isActive,
+  });
+  const { id } = useParams();
+  const [showCustomInput, setShowCustomInput] = useState(false);
+  const [isContentSelected, setIsContentSelected] = useState(false);
 
-    const handleChange = (e) => {
-        const { name, value, type, checked } = e.target;
-        setCourse((prevCourse) => ({
-            ...prevCourse,
-            [name]: type === 'checkbox' ? checked : value,
-        }));
-    };
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    if (name === "content" && value !== "") {
+      setIsContentSelected(true);
+    }
+  };
 
-    const handleSave = () => {
-        console.log("Dữ liệu đã được lưu:", course);
-        setIsEditing(false);
-    };
+  const handleFrequencyClick = (frequency) => {
+    if (frequency === "Hàng tuần") {
+      setFormData((prev) => ({ ...prev, frequency: "", selectedDays: [] }));
+    } else {
+      setFormData((prev) => ({ ...prev, frequency, selectedDays: [] }));
+    }
+  };
 
-    const toggleEdit = () => {
-        setIsEditing(!isEditing);
-    };
+  const toggleDay = (day) => {
+    setFormData((prev) => {
+      if (prev.selectedDays.includes(day)) {
+        return {
+          ...prev,
+          selectedDays: prev.selectedDays.filter((d) => d !== day),
+        };
+      } else {
+        return {
+          ...prev,
+          selectedDays: [...prev.selectedDays, day],
+        };
+      }
+    });
+  };
 
-    return (
-        <div className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg">
-            <h2 className="text-2xl font-bold mb-4 text-center">
-                {isEditing ? "Chỉnh sửa khóa học" : "Chi tiết khóa học"}
-            </h2>
-            <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                    <label className="font-semibold text-gray-700">ID:</label>
-                    {isEditing ? (
-                        <input
-                            type="text"
-                            name="id"
-                            value={course.id}
-                            onChange={handleChange}
-                            disabled
-                            className="w-1/2 px-3 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-600"
-                        />
-                    ) : (
-                        <span>{course.id}</span>
-                    )}
-                </div>
+  const handleSubmit = async () => {
+    try {
+      const payload = {
+        content: formData.content,
+        email: formData.email,
+        courseId: id,
+        frequency: formData.frequency,
+        selectedDays: formData.selectedDays,
+        time: formData.time,
+        isActive: formData.isActive,
+        userId: localStorage.getItem("userId"),
+      };
+      console.log(localStorage.getItem("userId"));
+      const response = await axios.put(
+        `http://localhost:8080/api/student/reminders/${Data.id}`,
+        payload
+      );
 
-                <div className="flex justify-between items-center">
-                    <label className="font-semibold text-gray-700">Tên khóa học:</label>
-                    {isEditing ? (
-                        <input
-                            type="text"
-                            name="content"
-                            value={course.content}
-                            onChange={handleChange}
-                            className="w-1/2 px-3 py-2 border border-gray-300 rounded-md"
-                        />
-                    ) : (
-                        <span>{course.content}</span>
-                    )}
-                </div>
+      alert("Nhắc nhở học tập đã được cập nhật thành công!");
+      closeModal();
+      console.log(response.data);
+    } catch (error) {
+      console.error("Có lỗi xảy ra khi cập nhật nhắc nhở:", error);
+      alert("Không thể cập nhật nhắc nhở. Vui lòng thử lại!");
+    }
+  };
 
-                <div className="flex justify-between items-center">
-                    <label className="font-semibold text-gray-700">Email:</label>
-                    {isEditing ? (
-                        <input
-                            type="email"
-                            name="email"
-                            value={course.email}
-                            onChange={handleChange}
-                            className="w-1/2 px-3 py-2 border border-gray-300 rounded-md"
-                        />
-                    ) : (
-                        <span>{course.email}</span>
-                    )}
-                </div>
-
-                <div className="flex justify-between items-center">
-                    <label className="font-semibold text-gray-700">Course ID:</label>
-                    {isEditing ? (
-                        <input
-                            type="text"
-                            name="courseId"
-                            value={course.courseId}
-                            onChange={handleChange}
-                            className="w-1/2 px-3 py-2 border border-gray-300 rounded-md"
-                        />
-                    ) : (
-                        <span>{course.courseId}</span>
-                    )}
-                </div>
-
-                <div className="flex justify-between items-center">
-                    <label className="font-semibold text-gray-700">Frequency:</label>
-                    {isEditing ? (
-                        <input
-                            type="text"
-                            name="frequency"
-                            value={course.frequency}
-                            onChange={handleChange}
-                            className="w-1/2 px-3 py-2 border border-gray-300 rounded-md"
-                        />
-                    ) : (
-                        <span>{course.frequency}</span>
-                    )}
-                </div>
-
-                <div className="flex justify-between items-center">
-                    <label className="font-semibold text-gray-700">Selected Days:</label>
-                    {isEditing ? (
-                        <input
-                            type="text"
-                            name="selectedDays"
-                            value={(course.selectedDays || []).join(", ")}  // Ensure selectedDays is always an array
-                            onChange={(e) => handleChange({ ...e, value: e.target.value.split(", ") })}
-                            className="w-1/2 px-3 py-2 border border-gray-300 rounded-md"
-                        />
-                    ) : (
-                        <span>{(course.selectedDays || []).join(", ")}</span> // Ensure selectedDays is always an array
-                    )}
-                </div>
-
-                <div className="flex justify-between items-center">
-                    <label className="font-semibold text-gray-700">Time:</label>
-                    {isEditing ? (
-                        <input
-                            type="time"
-                            name="time"
-                            value={course.time ? `${course.time[0]}:${course.time[1]}` : ""}
-                            onChange={(e) => handleChange({ ...e, value: e.target.value.split(":").map(Number) })}
-                            className="w-1/2 px-3 py-2 border border-gray-300 rounded-md"
-                        />
-                    ) : (
-                        <span>{course.time ? `${course.time[0]}:${course.time[1]}` : ""}</span>
-                    )}
-                </div>
-
-                <div className="flex justify-between items-center">
-                    <label className="font-semibold text-gray-700">Last Sent At:</label>
-                    {isEditing ? (
-                        <input
-                            type="datetime-local"
-                            name="lastSentAt"
-                            value={course.lastSentAt || ""}
-                            onChange={handleChange}
-                            className="w-1/2 px-3 py-2 border border-gray-300 rounded-md"
-                        />
-                    ) : (
-                        <span>{course.lastSentAt}</span>
-                    )}
-                </div>
-
-                <div className="flex justify-between items-center">
-                    <label className="font-semibold text-gray-700">Active:</label>
-                    {isEditing ? (
-                        <input
-                            type="checkbox"
-                            name="isActive"
-                            checked={course.isActive || false} // Ensure isActive is a boolean
-                            onChange={handleChange}
-                            className="h-5 w-5 text-indigo-600 border-gray-300 rounded"
-                        />
-                    ) : (
-                        <span>{course.isActive ? "Có" : "Không"}</span>
-                    )}
-                </div>
+  return (
+    <div className="max-w-lg mx-auto mt-10 p-5 bg-white mb-10">
+      {step === 1 && (
+        <div className="h-full">
+          <p className="text-gray-600 mb-2">Bước 1/3</p>
+          <div>
+            <p className="mb-2 font-bold text-xl text-gray-900">
+              Nội dung thông báo được đính kèm là:
+            </p>
+            <p className="mb-2 font-bold text-xl text-gray-900">
+              {formData.content}
+            </p>
+            <p className="mb-2 font-medium">Chọn nội dung thông báo khác:</p>
+            <div className="space-y-3">
+              {[
+                "Tiến lên mỗi ngày, bạn đang tiến gần hơn đến mục tiêu!",
+                "Chỉ cần kiên trì, thành công sẽ đến với bạn!",
+                "Mỗi bước nhỏ đều dẫn bạn đến thành công lớn!",
+                "Chinh phục thử thách và vươn tới đỉnh cao!",
+                "Không có",
+                "Nội dung khác",
+              ].map((option, index) => (
+                <label key={index} className="block cursor-pointer">
+                  <input
+                    type="radio"
+                    name="content"
+                    value={option}
+                    checked={formData.content === option}
+                    onChange={(e) => {
+                      handleInputChange(e);
+                      if (option === "Nội dung khác") {
+                        setShowCustomInput(true);
+                      } else {
+                        setShowCustomInput(false);
+                      }
+                    }}
+                    className="mr-2"
+                  />
+                  {option}
+                </label>
+              ))}
             </div>
 
-            <div className="mt-6 flex justify-end gap-4">
-                <button
-                    onClick={toggleEdit}
-                    className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
-                >
-                    {isEditing ? "Hủy chỉnh sửa" : "Chỉnh sửa"}
-                </button>
-                {isEditing && (
-                    <button
-                        onClick={handleSave}
-                        className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
-                    >
-                        Lưu
-                    </button>
-                )}
-            </div>
+            {showCustomInput && (
+              <input
+                type="text"
+                name="content"
+                value={formData.content}
+                onChange={(e) => {
+                  handleInputChange(e);
+                  if (e.target.value) {
+                    setFormData({
+                      ...formData,
+                      content: e.target.value,
+                    });
+                  }
+                }}
+                placeholder="Nhập nội dung khác"
+                className="w-full p-3 border rounded mt-4 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              />
+            )}
+          </div>
+
+          {formData.content && (
+            <button
+              onClick={() => setStep(2)}
+              className="mt-4 px-6 py-3 bg-blue-500 text-white font-medium rounded shadow hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              Tiếp theo
+            </button>
+          )}
         </div>
-    );
+      )}
+
+      {step === 2 && (
+        <div className="h-full">
+          <p className="text-gray-600 mb-2">Bước 2/3</p>
+          <p className="mb-2 font-medium">Tần suất</p>
+          <div className="flex space-x-4 mb-6">
+            {["Hàng ngày", "Hàng tuần", "Một lần"].map((frequency) => (
+              <button
+                key={frequency}
+                onClick={() => {
+                  handleFrequencyClick(frequency);
+                  if (frequency !== "Hàng tuần") {
+                    setFormData((prev) => ({
+                      ...prev,
+                      selectedDays: [],
+                      frequency,
+                    }));
+                  } else {
+                    setFormData((prev) => ({
+                      ...prev,
+                      frequency,
+                    }));
+                  }
+                }}
+                className={`px-4 py-2 border rounded font-medium shadow focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+                  formData.frequency === frequency
+                    ? "bg-blue-500 text-white"
+                    : ""
+                }`}
+              >
+                {frequency}
+              </button>
+            ))}
+          </div>
+
+          {formData.frequency === "Hàng tuần" && (
+            <>
+              <p className="mb-2 font-medium">Chọn các ngày trong tuần</p>
+              <div className="flex flex-wrap gap-2 mb-6">
+                {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((day) => (
+                  <button
+                    key={day}
+                    onClick={() => toggleDay(day)}
+                    className={`px-4 py-2 border rounded font-medium transition-all ${
+                      formData.selectedDays.includes(day)
+                        ? "bg-blue-500 text-white"
+                        : ""
+                    }`}
+                  >
+                    {day}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+
+          <div className="mb-6">
+            <label className="block font-medium mb-2">
+              Thời gian thông báo
+            </label>
+            <input
+              type="time"
+              name="time"
+              value={`${String(formData.time[0]).padStart(2, "0")}:${String(
+                formData.time[1]
+              ).padStart(2, "0")}`}
+              onChange={handleInputChange}
+              className="w-full p-3 border rounded focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            />
+          </div>
+
+          <div className="flex justify-between">
+            <button
+              onClick={() => setStep(1)}
+              className="px-6 py-3 border rounded shadow font-medium hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-400"
+            >
+              Trước
+            </button>
+            <button
+              onClick={() => {
+                setStep(3);
+              }}
+              className="px-6 py-3 bg-blue-500 text-white font-medium rounded shadow hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              Tiếp theo
+            </button>
+          </div>
+        </div>
+      )}
+
+      {step === 3 && (
+        <div className="h-full">
+          <p className="text-gray-600 mb-2">Bước 3/3</p>
+          <p className="text-gray-600">Email nhận thông báo</p>
+          <input
+            type="text"
+            name="email"
+            value={formData.email}
+            onChange={handleInputChange}
+            placeholder={formData.email}
+            className="w-full p-3 border rounded focus:ring-2 focus:ring-blue-500 focus:outline-none"
+          />
+
+          {/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(
+            formData.email
+          ) ? (
+            <div className="flex justify-between">
+              <button
+                onClick={() => setStep(2)}
+                className="px-6 py-3 border rounded shadow font-medium hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-400 mt-2"
+              >
+                Trước
+              </button>
+              <button
+                onClick={handleSubmit}
+                className="px-6 py-3 bg-blue-500 text-white font-medium rounded shadow hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 mt-2"
+              >
+                Xong
+              </button>
+            </div>
+          ) : (
+            <p className="text-red-500 text-sm mt-2">
+              Vui lòng nhập địa chỉ email hợp lệ.
+            </p>
+          )}
+        </div>
+      )}
+    </div>
+  );
 };
 
-export default CourseEditComponent;
+export default CreateStudyReminder;
