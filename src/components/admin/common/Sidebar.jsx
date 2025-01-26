@@ -87,7 +87,7 @@ const MENU_GROUPS = [
             color: "#6EE7B7"
           },
           {
-            name: "Sale By Instructor",
+            name: "Sale By Instructors",
             icon: Users,
             href: "/admin/sale-by-instructor",
             color: "#34D399"
