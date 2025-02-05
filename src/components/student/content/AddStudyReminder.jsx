@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 
@@ -16,7 +16,14 @@ const CreateStudyReminder = ({ closeModal }) => {
   const { id } = useParams();
   const [showCustomInput, setShowCustomInput] = useState(false);
   const [isContentSelected, setIsContentSelected] = useState(false);
-
+  useEffect(() => {
+    if (!formData.content) {
+      setFormData((prev) => ({
+        ...prev,
+        content: "Tiến lên mỗi ngày, bạn đang tiến gần hơn đến mục tiêu!",
+      }));
+    }
+  }, []);
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -78,76 +85,77 @@ const CreateStudyReminder = ({ closeModal }) => {
 
   return (
     <div className="max-w-lg mx-auto mt-10 p-5 bg-white mb-10">
-{step === 1 && (
-  <div className="h-full">
-    <h2 className="text-2xl font-semibold mb-4">
-      Tạo mới nhắc nhở học tập
-    </h2>
-    <p className="text-gray-600 mb-2">Bước 1/3</p>
-    <div>
-      <p className="mb-2 font-medium">
-        Nội dung thông báo đính kèm
-      </p>
-      <div className="space-y-3">
-        {[
-          "Tiến lên mỗi ngày, bạn đang tiến gần hơn đến mục tiêu!",
-          "Chỉ cần kiên trì, thành công sẽ đến với bạn!",
-          "Mỗi bước nhỏ đều dẫn bạn đến thành công lớn!",
-          "Chinh phục thử thách và vươn tới đỉnh cao!",
-          "Không có",
-          "Nội dung khác",
-        ].map((option, index) => (
-          <label key={index} className="block cursor-pointer">
-            <input
-              type="radio"
-              name="content"
-              value={option}
-              checked={formData.content === option || (option === "Nội dung khác" && formData.content && formData.content !== "")}
-              onChange={(e) => {
-                handleInputChange(e);
-                if (option === "Nội dung khác") {
-                  setShowCustomInput(true);
-                } else {
-                  setShowCustomInput(false);
+      {step === 1 && (
+        <div className="h-full">
+          <h2 className="text-2xl font-semibold mb-4">
+            Tạo mới nhắc nhở học tập
+          </h2>
+          <p className="text-gray-600 mb-2">Bước 1/3</p>
+          <div>
+            <p className="mb-2 font-medium">Nội dung thông báo đính kèm</p>
+            <div className="space-y-3">
+              {[
+                "Tiến lên mỗi ngày, bạn đang tiến gần hơn đến mục tiêu!",
+                "Chỉ cần kiên trì, thành công sẽ đến với bạn!",
+                "Mỗi bước nhỏ đều dẫn bạn đến thành công lớn!",
+                "Chinh phục thử thách và vươn tới đỉnh cao!",
+                "Nội dung khác",
+              ].map((option, index) => (
+                <label key={index} className="block cursor-pointer">
+                  <input
+                    type="radio"
+                    name="content"
+                    value={option}
+                    checked={
+                      option === "Nội dung khác"
+                        ? ![
+                            "Tiến lên mỗi ngày, bạn đang tiến gần hơn đến mục tiêu!",
+                            "Chỉ cần kiên trì, thành công sẽ đến với bạn!",
+                            "Mỗi bước nhỏ đều dẫn bạn đến thành công lớn!",
+                            "Chinh phục thử thách và vươn tới đỉnh cao!",
+                          ].includes(formData.content)
+                        : formData.content === option
+                    }
+                    onChange={(e) => {
+                      handleInputChange(e);
+                      if (option === "Nội dung khác") {
+                        setShowCustomInput(true);
+                        setFormData({ ...formData, content: "" });
+                      } else {
+                        setShowCustomInput(false);
+                        setFormData({ ...formData, content: option });
+                      }
+                    }}
+                    className="mr-2"
+                  />
+                  {option}
+                </label>
+              ))}
+            </div>
+            {showCustomInput && (
+              <input
+                type="text"
+                name="content"
+                value={formData.content}
+                onChange={(e) =>
+                  setFormData({ ...formData, content: e.target.value })
                 }
-              }}
-              className="mr-2"
-            />
-            {option}
-          </label>
-        ))}
-      </div>
-      {showCustomInput && (
-        <input
-          type="text"
-          name="content"
-          value={formData.content}
-          onChange={(e) => {
-            handleInputChange(e);
-            if (e.target.value) {
-              setFormData({
-                ...formData,
-                content: e.target.value
-              });
-            }
-          }}
-          placeholder="Nhập nội dung khác"
-          className="w-full p-3 border rounded mt-4 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-        />
+                placeholder="Nhập nội dung khác"
+                className="w-full p-3 border rounded mt-4 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              />
+            )}
+          </div>
+
+          {formData.content && (
+            <button
+              onClick={() => setStep(2)}
+              className="mt-4 px-6 py-3 bg-blue-500 text-white font-medium rounded shadow hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              Tiếp theo
+            </button>
+          )}
+        </div>
       )}
-    </div>
-
-    {formData.content && ( 
-      <button
-        onClick={() => setStep(2)}
-        className="mt-4 px-6 py-3 bg-blue-500 text-white font-medium rounded shadow hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-      >
-        Tiếp theo
-      </button>
-    )}
-  </div>
-)}
-
 
       {step === 2 && (
         <div className="h-full">
@@ -202,6 +210,11 @@ const CreateStudyReminder = ({ closeModal }) => {
                   </button>
                 ))}
               </div>
+              {formData.selectedDays.length === 0 && (
+                <p className="text-red-500 text-sm">
+                  Bạn cần chọn ít nhất 1 ngày trong tuần!
+                </p>
+              )}
             </>
           )}
 
@@ -209,13 +222,43 @@ const CreateStudyReminder = ({ closeModal }) => {
             <label className="block font-medium mb-2">
               Thời gian thông báo
             </label>
-            <input
-              type="time"
-              name="time"
-              value={formData.time}
-              onChange={handleInputChange}
-              className="w-full p-3 border rounded focus:ring-2 focus:ring-blue-500 focus:outline-none"
-            />
+            <div className="flex space-x-4">
+              <select
+                name="time"
+                value={formData.time.split(":")[0]} // lấy giờ
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    time: `${e.target.value}:${formData.time.split(":")[1]}`,
+                  })
+                }
+                className="w-1/2 p-3 border rounded focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              >
+                {Array.from({ length: 24 }, (_, index) => (
+                  <option key={index} value={index.toString().padStart(2, "0")}>
+                    {index.toString().padStart(2, "0")}
+                  </option>
+                ))}
+              </select>
+              <span className="text-xl">:</span>
+              <select
+                name="timeMinutes"
+                value={formData.time.split(":")[1]} // lấy phút
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    time: `${formData.time.split(":")[0]}:${e.target.value}`,
+                  })
+                }
+                className="w-1/2 p-3 border rounded focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              >
+                {Array.from({ length: 60 }, (_, index) => (
+                  <option key={index} value={index.toString().padStart(2, "0")}>
+                    {index.toString().padStart(2, "0")}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
           <div className="flex justify-between">
@@ -227,6 +270,13 @@ const CreateStudyReminder = ({ closeModal }) => {
             </button>
             <button
               onClick={() => {
+                if (
+                  formData.frequency === "Hàng tuần" &&
+                  formData.selectedDays.length === 0
+                ) {
+                  alert("Bạn cần chọn ít nhất 1 ngày trong tuần!");
+                  return;
+                }
                 setStep(3);
               }}
               className="px-6 py-3 bg-blue-500 text-white font-medium rounded shadow hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"

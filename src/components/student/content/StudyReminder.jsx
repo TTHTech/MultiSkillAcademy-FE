@@ -212,7 +212,30 @@ const StudyReminderList = () => {
                       Ngày nhận thông báo gần nhất:
                     </h3>
                     <span className="text-lg text-gray-700">
-                      {reminder.lastSentAt}
+                      {reminder.lastSentAt &&
+                      reminder.lastSentAt.length === 7 ? (
+                        (() => {
+                          const dateParts = reminder.lastSentAt;
+                          const date = new Date(
+                            dateParts[0], // Năm
+                            dateParts[1] - 1, // Tháng (bắt đầu từ 0)
+                            dateParts[2], // Ngày
+                            dateParts[3], // Giờ
+                            dateParts[4], // Phút
+                            dateParts[5] // Giây
+                          );
+                          return date.toLocaleString("vi-VN", {
+                            weekday: "long",
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          });
+                        })()
+                      ) : (
+                        <span>Không có dữ liệu</span>
+                      )}
                     </span>
                   </div>
                 </div>
@@ -229,19 +252,19 @@ const StudyReminderList = () => {
                 </div>
               </div>
 
-              <div className="flex justify-start space-x-4 mt-4">
+              <div className="flex justify-start space-x-6 mt-6">
                 <button
                   onClick={() => {
                     setSelectedReminder(reminder);
                     setShowUpdateModal(true);
                   }}
-                  className="px-6 py-2 bg-yellow-600 text-white rounded-lg shadow-md hover:bg-yellow-700 transition duration-300"
+                  className="px-8 py-3 bg-yellow-500 text-white rounded-lg shadow-lg transform transition-all duration-300 hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-opacity-50 active:scale-95"
                 >
                   Cập nhật
                 </button>
                 <button
                   onClick={() => handleDelete(reminder.id)}
-                  className="px-6 py-2 bg-red-600 text-white rounded-lg shadow-md hover:bg-red-700 transition duration-300"
+                  className="px-8 py-3 bg-red-500 text-white rounded-lg shadow-lg transform transition-all duration-300 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-50 active:scale-95"
                 >
                   Xóa
                 </button>

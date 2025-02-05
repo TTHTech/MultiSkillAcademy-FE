@@ -57,7 +57,7 @@ const CreateStudyReminder = ({ Data, closeModal }) => {
         courseId: id,
         frequency: formData.frequency,
         selectedDays: formData.selectedDays,
-        time: formData.time,
+        time: [parseInt(formData.time[0]), parseInt(formData.time[1])],
         isActive: formData.isActive,
         userId: localStorage.getItem("userId"),
       };
@@ -81,13 +81,15 @@ const CreateStudyReminder = ({ Data, closeModal }) => {
       {step === 1 && (
         <div className="h-full">
           <p className="text-gray-600 mb-2">Bước 1/3</p>
+          <div className="mb-6">
+            <p className="mb-2 font-bold text-xl text-gray-900">
+              Nội dung thông báo hiện tại:
+            </p>
+            <p className="mb-2 font-bold text-xl text-gray-900">
+              {formData.content || "Chưa có nội dung thông báo."}
+            </p>
+          </div>
           <div>
-            <p className="mb-2 font-bold text-xl text-gray-900">
-              Nội dung thông báo được đính kèm là:
-            </p>
-            <p className="mb-2 font-bold text-xl text-gray-900">
-              {formData.content}
-            </p>
             <p className="mb-2 font-medium">Chọn nội dung thông báo khác:</p>
             <div className="space-y-3">
               {[
@@ -95,7 +97,6 @@ const CreateStudyReminder = ({ Data, closeModal }) => {
                 "Chỉ cần kiên trì, thành công sẽ đến với bạn!",
                 "Mỗi bước nhỏ đều dẫn bạn đến thành công lớn!",
                 "Chinh phục thử thách và vươn tới đỉnh cao!",
-                "Không có",
                 "Nội dung khác",
               ].map((option, index) => (
                 <label key={index} className="block cursor-pointer">
@@ -103,13 +104,18 @@ const CreateStudyReminder = ({ Data, closeModal }) => {
                     type="radio"
                     name="content"
                     value={option}
-                    checked={formData.content === option}
+                    checked={
+                      formData.content === option ||
+                      (option === "Nội dung khác" && formData.content === "")
+                    }
                     onChange={(e) => {
                       handleInputChange(e);
                       if (option === "Nội dung khác") {
                         setShowCustomInput(true);
+                        setFormData({ ...formData, content: "" });
                       } else {
                         setShowCustomInput(false);
+                        setFormData({ ...formData, content: option });
                       }
                     }}
                     className="mr-2"
@@ -126,12 +132,10 @@ const CreateStudyReminder = ({ Data, closeModal }) => {
                 value={formData.content}
                 onChange={(e) => {
                   handleInputChange(e);
-                  if (e.target.value) {
-                    setFormData({
-                      ...formData,
-                      content: e.target.value,
-                    });
-                  }
+                  setFormData({
+                    ...formData,
+                    content: e.target.value,
+                  });
                 }}
                 placeholder="Nhập nội dung khác"
                 className="w-full p-3 border rounded mt-4 focus:ring-2 focus:ring-blue-500 focus:outline-none"
@@ -202,6 +206,11 @@ const CreateStudyReminder = ({ Data, closeModal }) => {
                   </button>
                 ))}
               </div>
+              {formData.selectedDays.length === 0 && (
+                <p className="text-red-500 text-sm">
+                  Bạn cần chọn ít nhất 1 ngày trong tuần!
+                </p>
+              )}
             </>
           )}
 
@@ -209,15 +218,43 @@ const CreateStudyReminder = ({ Data, closeModal }) => {
             <label className="block font-medium mb-2">
               Thời gian thông báo
             </label>
-            <input
-              type="time"
-              name="time"
-              value={`${String(formData.time[0]).padStart(2, "0")}:${String(
-                formData.time[1]
-              ).padStart(2, "0")}`}
-              onChange={handleInputChange}
-              className="w-full p-3 border rounded focus:ring-2 focus:ring-blue-500 focus:outline-none"
-            />
+            <div className="flex space-x-4">
+              <select
+                name="time"
+                value={String(formData.time[0]).padStart(2, "0")} // Giờ từ mảng
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    time: [e.target.value, formData.time[1]], // Cập nhật mảng giờ và phút
+                  })
+                }
+                className="w-1/2 p-3 border rounded focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              >
+                {Array.from({ length: 24 }, (_, index) => (
+                  <option key={index} value={index.toString().padStart(2, "0")}>
+                    {index.toString().padStart(2, "0")}
+                  </option>
+                ))}
+              </select>
+              <span className="text-xl">:</span>
+              <select
+                name="timeMinutes"
+                value={String(formData.time[1]).padStart(2, "0")} // Phút từ mảng
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    time: [formData.time[0], e.target.value], // Cập nhật mảng giờ và phút
+                  })
+                }
+                className="w-1/2 p-3 border rounded focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              >
+                {Array.from({ length: 60 }, (_, index) => (
+                  <option key={index} value={index.toString().padStart(2, "0")}>
+                    {index.toString().padStart(2, "0")}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
           <div className="flex justify-between">
@@ -229,6 +266,13 @@ const CreateStudyReminder = ({ Data, closeModal }) => {
             </button>
             <button
               onClick={() => {
+                if (
+                  formData.frequency === "Hàng tuần" &&
+                  formData.selectedDays.length === 0
+                ) {
+                  alert("Bạn cần chọn ít nhất 1 ngày trong tuần!");
+                  return;
+                }
                 setStep(3);
               }}
               className="px-6 py-3 bg-blue-500 text-white font-medium rounded shadow hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
