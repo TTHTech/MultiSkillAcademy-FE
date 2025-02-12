@@ -84,8 +84,8 @@ const CourseHeader = ({
   rating,
   studentCount,
   lastUpdated,
-  duration = "20 giờ học",
-  lectureCount = "200 bài giảng",
+  duration,
+  lectureCount,
   certificateType = "Chứng chỉ hoàn thành",
 }) => {
   return (
@@ -124,9 +124,9 @@ const CourseHeader = ({
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             <StatItem
               icon={FaUserGraduate}
-              value={`${studentCount.toLocaleString()} học viên`}
+              value={`${studentCount.toLocaleString()} Học viên`}
             />
-            <StatItem icon={FaPlayCircle} value={lectureCount} />
+            <StatItem icon={FaPlayCircle} value={lectureCount + " Bài giảng"} />
             <StatItem icon={FaClock} value={duration} />
             <StatItem
               icon={FaCertificate}
