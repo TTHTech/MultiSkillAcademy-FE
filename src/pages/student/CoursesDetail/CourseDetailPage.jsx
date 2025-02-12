@@ -89,6 +89,8 @@ const CourseDetailPage = () => {
             rating={courseData.rating}
             studentCount={courseData.studentCount || student}
             lastUpdated={courseData.updatedAt}
+            lectureCount={courseData.lessonsCount}
+            duration={courseData.duration}
           />
           <CourseContentDetails
             contentDetails={courseData.courseContent || []}
