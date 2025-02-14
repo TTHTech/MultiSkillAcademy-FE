@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 
-const CreateStudyReminder = ({ Data, closeModal }) => {
+const CreateStudyReminder = ({ Data, closeModal, triggerRefresh }) => {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     content: Data.content,
@@ -69,6 +69,7 @@ const CreateStudyReminder = ({ Data, closeModal }) => {
 
       alert("Nhắc nhở học tập đã được cập nhật thành công!");
       closeModal();
+      triggerRefresh();
       console.log(response.data);
     } catch (error) {
       console.error("Có lỗi xảy ra khi cập nhật nhắc nhở:", error);
