@@ -27,17 +27,19 @@ import { Link } from "react-router-dom";
 const InstructorHeader = ({ instructor }) => (
   <div className="flex items-center gap-6">
     <div className="relative">
-      <img
-        src={
-          instructor.image ||
-          "https://i1.sndcdn.com/artworks-9IsXLBkEVnMfN6qy-vlBoxg-t500x500.jpg"
-        }
-        alt={instructor.name}
-        className="w-24 h-24 rounded-2xl object-cover shadow-md"
-      />
-      <div className="absolute -bottom-2 -right-2 bg-blue-500 text-white text-xs font-medium px-2 py-1 rounded-lg">
-        Top Mentor
-      </div>
+      <Link to={`/student/profile-instructor/${instructor.id}`}>
+        <img
+          src={
+            instructor.image ||
+            "https://i1.sndcdn.com/artworks-9IsXLBkEVnMfN6qy-vlBoxg-t500x500.jpg"
+          }
+          alt={instructor.name}
+          className="w-24 h-24 rounded-2xl object-cover shadow-md"
+        />
+        <div className="absolute -bottom-2 -right-2 bg-blue-500 text-white text-xs font-medium px-2 py-1 rounded-lg">
+          Top Mentor
+        </div>
+      </Link>
     </div>
     <div className="flex-1">
       <div className="flex items-center gap-3 mb-1">

@@ -55,6 +55,7 @@ import NotificationPage from "./pages/admin/NotificationPage";
 import AddNotificationPage from "./pages/admin/AddNotificationPage";
 import AdminChatPage from "./pages/admin/AdminChatPage";
 import PageProfileInstructor from "./pages/student/ProfileInstructor/PageProfileInstructor";
+import ReminderPage from "./pages/student/Reminder/ReminderPage.jsx";
 import PageSearchCourse from "./pages/instructor/PageSearchCourse/PageSearchCourse";
 import SaleByInstructorPage from "./pages/admin/SaleByInstructorPage.jsx";
 function App() {
@@ -171,6 +172,7 @@ function App() {
                 <Route path="/student/payment/success" element={<SuccessPage />} />
                 <Route path="/student/result" element={<ResultPage />} />
                 <Route path="/student/profile-instructor/:id" element={<PageProfileInstructor />} />
+                <Route path="/student/reminder" element={<ReminderPage />} />
               </>
             )}
             {/* Instructor Routes */}
