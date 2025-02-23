@@ -6,7 +6,8 @@ import {
   User, 
   BookOpen, 
   ShoppingCart, 
-  Heart, 
+  Heart,
+  AlarmClock, 
   Globe, 
   UserCircle, 
   Settings, 
@@ -167,6 +168,13 @@ const ProfileMenu = () => {
               to="/student/wishlist" 
               icon={Heart} 
               label="Mong muốn" 
+            />
+
+            {/* Reminder Section */}
+            <MenuItem 
+              to="/student/reminder" 
+              icon={AlarmClock} 
+              label="Nhắc nhở" 
             />
 
             <div className="border-t border-gray-100 my-2" />

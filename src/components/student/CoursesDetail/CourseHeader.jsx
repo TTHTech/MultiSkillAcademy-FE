@@ -8,6 +8,7 @@ import {
   FaCertificate,
   FaUserGraduate,
 } from "react-icons/fa";
+import { Link } from "react-router-dom";
 
 const StatItem = ({ icon: Icon, label, value, color = "text-gray-300" }) => (
   <div
@@ -53,26 +54,30 @@ const RatingStars = ({ rating }) => {
 const InstructorAvatar = ({ instructor }) => (
   <div className="flex items-center gap-3">
     <div className="relative">
-      <img
-        src={
-          instructor.image ||
-          "https://i1.sndcdn.com/artworks-9IsXLBkEVnMfN6qy-vlBoxg-t500x500.jpg"
-        }
-        alt={instructor.name}
-        className="w-12 h-12 rounded-lg object-cover border-2 border-white/20"
-      />
-      {instructor.verified && (
-        <div className="absolute -bottom-1 -right-1 bg-blue-500 text-white text-xs font-medium px-2 py-0.5 rounded-md">
-          Top Mentor
-        </div>
-      )}
+      <Link to={`/student/profile-instructor/${instructor.id}`}>
+        <img
+          src={
+            instructor.image ||
+            "https://i1.sndcdn.com/artworks-9IsXLBkEVnMfN6qy-vlBoxg-t500x500.jpg"
+          }
+          alt={instructor.name}
+          className="w-12 h-12 rounded-lg object-cover border-2 border-white/20"
+        />
+        {instructor.verified && (
+          <div className="absolute -bottom-1 -right-1 bg-blue-500 text-white text-xs font-medium px-2 py-0.5 rounded-md">
+            Top Mentor
+          </div>
+        )}
+      </Link>
     </div>
     <div>
-      <div className="text-gray-400 text-sm">Giảng viên</div>
-      <div className="text-white font-medium">{instructor.name}</div>
-      {instructor.title && (
+      <Link to={`/student/profile-instructor/${instructor.id}`}>
+        <div className="text-gray-400 text-sm">Giảng viên</div>
+        <div className="text-white font-medium">{instructor.name}</div>
+        {/* {instructor.title && (
         <div className="text-gray-400 text-sm">{instructor.title}</div>
-      )}
+      )} */}
+      </Link>
     </div>
   </div>
 );
