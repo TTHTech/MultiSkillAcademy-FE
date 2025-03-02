@@ -558,7 +558,7 @@ const MainContent = ({
             </div>
           )}
           {selectedTab === 3 && (
-            <div>
+            <div  className="mt-6 mb-10">
               <h3 className="text-2xl font-semibold ml-8 mt-8">Nhắc nhở học tập</h3>
               <StudyReminder content="Nhắc nhở học tập" />
             </div>

@@ -118,27 +118,31 @@ const Reminder = () => {
           ))}
         </div>
       )}
-      <div className="flex justify-between mt-4">
+      <div className="flex items-center justify-center gap-4 mt-6">
         <button
           onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
           disabled={currentPage === 1}
-          className="p-2 bg-gray-300 rounded disabled:opacity-50"
+          className="px-4 py-2 bg-gray-500 text-white rounded-lg shadow-md transition disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-600 active:bg-gray-700"
         >
           Previous
         </button>
-        <span>
-          Page {currentPage} of {totalPages}
+
+        <span className="text-lg font-medium text-gray-700">
+          Page <span className="font-bold">{currentPage}</span> of{" "}
+          <span className="font-bold">{totalPages}</span>
         </span>
+
         <button
           onClick={() =>
             setCurrentPage((prev) => Math.min(prev + 1, totalPages))
           }
           disabled={currentPage === totalPages}
-          className="p-2 bg-gray-300 rounded disabled:opacity-50"
+          className="px-4 py-2 bg-gray-500 text-white rounded-lg shadow-md transition disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-600 active:bg-gray-700"
         >
           Next
         </button>
       </div>
+
       {selectedCourse && (
         <div
           id="overlay"
@@ -154,12 +158,14 @@ const Reminder = () => {
               courseId={selectedCourse.courseId}
               nameCourse={selectedCourse.nameCourse}
             />
-            <button
-              onClick={() => setSelectedCourse(null)}
-              className="mt-4 p-2 bg-gray-500 text-white rounded"
-            >
-              Close
-            </button>
+            <div className="flex justify-end">
+              <button
+                onClick={() => setSelectedCourse(null)}
+                className="mt-4 p-2 bg-gray-500 text-white rounded"
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}
