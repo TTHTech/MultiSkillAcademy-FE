@@ -172,14 +172,25 @@ const StudyReminderList = () => {
 
       <div className="space-y-8">
         {currentReminders.length === 0 ? (
-          <p className="text-center text-gray-500 font-semibold">
-            Không có nhắc nhở nào.
+          <div className="flex flex-col items-center justify-center p-6 border border-gray-300 rounded-lg bg-gray-100 shadow-md">
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-32 h-32 text-gray-600" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" >
+            <circle cx="50" cy="50" r="45" stroke="black" strokeWidth="3" fill="white" />
+            <line x1="50" y1="50" x2="50" y2="25" stroke="red" strokeWidth="3" />
+            <line x1="50" y1="50" x2="70" y2="50" stroke="blue" strokeWidth="2" />
+            <circle cx="50" cy="50" r="3" fill="black" />
+          </svg>
+          <p className="text-lg font-semibold text-gray-700">
+            Bạn không có nhắc nhở nào.
           </p>
+          <p className="text-gray-500 text-sm mt-1">
+            Bạn có thể đặt lịch để nhận thông báo nhắc nhở.
+          </p>
+        </div>
         ) : (
           currentReminders.map((reminder) => (
             <div
               key={reminder.id}
-              className="bg-white rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 p-6 border-l-4 border-blue-500 flex flex-col space-y-4"
+              className="bg-white rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 p-6 border-l-4 border-green-500 flex flex-col space-y-4"
             >
               <div className="flex justify-between items-start mb-4">
                 <h3 className="text-2xl font-semibold text-blue-600">
@@ -256,19 +267,19 @@ const StudyReminderList = () => {
                 </div>
               </div>
 
-              <div className="flex justify-start space-x-6 mt-6">
+              <div className="flex justify-end space-x-4 mt-6">
                 <button
                   onClick={() => {
                     setSelectedReminder(reminder);
                     setShowUpdateModal(true);
                   }}
-                  className="px-8 py-3 bg-yellow-500 text-white rounded-lg shadow-lg transform transition-all duration-300 hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-opacity-50 active:scale-95"
+                  className="px-6 py-3 bg-yellow-500 text-white rounded-lg shadow-md transition-all duration-300 hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-opacity-50 active:scale-95"
                 >
                   Cập nhật
                 </button>
                 <button
                   onClick={() => handleDelete(reminder.id)}
-                  className="px-8 py-3 bg-red-500 text-white rounded-lg shadow-lg transform transition-all duration-300 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-50 active:scale-95"
+                  className="px-6 py-3 bg-red-500 text-white rounded-lg shadow-md transition-all duration-300 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-50 active:scale-95"
                 >
                   Xóa
                 </button>

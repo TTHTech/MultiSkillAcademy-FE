@@ -173,9 +173,20 @@ const StudyReminderList = ({ courseId, nameCourse }) => {
 
       <div className="space-y-8">
         {currentReminders.length === 0 ? (
-          <p className="text-center text-gray-500 font-semibold">
-            Không có nhắc nhở nào.
-          </p>
+          <div className="flex flex-col items-center justify-center p-6 border border-gray-300 rounded-lg bg-gray-100 shadow-md">
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-32 h-32 text-gray-600" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" >
+              <circle cx="50" cy="50" r="45" stroke="black" strokeWidth="3" fill="white" />
+              <line x1="50" y1="50" x2="50" y2="25" stroke="red" strokeWidth="3" />
+              <line x1="50" y1="50" x2="70" y2="50" stroke="blue" strokeWidth="2" />
+              <circle cx="50" cy="50" r="3" fill="black" />
+            </svg>
+            <p className="text-lg font-semibold text-gray-700">
+              Bạn không có nhắc nhở nào.
+            </p>
+            <p className="text-gray-500 text-sm mt-1">
+              Bạn có thể đặt lịch để nhận thông báo nhắc nhở.
+            </p>
+          </div>
         ) : (
           currentReminders.map((reminder) => (
             <div
@@ -187,7 +198,6 @@ const StudyReminderList = ({ courseId, nameCourse }) => {
                   {reminder.content}
                 </h3>
               </div>
-
               <div className="flex flex-col space-y-2">
                 <div className="flex flex-col space-y-3 text-gray-600">
                   <div className="flex items-center space-x-2">
