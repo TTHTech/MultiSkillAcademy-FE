@@ -78,7 +78,7 @@ const HeroSection = () => {
       className="py-16 px-4 relative mx-auto max-w-[1500px] overflow-hidden"
       style={{
         backgroundImage:
-          'url("https://img-b.udemycdn.com/notices/web_carousel_slide/image/9fa1fa32-1920-45d1-8be1-e4653bbd7726.png")',
+          'url("https://img.freepik.com/premium-photo/social-media-bots-vector-illustration-fake-accounts-tiny-persons-concept_1029469-37979.jpg")',
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}
@@ -130,6 +130,7 @@ const HeroSection = () => {
         </Slider>
       </div>
 
+      {/* Các kiểu CSS toàn cục (global styles) */}
       <style jsx global>{`
         .slick-dots {
           bottom: 20px;
