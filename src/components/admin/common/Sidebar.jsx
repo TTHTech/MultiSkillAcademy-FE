@@ -94,7 +94,7 @@ const MENU_GROUPS = [
           },
         
           {
-            name: "Statistics Review",
+            name: "Statistics Reviews",
             icon: Activity,
             href: "/admin/statistics/performance",
             color: "#10B981"
