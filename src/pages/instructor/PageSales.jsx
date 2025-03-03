@@ -13,19 +13,32 @@ import {
   Legend,
   Filler,
 } from "chart.js";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
+import { AiFillFileExcel, AiFillFilePdf } from "react-icons/ai";
 
-// Đăng ký các plugin của Chart.js
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+);
 
 const InstructorDashboard = () => {
   const [salesData, setSalesData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1); // Trang hiện tại
-  const itemsPerPage = 8; // Số khóa học mỗi trang
-  const [open, setOpen] = useState(true); // Quản lý trạng thái Sidebar
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
+  const [open, setOpen] = useState(true);
   const userId = Number(localStorage.getItem("userId"));
-  const token = localStorage.getItem("token"); // Lấy token từ localStorage
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
     const fetchSalesData = async () => {
@@ -45,15 +58,14 @@ const InstructorDashboard = () => {
     };
 
     fetchSalesData();
-  }, [token]);
+  }, [token, userId]);
 
-  // Cấu hình dữ liệu cho biểu đồ
   const chartData = {
-    labels: salesData.map((item) => item.courseName), // Tên các khóa học
+    labels: salesData.map((item) => item.courseName),
     datasets: [
       {
-        label: "Doanh thu",
-        data: salesData.map((item) => item.totalSales), // Doanh thu của các khóa học
+        label: "Doanh Thu Các Khóa Học",
+        data: salesData.map((item) => item.totalSales),
         borderColor: "#4caf50",
         backgroundColor: (context) => {
           const ctx = context.chart.ctx;
@@ -66,8 +78,8 @@ const InstructorDashboard = () => {
         pointBorderColor: "#ffffff",
         pointHoverRadius: 7,
         pointRadius: 5,
-        fill: true, // Làm đầy vùng dưới đường biểu đồ
-        tension: 0.3, // Làm đường cong mượt hơn
+        fill: true,
+        tension: 0.3,
       },
     ],
   };
@@ -88,7 +100,7 @@ const InstructorDashboard = () => {
       },
       title: {
         display: true,
-        text: "Doanh Thu Các Khóa Học",
+        // text: "Doanh Thu Các Khóa Học",
         font: {
           size: 20,
           weight: "bold",
@@ -137,12 +149,88 @@ const InstructorDashboard = () => {
     },
   };
 
-  // Tính toán dữ liệu hiện tại
   const startIndex = (currentPage - 1) * itemsPerPage;
   const currentData = salesData.slice(startIndex, startIndex + itemsPerPage);
 
-  // Tính tổng số trang
   const totalPages = Math.ceil(salesData.length / itemsPerPage);
+
+  const exportToExcel = () => {
+    const worksheetData = [
+      ["Mã Khóa Học", "Tên Khóa Học", "Tổng Doanh Thu (VND)", "Số lượt mua"],
+      ...salesData.map((item) => [
+        item.courseId,
+        item.courseName,
+        item.totalSales.toLocaleString() + " VND",
+        item.salesSummary,
+      ]),
+    ];
+    const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
+
+    const columnWidths = [
+      { wch: 15 }, // Mã Khóa Học
+      { wch: 40 }, // Tên Khóa Học
+      { wch: 20 }, // Tổng Doanh Thu
+      { wch: 15 }, // Số lượt mua
+    ];
+    worksheet["!cols"] = columnWidths;
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Doanh Thu");
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "array",
+    });
+
+    const data = new Blob([excelBuffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+
+    saveAs(data, "DoanhThu_KhoaHoc.xlsx");
+  };
+
+  const exportToPDF = () => {
+    const doc = new jsPDF();
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(18);
+    doc.text("COURSE REVENUE REPORT", doc.internal.pageSize.width / 2, 15, {
+      align: "center",
+    });
+
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "normal");
+    const today = new Date().toLocaleDateString();
+    doc.text(`Export Date: ${today}`, 14, 25);
+
+    const tableColumn = [
+      "Course ID",
+      "Course Name",
+      "Total Revenue (VND)",
+      "Purchases",
+    ];
+    const tableRows = salesData.map((item) => [
+      item.courseId,
+      item.courseName,
+      item.totalSales.toLocaleString() + " VND",
+      item.salesSummary,
+    ]);
+
+    doc.autoTable({
+      startY: 35,
+      head: [tableColumn],
+      body: tableRows,
+      theme: "striped",
+      headStyles: {
+        fillColor: [0, 112, 192],
+        textColor: 255,
+        fontSize: 12,
+        fontStyle: "bold",
+      },
+      bodyStyles: { fontSize: 11 },
+      alternateRowStyles: { fillColor: [240, 240, 240] },
+      styles: { cellPadding: 4, font: "helvetica" },
+    });
+    doc.save("Course_Revenue_Report.pdf");
+  };
 
   return (
     <section
@@ -150,17 +238,29 @@ const InstructorDashboard = () => {
         open ? "ml-72" : "ml-16"
       }`}
     >
-      {/* Sidebar */}
       <Sidebar open={open} setOpen={setOpen} className="h-full lg:w-64" />
 
-      {/* Main Content */}
       <div className="flex-1 bg-gray-100 overflow-hidden">
         <div className="p-6 lg:p-8 max-w-7xl mx-auto">
           <h1 className="text-2xl lg:text-3xl font-bold text-gray-800 mb-6">
             Doanh Thu Các Khóa Học
           </h1>
-
-          {/* Hiển thị trạng thái */}
+<div className="flex justify-end space-x-2 mb-2">
+  <button
+    onClick={exportToExcel}
+    className="p-2 bg-green-500 text-white rounded-md hover:bg-green-600 flex items-center"
+  >
+    <AiFillFileExcel className="text-xl" />
+    Xuất Excel
+  </button>
+  <button
+    onClick={exportToPDF}
+    className="p-2 bg-red-500 text-white rounded-md hover:bg-red-600 flex items-center"
+  >
+    <AiFillFilePdf className="text-xl" />
+    Xuất PDF
+  </button>
+</div>
           {loading ? (
             <div className="flex justify-center items-center">
               <div className="animate-spin h-12 w-12 border-4 border-blue-500 border-t-transparent rounded-full"></div>
@@ -169,45 +269,64 @@ const InstructorDashboard = () => {
             <div className="text-center text-red-500">{error}</div>
           ) : (
             <div>
-              {/* Hiển thị biểu đồ */}
               <div className="mb-8 h-96">
                 <Line data={chartData} options={chartOptions} />
               </div>
 
-              {/* Danh sách khóa học */}
-              <div className="overflow-x-auto shadow-md rounded-md">
-                <table className="min-w-full table-auto bg-white">
-                  <thead className="bg-gray-200">
+              <div className="overflow-x-auto shadow-lg rounded-xl">
+                <table className="min-w-full border-collapse bg-white rounded-xl">
+                  <thead className="bg-gradient-to-r from-blue-700 to-blue-500 text-white">
                     <tr>
-                      <th className="px-4 py-2 text-left font-medium text-gray-700">Mã Khóa Học</th>
-                      <th className="px-4 py-2 text-left font-medium text-gray-700">Tên Khóa Học</th>
-                      <th className="px-4 py-2 text-left font-medium text-gray-700">Tổng Doanh Thu</th>
-                      <th className="px-4 py-2 text-left font-medium text-gray-700">Số lượt mua</th>
+                      <th className="px-6 py-3 text-left font-semibold uppercase tracking-wide">
+                        Mã Khóa Học
+                      </th>
+                      <th className="px-6 py-3 text-left font-semibold uppercase tracking-wide">
+                        Tên Khóa Học
+                      </th>
+                      <th className="px-6 py-3 text-right font-semibold uppercase tracking-wide">
+                        Tổng Doanh Thu
+                      </th>
+                      <th className="px-6 py-3 text-right font-semibold uppercase tracking-wide">
+                        Số lượt mua
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
                     {currentData.map((item, index) => (
                       <tr
                         key={index}
-                        className="border-b hover:bg-gray-100 transition"
+                        className={`border-b transition ${
+                          index % 2 === 0 ? "bg-gray-50" : "bg-white"
+                        } hover:bg-blue-100`}
                       >
-                        <td className="px-4 py-2">{item.courseId}</td>
-                        <td className="px-4 py-2">{item.courseName}</td>
-                        <td className="px-4 py-2">{item.totalSales.toLocaleString()}</td>
-                        <td className="px-4 py-2">{item.salesSummary}</td>
+                        <td className="px-6 py-4 text-gray-800">
+                          {item.courseId}
+                        </td>
+                        <td className="px-6 py-4 text-gray-800">
+                          {item.courseName}
+                        </td>
+                        <td className="px-6 py-4 text-right font-medium text-green-600">
+                          {item.totalSales.toLocaleString()} ₫
+                        </td>
+                        <td className="px-6 py-4 text-right font-medium">
+                          {item.salesSummary}
+                        </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
 
-              {/* Pagination */}
               <div className="flex justify-between items-center mt-4">
                 <button
                   disabled={currentPage === 1}
-                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.max(prev - 1, 1))
+                  }
                   className={`px-4 py-2 bg-blue-500 text-white rounded-md ${
-                    currentPage === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-blue-600"
+                    currentPage === 1
+                      ? "opacity-50 cursor-not-allowed"
+                      : "hover:bg-blue-600"
                   }`}
                 >
                   Trang trước
@@ -221,7 +340,9 @@ const InstructorDashboard = () => {
                     setCurrentPage((prev) => Math.min(prev + 1, totalPages))
                   }
                   className={`px-4 py-2 bg-blue-500 text-white rounded-md ${
-                    currentPage === totalPages ? "opacity-50 cursor-not-allowed" : "hover:bg-blue-600"
+                    currentPage === totalPages
+                      ? "opacity-50 cursor-not-allowed"
+                      : "hover:bg-blue-600"
                   }`}
                 >
                   Trang sau
