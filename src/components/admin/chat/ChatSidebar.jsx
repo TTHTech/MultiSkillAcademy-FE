@@ -1,13 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { Search, MoreHorizontal, Edit, Filter } from "lucide-react";
+import { Search, MoreHorizontal, Edit, Filter, UserPlus } from "lucide-react";
 import { toast } from "react-toastify";
 
 const ChatSidebar = ({ onUserSelect }) => {
   const [chatUsers, setChatUsers] = useState([]);
+  const [searchUsers, setSearchUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchLoading, setSearchLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [searchModalTerm, setSearchModalTerm] = useState("");
   const [filter, setFilter] = useState("ALL");
+  const [searchFilter, setSearchFilter] = useState("ALL");
   const [activeUserId, setActiveUserId] = useState(null);
+  const [showUserSearchModal, setShowUserSearchModal] = useState(false);
 
   // Fetch chat users on component mount
   useEffect(() => {
@@ -42,6 +47,41 @@ const ChatSidebar = ({ onUserSelect }) => {
       setLoading(false);
     }
   };
+  
+  // API tìm kiếm người dùng mới
+  const searchAllUsers = async (keyword = "", role = "ALL") => {
+    try {
+      setSearchLoading(true);
+      const token = localStorage.getItem("token");
+      
+      if (!token) {
+        throw new Error("Vui lòng đăng nhập lại");
+      }
+
+      // Chuẩn bị URL với các tham số tìm kiếm
+      const url = new URL("http://localhost:8080/api/admin/chat/search-users");
+      if (keyword) url.searchParams.append("keyword", keyword);
+      if (role && role !== "ALL") url.searchParams.append("role", role);
+
+      const response = await fetch(url.toString(), {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Không thể tìm kiếm người dùng");
+      }
+      
+      const data = await response.json();
+      setSearchUsers(data);
+    } catch (err) {
+      console.error("Error searching users:", err);
+      toast.error(err.message);
+    } finally {
+      setSearchLoading(false);
+    }
+  };
 
   const handleUserSelect = async (user) => {
     try {
@@ -59,18 +99,89 @@ const ChatSidebar = ({ onUserSelect }) => {
       );
 
       if (!response.ok) {
+        // Nếu không tìm thấy chat, tự động tạo mới
+        if (response.status === 404) {
+          await createNewChat(user.userId);
+          return;
+        }
         throw new Error("Không thể tải cuộc trò chuyện");
       }
 
       const chatData = await response.json();
       onUserSelect({ user, chat: chatData });
+      setShowUserSearchModal(false);
 
     } catch (err) {
       console.error("Error selecting user:", err);
       toast.error(err.message);
     }
-};
+  };
+  
+  // Tạo chat mới
+  const createNewChat = async (recipientId) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("Vui lòng đăng nhập lại");
+      
+      const chatRequest = {
+        chatType: "INDIVIDUAL",
+        recipientId: recipientId,
+        initialMessage: "Xin chào! Tôi là Admin."
+      };
+      
+      const response = await fetch("http://localhost:8080/api/admin/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify(chatRequest)
+      });
+      
+      if (!response.ok) {
+        throw new Error("Không thể tạo cuộc trò chuyện mới");
+      }
+      
+      const chatData = await response.json();
+      
+      // Tìm thông tin người dùng từ danh sách tìm kiếm
+      const user = searchUsers.find(user => user.userId === recipientId);
+      
+      if (user) {
+        onUserSelect({ user, chat: chatData });
+        // Reload danh sách chat sau khi tạo chat mới
+        fetchChatUsers();
+      } else {
+        throw new Error("Không tìm thấy thông tin người dùng");
+      }
+      
+    } catch (err) {
+      console.error("Error creating new chat:", err);
+      toast.error(err.message);
+    }
+  };
+  
+  // Xử lý khi người dùng mở modal tìm kiếm
+  const handleOpenUserSearch = () => {
+    setShowUserSearchModal(true);
+    setSearchModalTerm("");
+    setSearchFilter("ALL");
+    searchAllUsers("", "ALL");  // Tìm kiếm ban đầu không có điều kiện
+  };
 
+  // Xử lý khi người dùng thay đổi từ khóa tìm kiếm trong modal
+  const handleSearchTermChange = (term) => {
+    setSearchModalTerm(term);
+    searchAllUsers(term, searchFilter);
+  };
+
+  // Xử lý khi người dùng thay đổi bộ lọc trong modal
+  const handleSearchFilterChange = (filterValue) => {
+    setSearchFilter(filterValue);
+    searchAllUsers(searchModalTerm, filterValue);
+  };
+
+  // Lọc danh sách chat hiện tại
   const getFilteredUsers = () => {
     return chatUsers.filter((user) => {
       const searchMatch =
@@ -97,6 +208,13 @@ const ChatSidebar = ({ onUserSelect }) => {
           <h2 className="text-xl font-bold">Chat</h2>
         </div>
         <div className="flex items-center gap-2">
+          <button 
+            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            onClick={handleOpenUserSearch}
+            title="Tạo chat mới"
+          >
+            <UserPlus className="w-5 h-5 text-gray-600" />
+          </button>
           <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
             <MoreHorizontal className="w-5 h-5 text-gray-600" />
           </button>
@@ -153,6 +271,113 @@ const ChatSidebar = ({ onUserSelect }) => {
         </div>
       </div>
 
+      {/* User Search Modal */}
+      {showUserSearchModal && (
+        <div className="absolute left-0 top-0 w-[360px] h-screen bg-white z-10 border-r overflow-y-auto">
+          <div className="p-4 flex justify-between items-center border-b">
+            <h3 className="font-bold">Tìm kiếm người dùng</h3>
+            <button 
+              onClick={() => setShowUserSearchModal(false)}
+              className="p-2 hover:bg-gray-100 rounded-full"
+            >
+              &times;
+            </button>
+          </div>
+          
+          <div className="p-4">
+            <div className="relative mb-4">
+              <input
+                type="text"
+                value={searchModalTerm}
+                onChange={(e) => handleSearchTermChange(e.target.value)}
+                placeholder="Tìm kiếm người dùng"
+                className="w-full bg-gray-100 text-gray-900 px-4 py-2 rounded-full pl-10 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              />
+              <Search className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
+            </div>
+            
+            <div className="flex items-center gap-2 mb-4">
+              <button
+                onClick={() => handleSearchFilterChange("ALL")}
+                className={`px-3 py-1 text-sm rounded-full transition-colors ${
+                  searchFilter === "ALL"
+                    ? "bg-emerald-500 text-white"
+                    : "bg-gray-100 text-gray-900"
+                }`}
+              >
+                Tất cả
+              </button>
+              <button
+                onClick={() => handleSearchFilterChange("ADMIN")}
+                className={`px-3 py-1 text-sm rounded-full transition-colors ${
+                  searchFilter === "ADMIN"
+                    ? "bg-emerald-500 text-white"
+                    : "bg-gray-100 text-gray-900"
+                }`}
+              >
+                Admin
+              </button>
+              <button
+                onClick={() => handleSearchFilterChange("INSTRUCTOR")}
+                className={`px-3 py-1 text-sm rounded-full transition-colors ${
+                  searchFilter === "INSTRUCTOR"
+                    ? "bg-emerald-500 text-white"
+                    : "bg-gray-100 text-gray-900"
+                }`}
+              >
+                Instructor
+              </button>
+              <button
+                onClick={() => handleSearchFilterChange("STUDENT")}
+                className={`px-3 py-1 text-sm rounded-full transition-colors ${
+                  searchFilter === "STUDENT"
+                    ? "bg-emerald-500 text-white"
+                    : "bg-gray-100 text-gray-900"
+                }`}
+              >
+                Student
+              </button>
+            </div>
+            
+            {searchLoading ? (
+              <div className="flex justify-center items-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500"></div>
+              </div>
+            ) : searchUsers.length === 0 ? (
+              <div className="text-center py-4 text-gray-500">
+                Không tìm thấy người dùng nào
+              </div>
+            ) : (
+              searchUsers.map((user) => (
+                <div
+                  key={user.userId}
+                  className="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 cursor-pointer transition-colors"
+                  onClick={() => handleUserSelect(user)}
+                >
+                  <div className="relative flex-shrink-0">
+                    <img
+                      src={user.avatar || "https://th.bing.com/th/id/OIP.7fheetEuM-hyJg1sEyuqVwHaHa?rs=1&pid=ImgDetMain"}
+                      alt={user.firstName}
+                      className="w-12 h-12 rounded-full"
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold truncate text-gray-900">
+                      {`${user.firstName || ""} ${user.lastName || ""}`}
+                    </h3>
+                    <p className="text-sm text-gray-500">
+                      {user.role === "ADMIN" ? "Quản trị viên" : 
+                       user.role === "INSTRUCTOR" ? "Giảng viên" : 
+                       user.role === "STUDENT" ? "Học viên" : user.role}
+                    </p>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Users List */}
       <div className="flex-1 overflow-y-auto">
         {loading ? (
@@ -201,7 +426,8 @@ const ChatSidebar = ({ onUserSelect }) => {
                 <div className="flex justify-between items-center">
                   <div className="flex flex-col">
                     <p className="text-sm text-gray-500">
-                      {user.role === "INSTRUCTOR" ? "Giảng viên" : "Học viên"}
+                      {user.role === "ADMIN" ? "Quản trị viên" :
+                       user.role === "INSTRUCTOR" ? "Giảng viên" : "Học viên"}
                     </p>
                     {user.lastMessageContent && (
                       <p className="text-sm text-gray-500 truncate">
