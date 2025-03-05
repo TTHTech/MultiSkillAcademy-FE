@@ -173,8 +173,12 @@ const CourseQuestionsTable = () => {
             className={`fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 transition-all duration-300 ${
               open ? "pl-72" : "pl-16"
             }`}
+            onClick={closeModal}
           >
-            <div className="bg-white rounded-lg p-6 w-full max-w-[60vw] shadow-lg max-h-[80vh] overflow-y-auto">
+            <div
+              className="bg-white rounded-lg p-6 w-full max-w-[60vw] shadow-lg max-h-[80vh] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
               <h2 className="text-2xl font-bold text-blue-700 mb-4">
                 Questions for {selectedCourse.courseName}
               </h2>
