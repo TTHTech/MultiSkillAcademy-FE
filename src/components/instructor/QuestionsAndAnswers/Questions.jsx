@@ -67,10 +67,6 @@ const DetailQuestions = ({ courseId }) => {
     }
   };
   const [replyText, setReplyText] = useState("");
-
-  const handleCancelReply = () => {
-    setReplyText("");
-  };
   const handleReplySubmit = async () => {
     if (!replyText.trim()) return;
 
@@ -147,7 +143,10 @@ const DetailQuestions = ({ courseId }) => {
   const handleEvaluateChange = async (questionsId, answersId, newEvaluate) => {
     const swalResult = await Swal.fire({
       title: "Confirmation",
-      text: `Bạn có chắc chắn muốn chuyển đổi trạng thái của câu trả lời này thành ` + `${newEvaluate}` + ` hay không ?`,
+      text:
+        `Bạn có chắc chắn muốn chuyển đổi trạng thái của câu trả lời này thành ` +
+        `${newEvaluate}` +
+        ` hay không ?`,
       icon: "question",
       showCancelButton: true,
       confirmButtonText: "Yes",
@@ -188,7 +187,7 @@ const DetailQuestions = ({ courseId }) => {
           confirmButtonText: "Yes",
         });
       });
-      triggerRefresh();
+    triggerRefresh();
   };
   if (loading) {
     return <div className="text-center text-lg mt-10">Loading...</div>;
@@ -201,58 +200,65 @@ const DetailQuestions = ({ courseId }) => {
           key={question.questionsId}
           className="p-4 border-b border-gray-300"
         >
-          <div className="flex items-start space-x-4">
+          <div className="flex items-start gap-4 p-4 border-l-4 border-blue-500 rounded-lg shadow-md bg-white">
             <img
               src={question.userImage}
               alt={question.userName}
-              className="w-12 h-12 rounded-full object-cover"
+              className="w-12 h-12 rounded-full object-cover border border-gray-300"
             />
+
             <div className="flex-1">
-              <h2 className="text-lg font-semibold text-gray-800 capitalize flex justify-between items-center">
-                <span>{question.userName}</span>
-                <p
+              <div className="flex justify-between items-center">
+                <h2 className="text-lg font-semibold text-gray-900 capitalize">
+                  {question.userName}
+                </h2>
+                <button
                   onClick={() => handleDeleteQuestion(question.questionsId)}
-                  className="text-red-500 cursor-pointer"
-                  style={{ marginLeft: "auto" }}
+                  className="text-red-500 hover:text-red-700 transition-all duration-200 text-sm font-medium"
                 >
                   Delete
-                </p>
-              </h2>
-              <p className="text-gray-600 mt-1">{question.questionText}</p>
-              <div className="text-sm text-gray-500 mt-2 flex items-center">
+                </button>
+              </div>
+              <p className="text-gray-700 mt-2 leading-relaxed">
+                {question.questionText}
+              </p>
+              <div className="text-sm text-gray-500 mt-3 flex items-center">
                 <span>
                   {new Date(question.createdAt).toLocaleDateString()} •
                 </span>
-                <span
-                  className="text-blue-500 cursor-pointer ml-2"
+                <button
+                  className="text-blue-500 hover:text-blue-700 font-medium transition-all duration-200 ml-2"
                   onClick={() => toggleAnswersVisibility(question.questionsId)}
                 >
                   {question.totalAnswers} answers
-                </span>
+                </button>
               </div>
             </div>
           </div>
+
           {expandedQuestionId === question.questionsId && (
             <div className="mt-4 ml-16">
               {question.listAnswers.map((answer) => (
                 <div
                   key={answer.answersId}
-                  className="p-2 border-b border-gray-200 flex items-start space-x-4"
+                  className="p-3 border-l-4 border-green-500 bg-gray-50 rounded-lg shadow-sm flex items-start gap-4 mb-2"
                 >
                   <img
                     src={answer.userImage}
                     alt={answer.userName}
-                    className="w-8 h-8 rounded-full object-cover"
+                    className="w-8 h-8 rounded-full object-cover border border-gray-300"
                   />
                   <div className="flex-1">
-                    <h3 className="text-sm font-bold text-gray-800">
+                    <h3 className="text-sm font-bold text-gray-900">
                       {answer.userName}
                     </h3>
-                    <p className="text-gray-600 text-sm mt-1">
+                    <p className="text-gray-700 text-sm mt-1">
                       {answer.answersText}
                     </p>
-                    <div className="text-xs text-gray-500 mt-1">
-                      {new Date(answer.createdAt).toLocaleDateString()} •{" "}
+                    <div className="text-xs text-gray-500 mt-1 flex items-center">
+                      <span>
+                        {new Date(answer.createdAt).toLocaleDateString()} •{" "}
+                      </span>
                       <span
                         onClick={() =>
                           handleEvaluateChange(
@@ -263,34 +269,29 @@ const DetailQuestions = ({ courseId }) => {
                               : "Correct"
                           )
                         }
-                        className={`font-semibold cursor-pointer ${
+                        className={`font-semibold cursor-pointer ml-2 transition-all ${
                           answer.evaluate === "Correct"
-                            ? "text-green-500"
-                            : "text-red-500"
+                            ? "text-green-600 hover:text-green-800"
+                            : "text-red-500 hover:text-red-700"
                         }`}
                       >
                         {answer.evaluate}
                       </span>
                     </div>
                   </div>
-                  <div className="flex items-center">
-                    <p
-                      onClick={() =>
-                        handleDeleteAnswer(
-                          question.questionsId,
-                          answer.answersId
-                        )
-                      }
-                      className="text-red-500 cursor-pointer text-sm"
-                    >
-                      Delete
-                    </p>
-                  </div>
+                  <button
+                    onClick={() =>
+                      handleDeleteAnswer(question.questionsId, answer.answersId)
+                    }
+                    className="text-red-500 text-sm hover:text-red-700 transition-all"
+                  >
+                    Delete
+                  </button>
                 </div>
               ))}
-              <div className="mt-4">
+              <div className="mt-4 bg-gray-50 p-3 rounded-lg shadow-sm">
                 <textarea
-                  className="w-full border border-gray-300 p-2 rounded-lg"
+                  className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-green-500 outline-none"
                   rows="2"
                   placeholder="Nhập câu trả lời..."
                   value={replyText}
@@ -298,13 +299,15 @@ const DetailQuestions = ({ courseId }) => {
                 ></textarea>
                 <div className="flex justify-end space-x-2 mt-2">
                   <button
-                    className="px-4 py-2 bg-gray-500 text-white rounded-lg"
-                    onClick={handleCancelReply}
+                    className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-700 transition-all"
+                    onClick={() =>
+                      toggleAnswersVisibility(question.questionsId)
+                    }
                   >
                     Hủy
                   </button>
                   <button
-                    className="px-4 py-2 bg-blue-500 text-white rounded-lg"
+                    className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-700 transition-all"
                     onClick={handleReplySubmit}
                   >
                     Gửi

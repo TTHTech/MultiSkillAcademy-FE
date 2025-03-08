@@ -105,9 +105,9 @@ const ScoreTable = () => {
   // Chuyển đổi trang
   const handlePageChange = (pageNumber) => {
     if (pageNumber >= 1 && pageNumber <= totalPages) {
-        setCurrentPage(pageNumber);
+      setCurrentPage(pageNumber);
     }
-};
+  };
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
@@ -118,101 +118,57 @@ const ScoreTable = () => {
 
         {/* Bộ lọc */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          <div>
-            <label className="block text-gray-700 text-sm font-medium mb-1">
-              Student Name
-            </label>
-            <input
-              type="text"
-              name="studentName"
-              value={filters.studentName}
-              onChange={handleFilterChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
-              placeholder="Enter student name"
-            />
-          </div>
-          <div>
-            <label className="block text-gray-700 text-sm font-medium mb-1">
-              Course Name
-            </label>
-            <input
-              type="text"
-              name="courseName"
-              value={filters.courseName}
-              onChange={handleFilterChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
-              placeholder="Enter course name"
-            />
-          </div>
-          <div>
-            <label className="block text-gray-700 text-sm font-medium mb-1">
-              Min Score (1-10)
-            </label>
-            <input
-              type="number"
-              name="minScore"
-              value={filters.minScore}
-              onChange={handleFilterChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
-              placeholder="Min score"
-              min="1"
-              max="10"
-            />
-          </div>
-          <div>
-            <label className="block text-gray-700 text-sm font-medium mb-1">
-              Max Score (1-10)
-            </label>
-            <input
-              type="number"
-              name="maxScore"
-              value={filters.maxScore}
-              onChange={handleFilterChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
-              placeholder="Max score"
-              min="1"
-              max="10"
-            />
-          </div>
-        </div>
+  {[
+    { label: "Student Name", name: "studentName", type: "text", placeholder: "Enter student name" },
+    { label: "Course Name", name: "courseName", type: "text", placeholder: "Enter course name" },
+    { label: "Min Score (1-10)", name: "minScore", type: "number", placeholder: "Min score", min: 1, max: 10 },
+    { label: "Max Score (1-10)", name: "maxScore", type: "number", placeholder: "Max score", min: 1, max: 10 },
+  ].map((field) => (
+    <div key={field.name}>
+      <label className="block text-gray-800 text-sm font-bold mb-1">{field.label}</label>
+      <input
+        type={field.type}
+        name={field.name}
+        value={filters[field.name]}
+        onChange={handleFilterChange}
+        min={field.min}
+        max={field.max}
+        className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-md text-sm font-semibold
+                   focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 
+                   transition-all duration-200"
+        placeholder={field.placeholder}
+      />
+    </div>
+  ))}
+</div>
 
-        {/* Bảng hiển thị */}
-        <table className="w-full border-collapse border border-gray-300 text-left">
+        <table className="w-full border-collapse shadow-md rounded-lg overflow-hidden">
           <thead>
-            <tr className="bg-gray-200">
-              <th className="border border-gray-300 px-4 py-2 text-sm font-medium">
-                Student Name
-              </th>
-              <th className="border border-gray-300 px-4 py-2 text-sm font-medium">
-                Course Name
-              </th>
-              <th className="border border-gray-300 px-4 py-2 text-sm font-medium">
-                Test Name
-              </th>
-              <th className="border border-gray-300 px-4 py-2 text-sm font-medium">
-                Score
-              </th>
-              <th className="border border-gray-300 px-4 py-2 text-sm font-medium">
-                Test Date
-              </th>
+            <tr className="bg-green-500 text-white">
+              <th className="px-4 py-3 text-sm font-semibold">Student Name</th>
+              <th className="px-4 py-3 text-sm font-semibold">Course Name</th>
+              <th className="px-4 py-3 text-sm font-semibold">Test Name</th>
+              <th className="px-4 py-3 text-sm font-semibold">Score</th>
+              <th className="px-4 py-3 text-sm font-semibold">Test Date</th>
             </tr>
           </thead>
           <tbody>
-            {currentItems.map((score) => (
-              <tr key={score.id} className="hover:bg-gray-100">
-                <td className="border border-gray-300 px-4 py-2 text-sm">
+            {currentItems.map((score, index) => (
+              <tr
+                key={score.id}
+                className={`text-gray-700 text-sm ${
+                  index % 2 === 0 ? "bg-gray-50" : "bg-white"
+                } hover:bg-green-100 transition-all`}
+              >
+                <td className="px-4 py-3">
                   {score.firstName} {score.lastName}
                 </td>
-                <td className="border border-gray-300 px-4 py-2 text-sm">
-                  {score.nameCourse}
-                </td>
-                <td className="border border-gray-300 px-4 py-2 text-sm">
-                  {score.nameTest}
-                </td>
-                <td className="border border-gray-300 px-4 py-2 text-sm">
+                <td className="px-4 py-3">{score.nameCourse}</td>
+                <td className="px-4 py-3">{score.nameTest}</td>
+                <td className="px-4 py-3 font-semibold text-center">
                   {score.score}
                 </td>
-                <td className="border border-gray-300 px-4 py-2 text-sm">
+                <td className="px-4 py-3 text-center">
                   {new Date(score.testDate).toLocaleDateString()}
                 </td>
               </tr>
@@ -220,7 +176,6 @@ const ScoreTable = () => {
           </tbody>
         </table>
 
-        {/* Pagination Controls */}
         <div className="flex justify-center mt-4 space-x-4">
           <button
             onClick={() => handlePageChange(currentPage - 1)}

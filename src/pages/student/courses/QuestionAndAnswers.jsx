@@ -276,7 +276,7 @@ const QuestionsAndAnswers = ({ courseId }) => {
                       {answer.answersText}
                     </p>
                     <div className="text-xs text-gray-500 mt-1">
-                      {new Date(answer.createdAt).toLocaleDateString()} •
+                      {new Date(answer.createdAt).toLocaleDateString()} • 
                       <span
                         className={`font-semibold ${
                           {

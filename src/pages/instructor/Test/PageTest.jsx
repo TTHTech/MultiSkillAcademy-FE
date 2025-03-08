@@ -185,6 +185,7 @@ const TestList = () => {
         <TestDetailsModal
           test={selectedTest}
           onClose={() => setSelectedTest(null)}
+          open={open}
         />
       </div>
     </section>

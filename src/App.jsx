@@ -26,7 +26,7 @@ import PageDashboard from "./pages/instructor/PageDashboard";
 import PageCourses from "./pages/instructor/PageCourses/PageCourses";
 import PagneCourseDetail from "./pages/instructor/PageCourses/PageCourseDetail";
 import PageAdd from "./pages/instructor/PageCourses/PageCoursesAdd";
-import StudentList from "./pages/instructor/PageStudents";
+import StudentList from "./pages/instructor/PageStudent/PageStudents";
 import CourseViewerPage from "./pages/student/content/CourseViewerPage.jsx";
 import CategoryPage from "./pages/admin/CategoryPage";
 import Wishlist from "./pages/student/courses/PageWishlist";
