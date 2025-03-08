@@ -58,6 +58,7 @@ import PageProfileInstructor from "./pages/student/ProfileInstructor/PageProfile
 import ReminderPage from "./pages/student/Reminder/ReminderPage.jsx";
 import PageSearchCourse from "./pages/instructor/PageSearchCourse/PageSearchCourse";
 import SaleByInstructorPage from "./pages/admin/SaleByInstructorPage.jsx";
+import UpdateCourse from "./pages/instructor/PageCourses/UpdateCourse.jsx";
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [role, setRole] = useState("");
@@ -181,7 +182,7 @@ function App() {
                 <Route path="/instructor/user" element={<PageUser />} />
                 <Route path="/instructor/dashboard" element={<PageDashboard />} />
                 <Route path="/instructor/courses" element={<PageCourses />} />
-                <Route path="/instructor/courses/:id" element={<PagneCourseDetail />} />
+                {/* <Route path="/instructor/courses/:id" element={<PagneCourseDetail />} /> */}
                 <Route path="/instructor/addCourses" element={<PageAdd />} />
                 <Route path="/instructor/review" element={<PageReview />} />
                 <Route path="/instructor/students" element={<StudentList />} />
@@ -190,6 +191,7 @@ function App() {
                 <Route path="/instructor/scores" element={<PageViewScores />} />
                 <Route path="/instructor/questions" element={<PageQuestions />} />
                 <Route path="/instructor/search" element={<PageSearchCourse />} />
+                <Route path="/instructor/courses/:id" element={<UpdateCourse />} />
               </>
             )}
           </Routes>
