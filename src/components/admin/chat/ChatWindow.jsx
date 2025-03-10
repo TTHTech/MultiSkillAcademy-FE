@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Phone, Video, MoreVertical, Trash2, FileUp, Send } from 'lucide-react';
+import { Phone, Video, MoreVertical, Trash2, FileUp, Send, X } from 'lucide-react';
 import { toast } from 'react-toastify';
 import ChatInput from './ChatInput';
 
@@ -11,6 +11,8 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
   const [selectedMessageId, setSelectedMessageId] = useState(null);
   const [contextMenuPosition, setContextMenuPosition] = useState({ top: 0, left: 0 });
   const messagesEndRef = useRef(null);
+  const [enlargedImage, setEnlargedImage] = useState(null);
+  const [avatars, setAvatars] = useState({});
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -58,6 +60,37 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
     return `${hours}:${minutes}`;
   };
 
+  // Fetch user avatar
+  const fetchUserAvatar = async (userId) => {
+    try {
+      if (!userId || avatars[userId]) return;
+      
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      const response = await fetch(`http://localhost:8080/api/admin/chat/users/${userId}/avatar`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        console.warn(`Không thể tải ảnh cho người dùng ${userId}`);
+        return;
+      }
+      
+      const data = await response.json();
+      if (data.avatarUrl) {
+        setAvatars(prev => ({
+          ...prev,
+          [userId]: data.avatarUrl
+        }));
+      }
+    } catch (err) {
+      console.error(`Error fetching avatar for user ${userId}:`, err);
+    }
+  };
+
   const fetchMessages = async (chatId) => {
     try {
       const token = localStorage.getItem("token");
@@ -96,6 +129,11 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
 
         // Format timestamp từ server - sử dụng createdAt
         const serverTimestamp = formatServerTimestamp(msg.createdAt);
+
+        // Fetch avatar if needed
+        if (msg.senderId) {
+          fetchUserAvatar(msg.senderId);
+        }
 
         return {
           id: msg.messageId,
@@ -167,7 +205,7 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
     }
   };
 
-  // Sửa lại addMessage để sử dụng timestamp từ server
+  // Sửa lại addMessage để sử dụng timestamp từ server và rút gọn fileUrl
   const addMessage = async (content, fileUrl = null, messageType = 'TEXT') => {
     try {
       if (!chatData?.chatId || !selectedUser) return;
@@ -190,6 +228,16 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
         messageContent = String(content || "");
       }
 
+      // RÚT GỌN fileUrl NẾU QUÁ DÀI
+      let shortenedFileUrl = fileUrl;
+      if (fileUrl && fileUrl.length > 200) {
+        // Chỉ lấy phần tên file từ URL đầy đủ
+        const urlParts = fileUrl.split('/');
+        const fileName = urlParts[urlParts.length - 1];
+        shortenedFileUrl = `/api/admin/chat/files/${fileName}`;
+        console.log("URL gốc quá dài, đã rút gọn thành:", shortenedFileUrl);
+      }
+
       // Tạo timestamp tạm cho tin nhắn trước khi gửi
       const currentTimestamp = getCurrentTimeString();
       
@@ -202,15 +250,16 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
         avatar: localStorage.getItem("userAvatar") || null,
         timestamp: currentTimestamp,
         senderId: parseInt(localStorage.getItem("userId")),
-        messageType: messageType
+        messageType: messageType,
+        fileUrl: shortenedFileUrl // Sử dụng URL đã rút gọn
       };
       setMessages(prev => [...prev, tempMessage]);
 
-      // Chuẩn bị dữ liệu đúng định dạng cho API - CHỈ GỬI TEXT ĐƠN GIẢN
+      // Chuẩn bị dữ liệu đúng định dạng cho API
       const messageRequest = {
         content: messageContent,
         messageType: messageType,
-        fileUrl: fileUrl || null
+        fileUrl: shortenedFileUrl || null // Sử dụng URL đã rút gọn
       };
 
       console.log("Sending message data:", messageRequest);
@@ -241,7 +290,8 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
           message: sentMessage.content || msg.message,
           // Sử dụng timestamp từ server nếu có
           timestamp: formatServerTimestamp(sentMessage.createdAt) || currentTimestamp,
-          createdAt: sentMessage.createdAt
+          createdAt: sentMessage.createdAt,
+          fileUrl: sentMessage.fileUrl || msg.fileUrl
         } : msg
       ));
 
@@ -287,138 +337,191 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
   const getRoleText = (role) => {
     switch (role) {
       case 'ADMIN': return 'Quản trị viên';
+      case 'ROLE_ADMIN': return 'Quản trị viên';
       case 'INSTRUCTOR': return 'Giảng viên';
+      case 'ROLE_INSTRUCTOR': return 'Giảng viên';
       case 'STUDENT': return 'Học viên';
+      case 'ROLE_STUDENT': return 'Học viên';
       default: return role;
     }
   };
 
-  const ChatHeader = () => (
-    <div className="bg-emerald-500 p-4 flex items-center justify-between">
-      <div className="flex items-center space-x-3">
-        <img
-          src={selectedUser?.avatar || "https://th.bing.com/th/id/OIP.7fheetEuM-hyJg1sEyuqVwHaHa?rs=1&pid=ImgDetMain"}
-          alt="User Avatar"
-          className="w-10 h-10 rounded-full"
-        />
-        <div>
-          <h3 className="font-semibold text-white">
-            {selectedUser ? `${selectedUser.firstName} ${selectedUser.lastName}` : 'Chat'}
-          </h3>
-          <span className="text-sm text-emerald-50">
-            {isTyping ? 'Đang nhập...' : selectedUser ? getRoleText(selectedUser.role) : 'Đang hoạt động'}
-          </span>
-        </div>
-      </div>
-      <div className="flex items-center space-x-4">
-        <button className="p-2 text-white hover:bg-emerald-600 rounded-full transition-colors">
-          <Phone className="w-6 h-6" />
-        </button>
-        <button className="p-2 text-white hover:bg-emerald-600 rounded-full transition-colors">
-          <Video className="w-6 h-6" />
-        </button>
-        <button className="p-2 text-white hover:bg-emerald-600 rounded-full transition-colors">
-          <MoreVertical className="w-6 h-6" />
-        </button>
-      </div>
-    </div>
-  );
+  const enlargeImage = (imageUrl) => {
+    setEnlargedImage(imageUrl);
+  };
 
-  const ChatMessage = ({ id, message, isAdmin, avatar, timestamp, createdAt, senderName, messageType, fileUrl }) => (
-    <div 
-      className={`flex ${isAdmin ? 'justify-end' : 'justify-start'} mb-4`}
-      onContextMenu={(e) => handleRightClick(e, id)}
-    >
-      <div className={`flex ${isAdmin ? 'flex-row-reverse' : 'flex-row'} items-end max-w-[70%]`}>
-        {!isAdmin && (
-          <img src={avatar} alt="Avatar" className="w-8 h-8 rounded-full mr-2 mb-1" />
-        )}
-        <div>
-          {messageType === 'IMAGE' ? (
-            <div className={`rounded-2xl overflow-hidden ${isAdmin ? 'ml-2' : ''}`}>
-              <img 
-                src={fileUrl} 
-                alt="Shared image" 
-                className="max-w-full h-auto max-h-64 rounded-2xl"
-                onError={(e) => {
-                  e.target.onerror = null;
-                  e.target.src = "https://via.placeholder.com/300x200?text=Image+not+available";
-                }} 
-              />
-            </div>
-          ) : messageType === 'FILE' ? (
-            <div
-              className={`p-3 rounded-2xl ${
-                isAdmin
-                  ? 'bg-emerald-500 text-white ml-2'
-                  : 'bg-gray-100 text-gray-900'
-              }`}
-            >
-              <a 
-                href={fileUrl} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="flex items-center text-sm"
-              >
-                <FileUp className="w-4 h-4 mr-2" />
-                {message || "Tập tin đính kèm"}
-              </a>
-            </div>
-          ) : (
-            <div
-              className={`p-3 rounded-2xl ${
-                isAdmin
-                  ? 'bg-emerald-500 text-white ml-2'
-                  : 'bg-gray-100 text-gray-900'
-              }`}
-            >
-              <p className="text-sm">{message}</p>
-            </div>
-          )}
-          <div className={`mt-1 ${isAdmin ? 'text-right' : 'text-left'}`}>
-            <span className="text-xs text-gray-500">
-              {timestamp || getCurrentTimeString()}
+  const closeEnlargedImage = () => {
+    setEnlargedImage(null);
+  };
+
+  const ChatHeader = () => {
+    // Ưu tiên sử dụng avatar từ state nếu có
+    const userAvatar = selectedUser && avatars[selectedUser.userId] 
+      ? avatars[selectedUser.userId] 
+      : selectedUser?.avatar || "https://th.bing.com/th/id/OIP.7fheetEuM-hyJg1sEyuqVwHaHa?rs=1&pid=ImgDetMain";
+      
+    return (
+      <div className="bg-emerald-500 p-4 flex items-center justify-between">
+        <div className="flex items-center space-x-3">
+          <img
+            src={userAvatar}
+            alt="User Avatar"
+            className="w-10 h-10 rounded-full object-cover"
+          />
+          <div>
+            <h3 className="font-semibold text-white">
+              {selectedUser ? `${selectedUser.firstName} ${selectedUser.lastName}` : 'Chat'}
+            </h3>
+            <span className="text-sm text-emerald-50">
+              {isTyping ? 'Đang nhập...' : selectedUser ? getRoleText(selectedUser.role) : 'Đang hoạt động'}
             </span>
           </div>
         </div>
+        <div className="flex items-center space-x-4">
+          <button className="p-2 text-white hover:bg-emerald-600 rounded-full transition-colors">
+            <Phone className="w-6 h-6" />
+          </button>
+          <button className="p-2 text-white hover:bg-emerald-600 rounded-full transition-colors">
+            <Video className="w-6 h-6" />
+          </button>
+          <button className="p-2 text-white hover:bg-emerald-600 rounded-full transition-colors">
+            <MoreVertical className="w-6 h-6" />
+          </button>
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
-  const EmptyChat = () => (
-    <div className="flex flex-col items-center justify-center h-full">
-      {selectedUser ? (
-        <>
-          <img
-            src={selectedUser.avatar || "https://th.bing.com/th/id/OIP.7fheetEuM-hyJg1sEyuqVwHaHa?rs=1&pid=ImgDetMain"}
-            alt="User Avatar"
-            className="w-32 h-32 rounded-full mb-4"
-          />
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">
-            {`${selectedUser.firstName} ${selectedUser.lastName}`}
-          </h3>
-          <p className="text-sm text-gray-500 mb-2">
-            {getRoleText(selectedUser.role)}
-          </p>
-          <p className="text-sm text-gray-500">Hãy bắt đầu cuộc trò chuyện</p>
-        </>
-      ) : (
-        <>
-          <img
-            src="https://www.svgrepo.com/show/192262/chat.svg"
-            alt="Empty Chat"
-            className="w-32 h-32 mb-4"
-          />
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">
-            Chưa có cuộc trò chuyện nào
-          </h3>
-          <p className="text-sm text-gray-500">
-            Chọn một người dùng từ danh sách bên trái để bắt đầu chat
-          </p>
-        </>
-      )}
-    </div>
-  );
+  const ChatMessage = ({ id, message, isAdmin, avatar, timestamp, createdAt, senderName, messageType, fileUrl, senderId }) => {
+    // Ưu tiên sử dụng avatar từ state
+    const userAvatar = avatars[senderId] || avatar;
+    
+    return (
+      <div 
+        className={`flex ${isAdmin ? 'justify-end' : 'justify-start'} mb-4`}
+        onContextMenu={(e) => handleRightClick(e, id)}
+      >
+        <div className={`flex ${isAdmin ? 'flex-row-reverse' : 'flex-row'} items-end max-w-[70%]`}>
+          {!isAdmin && (
+            <img src={userAvatar} alt="Avatar" className="w-8 h-8 rounded-full mr-2 mb-1 object-cover" />
+          )}
+          <div>
+            {messageType === 'IMAGE' ? (
+              <div className={`rounded-2xl overflow-hidden ${isAdmin ? 'ml-2' : ''}`}>
+                <img 
+                  src={fileUrl} 
+                  alt="Shared image" 
+                  className="max-w-full h-auto max-h-64 rounded-2xl cursor-pointer"
+                  onClick={() => enlargeImage(fileUrl)}
+                  onError={(e) => {
+                    console.error("Image failed to load:", fileUrl);
+                    e.target.onerror = null;
+                    e.target.src = "https://via.placeholder.com/300x200?text=Image+not+available";
+                  }} 
+                />
+              </div>
+            ) : messageType === 'VIDEO' ? (
+              <div className={`rounded-2xl overflow-hidden ${isAdmin ? 'ml-2' : ''}`}>
+                <video 
+                  src={fileUrl} 
+                  controls
+                  className="max-w-full h-auto max-h-64 rounded-2xl"
+                  onError={(e) => {
+                    console.error("Video failed to load:", fileUrl);
+                    e.target.onerror = null;
+                    // Hiển thị message lỗi thay vì video không load được
+                    e.target.parentNode.innerHTML = `<div class="bg-gray-200 p-3 rounded-2xl text-sm text-gray-500">Video không thể hiển thị</div>`;
+                  }}
+                />
+              </div>
+            ) : messageType === 'FILE' || messageType === 'DOCUMENT' ? (
+              <div
+                className={`p-3 rounded-2xl ${
+                  isAdmin
+                    ? 'bg-emerald-500 text-white ml-2'
+                    : 'bg-gray-100 text-gray-900'
+                }`}
+              >
+                <a 
+                  href={fileUrl} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center text-sm"
+                >
+                  <FileUp className="w-4 h-4 mr-2" />
+                  {message || "Tập tin đính kèm"}
+                </a>
+              </div>
+            ) : (
+              <div
+                className={`p-3 rounded-2xl ${
+                  isAdmin
+                    ? 'bg-emerald-500 text-white ml-2'
+                    : 'bg-gray-100 text-gray-900'
+                }`}
+              >
+                <p className="text-sm">{message}</p>
+              </div>
+            )}
+            <div className={`mt-1 ${isAdmin ? 'text-right' : 'text-left'}`}>
+              <span className="text-xs text-gray-500">
+                {timestamp || getCurrentTimeString()}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const EmptyChat = () => {
+    // Ưu tiên sử dụng avatar từ state
+    const userAvatar = selectedUser && avatars[selectedUser.userId] 
+      ? avatars[selectedUser.userId] 
+      : selectedUser?.avatar || "https://th.bing.com/th/id/OIP.7fheetEuM-hyJg1sEyuqVwHaHa?rs=1&pid=ImgDetMain";
+    
+    return (
+      <div className="flex flex-col items-center justify-center h-full">
+        {selectedUser ? (
+          <>
+            <img
+              src={userAvatar}
+              alt="User Avatar"
+              className="w-32 h-32 rounded-full mb-4 object-cover"
+            />
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              {`${selectedUser.firstName} ${selectedUser.lastName}`}
+            </h3>
+            <p className="text-sm text-gray-500 mb-2">
+              {getRoleText(selectedUser.role)}
+            </p>
+            <p className="text-sm text-gray-500">Hãy bắt đầu cuộc trò chuyện</p>
+          </>
+        ) : (
+          <>
+            <img
+              src="https://www.svgrepo.com/show/192262/chat.svg"
+              alt="Empty Chat"
+              className="w-32 h-32 mb-4"
+            />
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              Chưa có cuộc trò chuyện nào
+            </h3>
+            <p className="text-sm text-gray-500">
+              Chọn một người dùng từ danh sách bên trái để bắt đầu chat
+            </p>
+          </>
+        )}
+      </div>
+    );
+  };
+
+  // Load avatar for selected user
+  useEffect(() => {
+    if (selectedUser && selectedUser.userId) {
+      fetchUserAvatar(selectedUser.userId);
+    }
+  }, [selectedUser]);
 
   return (
     <div className="flex flex-col h-screen bg-white relative">
@@ -440,6 +543,29 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
           <EmptyChat />
         )}
       </div>
+
+      {/* Enlarged Image Modal */}
+      {enlargedImage && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75" onClick={closeEnlargedImage}>
+          <div className="relative max-w-4xl max-h-[90vh]">
+            <button 
+              className="absolute top-2 right-2 bg-white rounded-full p-1 text-gray-800 hover:bg-gray-200"
+              onClick={(e) => {
+                e.stopPropagation();
+                closeEnlargedImage();
+              }}
+            >
+              <X className="w-6 h-6" />
+            </button>
+            <img 
+              src={enlargedImage} 
+              alt="Enlarged" 
+              className="max-w-full max-h-[90vh] object-contain"
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
+        </div>
+      )}
 
       {/* Context Menu for Message Actions */}
       {showContextMenu && (
