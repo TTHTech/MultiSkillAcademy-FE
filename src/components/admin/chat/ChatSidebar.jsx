@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Search, MoreHorizontal, Edit, Filter, UserPlus } from "lucide-react";
 import { toast } from "react-toastify";
 
@@ -13,6 +13,51 @@ const ChatSidebar = ({ onUserSelect }) => {
   const [searchFilter, setSearchFilter] = useState("ALL");
   const [activeUserId, setActiveUserId] = useState(null);
   const [showUserSearchModal, setShowUserSearchModal] = useState(false);
+  const [avatars, setAvatars] = useState({});
+
+  // Fetch user avatar
+  const fetchUserAvatar = useCallback(async (userId) => {
+    try {
+      const token = localStorage.getItem("token");
+      
+      if (!token) {
+        throw new Error("Vui lòng đăng nhập lại");
+      }
+
+      const response = await fetch(`http://localhost:8080/api/admin/chat/users/${userId}/avatar`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        console.warn(`Không thể tải ảnh cho người dùng ${userId}`);
+        return null;
+      }
+      
+      const data = await response.json();
+      return data.avatarUrl;
+    } catch (err) {
+      console.error(`Error fetching avatar for user ${userId}:`, err);
+      return null;
+    }
+  }, []);
+
+  // Fetch avatars for all users
+  const fetchAvatarsForUsers = useCallback(async (users) => {
+    const newAvatars = {...avatars};
+    
+    for (const user of users) {
+      if (!avatars[user.userId]) {
+        const avatarUrl = await fetchUserAvatar(user.userId);
+        if (avatarUrl) {
+          newAvatars[user.userId] = avatarUrl;
+        }
+      }
+    }
+    
+    setAvatars(newAvatars);
+  }, [avatars, fetchUserAvatar]);
 
   // Fetch chat users on component mount
   useEffect(() => {
@@ -40,6 +85,9 @@ const ChatSidebar = ({ onUserSelect }) => {
       
       const data = await response.json();
       setChatUsers(data);
+      
+      // Fetch avatars for users
+      fetchAvatarsForUsers(data);
     } catch (err) {
       console.error("Error fetching users:", err);
       toast.error(err.message);
@@ -75,6 +123,9 @@ const ChatSidebar = ({ onUserSelect }) => {
       
       const data = await response.json();
       setSearchUsers(data);
+      
+      // Fetch avatars for search results
+      fetchAvatarsForUsers(data);
     } catch (err) {
       console.error("Error searching users:", err);
       toast.error(err.message);
@@ -189,8 +240,35 @@ const ChatSidebar = ({ onUserSelect }) => {
         user.lastName?.toLowerCase().includes(searchTerm.toLowerCase());
       
       if (filter === "ALL") return searchMatch;
-      return searchMatch && user.role === filter;
+      
+      const userRole = user.role.replace("ROLE_", "");
+      return searchMatch && userRole === filter;
     });
+  };
+
+  // Tạo Avatar fallback với chữ cái đầu
+  const AvatarFallback = ({ user }) => {
+    const firstLetter = user.firstName ? user.firstName.charAt(0).toUpperCase() : "?";
+    const bgColors = {
+      ROLE_STUDENT: "bg-blue-500",
+      ROLE_INSTRUCTOR: "bg-purple-500",
+      ADMIN: "bg-red-500"
+    };
+    const bgColor = bgColors[user.role] || "bg-gray-500";
+    
+    return (
+      <div className={`w-full h-full rounded-full flex items-center justify-center ${bgColor} text-white font-bold text-xl`}>
+        {firstLetter}
+      </div>
+    );
+  };
+
+  // Hiển thị vai trò người dùng
+  const displayRole = (role) => {
+    if (role === "ROLE_STUDENT") return "Học viên";
+    if (role === "ROLE_INSTRUCTOR") return "Giảng viên";
+    if (role === "ADMIN") return "Quản trị viên";
+    return role;
   };
 
   const filteredUsers = getFilteredUsers();
@@ -256,7 +334,7 @@ const ChatSidebar = ({ onUserSelect }) => {
                 : "bg-gray-100 text-gray-900"
             }`}
           >
-            Instructor
+            Giảng viên
           </button>
           <button
             onClick={() => setFilter("STUDENT")}
@@ -266,7 +344,7 @@ const ChatSidebar = ({ onUserSelect }) => {
                 : "bg-gray-100 text-gray-900"
             }`}
           >
-            Student
+            Học viên
           </button>
         </div>
       </div>
@@ -307,35 +385,26 @@ const ChatSidebar = ({ onUserSelect }) => {
               >
                 Tất cả
               </button>
+             
               <button
-                onClick={() => handleSearchFilterChange("ADMIN")}
+                onClick={() => handleSearchFilterChange("ROLE_INSTRUCTOR")}
                 className={`px-3 py-1 text-sm rounded-full transition-colors ${
-                  searchFilter === "ADMIN"
+                  searchFilter === "ROLE_INSTRUCTOR"
                     ? "bg-emerald-500 text-white"
                     : "bg-gray-100 text-gray-900"
                 }`}
               >
-                Admin
+                Giảng viên
               </button>
               <button
-                onClick={() => handleSearchFilterChange("INSTRUCTOR")}
+                onClick={() => handleSearchFilterChange("ROLE_STUDENT")}
                 className={`px-3 py-1 text-sm rounded-full transition-colors ${
-                  searchFilter === "INSTRUCTOR"
+                  searchFilter === "ROLE_STUDENT"
                     ? "bg-emerald-500 text-white"
                     : "bg-gray-100 text-gray-900"
                 }`}
               >
-                Instructor
-              </button>
-              <button
-                onClick={() => handleSearchFilterChange("STUDENT")}
-                className={`px-3 py-1 text-sm rounded-full transition-colors ${
-                  searchFilter === "STUDENT"
-                    ? "bg-emerald-500 text-white"
-                    : "bg-gray-100 text-gray-900"
-                }`}
-              >
-                Student
+                Học viên
               </button>
             </div>
             
@@ -354,21 +423,23 @@ const ChatSidebar = ({ onUserSelect }) => {
                   className="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 cursor-pointer transition-colors"
                   onClick={() => handleUserSelect(user)}
                 >
-                  <div className="relative flex-shrink-0">
-                    <img
-                      src={user.avatar || "https://th.bing.com/th/id/OIP.7fheetEuM-hyJg1sEyuqVwHaHa?rs=1&pid=ImgDetMain"}
-                      alt={user.firstName}
-                      className="w-12 h-12 rounded-full"
-                    />
+                  <div className="relative flex-shrink-0 w-12 h-12">
+                    {avatars[user.userId] || user.avatar ? (
+                      <img
+                        src={avatars[user.userId] || user.avatar}
+                        alt={user.firstName}
+                        className="w-12 h-12 rounded-full object-cover"
+                      />
+                    ) : (
+                      <AvatarFallback user={user} />
+                    )}
                   </div>
                   <div className="flex-1 min-w-0">
                     <h3 className="font-semibold truncate text-gray-900">
                       {`${user.firstName || ""} ${user.lastName || ""}`}
                     </h3>
                     <p className="text-sm text-gray-500">
-                      {user.role === "ADMIN" ? "Quản trị viên" : 
-                       user.role === "INSTRUCTOR" ? "Giảng viên" : 
-                       user.role === "STUDENT" ? "Học viên" : user.role}
+                      {displayRole(user.role)}
                     </p>
                   </div>
                 </div>
@@ -397,12 +468,16 @@ const ChatSidebar = ({ onUserSelect }) => {
               }`}
               onClick={() => handleUserSelect(user)}
             >
-              <div className="relative flex-shrink-0">
-                <img
-                  src={user.avatar || "https://th.bing.com/th/id/OIP.7fheetEuM-hyJg1sEyuqVwHaHa?rs=1&pid=ImgDetMain"}
-                  alt={user.firstName}
-                  className="w-14 h-14 rounded-full"
-                />
+              <div className="relative flex-shrink-0 w-14 h-14">
+                {avatars[user.userId] || user.avatar ? (
+                  <img
+                    src={avatars[user.userId] || user.avatar}
+                    alt={user.firstName}
+                    className="w-14 h-14 rounded-full object-cover"
+                  />
+                ) : (
+                  <AvatarFallback user={user} />
+                )}
                 <span
                   className={`absolute bottom-1 right-1 w-3.5 h-3.5 rounded-full border-2 border-white ${
                     user.isOnline ? "bg-emerald-500" : "bg-gray-400"
@@ -426,8 +501,7 @@ const ChatSidebar = ({ onUserSelect }) => {
                 <div className="flex justify-between items-center">
                   <div className="flex flex-col">
                     <p className="text-sm text-gray-500">
-                      {user.role === "ADMIN" ? "Quản trị viên" :
-                       user.role === "INSTRUCTOR" ? "Giảng viên" : "Học viên"}
+                      {displayRole(user.role)}
                     </p>
                     {user.lastMessageContent && (
                       <p className="text-sm text-gray-500 truncate">
