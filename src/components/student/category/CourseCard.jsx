@@ -119,7 +119,9 @@ const StatBadge = ({ icon: Icon, value, label }) => (
   <div className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors">
     <Icon size={16} className="text-gray-400" />
     <span className="text-sm">
-      <span className="font-semibold">{value.toLocaleString('vi-VN')}</span> {label}
+      <span className="font-semibold">
+        {(value !== null && value !== undefined) ? value.toLocaleString('vi-VN') : '0'}
+      </span> {label}
     </span>
   </div>
 );
