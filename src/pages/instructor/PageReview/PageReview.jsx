@@ -75,6 +75,41 @@ const InstructorReviews = () => {
       setCurrentPage(pageNumber);
     }
   };
+  const getPageNumbers = () => {
+    const pages = [];
+    if (totalPages <= 10) {
+      // Nếu tổng số trang ít hơn hoặc bằng 10, hiển thị tất cả các trang
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      if (currentPage <= 4) {
+        // Nếu trang hiện tại gần đầu, hiển thị 5 trang đầu, dấu ... và 3 trang cuối
+        for (let i = 1; i <= 5; i++) {
+          pages.push(i);
+        }
+        pages.push("...");
+        pages.push(totalPages - 2, totalPages - 1, totalPages);
+      } else if (currentPage >= totalPages - 3) {
+        // Nếu trang hiện tại gần cuối, hiển thị 3 trang đầu, dấu ... và 5 trang cuối
+        pages.push(1, 2, 3);
+        pages.push("...");
+        for (let i = totalPages - 4; i <= totalPages; i++) {
+          pages.push(i);
+        }
+      } else {
+        // Nếu trang hiện tại nằm giữa
+        pages.push(1, 2, 3);
+        pages.push("...");
+        for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+          pages.push(i);
+        }
+        pages.push("...");
+        pages.push(totalPages - 2, totalPages - 1, totalPages);
+      }
+    }
+    return pages;
+  };
 
   return (
     <section
@@ -205,7 +240,7 @@ const InstructorReviews = () => {
                 <button
                   onClick={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage === 1}
-                  className={`px-3 py-2 mx-1 rounded ${
+                  className={`mx-1 px-3 py-2 rounded ${
                     currentPage === 1
                       ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                       : "bg-gray-200 text-gray-700 hover:bg-blue-500 hover:text-white transition"
@@ -213,13 +248,29 @@ const InstructorReviews = () => {
                 >
                   Trang trước
                 </button>
-                <span className="px-4 py-2 mx-2 text-gray-700">
-                  Trang {currentPage} / {totalPages}
-                </span>
+                {getPageNumbers().map((page, index) =>
+                  page === "..." ? (
+                    <span key={index} className="mx-1 px-3 py-2">
+                      ...
+                    </span>
+                  ) : (
+                    <button
+                      key={index}
+                      onClick={() => handlePageChange(page)}
+                      className={`mx-1 px-3 py-2 rounded ${
+                        currentPage === page
+                          ? "bg-blue-500 text-white"
+                          : "bg-gray-200 text-gray-700 hover:bg-blue-500 hover:text-white transition"
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  )
+                )}
                 <button
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPages}
-                  className={`px-3 py-2 mx-1 rounded ${
+                  className={`mx-1 px-3 py-2 rounded ${
                     currentPage === totalPages
                       ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                       : "bg-gray-200 text-gray-700 hover:bg-blue-500 hover:text-white transition"

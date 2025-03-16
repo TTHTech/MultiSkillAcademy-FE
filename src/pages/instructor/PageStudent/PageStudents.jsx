@@ -90,7 +90,39 @@ const StudentList = () => {
     if (progress <= 75) return "bg-yellow-500";
     return "bg-green-500";
   };
+  const totalPages = Math.ceil(filteredStudents.length / studentsPerPage);
 
+  const getPageNumbers = () => {
+    const pages = [];
+    if (totalPages <= 10) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      if (currentPage <= 4) {
+        for (let i = 1; i <= 5; i++) {
+          pages.push(i);
+        }
+        pages.push("...");
+        pages.push(totalPages - 2, totalPages - 1, totalPages);
+      } else if (currentPage >= totalPages - 3) {
+        pages.push(1, 2, 3);
+        pages.push("...");
+        for (let i = totalPages - 4; i <= totalPages; i++) {
+          pages.push(i);
+        }
+      } else {
+        pages.push(1, 2, 3);
+        pages.push("...");
+        for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+          pages.push(i);
+        }
+        pages.push("...");
+        pages.push(totalPages - 2, totalPages - 1, totalPages);
+      }
+    }
+    return pages;
+  };
   return (
     <section
       className={`flex-1 min-h-screen bg-gradient-to-b from-green-100 to-blue-200 duration-300 ${
@@ -173,19 +205,30 @@ const StudentList = () => {
             >
               Trang trước
             </button>
-            <span className="px-4 py-2 mx-2 text-gray-700 font-medium">
-              Trang {currentPage} /{" "}
-              {Math.ceil(filteredStudents.length / studentsPerPage)}
-            </span>
+            {getPageNumbers().map((page, index) =>
+              page === "..." ? (
+                <span key={index} className="px-4 py-2 mx-1">
+                  ...
+                </span>
+              ) : (
+                <button
+                  key={index}
+                  onClick={() => handlePageChange(page)}
+                  className={`px-4 py-2 mx-1 rounded-lg shadow-md border transition-all ${
+                    currentPage === page
+                      ? "bg-green-500 text-white border-green-500"
+                      : "bg-gray-200 text-gray-700 hover:bg-green-500 hover:text-white border-gray-300"
+                  }`}
+                >
+                  {page}
+                </button>
+              )
+            )}
             <button
               onClick={() => handlePageChange(currentPage + 1)}
-              disabled={
-                currentPage ===
-                Math.ceil(filteredStudents.length / studentsPerPage)
-              }
+              disabled={currentPage === totalPages}
               className={`px-4 py-2 mx-1 rounded-lg shadow-md border transition-all ${
-                currentPage ===
-                Math.ceil(filteredStudents.length / studentsPerPage)
+                currentPage === totalPages
                   ? "bg-gray-300 text-gray-500 cursor-not-allowed border-gray-300"
                   : "bg-gradient-to-r from-green-500 to-green-600 text-white border-green-500 hover:from-green-600 hover:to-green-700 hover:shadow-lg"
               }`}
