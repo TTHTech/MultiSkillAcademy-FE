@@ -15,6 +15,9 @@ const SidebarEditCourse = ({ onSelect }) => {
     { label: "Bài học miễn phí", key: "ManageFreeLectures" },
     { label: "Nội dung khóa học", key: "SectionsAndLectures" },
   ];
+  const actionItems = [
+    { label: "Chuyển đổi trạng thái", key: "ChangeStatus" },
+  ];
 
   const handleSelect = (key) => {
     setSelectedItem(key);
@@ -30,10 +33,11 @@ const SidebarEditCourse = ({ onSelect }) => {
 
       <h3 className="font-bold text-lg mt-4 mb-3">Nội dung khóa học</h3>
       {publishItems.map((item) => renderMenuItem(item))}
-{/* 
-      <button className="mt-6 w-full bg-purple-600 text-white py-2 rounded-md font-semibold hover:bg-purple-700 transition">
-        Lưu khóa học
-      </button> */}
+
+      <h3 className="font-bold text-lg mt-4 mb-3">Trạng thái hoạt động</h3>
+      {actionItems.map((item) => renderMenuItem(item))}
+
+
     </div>
   );
 
