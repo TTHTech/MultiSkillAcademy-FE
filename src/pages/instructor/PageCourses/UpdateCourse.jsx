@@ -7,6 +7,8 @@ import Requirements from "../../../components/instructor/Content/Requirements";
 import ResourceDescription from "../../../components/instructor/Content/ResourceDescription";
 import SectionsAndLectures from "../../../components/instructor/Content/SectionsAndLectures";
 import TargetAudience from "../../../components/instructor/Content/TargetAudience";
+import ChangeStatus from "../../../components/instructor/Content/ChangeStatus";
+
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 const UpdateCourse = () => {
@@ -44,6 +46,7 @@ const UpdateCourse = () => {
     Requirements: <Requirements />,
     ManageFreeLectures: <ManageFreeLectures />,
     SectionsAndLectures: <SectionsAndLectures />,
+    ChangeStatus: <ChangeStatus />,
   };
 
   return (
@@ -52,12 +55,8 @@ const UpdateCourse = () => {
       <NavbarEditCourse title={course?.title} status={course?.status} />
       </div>
       <div className="flex flex-1 pt-16">
-        {/* Sidebar */}
         <SidebarEditCourse onSelect={setSelectedComponent} />
-
-        {/* Main Content */}
         <div className="flex-1 p-6">
-          {/* Hiển thị component theo lựa chọn */}
           <div className="bg-white p-6 shadow-md rounded-lg mt-4">
             {componentMap[selectedComponent] || <p>Chọn một mục từ menu để chỉnh sửa.</p>}
           </div>

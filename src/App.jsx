@@ -59,6 +59,10 @@ import ReminderPage from "./pages/student/Reminder/ReminderPage.jsx";
 import PageSearchCourse from "./pages/instructor/PageSearchCourse/PageSearchCourse";
 import SaleByInstructorPage from "./pages/admin/SaleByInstructorPage.jsx";
 import UpdateCourse from "./pages/instructor/PageCourses/UpdateCourse.jsx";
+import PageReviewCourse from "./pages/admin/PageReviewCourse";
+import PageSection from "./pages/admin/PageSection";
+import PageLecture from "./pages/admin/PageLecture";
+
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [role, setRole] = useState("");
@@ -154,9 +158,12 @@ function App() {
                 <Route path="/admin/add-notification" element={<AddNotificationPage />} />
                 <Route path="/admin/chat" element={<AdminChatPage />} />
                 <Route path="/admin/sale-by-instructor" element={<SaleByInstructorPage />} />
+                <Route path="/admin/courses/reviews" element={<PageReviewCourse />} />
+                <Route path="/admin/courses/sections" element={<PageSection />} />
+                <Route path="/admin/courses/lectures" element={<PageLecture />} />
               </>
             )}
-
+            
             {/* Student Routes */}
             {isLoggedIn && role === "ROLE_STUDENT" && (
               <>

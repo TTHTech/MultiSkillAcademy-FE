@@ -18,9 +18,6 @@ const Navbar = ({ title, status }) => {
           <span className="bg-gray-700 text-xs text-white px-3 py-1 rounded-full shadow-sm">
             {status}
           </span>
-          {/* <span className="text-gray-400 text-sm italic">
-            Đã tải <span className="text-white font-medium">0 phút</span> nội dung video lên
-          </span> */}
         </div>
       </div>
     </nav>
