@@ -62,6 +62,7 @@ import UpdateCourse from "./pages/instructor/PageCourses/UpdateCourse.jsx";
 import PageReviewCourse from "./pages/admin/PageReviewCourse";
 import PageSection from "./pages/admin/PageSection";
 import PageLecture from "./pages/admin/PageLecture";
+import InstructorChatPage from "./pages/instructor/InstructorChatPage.jsx";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -199,6 +200,7 @@ function App() {
                 <Route path="/instructor/questions" element={<PageQuestions />} />
                 <Route path="/instructor/search" element={<PageSearchCourse />} />
                 <Route path="/instructor/courses/:id" element={<UpdateCourse />} />
+                <Route path="/instructor/chat" element={<InstructorChatPage />} />
               </>
             )}
           </Routes>
