@@ -17,12 +17,15 @@ const PageLecture = () => {
     const fetchLectures = async () => {
       setLoading(true);
       try {
-        const response = await fetch("http://localhost:8080/api/admin/lectures", {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await fetch(
+          "http://localhost:8080/api/admin/lectures",
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         if (!response.ok) {
           throw new Error("Lỗi fetch dữ liệu");
         }
@@ -41,29 +44,22 @@ const PageLecture = () => {
   const handleFilter = useCallback(
     (lectureId, title, courseName, sectionName, status) => {
       let filtered = lectures;
-      if (lectureId) {
-        filtered = filtered.filter((lecture) =>
-          lecture.lectureId.toString().toLowerCase().includes(lectureId.toLowerCase())
-        );
-      }
-      if (title) {
-        filtered = filtered.filter((lecture) =>
-          lecture.title.toLowerCase().includes(title.toLowerCase())
-        );
-      }
-      if (courseName) {
-        filtered = filtered.filter((lecture) =>
-          lecture.courseName.toLowerCase().includes(courseName.toLowerCase())
-        );
-      }
-      if (sectionName) {
-        filtered = filtered.filter((lecture) =>
-          lecture.sectionName.toLowerCase().includes(sectionName.toLowerCase())
+      const searchText = lectureId;
+      if (searchText) {
+        const lowerSearch = searchText.toLowerCase();
+        filtered = filtered.filter(
+          (lecture) =>
+            lecture.lectureId.toString().toLowerCase().includes(lowerSearch) ||
+            lecture.title.toLowerCase().includes(lowerSearch) ||
+            lecture.courseName.toLowerCase().includes(lowerSearch) ||
+            lecture.sectionName.toLowerCase().includes(lowerSearch)
         );
       }
       if (status !== "all") {
         filtered = filtered.filter((lecture) =>
-          status === "active" ? lecture.status === true : lecture.status === false
+          status === "active"
+            ? lecture.status === true
+            : lecture.status === false
         );
       }
       setFilteredLectures(filtered);
@@ -75,7 +71,10 @@ const PageLecture = () => {
   const totalPages = Math.ceil(filteredLectures.length / lecturesPerPage);
   const indexOfLastLecture = currentPage * lecturesPerPage;
   const indexOfFirstLecture = indexOfLastLecture - lecturesPerPage;
-  const currentLectures = filteredLectures.slice(indexOfFirstLecture, indexOfLastLecture);
+  const currentLectures = filteredLectures.slice(
+    indexOfFirstLecture,
+    indexOfLastLecture
+  );
 
   const handlePageChange = (pageNumber) => {
     if (pageNumber < 1 || pageNumber > totalPages) return;
@@ -99,7 +98,9 @@ const PageLecture = () => {
       } else {
         middle = [totalPages - 4, totalPages - 3];
       }
-      let allPages = [...new Set([...left, ...middle, ...right])].sort((a, b) => a - b);
+      let allPages = [...new Set([...left, ...middle, ...right])].sort(
+        (a, b) => a - b
+      );
       for (let i = 0; i < allPages.length; i++) {
         if (i > 0 && allPages[i] - allPages[i - 1] > 1) {
           pageNumbers.push("...");
@@ -156,11 +157,16 @@ const PageLecture = () => {
             <p>Đang tải dữ liệu...</p>
           ) : (
             <>
-              <TableLecture lectures={currentLectures} triggerRefresh={triggerRefresh} />
+              <TableLecture
+                lectures={currentLectures}
+                triggerRefresh={triggerRefresh}
+              />
               {filteredLectures.length > 0 ? (
                 renderPagination()
               ) : (
-                <p className="mt-4 text-center text-gray-600">Không có dữ liệu</p>
+                <p className="mt-4 text-center text-gray-600">
+                  Không có dữ liệu
+                </p>
               )}
             </>
           )}
