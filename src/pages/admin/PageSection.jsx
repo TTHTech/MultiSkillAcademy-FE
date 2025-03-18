@@ -43,19 +43,14 @@ const PageSection = () => {
   const handleFilter = useCallback(
     (id, title, courseName, status) => {
       let filtered = sections;
-      if (id) {
-        filtered = filtered.filter((section) =>
-          section.sectionId.toString().toLowerCase().includes(id.toLowerCase())
-        );
-      }
-      if (title) {
-        filtered = filtered.filter((section) =>
-          section.title.toLowerCase().includes(title.toLowerCase())
-        );
-      }
-      if (courseName) {
-        filtered = filtered.filter((section) =>
-          section.courseName.toLowerCase().includes(courseName.toLowerCase())
+      const searchText = id;
+      if (searchText) {
+        const lowerSearch = searchText.toLowerCase();
+        filtered = filtered.filter(
+          (section) =>
+            section.sectionId.toString().toLowerCase().includes(lowerSearch) ||
+            section.title.toLowerCase().includes(lowerSearch) ||
+            section.courseName.toLowerCase().includes(lowerSearch)
         );
       }
       if (status !== "all") {
