@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Phone, Video, MoreVertical, Trash2, FileUp, Send, X } from 'lucide-react';
 import { toast } from 'react-toastify';
+import InstructorChatInput from './InstructorChatInput';
 
-import ChatInput from './InstructorChatInput';
-const ChatWindow = ({ selectedUser, chatId, chatData }) => {
+const InstructorChatWindow = ({ selectedUser, chatId, chatData }) => {
   const [isTyping, setIsTyping] = useState(false);
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -18,7 +18,7 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  // Lấy và format tin nhắn khi chatData thay đổi
+  // Get and format messages when chatData changes
   useEffect(() => {
     if (chatData?.chatId) {
       setLoading(true);
@@ -29,7 +29,7 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
     }
   }, [chatData]);
 
-  // Format timestamp từ server datetime
+  // Format timestamp from server datetime
   const formatServerTimestamp = (dateTimeString) => {
     if (!dateTimeString) return getCurrentTimeString();
     
@@ -52,7 +52,7 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
     }
   };
 
-  // Lấy thời gian hiện tại dạng chuỗi
+  // Get current time as string
   const getCurrentTimeString = () => {
     const now = new Date();
     const hours = now.getHours().toString().padStart(2, '0');
@@ -91,12 +91,52 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
     }
   };
 
+  // Ensure file URL is complete and valid
+  // Sửa hàm getFullFileUrl trong InstructorChatWindow.jsx
+const getFullFileUrl = (fileUrl) => {
+  if (!fileUrl) return null;
+  
+  // Log để debug
+  console.log("Processing file URL:", fileUrl);
+  
+  // Chuyển hướng từ API instructor sang API admin
+  if (fileUrl && fileUrl.includes('/api/instructor/chat/files/')) {
+    const fileName = fileUrl.split('/').pop();
+    return `http://localhost:8080/api/admin/chat/files/${fileName}`;
+  }
+  
+  // Chuyển hướng tương tự cho các URL ngắn (image_XXXX)
+  if (fileUrl && fileUrl.includes('image_')) {
+    const imageId = fileUrl.includes('/') ? fileUrl.split('/').pop() : fileUrl;
+    return `http://localhost:8080/api/admin/chat/files/${imageId}`;
+  }
+  
+  // Các trường hợp khác giữ nguyên
+  if (fileUrl.startsWith('http://') || fileUrl.startsWith('https://')) {
+    return fileUrl;
+  }
+  
+  if (fileUrl.startsWith('/api/')) {
+    return `http://localhost:8080${fileUrl}`;
+  }
+
+  if (fileUrl.includes('/uploads/')) {
+    return `http://localhost:8080${fileUrl.startsWith('/') ? '' : '/'}${fileUrl}`;
+  }
+  
+  if (!fileUrl.includes('/') && !fileUrl.includes(':\\')) {
+    return `http://localhost:8080/uploads/${fileUrl}`;
+  }
+  
+  return fileUrl;
+};
+
   const fetchMessages = async (chatId) => {
     try {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("Vui lòng đăng nhập lại");
 
-      // Sử dụng API instructor để lấy tin nhắn
+      // Use instructor API to get messages
       const response = await fetch(`http://localhost:8080/api/instructor/chat/${chatId}/messages`, {
         headers: {
           Authorization: `Bearer ${token}`
@@ -112,22 +152,21 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
       }
 
       const messageData = await response.json();
-      console.log("Raw message data:", messageData); // Log để debug
+      console.log("Raw message data:", messageData);
 
       const formattedMessages = messageData.map(msg => {
-        // Xử lý nếu content là chuỗi JSON
+        // Handle JSON content if applicable
         let messageContent = msg.content;
         try {
-          // Kiểm tra nếu content là JSON string, thì parse để lấy trường message
           const parsedContent = JSON.parse(msg.content);
           if (parsedContent && typeof parsedContent === 'object' && parsedContent.message) {
             messageContent = parsedContent.message;
           }
         } catch (e) {
-          // Nếu không phải JSON, giữ nguyên content
+          // Not JSON, keep original content
         }
 
-        // Format timestamp từ server - sử dụng createdAt
+        // Format timestamp from server
         const serverTimestamp = formatServerTimestamp(msg.createdAt);
 
         // Fetch avatar if needed
@@ -135,17 +174,20 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
           fetchUserAvatar(msg.senderId);
         }
 
+        // Ensure fileUrl is complete
+        const fullFileUrl = getFullFileUrl(msg.fileUrl);
+
         return {
           id: msg.messageId,
           message: messageContent,
           isAdmin: msg.senderId === parseInt(localStorage.getItem("userId")),
           avatar: msg.senderAvatar || "https://th.bing.com/th/id/OIP.7fheetEuM-hyJg1sEyuqVwHaHa?rs=1&pid=ImgDetMain",
-          timestamp: serverTimestamp, // Timestamp đã format từ server
-          createdAt: msg.createdAt, // Lưu giá trị gốc để debug
+          timestamp: serverTimestamp,
+          createdAt: msg.createdAt,
           senderId: msg.senderId,
           senderName: msg.senderName,
           messageType: msg.messageType || 'TEXT',
-          fileUrl: msg.fileUrl
+          fileUrl: fullFileUrl
         };
       });
       
@@ -193,7 +235,7 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
         throw new Error("Không thể xóa tin nhắn");
       }
 
-      // Xóa tin nhắn khỏi state
+      // Remove message from state
       setMessages(prev => prev.filter(m => m.id !== selectedMessageId));
       toast.success("Đã xóa tin nhắn");
       
@@ -205,7 +247,7 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
     }
   };
 
-  // Sửa lại addMessage để sử dụng timestamp từ server và rút gọn fileUrl
+  // Modified addMessage function to fix the 403 error and image display
   const addMessage = async (content, fileUrl = null, messageType = 'TEXT') => {
     try {
       if (!chatData?.chatId || !selectedUser) return;
@@ -213,35 +255,36 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("Vui lòng đăng nhập lại");
 
-      // Trích xuất tin nhắn từ content (có thể là string hoặc object)
+      // Extract message from content
       let messageContent = "";
       if (typeof content === 'object') {
-        // Nếu content là object có trường message, sử dụng nó
         if (content.message) {
           messageContent = content.message;
         } else {
-          // Nếu không có trường message, chuyển đổi cả object thành string
           messageContent = JSON.stringify(content);
         }
       } else {
-        // Nếu content là string, sử dụng trực tiếp
         messageContent = String(content || "");
       }
 
-      // RÚT GỌN fileUrl NẾU QUÁ DÀI
-      let shortenedFileUrl = fileUrl;
-      if (fileUrl && fileUrl.length > 200) {
-        // Chỉ lấy phần tên file từ URL đầy đủ
-        const urlParts = fileUrl.split('/');
+      // Ensure file URL is complete
+      let processedFileUrl = getFullFileUrl(fileUrl);
+
+      // Shorten fileUrl if too long
+      let shortenedFileUrl = processedFileUrl;
+      if (processedFileUrl && processedFileUrl.length > 200) {
+        const urlParts = processedFileUrl.split('/');
         const fileName = urlParts[urlParts.length - 1];
         shortenedFileUrl = `/api/instructor/chat/files/${fileName}`;
         console.log("URL gốc quá dài, đã rút gọn thành:", shortenedFileUrl);
+        // Update the full URL for display
+        processedFileUrl = getFullFileUrl(shortenedFileUrl);
       }
 
-      // Tạo timestamp tạm cho tin nhắn trước khi gửi
+      // Create temporary timestamp for message
       const currentTimestamp = getCurrentTimeString();
       
-      // Hiển thị tin nhắn tạm thời ngay lập tức
+      // Show temporary message immediately
       const tempId = "temp-" + Date.now();
       const tempMessage = {
         id: tempId,
@@ -251,20 +294,21 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
         timestamp: currentTimestamp,
         senderId: parseInt(localStorage.getItem("userId")),
         messageType: messageType,
-        fileUrl: shortenedFileUrl // Sử dụng URL đã rút gọn
+        fileUrl: processedFileUrl
       };
       setMessages(prev => [...prev, tempMessage]);
 
-      // Chuẩn bị dữ liệu đúng định dạng cho API
+      // Prepare data for API - Make sure to match InstructorMessageRequestDTO structure
       const messageRequest = {
         content: messageContent,
-        messageType: messageType,
-        fileUrl: shortenedFileUrl || null // Sử dụng URL đã rút gọn
+        messageType: messageType || "TEXT",
+        fileUrl: shortenedFileUrl || null
       };
 
       console.log("Sending message data:", messageRequest);
+      console.log("Sending request to:", `http://localhost:8080/api/instructor/chat/${chatData.chatId}/messages`);
 
-      // Send to server using instructor API
+      // Send to server using instructor API with more detailed error handling
       const response = await fetch(`http://localhost:8080/api/instructor/chat/${chatData.chatId}/messages`, {
         method: 'POST',
         headers: {
@@ -275,34 +319,41 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
       });
 
       if (!response.ok) {
-        throw new Error(`Không thể gửi tin nhắn (${response.status})`);
+        const errorText = await response.text();
+        console.error("Error response:", errorText);
+        throw new Error(`Không thể gửi tin nhắn (${response.status}): ${errorText || response.statusText}`);
       }
 
-      // Lấy tin nhắn đã gửi từ response
+      // Get sent message from response
       const sentMessage = await response.json();
-      console.log("Server response for sent message:", sentMessage); // Log để debug
+      console.log("Server response for sent message:", sentMessage);
       
-      // Cập nhật tin nhắn tạm thời với id thật và timestamp từ server
+      // Ensure fileUrl is complete
+      let updatedFileUrl = sentMessage.fileUrl;
+      if (updatedFileUrl) {
+        updatedFileUrl = getFullFileUrl(updatedFileUrl);
+      }
+      
+      // Update temporary message with real ID and server timestamp
       setMessages(prev => prev.map(msg => 
         msg.id === tempId ? {
           ...msg,
           id: sentMessage.messageId,
           message: sentMessage.content || msg.message,
-          // Sử dụng timestamp từ server nếu có
           timestamp: formatServerTimestamp(sentMessage.createdAt) || currentTimestamp,
           createdAt: sentMessage.createdAt,
-          fileUrl: sentMessage.fileUrl || msg.fileUrl
+          fileUrl: updatedFileUrl || msg.fileUrl
         } : msg
       ));
 
-      // Cuộn xuống sau khi gửi tin nhắn
+      // Scroll down after sending message
       setTimeout(scrollToBottom, 100);
       return sentMessage;
 
     } catch (err) {
       console.error("Error sending message:", err);
       toast.error(err.message);
-      // Xóa tin nhắn tạm nếu gửi thất bại
+      // Remove temp message if sending failed
       setMessages(prev => prev.filter(msg => !msg.id.toString().startsWith("temp-")));
       throw err;
     }
@@ -318,17 +369,21 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
     if (!token || !userId) return;
     
     try {
-      // Đây là ví dụ - phần này cần được triển khai qua WebSocket
+      // Example for WebSocket implementation
       const typingData = {
         chatId: chatData.chatId,
         userId: parseInt(userId),
         isTyping: isTyping
       };
       
-      // Gửi qua WebSocket nếu được cấu hình
-      // if (stompClient && stompClient.connected) {
-      //   stompClient.send('/app/instructor-chat.typing', {}, JSON.stringify(typingData));
-      // }
+      // Send via WebSocket if configured
+      const stompClient = window.stompClient;
+      if (stompClient && stompClient.connected) {
+        stompClient.publish({
+          destination: "/app/instructor-chat.typing",
+          body: JSON.stringify(typingData)
+        });
+      }
     } catch (err) {
       console.error("Error sending typing status:", err);
     }
@@ -355,7 +410,7 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
   };
 
   const ChatHeader = () => {
-    // Ưu tiên sử dụng avatar từ state nếu có
+    // Prioritize avatar from state if available
     const userAvatar = selectedUser && avatars[selectedUser.userId] 
       ? avatars[selectedUser.userId] 
       : selectedUser?.avatar || "https://th.bing.com/th/id/OIP.7fheetEuM-hyJg1sEyuqVwHaHa?rs=1&pid=ImgDetMain";
@@ -393,8 +448,12 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
   };
 
   const ChatMessage = ({ id, message, isAdmin, avatar, timestamp, createdAt, senderName, messageType, fileUrl, senderId }) => {
-    // Ưu tiên sử dụng avatar từ state
+    // Prioritize avatar from state
     const userAvatar = avatars[senderId] || avatar;
+    
+    // Image loading state
+    const [imgLoaded, setImgLoaded] = useState(false);
+    const [imgError, setImgError] = useState(false);
     
     return (
       <div 
@@ -403,22 +462,42 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
       >
         <div className={`flex ${isAdmin ? 'flex-row-reverse' : 'flex-row'} items-end max-w-[70%]`}>
           {!isAdmin && (
-            <img src={userAvatar} alt="Avatar" className="w-8 h-8 rounded-full mr-2 mb-1 object-cover" />
+            <img 
+              src={userAvatar} 
+              alt="Avatar" 
+              className="w-8 h-8 rounded-full mr-2 mb-1 object-cover"
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = "https://ui-avatars.com/api/?name=U&background=3B82F6&color=ffffff&size=128&bold=true";
+              }}
+            />
           )}
           <div>
             {messageType === 'IMAGE' ? (
-              <div className={`rounded-2xl overflow-hidden ${isAdmin ? 'ml-2' : ''}`}>
-                <img 
-                  src={fileUrl} 
-                  alt="Shared image" 
-                  className="max-w-full h-auto max-h-64 rounded-2xl cursor-pointer"
-                  onClick={() => enlargeImage(fileUrl)}
-                  onError={(e) => {
-                    console.error("Image failed to load:", fileUrl);
-                    e.target.onerror = null;
-                    e.target.src = "https://via.placeholder.com/300x200?text=Image+not+available";
-                  }} 
-                />
+              <div className={`rounded-2xl overflow-hidden ${isAdmin ? 'ml-2' : ''} bg-gray-100`}>
+                {!imgLoaded && !imgError && (
+                  <div className="w-48 h-48 flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500"></div>
+                  </div>
+                )}
+                {imgError ? (
+                  <div className="w-48 h-48 flex items-center justify-center bg-gray-200 text-gray-500 text-sm p-4 text-center">
+                    Không thể tải hình ảnh
+                  </div>
+                ) : (
+                  <img 
+                    src={fileUrl} 
+                    alt="Shared image" 
+                    className={`max-w-full h-auto max-h-64 rounded-2xl cursor-pointer ${imgLoaded ? 'block' : 'hidden'}`}
+                    onClick={() => enlargeImage(fileUrl)}
+                    onLoad={() => setImgLoaded(true)}
+                    onError={(e) => {
+                      console.error("Image failed to load:", fileUrl);
+                      setImgError(true);
+                      setImgLoaded(false);
+                    }}
+                  />
+                )}
               </div>
             ) : messageType === 'VIDEO' ? (
               <div className={`rounded-2xl overflow-hidden ${isAdmin ? 'ml-2' : ''}`}>
@@ -429,29 +508,32 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
                   onError={(e) => {
                     console.error("Video failed to load:", fileUrl);
                     e.target.onerror = null;
-                    // Hiển thị message lỗi thay vì video không load được
+                    // Display error message instead of video that can't load
                     e.target.parentNode.innerHTML = `<div class="bg-gray-200 p-3 rounded-2xl text-sm text-gray-500">Video không thể hiển thị</div>`;
                   }}
                 />
               </div>
             ) : messageType === 'FILE' || messageType === 'DOCUMENT' ? (
               <div
-                className={`p-3 rounded-2xl ${
-                  isAdmin
-                    ? 'bg-emerald-500 text-white ml-2'
-                    : 'bg-gray-100 text-gray-900'
-                }`}
-              >
-                <a 
-                  href={fileUrl} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="flex items-center text-sm"
-                >
-                  <FileUp className="w-4 h-4 mr-2" />
-                  {message || "Tập tin đính kèm"}
-                </a>
-              </div>
+    className={`p-3 rounded-2xl ${
+      isAdmin
+        ? 'bg-emerald-500 text-white ml-2'
+        : 'bg-gray-100 text-gray-900'
+    }`}
+  >
+    <a 
+      href={fileUrl} 
+      target="_blank" 
+      rel="noopener noreferrer"
+      className="flex items-center text-sm"
+    >
+      <FileUp className="w-4 h-4 mr-2" />
+      <span className="flex flex-col">
+        <span>{message || "Tập tin đính kèm"}</span>
+        <span className="text-xs mt-1 text-gray-300 break-all">{fileUrl}</span>
+      </span>
+    </a>
+  </div>
             ) : (
               <div
                 className={`p-3 rounded-2xl ${
@@ -473,9 +555,9 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
       </div>
     );
   };
-
+  
   const EmptyChat = () => {
-    // Ưu tiên sử dụng avatar từ state
+    // Prioritize avatar from state
     const userAvatar = selectedUser && avatars[selectedUser.userId] 
       ? avatars[selectedUser.userId] 
       : selectedUser?.avatar || "https://th.bing.com/th/id/OIP.7fheetEuM-hyJg1sEyuqVwHaHa?rs=1&pid=ImgDetMain";
@@ -488,6 +570,10 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
               src={userAvatar}
               alt="User Avatar"
               className="w-32 h-32 rounded-full mb-4 object-cover"
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = "https://ui-avatars.com/api/?name=U&background=3B82F6&color=ffffff&size=128&bold=true";
+              }}
             />
             <h3 className="text-xl font-semibold text-gray-900 mb-2">
               {`${selectedUser.firstName} ${selectedUser.lastName}`}
@@ -515,7 +601,7 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
       </div>
     );
   };
-
+  
   // Load avatar for selected user
   useEffect(() => {
     if (selectedUser && selectedUser.userId) {
@@ -562,6 +648,10 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
               alt="Enlarged" 
               className="max-w-full max-h-[90vh] object-contain"
               onClick={(e) => e.stopPropagation()}
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = "https://via.placeholder.com/800x600?text=Image+not+available";
+              }}
             />
           </div>
         </div>
@@ -594,7 +684,8 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
         />
       )}
 
-      <ChatInput 
+      <InstructorChatInput 
+        chatId={chatData?.chatId}
         addMessage={addMessage} 
         setIsTyping={(isTyping) => {
           setIsTyping(isTyping);
@@ -606,4 +697,4 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
   );
 };
 
-export default ChatWindow;
+export default InstructorChatWindow;

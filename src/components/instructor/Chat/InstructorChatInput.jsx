@@ -2,9 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Send, Paperclip, Image, FileText, Video, X, Smile } from 'lucide-react';
 import { toast } from 'react-toastify';
 import EmojiPicker from 'emoji-picker-react';
-import axios from 'axios';
 
-const ChatInput = ({ chatId, addMessage, setIsTyping, disabled }) => {
+const InstructorChatInput = ({ chatId, addMessage, setIsTyping, disabled }) => {
   const [message, setMessage] = useState('');
   const [showAttachmentOptions, setShowAttachmentOptions] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -23,7 +22,7 @@ const ChatInput = ({ chatId, addMessage, setIsTyping, disabled }) => {
     }
   }, []);
 
-  // Đóng emoji picker khi click ra ngoài
+  // Close emoji picker when clicking outside
   useEffect(() => {
     function handleClickOutside(event) {
       if (emojiPickerRef.current && !emojiPickerRef.current.contains(event.target)) {
@@ -53,7 +52,7 @@ const ChatInput = ({ chatId, addMessage, setIsTyping, disabled }) => {
     const file = e.target.files[0];
     if (!file) return;
     
-    // Kiểm tra kích thước file (tối đa 20MB)
+    // Check file size (max 20MB)
     if (file.size > 20 * 1024 * 1024) {
       toast.error('Kích thước file không được vượt quá 20MB');
       return;
@@ -61,7 +60,7 @@ const ChatInput = ({ chatId, addMessage, setIsTyping, disabled }) => {
 
     setSelectedFile(file);
     
-    // Xác định loại file
+    // Determine file type
     if (file.type.startsWith('image/')) {
       setFileType('IMAGE');
       const reader = new FileReader();
@@ -86,7 +85,7 @@ const ChatInput = ({ chatId, addMessage, setIsTyping, disabled }) => {
 
   const handleAttachmentClick = (type) => {
     if (fileInputRef.current) {
-      // Thiết lập accept attribute dựa trên loại file được chọn
+      // Set accept attribute based on selected file type
       switch (type) {
         case 'IMAGE':
           fileInputRef.current.accept = 'image/*';
@@ -105,7 +104,7 @@ const ChatInput = ({ chatId, addMessage, setIsTyping, disabled }) => {
     setShowAttachmentOptions(false);
   };
 
-  // Xử lý khi người dùng chọn emoji
+  // Handle emoji selection
   const onEmojiClick = (emojiObject) => {
     setMessage(prevMessage => prevMessage + emojiObject.emoji);
     if (inputRef.current) {
@@ -113,6 +112,7 @@ const ChatInput = ({ chatId, addMessage, setIsTyping, disabled }) => {
     }
   };
 
+  // Modified uploadFile function to fix upload issues
   const uploadFile = async (file) => {
     try {
       const token = localStorage.getItem("token");
@@ -127,7 +127,11 @@ const ChatInput = ({ chatId, addMessage, setIsTyping, disabled }) => {
       formData.append('file', file);
       formData.append('type', fileType);
       
-      // Sử dụng XMLHttpRequest để tracking tiến trình upload
+      console.log("Uploading file to endpoint:", `http://localhost:8080/api/instructor/chat/${chatId}/upload`);
+      console.log("File type:", fileType);
+      console.log("File size:", file.size);
+      
+      // Use XMLHttpRequest to track upload progress
       return new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
         
@@ -140,9 +144,17 @@ const ChatInput = ({ chatId, addMessage, setIsTyping, disabled }) => {
         
         xhr.addEventListener('load', () => {
           if (xhr.status >= 200 && xhr.status < 300) {
-            const response = JSON.parse(xhr.responseText);
-            resolve(response);
+            try {
+              const response = JSON.parse(xhr.responseText);
+              resolve(response);
+            } catch (error) {
+              console.error("Error parsing upload response:", error);
+              console.log("Raw response:", xhr.responseText);
+              reject(new Error("Invalid response format"));
+            }
           } else {
+            console.error("Upload error status:", xhr.status);
+            console.error("Response text:", xhr.responseText);
             reject(new Error(`Upload failed: ${xhr.status}`));
           }
         });
@@ -151,7 +163,7 @@ const ChatInput = ({ chatId, addMessage, setIsTyping, disabled }) => {
           reject(new Error('Network error during upload'));
         });
         
-        // Sử dụng API instructor thay vì admin
+        // Use instructor API
         xhr.open('POST', `http://localhost:8080/api/instructor/chat/${chatId}/upload`);
         xhr.setRequestHeader('Authorization', `Bearer ${token}`);
         xhr.send(formData);
@@ -165,36 +177,6 @@ const ChatInput = ({ chatId, addMessage, setIsTyping, disabled }) => {
     }
   };
 
-  const sendTextMessage = async (content) => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) throw new Error("Vui lòng đăng nhập lại");
-      
-      if (!chatId) throw new Error("Không có ID cuộc trò chuyện");
-      
-      const response = await axios.post(
-        `http://localhost:8080/api/instructor/chat/${chatId}/messages`,
-        {
-          chatId: chatId,
-          content: content,
-          messageType: "TEXT",
-          fileUrl: null
-        },
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        }
-      );
-      
-      return response.data;
-    } catch (error) {
-      console.error("Error sending text message:", error);
-      throw error;
-    }
-  };
-
   const resetFileSelection = () => {
     setSelectedFile(null);
     setFilePreview(null);
@@ -204,47 +186,55 @@ const ChatInput = ({ chatId, addMessage, setIsTyping, disabled }) => {
     }
   };
 
+  // Modified handleSendMessage function to fix message sending issues
   const handleSendMessage = async () => {
     if (disabled || !chatId) return;
     
     try {
-      // Nếu có file được chọn
+      // If a file is selected
       if (selectedFile) {
         setIsUploading(true);
         
-        // Upload file lên server instructor
+        // Upload file to server
         const uploadResponse = await uploadFile(selectedFile);
         console.log('File uploaded successfully:', uploadResponse);
         
-        // Thêm tin nhắn vào giao diện
-        if (addMessage) {
-          if (fileType === 'IMAGE') {
-            await addMessage(message || '[Hình ảnh]', uploadResponse.fileUrl, fileType);
-          } else if (fileType === 'VIDEO') {
-            await addMessage(message || '[Video]', uploadResponse.fileUrl, fileType);
-          } else {
-            await addMessage(message || `[Tập tin: ${selectedFile.name}]`, uploadResponse.fileUrl, fileType);
-          }
+        // Create message content based on file type
+        let messageContent = message || '';
+        if (fileType === 'IMAGE') {
+          messageContent = message || '[Hình ảnh]';
+        } else if (fileType === 'VIDEO') {
+          messageContent = message || '[Video]';
+        } else {
+          messageContent = message || `[Tập tin: ${selectedFile.name}]`;
         }
+        
+        // Shorten URL if too long
+        let fileUrl = uploadResponse.fileUrl;
+        if (fileUrl && fileUrl.length > 200) {
+          const urlParts = fileUrl.split('/');
+          const fileName = urlParts[urlParts.length - 1];
+          fileUrl = `/api/instructor/chat/files/${fileName}`;
+          console.log("URL gốc quá dài, đã rút gọn thành:", fileUrl);
+        }
+        
+        // Send message with file URL - Using the modified addMessage function
+        await addMessage(messageContent, fileUrl, fileType);
         
         // Reset file selection
         resetFileSelection();
       } else if (message.trim()) {
-        // Gửi tin nhắn văn bản thông thường qua API instructor
-        const sentMessage = await sendTextMessage(message.trim());
-        
-        // Thêm tin nhắn vào giao diện
-        if (addMessage) {
-          await addMessage(message.trim());
-        }
+        // Send regular text message with the proper format
+        // Make sure the message format matches InstructorMessageRequestDTO
+        await addMessage(message.trim(), null, 'TEXT');
       }
       
-      // Reset tin nhắn và typing status
+      // Reset message and typing status
       setMessage('');
       setIsTyping(false);
       setShowEmojiPicker(false);
       
-      // Focus lại input sau khi gửi
+      // Focus input after sending
       if (inputRef.current) {
         inputRef.current.focus();
       }
@@ -256,7 +246,7 @@ const ChatInput = ({ chatId, addMessage, setIsTyping, disabled }) => {
     }
   };
 
-  // Hàm để gửi trạng thái typing qua WebSocket
+  // Send typing status via WebSocket
   const sendTypingStatus = (isTyping) => {
     const token = localStorage.getItem("token");
     if (!token || !chatId) return;
@@ -282,7 +272,7 @@ const ChatInput = ({ chatId, addMessage, setIsTyping, disabled }) => {
     }
   };
 
-  // Gửi trạng thái typing khi người dùng nhập
+  // Send typing status when user types
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       sendTypingStatus(message.length > 0);
@@ -293,7 +283,7 @@ const ChatInput = ({ chatId, addMessage, setIsTyping, disabled }) => {
 
   return (
     <div className="border-t p-3 relative">
-      {/* Hiển thị file đã chọn */}
+      {/* Display selected file */}
       {selectedFile && (
         <div className="mb-2 p-2 bg-gray-100 rounded-md relative">
           <div className="flex items-center">
@@ -436,4 +426,4 @@ const ChatInput = ({ chatId, addMessage, setIsTyping, disabled }) => {
   );
 };
 
-export default ChatInput;
+export default InstructorChatInput;

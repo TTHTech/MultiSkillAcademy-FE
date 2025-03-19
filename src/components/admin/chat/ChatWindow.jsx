@@ -60,6 +60,45 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
     return `${hours}:${minutes}`;
   };
 
+  // Hàm mới: Đảm bảo URL file đầy đủ và hợp lệ - THÊM HÀM NÀY VÀO COMPONENT
+  const getFullFileUrl = (fileUrl) => {
+    if (!fileUrl) return null;
+    
+    // Log để debug
+    console.log("Processing file URL:", fileUrl);
+    
+    // Chuyển hướng từ API instructor sang API admin
+    if (fileUrl && fileUrl.includes('/api/instructor/chat/files/')) {
+      const fileName = fileUrl.split('/').pop();
+      return `http://localhost:8080/api/admin/chat/files/${fileName}`;
+    }
+    
+    // Chuyển hướng tương tự cho các URL ngắn (image_XXXX)
+    if (fileUrl && fileUrl.includes('image_')) {
+      const imageId = fileUrl.includes('/') ? fileUrl.split('/').pop() : fileUrl;
+      return `http://localhost:8080/api/admin/chat/files/${imageId}`;
+    }
+    
+    // Các trường hợp khác giữ nguyên
+    if (fileUrl.startsWith('http://') || fileUrl.startsWith('https://')) {
+      return fileUrl;
+    }
+    
+    if (fileUrl.startsWith('/api/')) {
+      return `http://localhost:8080${fileUrl}`;
+    }
+
+    if (fileUrl.includes('/uploads/')) {
+      return `http://localhost:8080${fileUrl.startsWith('/') ? '' : '/'}${fileUrl}`;
+    }
+    
+    if (!fileUrl.includes('/') && !fileUrl.includes(':\\')) {
+      return `http://localhost:8080/uploads/${fileUrl}`;
+    }
+    
+    return fileUrl;
+  };
+
   // Fetch user avatar
   const fetchUserAvatar = async (userId) => {
     try {
@@ -135,6 +174,9 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
           fetchUserAvatar(msg.senderId);
         }
 
+        // Đảm bảo URL file đầy đủ - SỬ DỤNG HÀM MỚI Ở ĐÂY
+        const fullFileUrl = getFullFileUrl(msg.fileUrl);
+
         return {
           id: msg.messageId,
           message: messageContent,
@@ -145,7 +187,7 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
           senderId: msg.senderId,
           senderName: msg.senderName,
           messageType: msg.messageType || 'TEXT',
-          fileUrl: msg.fileUrl
+          fileUrl: fullFileUrl
         };
       });
       
@@ -228,11 +270,14 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
         messageContent = String(content || "");
       }
 
+      // Đảm bảo URL file đầy đủ - SỬ DỤNG HÀM MỚI Ở ĐÂY
+      let processedFileUrl = getFullFileUrl(fileUrl);
+
       // RÚT GỌN fileUrl NẾU QUÁ DÀI
-      let shortenedFileUrl = fileUrl;
-      if (fileUrl && fileUrl.length > 200) {
+      let shortenedFileUrl = processedFileUrl;
+      if (processedFileUrl && processedFileUrl.length > 200) {
         // Chỉ lấy phần tên file từ URL đầy đủ
-        const urlParts = fileUrl.split('/');
+        const urlParts = processedFileUrl.split('/');
         const fileName = urlParts[urlParts.length - 1];
         shortenedFileUrl = `/api/admin/chat/files/${fileName}`;
         console.log("URL gốc quá dài, đã rút gọn thành:", shortenedFileUrl);
@@ -251,7 +296,7 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
         timestamp: currentTimestamp,
         senderId: parseInt(localStorage.getItem("userId")),
         messageType: messageType,
-        fileUrl: shortenedFileUrl // Sử dụng URL đã rút gọn
+        fileUrl: processedFileUrl // Sử dụng URL đã xử lý
       };
       setMessages(prev => [...prev, tempMessage]);
 
@@ -282,6 +327,12 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
       const sentMessage = await response.json();
       console.log("Server response for sent message:", sentMessage); // Log để debug
       
+      // Đảm bảo URL file đầy đủ cho tin nhắn đã gửi
+      let updatedFileUrl = sentMessage.fileUrl;
+      if (updatedFileUrl) {
+        updatedFileUrl = getFullFileUrl(updatedFileUrl);
+      }
+      
       // Cập nhật tin nhắn tạm thời với id thật và timestamp từ server
       setMessages(prev => prev.map(msg => 
         msg.id === tempId ? {
@@ -291,7 +342,7 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
           // Sử dụng timestamp từ server nếu có
           timestamp: formatServerTimestamp(sentMessage.createdAt) || currentTimestamp,
           createdAt: sentMessage.createdAt,
-          fileUrl: sentMessage.fileUrl || msg.fileUrl
+          fileUrl: updatedFileUrl || msg.fileUrl
         } : msg
       ));
 
@@ -396,6 +447,10 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
     // Ưu tiên sử dụng avatar từ state
     const userAvatar = avatars[senderId] || avatar;
     
+    // Thêm state để theo dõi trạng thái tải hình ảnh
+    const [imgLoaded, setImgLoaded] = useState(false);
+    const [imgError, setImgError] = useState(false);
+    
     return (
       <div 
         className={`flex ${isAdmin ? 'justify-end' : 'justify-start'} mb-4`}
@@ -403,22 +458,42 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
       >
         <div className={`flex ${isAdmin ? 'flex-row-reverse' : 'flex-row'} items-end max-w-[70%]`}>
           {!isAdmin && (
-            <img src={userAvatar} alt="Avatar" className="w-8 h-8 rounded-full mr-2 mb-1 object-cover" />
+            <img 
+              src={userAvatar} 
+              alt="Avatar" 
+              className="w-8 h-8 rounded-full mr-2 mb-1 object-cover" 
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = "https://ui-avatars.com/api/?name=U&background=3B82F6&color=ffffff&size=128&bold=true";
+              }}
+            />
           )}
           <div>
             {messageType === 'IMAGE' ? (
-              <div className={`rounded-2xl overflow-hidden ${isAdmin ? 'ml-2' : ''}`}>
-                <img 
-                  src={fileUrl} 
-                  alt="Shared image" 
-                  className="max-w-full h-auto max-h-64 rounded-2xl cursor-pointer"
-                  onClick={() => enlargeImage(fileUrl)}
-                  onError={(e) => {
-                    console.error("Image failed to load:", fileUrl);
-                    e.target.onerror = null;
-                    e.target.src = "https://via.placeholder.com/300x200?text=Image+not+available";
-                  }} 
-                />
+              <div className={`rounded-2xl overflow-hidden ${isAdmin ? 'ml-2' : ''} bg-gray-100`}>
+                {!imgLoaded && !imgError && (
+                  <div className="w-48 h-48 flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500"></div>
+                  </div>
+                )}
+                {imgError ? (
+                  <div className="w-48 h-48 flex items-center justify-center bg-gray-200 text-gray-500 text-sm p-4 text-center">
+                    Không thể tải hình ảnh
+                  </div>
+                ) : (
+                  <img 
+                    src={fileUrl} 
+                    alt="Shared image" 
+                    className={`max-w-full h-auto max-h-64 rounded-2xl cursor-pointer ${imgLoaded ? 'block' : 'hidden'}`}
+                    onClick={() => enlargeImage(fileUrl)}
+                    onLoad={() => setImgLoaded(true)}
+                    onError={(e) => {
+                      console.error("Image failed to load:", fileUrl);
+                      setImgError(true);
+                      setImgLoaded(false);
+                    }} 
+                  />
+                )}
               </div>
             ) : messageType === 'VIDEO' ? (
               <div className={`rounded-2xl overflow-hidden ${isAdmin ? 'ml-2' : ''}`}>
@@ -436,22 +511,25 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
               </div>
             ) : messageType === 'FILE' || messageType === 'DOCUMENT' ? (
               <div
-                className={`p-3 rounded-2xl ${
-                  isAdmin
-                    ? 'bg-emerald-500 text-white ml-2'
-                    : 'bg-gray-100 text-gray-900'
-                }`}
+              className={`p-3 rounded-2xl ${
+                isAdmin
+                  ? 'bg-emerald-500 text-white ml-2'
+                  : 'bg-gray-100 text-gray-900'
+              }`}
+            >
+              <a 
+                href={fileUrl} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="flex items-center text-sm"
               >
-                <a 
-                  href={fileUrl} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="flex items-center text-sm"
-                >
-                  <FileUp className="w-4 h-4 mr-2" />
-                  {message || "Tập tin đính kèm"}
-                </a>
-              </div>
+                <FileUp className="w-4 h-4 mr-2" />
+                <span className="flex flex-col">
+                  <span>{message || "Tập tin đính kèm"}</span>
+                  <span className="text-xs mt-1 text-gray-300 break-all">{fileUrl}</span>
+                </span>
+              </a>
+            </div>
             ) : (
               <div
                 className={`p-3 rounded-2xl ${
@@ -488,6 +566,10 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
               src={userAvatar}
               alt="User Avatar"
               className="w-32 h-32 rounded-full mb-4 object-cover"
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = "https://ui-avatars.com/api/?name=U&background=3B82F6&color=ffffff&size=128&bold=true";
+              }}
             />
             <h3 className="text-xl font-semibold text-gray-900 mb-2">
               {`${selectedUser.firstName} ${selectedUser.lastName}`}
@@ -562,6 +644,10 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
               alt="Enlarged" 
               className="max-w-full max-h-[90vh] object-contain"
               onClick={(e) => e.stopPropagation()}
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = "https://via.placeholder.com/800x600?text=Image+not+available";
+              }}
             />
           </div>
         </div>
