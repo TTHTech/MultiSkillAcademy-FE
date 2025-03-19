@@ -5,7 +5,7 @@ import { ImBook } from "react-icons/im";
 import { AiOutlineUser } from "react-icons/ai";
 import { PiStudentFill } from "react-icons/pi";
 import { FaSignOutAlt } from "react-icons/fa";
-import { BsFillQuestionSquareFill } from "react-icons/bs";
+import { BsFillQuestionSquareFill, BsChatDots } from "react-icons/bs";
 import { Link, useLocation } from "react-router-dom";
 import { LuFileSignature } from "react-icons/lu";
 import { MdOutlineReviews } from "react-icons/md";
@@ -28,6 +28,7 @@ const Sidebar = ({ open, setOpen }) => {
     { name: "Scores", link: "/instructor/scores", icon: GrScorecard },
     { name: "Questions", link: "/instructor/questions", icon: BsFillQuestionSquareFill },
     { name: "Students", link: "/instructor/students", icon: PiStudentFill },
+    { name: "Chat", link: "/instructor/chat", icon: BsChatDots },
     { name: "Sign Out", link: "/login", icon: FaSignOutAlt },
   ];
 
@@ -52,7 +53,7 @@ const Sidebar = ({ open, setOpen }) => {
             key={i}
             className={`group flex items-center text-sm gap-3.5 font-medium p-2 rounded-md
               ${
-                location.pathname.startsWith(menu.link) 
+                location.pathname.startsWith(menu.link)
                   ? "bg-gray-800 text-white"
                   : "hover:bg-gray-800 text-gray-600 hover:text-white"
               }
