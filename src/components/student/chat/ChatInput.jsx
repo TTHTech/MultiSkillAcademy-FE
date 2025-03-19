@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Paperclip, Image, Smile } from 'lucide-react';
 import axios from 'axios';
-import ChatMessages from './ChatMessages'; // Điều chỉnh đường dẫn nếu cần
+import ChatMessages from './ChatWindow'; // Điều chỉnh đường dẫn nếu cần
 
 const ChatInput = ({ chatId, onMessageSent, stompClient }) => {
   const [message, setMessage] = useState('');
