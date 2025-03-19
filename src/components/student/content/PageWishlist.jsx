@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Search, SlidersHorizontal, Loader2, RefreshCw, Heart, X } from "lucide-react";
+import { Search, SlidersHorizontal, Loader2, RefreshCw, Heart, X, AlertTriangle } from "lucide-react";
 import WishlistList from "../../instructor/Card/WishlistListCard";
 
 const ITEMS_PER_PAGE = 4;
@@ -32,7 +32,8 @@ const PageWishlist = () => {
         throw new Error("Failed to fetch wishlist");
       }
       
-      const data = await response.json();
+      const text = await response.text();
+      const data = text ? JSON.parse(text) : [];
       setWishlist(data);
     } catch (error) {
       console.error("Error fetching wishlist data:", error);
@@ -109,7 +110,7 @@ const PageWishlist = () => {
   );
 
   return (
-    <div className="bg-gray-50 min-h-screen mt-[50px] mb-[90px]">
+    <div className="bg-gray-100 min-h-screen mt-[50px] mb-[90px]">
       <div className="max-w-[1350px] mx-auto px-4 pt-24 pb-12">
         {/* Header Section */}
         <div className="flex items-center justify-between mb-8 border-b border-gray-200 pb-6">

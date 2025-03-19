@@ -46,15 +46,13 @@ const PageReview = () => {
     fetchReviews();
   }, [refresh]);
   const filteredReviews = reviews.filter((review) => {
-    const matchCourseTitle = review.courseTitle
-      .toLowerCase()
-      .includes(filters.courseTitle.toLowerCase());
-    const matchusername = review.username
-      .toLowerCase()
-      .includes(filters.username.toLowerCase());
-    const matchRating =
+    const searchValue = filters.courseTitle.toLowerCase();
+    const matchesSearch =
+      review.courseTitle.toLowerCase().includes(searchValue) ||
+      review.username.toLowerCase().includes(searchValue);
+    const matchesRating =
       filters.rating === "" || review.rating.toString() === filters.rating;
-    return matchCourseTitle && matchusername && matchRating;
+    return matchesSearch && matchesRating;
   });
   const totalPages = Math.ceil(filteredReviews.length / reviewsPerPage);
   const indexOfLastReview = currentPage * reviewsPerPage;
