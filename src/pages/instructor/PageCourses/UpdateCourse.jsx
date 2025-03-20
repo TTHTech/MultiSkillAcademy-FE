@@ -17,6 +17,8 @@ const UpdateCourse = () => {
   const { id } = useParams();
   const [course, setCourse] = useState(null);
   const userId = localStorage.getItem("userId");
+  const [refresh, setRefresh] = useState(false);
+  const triggerRefresh = () => setRefresh((prev) => !prev);
 
   useEffect(() => {
     const fetchCourse = async () => {
@@ -52,7 +54,7 @@ const UpdateCourse = () => {
       }
     };
     fetchCourse();
-  }, [id, userId]);
+  }, [id, userId, refresh]);
   const componentMap = {
     CourseDetails: <CourseDetails />,
     TargetAudience: <TargetAudience />,
@@ -61,7 +63,7 @@ const UpdateCourse = () => {
     Requirements: <Requirements />,
     ManageFreeLectures: <ManageFreeLectures />,
     SectionsAndLectures: <SectionsAndLectures />,
-    ChangeStatus: <ChangeStatus />,
+    ChangeStatus: <ChangeStatus title={course?.title} courseId={course?.courseId} status={course?.status}  triggerRefresh={triggerRefresh} />,
   };
   if (error) {
     return (
