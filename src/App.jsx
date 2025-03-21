@@ -63,7 +63,7 @@ import PageReviewCourse from "./pages/admin/PageReviewCourse";
 import PageSection from "./pages/admin/PageSection";
 import PageLecture from "./pages/admin/PageLecture";
 import InstructorChatPage from "./pages/instructor/InstructorChatPage.jsx";
-
+import GoogleCallbackPage from "./pages/auth/GoogleCallbackPage";
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [role, setRole] = useState("");
@@ -140,6 +140,7 @@ function App() {
             <Route path="/certificate" element={<CertificateGenerator />} />
             <Route path="/search" element={<SearchCoursePage />} />
             <Route path="/course/:courseId" element={<CourseDetailPage />} />
+            <Route path="/auth/callback" element={<GoogleCallbackPage />} />
 
             {/* Admin Routes */}
             {isLoggedIn && role === "ROLE_ADMIN" && (
@@ -182,6 +183,7 @@ function App() {
                 <Route path="/student/result" element={<ResultPage />} />
                 <Route path="/student/profile-instructor/:id" element={<PageProfileInstructor />} />
                 <Route path="/student/reminder" element={<ReminderPage />} />
+               
               </>
             )}
             {/* Instructor Routes */}

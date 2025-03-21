@@ -1,280 +1,585 @@
-import React, { useState, useEffect } from 'react';
-import { Search, Shield, BookOpen, User } from 'lucide-react';
-import axios from 'axios';
+import React, { useState, useEffect, useCallback } from "react";
+import { Search, MoreHorizontal, Edit, Filter, UserPlus } from "lucide-react";
+import { toast } from "react-toastify";
+import axios from "axios";
 
-const ChatSidebar = ({ onSelectChat, selectedChatId }) => {
-  const [chats, setChats] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [searchResults, setSearchResults] = useState([]);
+const ChatSidebar = ({ onUserSelect }) => {
+  const [chatUsers, setChatUsers] = useState([]);
+  const [searchUsers, setSearchUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [showSearchResults, setShowSearchResults] = useState(false);
-  
-  // Lấy ID người dùng từ localStorage
-  const currentUserId = parseInt(localStorage.getItem('userId'));
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchModalTerm, setSearchModalTerm] = useState("");
+  const [filter, setFilter] = useState("ALL");
+  const [searchFilter, setSearchFilter] = useState("ALL");
+  const [activeUserId, setActiveUserId] = useState(null);
+  const [showUserSearchModal, setShowUserSearchModal] = useState(false);
+  const [avatars, setAvatars] = useState({});
 
-  // Lấy danh sách cuộc trò chuyện khi component mount
-  useEffect(() => {
-    const fetchChats = async () => {
-      try {
-        setLoading(true);
-        
-        const response = await axios.get('http://localhost:8080/api/student/chat', {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`
-          }
-        });
-        
-        setChats(response.data);
-        setError(null);
-      } catch (err) {
-        console.error('Failed to fetch chats:', err);
-        setError('Failed to load conversations');
-      } finally {
-        setLoading(false);
+  // Fetch user avatar
+  const fetchUserAvatar = useCallback(async (userId) => {
+    try {
+      const token = localStorage.getItem("token");
+      
+      if (!token) {
+        throw new Error("Vui lòng đăng nhập lại");
       }
-    };
 
-    fetchChats();
-    
-    // Thiết lập polling để cập nhật danh sách chat định kỳ (tùy chọn)
-    const intervalId = setInterval(fetchChats, 30000); // Cập nhật mỗi 30 giây
-    
-    return () => clearInterval(intervalId);
+      const response = await fetch(`http://localhost:8080/api/student/chat/users/${userId}/avatar`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        console.warn(`Không thể tải ảnh cho người dùng ${userId}`);
+        return null;
+      }
+      
+      const data = await response.json();
+      return data.avatarUrl;
+    } catch (err) {
+      console.error(`Error fetching avatar for user ${userId}:`, err);
+      return null;
+    }
   }, []);
 
-  // Xử lý tìm kiếm
-  const handleSearch = async (e) => {
-    const value = e.target.value;
-    setSearchTerm(value);
+  // Fetch avatars for all users
+  const fetchAvatarsForUsers = useCallback(async (users) => {
+    const newAvatars = {...avatars};
     
-    if (value.trim().length > 2) {
-      try {
-        setLoading(true);
-        
-        const response = await axios.get(`http://localhost:8080/api/student/chat/search-users`, {
-          params: { keyword: value },
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`
-          }
-        });
-        
-        setSearchResults(response.data);
-        setShowSearchResults(true);
-      } catch (err) {
-        console.error('Search failed:', err);
-      } finally {
-        setLoading(false);
-      }
-    } else {
-      setShowSearchResults(false);
-    }
-  };
-
-  // Bắt đầu hoặc tiếp tục chat với một người dùng
-  const startOrContinueChat = async (userId) => {
-    try {
-      setLoading(true);
-      
-      // Kiểm tra xem đã có cuộc trò chuyện với người dùng này chưa
-      const existingChat = chats.find(chat => 
-        chat.participants.some(p => p.userId === userId)
-      );
-      
-      if (existingChat) {
-        onSelectChat(existingChat.chatId);
-      } else {
-        // Tạo cuộc trò chuyện mới
-        const response = await axios.post('http://localhost:8080/api/student/chat', {
-          chatType: 'INDIVIDUAL',
-          recipientId: userId
-        }, {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('token')}`
-          }
-        });
-        
-        // Thêm cuộc trò chuyện mới và chọn nó
-        if (response.data) {
-          setChats(prevChats => [...prevChats, response.data]);
-          onSelectChat(response.data.chatId);
+    for (const user of users) {
+      if (!avatars[user.userId]) {
+        const avatarUrl = await fetchUserAvatar(user.userId);
+        if (avatarUrl) {
+          newAvatars[user.userId] = avatarUrl;
         }
       }
+    }
+    
+    setAvatars(newAvatars);
+  }, [avatars, fetchUserAvatar]);
+
+  // Fetch chat users on component mount
+  useEffect(() => {
+    fetchChatUsers();
+  }, []);
+
+  const fetchChatUsers = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem("token");
       
-      // Đóng kết quả tìm kiếm
-      setShowSearchResults(false);
-      setSearchTerm('');
+      if (!token) {
+        throw new Error("Vui lòng đăng nhập lại");
+      }
+
+      const response = await fetch("http://localhost:8080/api/student/chat/users", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Không thể tải danh sách người dùng");
+      }
+      
+      const data = await response.json();
+      setChatUsers(data);
+      
+      // Fetch avatars for users
+      fetchAvatarsForUsers(data);
     } catch (err) {
-      console.error('Failed to start chat:', err);
+      console.error("Error fetching users:", err);
+      toast.error(err.message);
     } finally {
       setLoading(false);
     }
   };
+  
+  // API tìm kiếm người dùng mới
+  const searchAllUsers = async (keyword = "", role = "ALL") => {
+    try {
+      setSearchLoading(true);
+      const token = localStorage.getItem("token");
+      
+      if (!token) {
+        throw new Error("Vui lòng đăng nhập lại");
+      }
 
-  // Format thời gian hiện thị
-  const formatTimestamp = (timestamp) => {
-    if (!timestamp) return '';
-    
-    const date = new Date(timestamp);
-    const now = new Date();
-    const diff = now - date;
-    
-    // Nếu dưới 24h, hiển thị giờ:phút
-    if (diff < 24 * 60 * 60 * 1000) {
-      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    } 
-    // Nếu dưới 7 ngày, hiển thị tên ngày
-    else if (diff < 7 * 24 * 60 * 60 * 1000) {
-      return date.toLocaleDateString([], { weekday: 'long' });
-    }
-    // Còn lại hiển thị ngày/tháng
-    else {
-      return date.toLocaleDateString();
+      // Chuẩn bị URL với các tham số tìm kiếm
+      const url = new URL("http://localhost:8080/api/student/chat/search-users");
+      if (keyword) url.searchParams.append("keyword", keyword);
+      if (role && role !== "ALL") url.searchParams.append("role", role);
+
+      const response = await fetch(url.toString(), {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Không thể tìm kiếm người dùng");
+      }
+      
+      const data = await response.json();
+      setSearchUsers(data);
+      
+      // Fetch avatars for search results
+      fetchAvatarsForUsers(data);
+    } catch (err) {
+      console.error("Error searching users:", err);
+      toast.error(err.message);
+    } finally {
+      setSearchLoading(false);
     }
   };
 
-  // Icon dựa vào role
-  const getRoleIcon = (role) => {
-    if (role === 'ADMIN') {
-      return <Shield className="w-5 h-5 text-red-500" />;
+  const handleUserSelect = async (user) => {
+    try {
+      setActiveUserId(user.userId);
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("Vui lòng đăng nhập lại");
+
+      console.log("Selecting user:", user);
+
+      // Cố gắng tìm cuộc trò chuyện hiện có trước
+      try {
+        const response = await fetch(
+          `http://localhost:8080/api/student/chat/one-to-one/${user.userId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        // Nếu tìm thấy cuộc trò chuyện, sử dụng nó
+        if (response.ok) {
+          const chatData = await response.json();
+          console.log("Existing chat found:", chatData);
+          
+          if (!chatData || !chatData.chatId) {
+            console.warn("Chat data is missing or invalid, creating new chat instead");
+            await createNewChat(user.userId);
+            return;
+          }
+          
+          onUserSelect({ user, chat: chatData });
+          setShowUserSearchModal(false);
+          return;
+        }
+      } catch (error) {
+        console.warn("Error fetching existing chat:", error);
+      }
+      
+      // Nếu không tìm thấy hoặc có lỗi, tạo cuộc trò chuyện mới
+      await createNewChat(user.userId);
+
+    } catch (err) {
+      console.error("Error selecting user:", err);
+      toast.error(err.message);
     }
-    return <BookOpen className="w-5 h-5 text-green-500" />;
+  };
+  
+  // Tạo chat mới
+  const createNewChat = async (recipientId) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("Vui lòng đăng nhập lại");
+      
+      console.log("Creating new chat with user:", recipientId);
+      
+      const chatRequest = {
+        chatType: "INDIVIDUAL",
+        recipientId: recipientId,
+        initialMessage: "Xin chào! Tôi có thể giúp gì cho bạn?"
+      };
+      
+      const response = await axios.post(
+        "http://localhost:8080/api/student/chat", 
+        chatRequest,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+      
+      console.log("Chat creation response:", response);
+      
+      if (response.status >= 200 && response.status < 300) {
+        const chatData = response.data;
+        console.log("New chat created:", chatData);
+        
+        // Tìm thông tin người dùng
+        let user;
+        
+        // Tìm từ danh sách tìm kiếm
+        if (searchUsers.length > 0) {
+          user = searchUsers.find(u => u.userId === recipientId);
+        }
+        
+        // Nếu không tìm thấy trong danh sách tìm kiếm, tìm trong danh sách chat
+        if (!user && chatUsers.length > 0) {
+          user = chatUsers.find(u => u.userId === recipientId);
+        }
+        
+        // Nếu vẫn không tìm thấy, lấy thông tin người dùng từ API
+        if (!user) {
+          try {
+            const userResponse = await axios.get(
+              `http://localhost:8080/api/student/chat/users/${recipientId}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`
+                }
+              }
+            );
+            
+            if (userResponse.status === 200) {
+              user = userResponse.data;
+            }
+          } catch (error) {
+            console.warn("Could not fetch user details:", error);
+          }
+        }
+        
+        if (user) {
+          onUserSelect({ user, chat: chatData });
+          setShowUserSearchModal(false);
+          // Reload danh sách chat
+          fetchChatUsers();
+        } else {
+          // Nếu không tìm được thông tin người dùng, vẫn gửi thông tin cuộc trò chuyện
+          console.warn("User not found, using basic info");
+          const basicUser = {
+            userId: recipientId,
+            firstName: "Người dùng",
+            lastName: "#" + recipientId,
+            role: "UNKNOWN"
+          };
+          onUserSelect({ user: basicUser, chat: chatData });
+          setShowUserSearchModal(false);
+          fetchChatUsers();
+        }
+      } else {
+        throw new Error(`Không thể tạo cuộc trò chuyện mới: ${response.status}`);
+      }
+      
+    } catch (err) {
+      console.error("Error creating new chat:", err);
+      toast.error(`Không thể tạo cuộc trò chuyện: ${err.message}`);
+    }
+  };
+  
+  // Xử lý khi người dùng mở modal tìm kiếm
+  const handleOpenUserSearch = () => {
+    setShowUserSearchModal(true);
+    setSearchModalTerm("");
+    setSearchFilter("ALL");
+    searchAllUsers("", "ALL");  // Tìm kiếm ban đầu không có điều kiện
   };
 
-  // Hàm lấy tên người nhận trong chat (không phải người dùng hiện tại)
-  const getChatName = (chat) => {
-    // Lọc ra người tham gia không phải bản thân
-    const otherParticipants = chat.participants.filter(p => p.userId !== currentUserId);
-    
-    if (otherParticipants.length > 0) {
-      const participant = otherParticipants[0];
-      return `${participant.firstName} ${participant.lastName}`;
-    }
-    
-    return 'Chat Room';
+  // Xử lý khi người dùng thay đổi từ khóa tìm kiếm trong modal
+  const handleSearchTermChange = (term) => {
+    setSearchModalTerm(term);
+    searchAllUsers(term, searchFilter);
   };
 
-  // Lấy role của người nhận (cho biểu tượng)
-  const getChatRole = (chat) => {
-    const otherParticipants = chat.participants.filter(p => p.userId !== currentUserId);
-    
-    if (otherParticipants.length > 0) {
-      return otherParticipants[0].role;
-    }
-    
-    return 'INSTRUCTOR';
+  // Xử lý khi người dùng thay đổi bộ lọc trong modal
+  const handleSearchFilterChange = (filterValue) => {
+    setSearchFilter(filterValue);
+    searchAllUsers(searchModalTerm, filterValue);
   };
 
-  // Đếm tin nhắn chưa đọc
-  const getUnreadCount = (chat) => {
-    if (chat.lastMessage && 
-        !chat.lastMessage.isRead && 
-        chat.lastMessage.senderId !== currentUserId) {
-      return 1;
-    }
-    return 0;
+  // Lọc danh sách chat hiện tại
+  const getFilteredUsers = () => {
+    return chatUsers.filter((user) => {
+      const searchMatch =
+        user.firstName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.lastName?.toLowerCase().includes(searchTerm.toLowerCase());
+      
+      if (filter === "ALL") return searchMatch;
+      
+      const userRole = user.role.replace("ROLE_", "");
+      return searchMatch && userRole === filter;
+    });
   };
 
-  if (loading && chats.length === 0) {
+  // Tạo Avatar fallback với chữ cái đầu
+  const AvatarFallback = ({ user }) => {
+    const firstLetter = user.firstName ? user.firstName.charAt(0).toUpperCase() : "?";
+    const bgColors = {
+      ROLE_STUDENT: "bg-blue-500",
+      ROLE_INSTRUCTOR: "bg-purple-500",
+      ADMIN: "bg-red-500"
+    };
+    const bgColor = bgColors[user.role] || "bg-gray-500";
+    
     return (
-      <div className="w-80 border-r bg-white flex justify-center items-center">
-        <div className="p-4">Loading conversations...</div>
+      <div className={`w-full h-full rounded-full flex items-center justify-center ${bgColor} text-white font-bold text-xl`}>
+        {firstLetter}
       </div>
     );
-  }
+  };
 
-  if (error && chats.length === 0) {
-    return (
-      <div className="w-80 border-r bg-white">
-        <div className="p-4 text-red-500">{error}</div>
-      </div>
-    );
-  }
+  // Hiển thị vai trò người dùng
+  const displayRole = (role) => {
+    if (role === "ROLE_STUDENT") return "Học viên";
+    if (role === "ROLE_INSTRUCTOR") return "Giảng viên";
+    if (role === "ADMIN") return "Quản trị viên";
+    return role;
+  };
+
+  const filteredUsers = getFilteredUsers();
 
   return (
-    <div className="w-80 border-r bg-white">
-      <div className="p-4 border-b">
+    <div className="w-[360px] bg-white border-r flex flex-col h-screen">
+      {/* Header */}
+      <div className="p-4 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <img
+            src="https://th.bing.com/th/id/OIP.7fheetEuM-hyJg1sEyuqVwHaHa?rs=1&pid=ImgDetMain"
+            alt="Profile"
+            className="w-10 h-10 rounded-full"
+          />
+          <h2 className="text-xl font-bold">Chat</h2>
+        </div>
+        <div className="flex items-center gap-2">
+          <button 
+            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            onClick={handleOpenUserSearch}
+            title="Tạo chat mới"
+          >
+            <UserPlus className="w-5 h-5 text-gray-600" />
+          </button>
+          <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+            <MoreHorizontal className="w-5 h-5 text-gray-600" />
+          </button>
+          <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+            <Edit className="w-5 h-5 text-gray-600" />
+          </button>
+        </div>
+      </div>
+
+      {/* Search and Filters */}
+      <div className="p-4 space-y-2">
         <div className="relative">
           <input
             type="text"
             value={searchTerm}
-            onChange={handleSearch}
-            placeholder="Tìm kiếm cuộc trò chuyện..."
-            className="w-full px-4 py-2 pl-10 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Tìm kiếm trên Messenger"
+            className="w-full bg-gray-100 text-gray-900 px-4 py-2 rounded-full pl-10 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
-          <Search className="absolute left-3 top-2.5 w-5 h-5 text-gray-400" />
+          <Search className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
+        </div>
+
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setFilter("ALL")}
+            className={`px-3 py-1 text-sm rounded-full transition-colors ${
+              filter === "ALL"
+                ? "bg-blue-500 text-white"
+                : "bg-gray-100 text-gray-900"
+            }`}
+          >
+            Tất cả
+          </button>
+          <button
+            onClick={() => setFilter("INSTRUCTOR")}
+            className={`px-3 py-1 text-sm rounded-full transition-colors ${
+              filter === "INSTRUCTOR"
+                ? "bg-blue-500 text-white"
+                : "bg-gray-100 text-gray-900"
+            }`}
+          >
+            Giảng viên
+          </button>
+          <button
+            onClick={() => setFilter("STUDENT")}
+            className={`px-3 py-1 text-sm rounded-full transition-colors ${
+              filter === "STUDENT"
+                ? "bg-blue-500 text-white"
+                : "bg-gray-100 text-gray-900"
+            }`}
+          >
+            Học viên
+          </button>
         </div>
       </div>
-      
-      {/* Hiển thị kết quả tìm kiếm */}
-      {showSearchResults && searchResults.length > 0 && (
-        <div className="border-b py-2">
-          <h3 className="px-4 py-1 text-sm font-medium text-gray-500">Kết quả tìm kiếm</h3>
-          {searchResults.map((user) => (
-            <div
-              key={user.userId}
-              className="flex items-center px-4 py-2 hover:bg-gray-50 cursor-pointer"
-              onClick={() => startOrContinueChat(user.userId)}
+
+      {/* User Search Modal */}
+      {showUserSearchModal && (
+        <div className="absolute left-0 top-0 w-[360px] h-screen bg-white z-10 border-r overflow-y-auto">
+          <div className="p-4 flex justify-between items-center border-b">
+            <h3 className="font-bold">Tìm kiếm người dùng</h3>
+            <button 
+              onClick={() => setShowUserSearchModal(false)}
+              className="p-2 hover:bg-gray-100 rounded-full"
             >
-              <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
-                {getRoleIcon(user.role)}
-              </div>
-              <div className="ml-3">
-                <p className="font-medium">{`${user.firstName} ${user.lastName}`}</p>
-                <p className="text-xs text-gray-500">
-                  {user.role === 'ADMIN' ? 'Admin Support' : 'Course Instructor'}
-                </p>
-              </div>
+              &times;
+            </button>
+          </div>
+          
+          <div className="p-4">
+            <div className="relative mb-4">
+              <input
+                type="text"
+                value={searchModalTerm}
+                onChange={(e) => handleSearchTermChange(e.target.value)}
+                placeholder="Tìm kiếm người dùng"
+                className="w-full bg-gray-100 text-gray-900 px-4 py-2 rounded-full pl-10 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <Search className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
             </div>
-          ))}
+            
+            <div className="flex items-center gap-2 mb-4">
+              <button
+                onClick={() => handleSearchFilterChange("ALL")}
+                className={`px-3 py-1 text-sm rounded-full transition-colors ${
+                  searchFilter === "ALL"
+                    ? "bg-blue-500 text-white"
+                    : "bg-gray-100 text-gray-900"
+                }`}
+              >
+                Tất cả
+              </button>
+             
+              <button
+                onClick={() => handleSearchFilterChange("ROLE_INSTRUCTOR")}
+                className={`px-3 py-1 text-sm rounded-full transition-colors ${
+                  searchFilter === "ROLE_INSTRUCTOR"
+                    ? "bg-blue-500 text-white"
+                    : "bg-gray-100 text-gray-900"
+                }`}
+              >
+                Giảng viên
+              </button>
+              <button
+                onClick={() => handleSearchFilterChange("ROLE_STUDENT")}
+                className={`px-3 py-1 text-sm rounded-full transition-colors ${
+                  searchFilter === "ROLE_STUDENT"
+                    ? "bg-blue-500 text-white"
+                    : "bg-gray-100 text-gray-900"
+                }`}
+              >
+                Học viên
+              </button>
+            </div>
+            
+            {searchLoading ? (
+              <div className="flex justify-center items-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+              </div>
+            ) : searchUsers.length === 0 ? (
+              <div className="text-center py-4 text-gray-500">
+                Không tìm thấy người dùng nào
+              </div>
+            ) : (
+              searchUsers.map((user) => (
+                <div
+                  key={user.userId}
+                  className="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 cursor-pointer transition-colors"
+                  onClick={() => handleUserSelect(user)}
+                >
+                  <div className="relative flex-shrink-0 w-12 h-12">
+                    {avatars[user.userId] || user.avatar ? (
+                      <img
+                        src={avatars[user.userId] || user.avatar}
+                        alt={user.firstName}
+                        className="w-12 h-12 rounded-full object-cover"
+                      />
+                    ) : (
+                      <AvatarFallback user={user} />
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold truncate text-gray-900">
+                      {`${user.firstName || ""} ${user.lastName || ""}`}
+                    </h3>
+                    <p className="text-sm text-gray-500">
+                      {displayRole(user.role)}
+                    </p>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
         </div>
       )}
-      
-      {/* Hiển thị danh sách chat */}
-      <div className="overflow-y-auto" style={{ maxHeight: 'calc(100vh - 68px)' }}>
-        {chats.map((chat) => (
-          <div
-            key={chat.chatId}
-            className={`flex items-center px-4 py-3 border-b hover:bg-gray-50 cursor-pointer ${
-              selectedChatId === chat.chatId ? 'bg-blue-50' : ''
-            }`}
-            onClick={() => onSelectChat(chat.chatId)}
-          >
-            <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
-              {getRoleIcon(getChatRole(chat))}
-            </div>
-            <div className="ml-3 flex-1">
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="font-medium">{getChatName(chat)}</p>
-                  <p className="text-sm text-gray-500 truncate" style={{ maxWidth: '180px' }}>
-                    {chat.lastMessage ? chat.lastMessage.content : 'Bắt đầu cuộc trò chuyện'}
-                  </p>
+
+      {/* Users List */}
+      <div className="flex-1 overflow-y-auto">
+        {loading ? (
+          <div className="flex justify-center items-center h-full">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+          </div>
+        ) : filteredUsers.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-full text-gray-500">
+            <p>Không có người dùng nào</p>
+          </div>
+        ) : (
+          filteredUsers.map((user) => (
+            <div
+              key={user.userId}
+              className={`flex items-center gap-3 px-4 py-2 hover:bg-gray-100 cursor-pointer transition-colors ${
+                activeUserId === user.userId ? "bg-gray-100" : ""
+              }`}
+              onClick={() => handleUserSelect(user)}
+            >
+              <div className="relative flex-shrink-0 w-14 h-14">
+                {avatars[user.userId] || user.avatar ? (
+                  <img
+                    src={avatars[user.userId] || user.avatar}
+                    alt={user.firstName}
+                    className="w-14 h-14 rounded-full object-cover"
+                  />
+                ) : (
+                  <AvatarFallback user={user} />
+                )}
+                <span
+                  className={`absolute bottom-1 right-1 w-3.5 h-3.5 rounded-full border-2 border-white ${
+                    user.isOnline ? "bg-blue-500" : "bg-gray-400"
+                  }`}
+                />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex justify-between">
+                  <h3 className="font-semibold truncate text-gray-900">
+                    {`${user.firstName || ""} ${user.lastName || ""}`}
+                  </h3>
+                  {user.lastMessageTime && (
+                    <span className="text-xs text-gray-500">
+                      {new Date(user.lastMessageTime).toLocaleTimeString('vi-VN', {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
+                    </span>
+                  )}
                 </div>
-                <div className="flex flex-col items-end">
-                  <span className="text-xs text-gray-500">
-                    {chat.lastMessage ? formatTimestamp(chat.lastMessage.createdAt) : formatTimestamp(chat.createdAt)}
-                  </span>
-                  {getUnreadCount(chat) > 0 && (
-                    <span className="bg-blue-500 text-white text-xs rounded-full px-2 py-1 mt-1">
-                      {getUnreadCount(chat)}
+                <div className="flex justify-between items-center">
+                  <div className="flex flex-col">
+                    <p className="text-sm text-gray-500">
+                      {displayRole(user.role)}
+                    </p>
+                    {user.lastMessageContent && (
+                      <p className="text-sm text-gray-500 truncate">
+                        {user.lastMessageContent}
+                      </p>
+                    )}
+                  </div>
+                  {user.unreadCount > 0 && (
+                    <span className="bg-blue-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                      {user.unreadCount}
                     </span>
                   )}
                 </div>
               </div>
-              <div className="text-xs text-gray-500 mt-1">
-                {getChatRole(chat) === 'ADMIN' ? 'Admin Support' : 'Course Instructor'}
-              </div>
             </div>
-          </div>
-        ))}
-        
-        {chats.length === 0 && !loading && (
-          <div className="p-4 text-center text-gray-500">
-            <p>Chưa có cuộc trò chuyện nào</p>
-            <p className="text-sm mt-2">Tìm kiếm giảng viên hoặc admin để bắt đầu chat</p>
-          </div>
+          ))
         )}
       </div>
     </div>
