@@ -96,7 +96,7 @@ const InstructorChatSidebar = ({ onUserSelect }) => {
     }
   };
   
-  // API tìm kiếm người dùng mới
+  // API to search for new users
   const searchAllUsers = async (keyword = "", role = "ALL") => {
     try {
       setSearchLoading(true);
@@ -106,7 +106,7 @@ const InstructorChatSidebar = ({ onUserSelect }) => {
         throw new Error("Vui lòng đăng nhập lại");
       }
 
-      // Chuẩn bị URL với các tham số tìm kiếm
+      // Prepare URL with search parameters
       const url = new URL("http://localhost:8080/api/instructor/chat/search-users");
       if (keyword) url.searchParams.append("keyword", keyword);
       if (role && role !== "ALL") url.searchParams.append("role", role);
@@ -134,51 +134,85 @@ const InstructorChatSidebar = ({ onUserSelect }) => {
     }
   };
 
+  // Modified handleUserSelect with better error handling
   const handleUserSelect = async (user) => {
     try {
       setActiveUserId(user.userId);
       const token = localStorage.getItem("token");
       if (!token) throw new Error("Vui lòng đăng nhập lại");
 
-      const response = await fetch(
-        `http://localhost:8080/api/instructor/chat/one-to-one/${user.userId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      // Log user information to debug
+      console.log("Selecting user:", user);
+      console.log("User ID:", user.userId);
 
-      if (!response.ok) {
-        // Nếu không tìm thấy chat, tự động tạo mới
-        if (response.status === 404) {
-          await createNewChat(user.userId);
-          return;
-        }
-        throw new Error("Không thể tải cuộc trò chuyện");
+      // Check if user ID is valid
+      if (!user.userId) {
+        toast.error("ID người dùng không hợp lệ");
+        return;
       }
 
-      const chatData = await response.json();
-      onUserSelect({ user, chat: chatData });
-      setShowUserSearchModal(false);
+      try {
+        const response = await fetch(
+          `http://localhost:8080/api/instructor/chat/one-to-one/${user.userId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
+        console.log("One-to-one chat response status:", response.status);
+
+        if (!response.ok) {
+          // If chat not found, automatically create a new one
+          if (response.status === 404) {
+            console.log("Chat not found, creating new chat");
+            await createNewChat(user.userId);
+            return;
+          } else if (response.status === 400) {
+            // Handle 400 error - Print response for debugging
+            const errorText = await response.text();
+            console.error("Error response (400):", errorText);
+            throw new Error(`Yêu cầu không hợp lệ: ${errorText}`);
+          } else {
+            throw new Error(`Không thể tải cuộc trò chuyện (${response.status})`);
+          }
+        }
+
+        const chatData = await response.json();
+        console.log("Chat data received:", chatData);
+        onUserSelect({ user, chat: chatData });
+        setShowUserSearchModal(false);
+      } catch (error) {
+        console.error("Error in fetch:", error);
+        throw error;
+      }
     } catch (err) {
       console.error("Error selecting user:", err);
       toast.error(err.message);
     }
   };
   
-  // Tạo chat mới
+  // Create new chat - Modified with improved error handling
   const createNewChat = async (recipientId) => {
     try {
+      console.log("Creating new chat with recipient ID:", recipientId);
+      
       const token = localStorage.getItem("token");
       if (!token) throw new Error("Vui lòng đăng nhập lại");
       
+      // Ensure recipient ID is valid
+      if (!recipientId) {
+        throw new Error("ID người nhận không hợp lệ");
+      }
+      
       const chatRequest = {
-        chatType: "INDIVIDUAL",
+        chatType: "INDIVIDUAL", // Make sure this matches the expected enum
         recipientId: recipientId,
         initialMessage: "Xin chào! Tôi là giảng viên."
       };
+      
+      console.log("Chat request payload:", chatRequest);
       
       const response = await fetch("http://localhost:8080/api/instructor/chat", {
         method: "POST",
@@ -189,18 +223,36 @@ const InstructorChatSidebar = ({ onUserSelect }) => {
         body: JSON.stringify(chatRequest)
       });
       
+      // Check for specific error status codes
+      if (response.status === 400) {
+        const errorText = await response.text();
+        console.error("Bad request error:", errorText);
+        
+        // Check if this is a duplicate chat error
+        if (errorText.includes("already exists")) {
+          console.log("Chat already exists, fetching existing chat");
+          await getExistingChat(recipientId);
+          return;
+        }
+        
+        throw new Error(`Yêu cầu không hợp lệ: ${errorText}`);
+      }
+      
       if (!response.ok) {
-        throw new Error("Không thể tạo cuộc trò chuyện mới");
+        const errorText = await response.text();
+        console.error("Error creating chat:", errorText);
+        throw new Error(`Không thể tạo cuộc trò chuyện mới (${response.status}): ${errorText}`);
       }
       
       const chatData = await response.json();
+      console.log("New chat created:", chatData);
       
-      // Tìm thông tin người dùng từ danh sách tìm kiếm
+      // Find user info from search list
       const user = searchUsers.find(user => user.userId === recipientId);
       
       if (user) {
         onUserSelect({ user, chat: chatData });
-        // Reload danh sách chat sau khi tạo chat mới
+        // Reload chat list after creating new chat
         fetchChatUsers();
       } else {
         throw new Error("Không tìm thấy thông tin người dùng");
@@ -212,27 +264,61 @@ const InstructorChatSidebar = ({ onUserSelect }) => {
     }
   };
   
-  // Xử lý khi người dùng mở modal tìm kiếm
+  // Helper method to get existing chat
+  const getExistingChat = async (recipientId) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("Vui lòng đăng nhập lại");
+      
+      // Try to fetch the chat by user ID directly
+      const response = await fetch(`http://localhost:8080/api/instructor/chat/users/${recipientId}/chat`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Không thể tìm cuộc trò chuyện (${response.status})`);
+      }
+      
+      const chatData = await response.json();
+      console.log("Existing chat found:", chatData);
+      
+      // Find user info from search list
+      const user = searchUsers.find(user => user.userId === recipientId);
+      
+      if (user) {
+        onUserSelect({ user, chat: chatData });
+      } else {
+        throw new Error("Không tìm thấy thông tin người dùng");
+      }
+    } catch (err) {
+      console.error("Error getting existing chat:", err);
+      toast.error(err.message);
+    }
+  };
+  
+  // Handle when user opens search modal
   const handleOpenUserSearch = () => {
     setShowUserSearchModal(true);
     setSearchModalTerm("");
     setSearchFilter("ALL");
-    searchAllUsers("", "ALL");  // Tìm kiếm ban đầu không có điều kiện
+    searchAllUsers("", "ALL");  // Initial search without conditions
   };
 
-  // Xử lý khi người dùng thay đổi từ khóa tìm kiếm trong modal
+  // Handle when user changes search term in modal
   const handleSearchTermChange = (term) => {
     setSearchModalTerm(term);
     searchAllUsers(term, searchFilter);
   };
 
-  // Xử lý khi người dùng thay đổi bộ lọc trong modal
+  // Handle when user changes filter in modal
   const handleSearchFilterChange = (filterValue) => {
     setSearchFilter(filterValue);
     searchAllUsers(searchModalTerm, filterValue);
   };
 
-  // Lọc danh sách chat hiện tại
+  // Filter current chat list
   const getFilteredUsers = () => {
     return chatUsers.filter((user) => {
       const searchMatch =
@@ -246,7 +332,7 @@ const InstructorChatSidebar = ({ onUserSelect }) => {
     });
   };
 
-  // Tạo Avatar fallback với chữ cái đầu
+  // Create Avatar fallback with first letter
   const AvatarFallback = ({ user }) => {
     const firstLetter = user.firstName ? user.firstName.charAt(0).toUpperCase() : "?";
     const bgColors = {
@@ -263,12 +349,17 @@ const InstructorChatSidebar = ({ onUserSelect }) => {
     );
   };
 
-  // Hiển thị vai trò người dùng
+  // Display user role
   const displayRole = (role) => {
-    if (role === "ROLE_STUDENT") return "Học viên";
-    if (role === "ROLE_INSTRUCTOR") return "Giảng viên";
-    if (role === "ADMIN") return "Quản trị viên";
-    return role;
+    switch (role) {
+      case 'ADMIN': return 'Quản trị viên';
+      case 'ROLE_ADMIN': return 'Quản trị viên';
+      case 'INSTRUCTOR': return 'Giảng viên';
+      case 'ROLE_INSTRUCTOR': return 'Giảng viên';
+      case 'STUDENT': return 'Học viên';
+      case 'ROLE_STUDENT': return 'Học viên';
+      default: return role;
+    }
   };
 
   const filteredUsers = getFilteredUsers();

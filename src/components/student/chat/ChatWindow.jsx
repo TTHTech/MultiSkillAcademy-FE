@@ -60,23 +60,29 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
     return `${hours}:${minutes}`;
   };
 
-  // Hàm mới: Đảm bảo URL file đầy đủ và hợp lệ - THÊM HÀM NÀY VÀO COMPONENT
+  // Hàm mới: Đảm bảo URL file đầy đủ và hợp lệ
   const getFullFileUrl = (fileUrl) => {
     if (!fileUrl) return null;
     
     // Log để debug
     console.log("Processing file URL:", fileUrl);
     
-    // Chuyển hướng từ API instructor sang API admin
+    // Chuyển hướng từ API instructor sang API student
     if (fileUrl && fileUrl.includes('/api/instructor/chat/files/')) {
       const fileName = fileUrl.split('/').pop();
-      return `http://localhost:8080/api/admin/chat/files/${fileName}`;
+      return `http://localhost:8080/api/student/chat/files/${fileName}`;
+    }
+    
+    // Chuyển hướng từ API admin sang API student
+    if (fileUrl && fileUrl.includes('/api/admin/chat/files/')) {
+      const fileName = fileUrl.split('/').pop();
+      return `http://localhost:8080/api/student/chat/files/${fileName}`;
     }
     
     // Chuyển hướng tương tự cho các URL ngắn (image_XXXX)
     if (fileUrl && fileUrl.includes('image_')) {
       const imageId = fileUrl.includes('/') ? fileUrl.split('/').pop() : fileUrl;
-      return `http://localhost:8080/api/admin/chat/files/${imageId}`;
+      return `http://localhost:8080/api/student/chat/files/${imageId}`;
     }
     
     // Các trường hợp khác giữ nguyên
@@ -107,7 +113,7 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
       const token = localStorage.getItem("token");
       if (!token) return;
 
-      const response = await fetch(`http://localhost:8080/api/admin/chat/users/${userId}/avatar`, {
+      const response = await fetch(`http://localhost:8080/api/student/chat/users/${userId}/avatar`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -135,8 +141,8 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("Vui lòng đăng nhập lại");
 
-      // Sử dụng API chuyên biệt để lấy tin nhắn
-      const response = await fetch(`http://localhost:8080/api/admin/chat/${chatId}/messages`, {
+      // Sử dụng API student để lấy tin nhắn
+      const response = await fetch(`http://localhost:8080/api/student/chat/${chatId}/messages`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -174,7 +180,7 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
           fetchUserAvatar(msg.senderId);
         }
 
-        // Đảm bảo URL file đầy đủ - SỬ DỤNG HÀM MỚI Ở ĐÂY
+        // Đảm bảo URL file đầy đủ
         const fullFileUrl = getFullFileUrl(msg.fileUrl);
 
         return {
@@ -222,7 +228,7 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
       if (!token) throw new Error("Vui lòng đăng nhập lại");
 
       const response = await fetch(
-        `http://localhost:8080/api/admin/chat/${chatData.chatId}/messages/${selectedMessageId}`, 
+        `http://localhost:8080/api/student/chat/${chatData.chatId}/messages/${selectedMessageId}`, 
         {
           method: 'DELETE',
           headers: {
@@ -247,7 +253,7 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
     }
   };
 
-  // Sửa lại addMessage để sử dụng timestamp từ server và rút gọn fileUrl
+  // Gửi tin nhắn
   const addMessage = async (content, fileUrl = null, messageType = 'TEXT') => {
     try {
       if (!chatData?.chatId || !selectedUser) return;
@@ -270,7 +276,7 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
         messageContent = String(content || "");
       }
 
-      // Đảm bảo URL file đầy đủ - SỬ DỤNG HÀM MỚI Ở ĐÂY
+      // Đảm bảo URL file đầy đủ
       let processedFileUrl = getFullFileUrl(fileUrl);
 
       // RÚT GỌN fileUrl NẾU QUÁ DÀI
@@ -279,7 +285,7 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
         // Chỉ lấy phần tên file từ URL đầy đủ
         const urlParts = processedFileUrl.split('/');
         const fileName = urlParts[urlParts.length - 1];
-        shortenedFileUrl = `/api/admin/chat/files/${fileName}`;
+        shortenedFileUrl = `/api/student/chat/files/${fileName}`;
         console.log("URL gốc quá dài, đã rút gọn thành:", shortenedFileUrl);
       }
 
@@ -310,7 +316,7 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
       console.log("Sending message data:", messageRequest);
 
       // Send to server
-      const response = await fetch(`http://localhost:8080/api/admin/chat/${chatData.chatId}/messages`, {
+      const response = await fetch(`http://localhost:8080/api/student/chat/${chatData.chatId}/messages`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -378,7 +384,7 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
       
       // Gửi qua WebSocket nếu được cấu hình
       // if (stompClient && stompClient.connected) {
-      //   stompClient.send('/app/chat.typing', {}, JSON.stringify(typingData));
+      //   stompClient.send('/app/student/chat.typing', {}, JSON.stringify(typingData));
       // }
     } catch (err) {
       console.error("Error sending typing status:", err);
@@ -412,7 +418,7 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
       : selectedUser?.avatar || "https://th.bing.com/th/id/OIP.7fheetEuM-hyJg1sEyuqVwHaHa?rs=1&pid=ImgDetMain";
       
     return (
-      <div className="bg-emerald-500 p-4 flex items-center justify-between">
+      <div className="bg-blue-500 p-4 flex items-center justify-between">
         <div className="flex items-center space-x-3">
           <img
             src={userAvatar}
@@ -423,19 +429,19 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
             <h3 className="font-semibold text-white">
               {selectedUser ? `${selectedUser.firstName} ${selectedUser.lastName}` : 'Chat'}
             </h3>
-            <span className="text-sm text-emerald-50">
+            <span className="text-sm text-blue-50">
               {isTyping ? 'Đang nhập...' : selectedUser ? getRoleText(selectedUser.role) : 'Đang hoạt động'}
             </span>
           </div>
         </div>
         <div className="flex items-center space-x-4">
-          <button className="p-2 text-white hover:bg-emerald-600 rounded-full transition-colors">
+          <button className="p-2 text-white hover:bg-blue-600 rounded-full transition-colors">
             <Phone className="w-6 h-6" />
           </button>
-          <button className="p-2 text-white hover:bg-emerald-600 rounded-full transition-colors">
+          <button className="p-2 text-white hover:bg-blue-600 rounded-full transition-colors">
             <Video className="w-6 h-6" />
           </button>
-          <button className="p-2 text-white hover:bg-emerald-600 rounded-full transition-colors">
+          <button className="p-2 text-white hover:bg-blue-600 rounded-full transition-colors">
             <MoreVertical className="w-6 h-6" />
           </button>
         </div>
@@ -473,7 +479,7 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
               <div className={`rounded-2xl overflow-hidden ${isAdmin ? 'ml-2' : ''} bg-gray-100`}>
                 {!imgLoaded && !imgError && (
                   <div className="w-48 h-48 flex items-center justify-center">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500"></div>
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
                   </div>
                 )}
                 {imgError ? (
@@ -513,7 +519,7 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
               <div
               className={`p-3 rounded-2xl ${
                 isAdmin
-                  ? 'bg-emerald-500 text-white ml-2'
+                  ? 'bg-blue-500 text-white ml-2'
                   : 'bg-gray-100 text-gray-900'
               }`}
             >
@@ -534,7 +540,7 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
               <div
                 className={`p-3 rounded-2xl ${
                   isAdmin
-                    ? 'bg-emerald-500 text-white ml-2'
+                    ? 'bg-blue-500 text-white ml-2'
                     : 'bg-gray-100 text-gray-900'
                 }`}
               >
@@ -612,7 +618,7 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
       <div className="flex-1 overflow-y-auto p-4 bg-white">
         {loading ? (
           <div className="flex justify-center items-center h-full">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
           </div>
         ) : messages.length > 0 ? (
           <>
