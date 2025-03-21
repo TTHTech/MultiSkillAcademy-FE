@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { AiFillHeart, AiOutlineHeart, AiOutlinePlayCircle } from "react-icons/ai";
+import {
+  AiFillHeart,
+  AiOutlineHeart,
+  AiOutlinePlayCircle,
+} from "react-icons/ai";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import ListLectureFree from "./ListLectureFree";
 import { BsClock } from "react-icons/bs";
-import { 
+import {
   Video,
   Download,
   Smartphone,
@@ -19,26 +23,65 @@ import {
   FileText,
   MessageCircle,
   Users,
-  Trophy
-} from 'lucide-react';
+  Trophy,
+} from "lucide-react";
 
 const getResourceIcon = (description) => {
   const lowerDesc = description.toLowerCase();
-  
-  if (lowerDesc.includes('video')) return { icon: Video, color: 'text-blue-500', bgColor: 'bg-blue-100' };
-  if (lowerDesc.includes('tải') || lowerDesc.includes('download')) return { icon: Download, color: 'text-purple-500', bgColor: 'bg-purple-100' };
-  if (lowerDesc.includes('mobile') || lowerDesc.includes('điện thoại')) return { icon: Smartphone, color: 'text-green-500', bgColor: 'bg-green-100' };
-  if (lowerDesc.includes('truy cập')) return { icon: InfinityIcon, color: 'text-orange-500', bgColor: 'bg-orange-100' };
-  if (lowerDesc.includes('chứng chỉ')) return { icon: GraduationCap, color: 'text-yellow-500', bgColor: 'bg-yellow-100' };
-  if (lowerDesc.includes('hỗ trợ')) return { icon: MessageCircle, color: 'text-teal-500', bgColor: 'bg-teal-100' };
-  if (lowerDesc.includes('giảng dạy')) return { icon: MonitorPlay, color: 'text-rose-500', bgColor: 'bg-rose-100' };
-  if (lowerDesc.includes('tài liệu')) return { icon: FileText, color: 'text-gray-500', bgColor: 'bg-gray-100' };
-  if (lowerDesc.includes('học viên')) return { icon: Users, color: 'text-cyan-500', bgColor: 'bg-cyan-100' };
-  if (lowerDesc.includes('sách')) return { icon: BookOpen, color: 'text-emerald-500', bgColor: 'bg-emerald-100' };
-  if (lowerDesc.includes('online')) return { icon: Globe, color: 'text-indigo-500', bgColor: 'bg-indigo-100' };
+
+  if (lowerDesc.includes("video"))
+    return { icon: Video, color: "text-blue-500", bgColor: "bg-blue-100" };
+  if (lowerDesc.includes("tải") || lowerDesc.includes("download"))
+    return {
+      icon: Download,
+      color: "text-purple-500",
+      bgColor: "bg-purple-100",
+    };
+  if (lowerDesc.includes("mobile") || lowerDesc.includes("điện thoại"))
+    return {
+      icon: Smartphone,
+      color: "text-green-500",
+      bgColor: "bg-green-100",
+    };
+  if (lowerDesc.includes("truy cập"))
+    return {
+      icon: InfinityIcon,
+      color: "text-orange-500",
+      bgColor: "bg-orange-100",
+    };
+  if (lowerDesc.includes("chứng chỉ"))
+    return {
+      icon: GraduationCap,
+      color: "text-yellow-500",
+      bgColor: "bg-yellow-100",
+    };
+  if (lowerDesc.includes("hỗ trợ"))
+    return {
+      icon: MessageCircle,
+      color: "text-teal-500",
+      bgColor: "bg-teal-100",
+    };
+  if (lowerDesc.includes("giảng dạy"))
+    return {
+      icon: MonitorPlay,
+      color: "text-rose-500",
+      bgColor: "bg-rose-100",
+    };
+  if (lowerDesc.includes("tài liệu"))
+    return { icon: FileText, color: "text-gray-500", bgColor: "bg-gray-100" };
+  if (lowerDesc.includes("học viên"))
+    return { icon: Users, color: "text-cyan-500", bgColor: "bg-cyan-100" };
+  if (lowerDesc.includes("sách"))
+    return {
+      icon: BookOpen,
+      color: "text-emerald-500",
+      bgColor: "bg-emerald-100",
+    };
+  if (lowerDesc.includes("online"))
+    return { icon: Globe, color: "text-indigo-500", bgColor: "bg-indigo-100" };
 
   // Default icon
-  return { icon: Trophy, color: 'text-blue-500', bgColor: 'bg-blue-100' };
+  return { icon: Trophy, color: "text-blue-500", bgColor: "bg-blue-100" };
 };
 
 const CourseMedia = ({
@@ -51,7 +94,7 @@ const CourseMedia = ({
   const discount = 30; // Mặc định giảm giá 30%
   const discountedPrice = Math.floor(price * (1 - discount / 100));
   const daysLeft = 3;
-  
+
   const userId = Number(localStorage.getItem("userId"));
   const { courseId } = useParams();
   const [error, setError] = useState(null);
@@ -60,23 +103,40 @@ const CourseMedia = ({
   const [checkOnStudy, setCheckOnStudy] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [lectures, setLectures] = useState([]);
+  const [activeCourse, setActiveCourse] = useState([]);
+
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchStatusesAndLectures = async () => {
       try {
-        const [cartResponse, favoriteResponse, studyResponse, lecturesResponse] =
-          await Promise.all([
-            axios.get(`http://localhost:8080/api/student/cart/check/${userId}/${courseId}`),
-            axios.get(`http://localhost:8080/api/student/wishlist/check/${userId}/${courseId}`),
-            axios.get(`http://localhost:8080/api/student/enrollments/check/${userId}/${courseId}`),
-            axios.get(`http://localhost:8080/api/student/lectures/${courseId}`),
-          ]);
+        const [
+          cartResponse,
+          favoriteResponse,
+          studyResponse,
+          lecturesResponse,
+          activeCourse,
+        ] = await Promise.all([
+          axios.get(
+            `http://localhost:8080/api/student/cart/check/${userId}/${courseId}`
+          ),
+          axios.get(
+            `http://localhost:8080/api/student/wishlist/check/${userId}/${courseId}`
+          ),
+          axios.get(
+            `http://localhost:8080/api/student/enrollments/check/${userId}/${courseId}`
+          ),
+          axios.get(`http://localhost:8080/api/student/lectures/${courseId}`),
+          axios.get(
+            `http://localhost:8080/api/student/courses/${courseId}/status`
+          ),
+        ]);
 
         setCheckCart(cartResponse.data);
         setCheckFavorite(favoriteResponse.data);
         setCheckOnStudy(studyResponse.data);
         setLectures(lecturesResponse.data);
+        setActiveCourse(activeCourse.data);
       } catch (err) {
         console.error("Error fetching data:", err);
         setError("Không thể tải dữ liệu, vui lòng thử lại sau.");
@@ -152,16 +212,14 @@ const CourseMedia = ({
         <div className="mb-6">
           <div className="flex items-center gap-2 mb-2">
             <span className="text-3xl font-bold text-gray-900">
-              đ{discountedPrice.toLocaleString('vi-VN')}
+              đ{discountedPrice.toLocaleString("vi-VN")}
             </span>
             <span className="text-lg text-gray-500 line-through">
-              đ{price.toLocaleString('vi-VN')}
+              đ{price.toLocaleString("vi-VN")}
             </span>
           </div>
           <div className="flex items-center gap-2 mb-2">
-            <span className="text-red-500 font-semibold">
-              Giảm {discount}%
-            </span>
+            <span className="text-red-500 font-semibold">Giảm {discount}%</span>
           </div>
           <div className="flex items-center gap-2 text-red-500">
             <BsClock className="w-4 h-4" />
@@ -182,32 +240,38 @@ const CourseMedia = ({
             </button>
           ) : (
             <>
-              <button
-                onClick={handleBuyNow}
-                className="w-full bg-white text-gray-800 py-3 rounded-md font-semibold text-lg border-2 border-gray-300 hover:bg-gray-50 transition-all duration-300"
-              >
-                Mua ngay
-              </button>
-              
-              <div className="flex gap-2">
-                <button
-                  onClick={checkCart ? onGoToCart : onAddToCart}
-                  className="flex-1 py-3 rounded-md font-semibold text-lg transition-all duration-300 bg-purple-600 text-white hover:bg-purple-700"
-                >
-                  {checkCart ? "Đến giỏ hàng" : "Thêm vào giỏ hàng"}
-                </button>
-
-                <button
-                  onClick={handleFavoriteToggle}
-                  className="w-12 h-12 flex items-center justify-center rounded-md bg-gray-50 hover:bg-gray-100 border border-gray-200 transition-all duration-300 group"
-                >
-                  {checkFavorite ? (
-                    <AiFillHeart className="text-2xl text-red-500 group-hover:scale-110 transition-transform" />
-                  ) : (
-                    <AiOutlineHeart className="text-2xl text-gray-400 group-hover:text-red-500 group-hover:scale-110 transition-all" />
-                  )}
-                </button>
-              </div>
+              {activeCourse?.active === false ? (
+                <div className="w-full text-center py-3 rounded-md font-semibold text-lg text-gray-800 border-2 border-gray-300">
+                  Khóa học này bị tạm dừng hoặc bị khóa
+                </div>
+              ) : (
+                <>
+                  <button
+                    onClick={handleBuyNow}
+                    className="w-full bg-white text-gray-800 py-3 rounded-md font-semibold text-lg border-2 border-gray-300 hover:bg-gray-50 transition-all duration-300"
+                  >
+                    Mua ngay
+                  </button>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={checkCart ? onGoToCart : onAddToCart}
+                      className="flex-1 py-3 rounded-md font-semibold text-lg transition-all duration-300 bg-purple-600 text-white hover:bg-purple-700"
+                    >
+                      {checkCart ? "Đến giỏ hàng" : "Thêm vào giỏ hàng"}
+                    </button>
+                    <button
+                      onClick={handleFavoriteToggle}
+                      className="w-12 h-12 flex items-center justify-center rounded-md bg-gray-50 hover:bg-gray-100 border border-gray-200 transition-all duration-300 group"
+                    >
+                      {checkFavorite ? (
+                        <AiFillHeart className="text-2xl text-red-500 group-hover:scale-110 transition-transform" />
+                      ) : (
+                        <AiOutlineHeart className="text-2xl text-gray-400 group-hover:text-red-500 group-hover:scale-110 transition-all" />
+                      )}
+                    </button>
+                  </div>
+                </>
+              )}
             </>
           )}
         </div>
@@ -229,13 +293,19 @@ const CourseMedia = ({
           <ul className="space-y-4">
             {resourceDescription.length > 0 ? (
               resourceDescription.map((item, index) => {
-                const { icon: IconComponent, color, bgColor } = getResourceIcon(item);
+                const {
+                  icon: IconComponent,
+                  color,
+                  bgColor,
+                } = getResourceIcon(item);
                 return (
-                  <li 
-                    key={index} 
+                  <li
+                    key={index}
                     className="flex items-center gap-4 text-gray-700 hover:text-gray-900 transition-colors group"
                   >
-                    <div className={`w-12 h-12 rounded-xl ${bgColor} ${color} flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform shadow-sm`}>
+                    <div
+                      className={`w-12 h-12 rounded-xl ${bgColor} ${color} flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform shadow-sm`}
+                    >
                       <IconComponent className="w-6 h-6" />
                     </div>
                     <span className="font-medium leading-tight">{item}</span>
