@@ -2,7 +2,7 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 
-const TestDetailsModal = ({ test, onClose }) => {
+const TestDetailsModal = ({ test, onClose, open }) => {
   const [testData, setTestData] = useState(test);
   const token = localStorage.getItem("token");
   const [isEditing, setIsEditing] = useState(false);
@@ -204,7 +204,7 @@ const TestDetailsModal = ({ test, onClose }) => {
     }
     setIsEditing(false);
     onClose();
-  }
+  };
   const handleDeleteTest = async () => {
     const swalResult = await Swal.fire({
       title: "Xác nhận",
@@ -247,7 +247,6 @@ const TestDetailsModal = ({ test, onClose }) => {
   };
 
   const handleDeleteQuestion = async (questionId) => {
-    // Xác nhận xóa câu hỏi
     const swalResult = await Swal.fire({
       title: "Xác nhận",
       text: "Bạn có chắc chắn muốn xóa câu hỏi này?",
@@ -348,33 +347,38 @@ const TestDetailsModal = ({ test, onClose }) => {
     setSelectedQuestionId(null);
   };
   return (
-    <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
-      <button
-        className="absolute top-8 right-8 text-white bg-gray-600 rounded-full p-2 hover:bg-red-700 focus:ring-4 focus:ring-red-300"
-        onClick={() => {
-          clodeForm();
-        }}
-        aria-label="Đóng"
+    <div
+      className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50 transition-all duration-300"
+      onClick={onClose}
+    >
+      <div
+        className={`bg-white p-6 rounded-xl shadow-lg w-[90%] max-w-4xl relative transition-all duration-300 ${
+          open ? "ml-72" : "ml-0"
+        } overflow-auto max-h-[90vh]`}
+        onClick={(e) => e.stopPropagation()}
       >
-        &#x2715;
-      </button>
-      <div className="bg-white p-6 rounded-xl shadow-xl w-full sm:max-w-lg md:max-w-2xl lg:max-w-4xl max-h-[90vh] overflow-y-auto">
         {isEditing ? (
           <>
-            <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-semibold text-gray-700">
+                Tên bài kiểm tra
+              </label>
               <input
                 type="text"
                 name="title"
                 value={testData.title}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
                 placeholder="Tiêu đề bài kiểm tra"
               />
+              <label className="block text-sm font-semibold text-gray-700">
+                Mô tả bài kiểm tra
+              </label>
               <textarea
                 name="description"
                 value={testData.description}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
                 placeholder="Mô tả bài kiểm tra"
                 rows="3"
               />
@@ -416,18 +420,18 @@ const TestDetailsModal = ({ test, onClose }) => {
                   />
                 </div>
               </div>
-              <div className="flex space-x-4">
+              <div className="flex justify-end space-x-4 mt-6">
                 <button
-                  className="px-6 py-2 bg-green-500 text-white rounded-lg shadow-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500"
-                  onClick={handleSaveChanges}
-                >
-                  Lưu
-                </button>
-                <button
-                  className="px-6 py-2 bg-gray-500 text-white rounded-lg shadow-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                  className="px-6 py-2 bg-gray-500 text-white rounded-lg shadow-md hover:bg-gray-600 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-gray-400"
                   onClick={handleCancelEdit}
                 >
                   Hủy
+                </button>
+                <button
+                  className="px-6 py-2 bg-green-500 text-white rounded-lg shadow-md hover:bg-green-600 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-green-400"
+                  onClick={handleSaveChanges}
+                >
+                  Lưu
                 </button>
               </div>
             </div>
@@ -450,15 +454,23 @@ const TestDetailsModal = ({ test, onClose }) => {
               <strong>Câu hỏi yêu cầu đúng:</strong>{" "}
               {testData.correctAnswersRequired}
             </p>
-            <button
-              className="px-6 py-2 bg-yellow-500 text-white rounded-lg shadow-md hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500"
-              onClick={() => setIsEditing(true)}
-            >
-              Chỉnh sửa
-            </button>
+            <div className="flex justify-end space-x-4 mt-6">
+              <button
+                className="px-6 py-2 bg-amber-500 text-white rounded-full shadow-lg hover:bg-amber-600 transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-amber-300 flex items-center space-x-2"
+                onClick={() => setIsEditing(true)}
+              >
+                <span>Chỉnh sửa</span>
+              </button>
+              <button
+                className="px-6 py-2 bg-rose-500 text-white rounded-full shadow-lg hover:bg-rose-600 transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-rose-300 flex items-center space-x-2"
+                onClick={handleDeleteTest}
+              >
+                <span>Xóa bài kiểm tra</span>
+              </button>
+            </div>
           </>
         )}
-        <div className="mb-4">
+        <div className="mt-8 mb-4">
           <h3 className="text-lg font-semibold text-gray-800">Thêm câu hỏi</h3>
           <input
             type="text"
@@ -571,20 +583,13 @@ const TestDetailsModal = ({ test, onClose }) => {
           })}
         </ul>
 
-        <div className="mt-6 flex justify-between">
+        <div className="mt-6 flex justify-end">
           <button
-            className="px-6 py-2 bg-red-500 text-white rounded-lg shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500"
-            onClick={handleDeleteTest}
+            className="px-6 py-2 bg-red-500 text-white rounded-full shadow-lg hover:bg-red-600 transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-red-300 flex items-center space-x-2"
+            onClick={() => clodeForm()}
           >
-            Xóa bài kiểm tra
-          </button>
-          <button
-            className="px-6 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            onClick={() => {
-              clodeForm();
-            }}
-          >
-            Đóng
+            <span>✖</span>
+            <span>Đóng</span>
           </button>
         </div>
       </div>

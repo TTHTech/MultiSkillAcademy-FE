@@ -136,8 +136,8 @@ const CourseCard = ({ course = defaultCourse, onEnroll }) => {
     price,
     description,
     studentsCount = 0,
-    lessonsCount = 0,
-    reviewsCount = 0
+    lessonsCount,
+    numberReview
   } = { ...defaultCourse, ...course };
 
   const discountPercent = Math.round(((500000 - price) / 500000) * 100);
@@ -195,7 +195,7 @@ const CourseCard = ({ course = defaultCourse, onEnroll }) => {
                 {instructorFirstName} {instructorLastName}
               </span>
             </p>
-            <RatingStars rating={rating} reviewsCount={reviewsCount} />
+            <RatingStars rating={rating} reviewsCount={numberReview} />
             <p className="text-gray-600 line-clamp-2 leading-relaxed">
               {description}
             </p>

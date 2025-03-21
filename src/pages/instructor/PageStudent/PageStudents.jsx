@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import Sidebar from "../../components/instructor/Sidebar/Sidebar";
+import Sidebar from "../../../components/instructor/Sidebar/Sidebar";
 import axios from "axios";
 import moment from "moment";
+import CourseFilter from "./CourseFilter";
 
 const userId = Number(localStorage.getItem("userId"));
 const StudentList = () => {
@@ -73,33 +74,55 @@ const StudentList = () => {
       })
       .then((response) => {
         setStudents(response.data);
+        setFilteredStudents(response.data);
       })
       .catch((error) => {
         console.error("Error fetching data:", error);
       });
   }, []);
-
-  const courseOptions = Array.from(
-    new Set(students.map((student) => student.courseName))
-  );
-
-  useEffect(() => {
-    if (selectedCourse) {
-      const filtered = students.filter(
-        (student) => student.courseName === selectedCourse
-      );
-      setFilteredStudents(filtered);
-    } else {
-      setFilteredStudents(students);
-    }
-  }, [selectedCourse, students]);
+  const handleFilterChange = (filteredData) => {
+    setFilteredStudents(filteredData);
+    setCurrentPage(1); // Reset về trang đầu khi lọc
+  };
 
   const getProgressColor = (progress) => {
     if (progress <= 40) return "bg-red-500";
     if (progress <= 75) return "bg-yellow-500";
     return "bg-green-500";
   };
+  const totalPages = Math.ceil(filteredStudents.length / studentsPerPage);
 
+  const getPageNumbers = () => {
+    const pages = [];
+    if (totalPages <= 10) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      if (currentPage <= 4) {
+        for (let i = 1; i <= 5; i++) {
+          pages.push(i);
+        }
+        pages.push("...");
+        pages.push(totalPages - 2, totalPages - 1, totalPages);
+      } else if (currentPage >= totalPages - 3) {
+        pages.push(1, 2, 3);
+        pages.push("...");
+        for (let i = totalPages - 4; i <= totalPages; i++) {
+          pages.push(i);
+        }
+      } else {
+        pages.push(1, 2, 3);
+        pages.push("...");
+        for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+          pages.push(i);
+        }
+        pages.push("...");
+        pages.push(totalPages - 2, totalPages - 1, totalPages);
+      }
+    }
+    return pages;
+  };
   return (
     <section
       className={`flex-1 min-h-screen bg-gradient-to-b from-green-100 to-blue-200 duration-300 ${
@@ -111,23 +134,7 @@ const StudentList = () => {
       <div className="container mx-auto p-6">
         <h1 className="text-3xl font-bold mb-6 text-gray-800">Student List</h1>
 
-        <div className="mb-4">
-          <select
-            className="block appearance-none bg-white py-2 pl-3 pr-8 text-sm font-medium text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            onChange={(e) => {
-              setSelectedCourse(e.target.value);
-              setCurrentPage(1);
-            }}
-            value={selectedCourse}
-          >
-            <option value="">All Courses</option>
-            {courseOptions.map((course) => (
-              <option key={course} value={course}>
-                {course}
-              </option>
-            ))}
-          </select>
-        </div>
+        <CourseFilter students={students} onFilterChange={handleFilterChange} />
 
         <div className="overflow-x-auto">
           <table className="min-w-full border-collapse bg-white shadow-md rounded-lg overflow-hidden">
@@ -198,19 +205,30 @@ const StudentList = () => {
             >
               Trang trước
             </button>
-            <span className="px-4 py-2 mx-2 text-gray-700 font-medium">
-              Trang {currentPage} /{" "}
-              {Math.ceil(filteredStudents.length / studentsPerPage)}
-            </span>
+            {getPageNumbers().map((page, index) =>
+              page === "..." ? (
+                <span key={index} className="px-4 py-2 mx-1">
+                  ...
+                </span>
+              ) : (
+                <button
+                  key={index}
+                  onClick={() => handlePageChange(page)}
+                  className={`px-4 py-2 mx-1 rounded-lg shadow-md border transition-all ${
+                    currentPage === page
+                      ? "bg-green-500 text-white border-green-500"
+                      : "bg-gray-200 text-gray-700 hover:bg-green-500 hover:text-white border-gray-300"
+                  }`}
+                >
+                  {page}
+                </button>
+              )
+            )}
             <button
               onClick={() => handlePageChange(currentPage + 1)}
-              disabled={
-                currentPage ===
-                Math.ceil(filteredStudents.length / studentsPerPage)
-              }
+              disabled={currentPage === totalPages}
               className={`px-4 py-2 mx-1 rounded-lg shadow-md border transition-all ${
-                currentPage ===
-                Math.ceil(filteredStudents.length / studentsPerPage)
+                currentPage === totalPages
                   ? "bg-gray-300 text-gray-500 cursor-not-allowed border-gray-300"
                   : "bg-gradient-to-r from-green-500 to-green-600 text-white border-green-500 hover:from-green-600 hover:to-green-700 hover:shadow-lg"
               }`}
@@ -222,7 +240,10 @@ const StudentList = () => {
       </div>
 
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 transition-opacity duration-300 ease-in-out">
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 transition-opacity duration-300 ease-in-out"
+          onClick={() => setIsModalOpen(false)}
+        >
           <div className="bg-white rounded-lg p-6 w-full max-w-lg shadow-lg transform transition-transform duration-300 ease-in-out">
             <h3 className="text-lg font-bold mb-4 text-gray-800">
               Send Email to {selectedStudentEmail}

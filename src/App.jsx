@@ -26,7 +26,7 @@ import PageDashboard from "./pages/instructor/PageDashboard";
 import PageCourses from "./pages/instructor/PageCourses/PageCourses";
 import PagneCourseDetail from "./pages/instructor/PageCourses/PageCourseDetail";
 import PageAdd from "./pages/instructor/PageCourses/PageCoursesAdd";
-import StudentList from "./pages/instructor/PageStudents";
+import StudentList from "./pages/instructor/PageStudent/PageStudents";
 import CourseViewerPage from "./pages/student/content/CourseViewerPage.jsx";
 import CategoryPage from "./pages/admin/CategoryPage";
 import Wishlist from "./pages/student/courses/PageWishlist";
@@ -53,8 +53,17 @@ import NotificationList from "./components/student/notification/NotificationList
 import ChatPage from "./pages/student/chat/ChatPage.jsx";
 import NotificationPage from "./pages/admin/NotificationPage";
 import AddNotificationPage from "./pages/admin/AddNotificationPage";
-import PageSearchCourse from "./pages/instructor/PageSearchCourse/PageSearchCourse.jsx";
-
+import AdminChatPage from "./pages/admin/AdminChatPage";
+import PageProfileInstructor from "./pages/student/ProfileInstructor/PageProfileInstructor";
+import ReminderPage from "./pages/student/Reminder/ReminderPage.jsx";
+import PageSearchCourse from "./pages/instructor/PageSearchCourse/PageSearchCourse";
+import SaleByInstructorPage from "./pages/admin/SaleByInstructorPage.jsx";
+import UpdateCourse from "./pages/instructor/PageCourses/UpdateCourse.jsx";
+import PageReviewCourse from "./pages/admin/PageReviewCourse";
+import PageSection from "./pages/admin/PageSection";
+import PageLecture from "./pages/admin/PageLecture";
+import InstructorChatPage from "./pages/instructor/InstructorChatPage.jsx";
+import GoogleCallbackPage from "./pages/auth/GoogleCallbackPage";
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [role, setRole] = useState("");
@@ -131,6 +140,7 @@ function App() {
             <Route path="/certificate" element={<CertificateGenerator />} />
             <Route path="/search" element={<SearchCoursePage />} />
             <Route path="/course/:courseId" element={<CourseDetailPage />} />
+            <Route path="/auth/callback" element={<GoogleCallbackPage />} />
 
             {/* Admin Routes */}
             {isLoggedIn && role === "ROLE_ADMIN" && (
@@ -148,9 +158,14 @@ function App() {
                 <Route path="/admin/review" element={<ReviewPage />} />
                 <Route path="/admin/notification" element={<NotificationPage />} />
                 <Route path="/admin/add-notification" element={<AddNotificationPage />} />
+                <Route path="/admin/chat" element={<AdminChatPage />} />
+                <Route path="/admin/sale-by-instructor" element={<SaleByInstructorPage />} />
+                <Route path="/admin/courses/reviews" element={<PageReviewCourse />} />
+                <Route path="/admin/courses/sections" element={<PageSection />} />
+                <Route path="/admin/courses/lectures" element={<PageLecture />} />
               </>
             )}
-
+            
             {/* Student Routes */}
             {isLoggedIn && role === "ROLE_STUDENT" && (
               <>
@@ -166,16 +181,18 @@ function App() {
                 <Route path="/student/Success" element={<SuccessPage />} />
                 <Route path="/student/payment/success" element={<SuccessPage />} />
                 <Route path="/student/result" element={<ResultPage />} />
+                <Route path="/student/profile-instructor/:id" element={<PageProfileInstructor />} />
+                <Route path="/student/reminder" element={<ReminderPage />} />
+               
               </>
             )}
-
             {/* Instructor Routes */}
             {isLoggedIn && role === "ROLE_INSTRUCTOR" && (
               <>
                 <Route path="/instructor/user" element={<PageUser />} />
                 <Route path="/instructor/dashboard" element={<PageDashboard />} />
                 <Route path="/instructor/courses" element={<PageCourses />} />
-                <Route path="/instructor/courses/:id" element={<PagneCourseDetail />} />
+                {/* <Route path="/instructor/courses/:id" element={<PagneCourseDetail />} /> */}
                 <Route path="/instructor/addCourses" element={<PageAdd />} />
                 <Route path="/instructor/review" element={<PageReview />} />
                 <Route path="/instructor/students" element={<StudentList />} />
@@ -184,6 +201,8 @@ function App() {
                 <Route path="/instructor/scores" element={<PageViewScores />} />
                 <Route path="/instructor/questions" element={<PageQuestions />} />
                 <Route path="/instructor/search" element={<PageSearchCourse />} />
+                <Route path="/instructor/courses/:id" element={<UpdateCourse />} />
+                <Route path="/instructor/chat" element={<InstructorChatPage />} />
               </>
             )}
           </Routes>

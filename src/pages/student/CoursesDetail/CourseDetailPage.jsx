@@ -85,10 +85,23 @@ const CourseDetailPage = () => {
           <CourseHeader
             title={courseData.title}
             description={courseData.description}
-            instructor={`${courseData.instructorFirstName} ${courseData.instructorLastName}`}
+            instructor={{
+              id: courseData.instructorId,
+              name: `${courseData.instructorFirstName} ${courseData.instructorLastName}`,
+              title: courseData.instructorTitle || "Giảng viên",
+              image:
+                courseData.instructorProfileImage || "default-image-url.jpg",
+              rating: instructorDetail.rating || 0,
+              reviews: instructorDetail.reviews || 0,
+              students: instructorDetail.students || 0,
+              courses: instructorDetail.courses || 0,
+              description: courseData.instructorDescription || "",
+            }}
             rating={courseData.rating}
             studentCount={courseData.studentCount || student}
             lastUpdated={courseData.updatedAt}
+            lectureCount={courseData.lessonsCount}
+            duration={courseData.duration}
           />
           <CourseContentDetails
             contentDetails={courseData.courseContent || []}
@@ -101,6 +114,7 @@ const CourseDetailPage = () => {
           />
           <CourseInstructor
             instructor={{
+              id: courseData.instructorId,
               name: `${courseData.instructorFirstName} ${courseData.instructorLastName}`,
               title: courseData.instructorTitle || "Giảng viên",
               image:
