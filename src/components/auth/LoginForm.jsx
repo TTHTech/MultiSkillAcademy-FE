@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { FaGoogle, FaFacebookF, FaEye, FaEyeSlash } from "react-icons/fa";
@@ -65,8 +65,27 @@ const LoginForm = () => {
     }
   };
 
-  const handleOAuthLogin = (provider) => {
-    window.location.href = `http://localhost:8080/oauth2/authorize/${provider}`;
+  // Hàm xử lý đăng nhập bằng Google
+  const handleGoogleLogin = () => {
+    // Sử dụng Client ID Google của bạn
+    const googleClientId = '979797905767-l9rt1m82le6jfmmr9v0mbpqnsh8va1es.apps.googleusercontent.com';
+    
+    // Tạo URL chuyển hướng để người dùng đăng nhập bằng Google
+    const redirectUri = encodeURIComponent(`${window.location.origin}/auth/callback`);
+    const scope = encodeURIComponent('email profile');
+    const responseType = 'code';
+    
+    // Tạo URL đầy đủ
+    const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${googleClientId}&redirect_uri=${redirectUri}&response_type=${responseType}&scope=${scope}`;
+    
+    // Chuyển hướng đến trang đăng nhập Google
+    window.location.href = googleAuthUrl;
+  };
+
+  // Hàm xử lý đăng nhập bằng Facebook
+  const handleFacebookLogin = () => {
+    // Giữ nguyên phương thức cũ cho Facebook nếu bạn đang sử dụng
+    window.location.href = `http://localhost:8080/oauth2/authorize/facebook`;
   };
 
   return (
@@ -233,7 +252,7 @@ const LoginForm = () => {
             <div className="space-y-3">
               <button
                 type="button"
-                onClick={() => handleOAuthLogin("google")}
+                onClick={handleGoogleLogin}
                 className="w-full px-4 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-white hover:bg-gray-50 flex items-center justify-center space-x-2 transition-all duration-200"
               >
                 <FaGoogle className="text-red-500" />
@@ -242,7 +261,7 @@ const LoginForm = () => {
 
               <button
                 type="button"
-                onClick={() => handleOAuthLogin("facebook")}
+                onClick={handleFacebookLogin}
                 className="w-full px-4 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-white hover:bg-gray-50 flex items-center justify-center space-x-2 transition-all duration-200"
               >
                 <FaFacebookF className="text-blue-600" />

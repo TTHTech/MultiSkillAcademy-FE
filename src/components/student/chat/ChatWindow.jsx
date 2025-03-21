@@ -1,24 +1,33 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { User, Shield, BookOpen, FileUp, X } from 'lucide-react';
-import axios from 'axios';
+import React, { useState, useRef, useEffect } from 'react';
+import { Phone, Video, MoreVertical, Trash2, FileUp, Send, X } from 'lucide-react';
+import { toast } from 'react-toastify';
+import ChatInput from './ChatInput';
 
-// Lưu trữ các callback để cập nhật tin nhắn
-const messageCallbacks = new Set();
-
-const ChatMessages = ({ chatId, newMessage }) => {
+const ChatWindow = ({ selectedUser, chatId, chatData }) => {
+  const [isTyping, setIsTyping] = useState(false);
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [typingStatus, setTypingStatus] = useState(null);
+  const [showContextMenu, setShowContextMenu] = useState(false);
+  const [selectedMessageId, setSelectedMessageId] = useState(null);
+  const [contextMenuPosition, setContextMenuPosition] = useState({ top: 0, left: 0 });
+  const messagesEndRef = useRef(null);
   const [enlargedImage, setEnlargedImage] = useState(null);
   const [avatars, setAvatars] = useState({});
-  const messagesEndRef = useRef(null);
-  const pollingIntervalRef = useRef(null);
-  const previousMessageIdsRef = useRef(new Set());
-  const fetchMessagesRef = useRef(null);
-  
-  // Lấy ID của người dùng hiện tại từ localStorage
-  const currentUserId = parseInt(localStorage.getItem('userId'));
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  // Lấy và format tin nhắn khi chatData thay đổi
+  useEffect(() => {
+    if (chatData?.chatId) {
+      setLoading(true);
+      fetchMessages(chatData.chatId)
+        .finally(() => setLoading(false));
+    } else {
+      setMessages([]);
+    }
+  }, [chatData]);
 
   // Format timestamp từ server datetime
   const formatServerTimestamp = (dateTimeString) => {
@@ -51,100 +60,50 @@ const ChatMessages = ({ chatId, newMessage }) => {
     return `${hours}:${minutes}`;
   };
 
-  // Thiết lập polling để cập nhật tin nhắn định kỳ
-  useEffect(() => {
-    if (!chatId) return;
+  // Hàm mới: Đảm bảo URL file đầy đủ và hợp lệ
+  const getFullFileUrl = (fileUrl) => {
+    if (!fileUrl) return null;
     
-    // Reset messages và trạng thái khi chuyển đổi chat
-    setMessages([]);
-    setLoading(true);
-    previousMessageIdsRef.current = new Set();
+    // Log để debug
+    console.log("Processing file URL:", fileUrl);
     
-    const fetchMessages = async () => {
-      try {
-        const response = await axios.get(`http://localhost:8080/api/student/chat/${chatId}/messages`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`
-          }
-        });
-        
-        // Kiểm tra có dữ liệu không
-        if (!response.data || !Array.isArray(response.data)) {
-          setLoading(false);
-          return;
-        }
-        
-        // Format messages
-        const formattedMessages = response.data.map(msg => {
-          let messageContent = msg.content;
-          try {
-            const parsedContent = JSON.parse(msg.content);
-            if (parsedContent && typeof parsedContent === 'object' && parsedContent.message) {
-              messageContent = parsedContent.message;
-            }
-          } catch (e) {
-            // Không phải JSON, giữ nguyên content
-          }
+    // Chuyển hướng từ API instructor sang API student
+    if (fileUrl && fileUrl.includes('/api/instructor/chat/files/')) {
+      const fileName = fileUrl.split('/').pop();
+      return `http://localhost:8080/api/student/chat/files/${fileName}`;
+    }
+    
+    // Chuyển hướng từ API admin sang API student
+    if (fileUrl && fileUrl.includes('/api/admin/chat/files/')) {
+      const fileName = fileUrl.split('/').pop();
+      return `http://localhost:8080/api/student/chat/files/${fileName}`;
+    }
+    
+    // Chuyển hướng tương tự cho các URL ngắn (image_XXXX)
+    if (fileUrl && fileUrl.includes('image_')) {
+      const imageId = fileUrl.includes('/') ? fileUrl.split('/').pop() : fileUrl;
+      return `http://localhost:8080/api/student/chat/files/${imageId}`;
+    }
+    
+    // Các trường hợp khác giữ nguyên
+    if (fileUrl.startsWith('http://') || fileUrl.startsWith('https://')) {
+      return fileUrl;
+    }
+    
+    if (fileUrl.startsWith('/api/')) {
+      return `http://localhost:8080${fileUrl}`;
+    }
 
-          return {
-            id: msg.messageId,
-            message: messageContent,
-            isAdmin: msg.senderRole && msg.senderRole.includes('ADMIN'),
-            isInstructor: msg.senderRole && msg.senderRole.includes('INSTRUCTOR'),
-            isCurrentUser: msg.senderId === currentUserId,
-            avatar: msg.senderAvatar || getDefaultAvatar(msg.senderRole),
-            timestamp: formatServerTimestamp(msg.createdAt),
-            createdAt: msg.createdAt,
-            senderId: msg.senderId,
-            senderName: msg.senderName || getDefaultSenderName(msg.senderRole, msg.senderId === currentUserId),
-            messageType: msg.messageType || 'TEXT',
-            fileUrl: msg.fileUrl,
-            senderRole: msg.senderRole
-          };
-        });
-        
-        // Kiểm tra xem có tin nhắn mới không
-        const currentMessageIds = new Set(formattedMessages.map(msg => msg.id));
-        const hasNewMessages = formattedMessages.some(msg => !previousMessageIdsRef.current.has(msg.id));
-        
-        // Cập nhật state tin nhắn nếu có tin nhắn mới
-        if (hasNewMessages || messages.length === 0) {
-          setMessages(formattedMessages);
-          
-          // Cập nhật danh sách ID tin nhắn đã biết
-          previousMessageIdsRef.current = currentMessageIds;
-          
-          // Fetch avatars cho những tin nhắn mới
-          formattedMessages.forEach(msg => {
-            if (msg.senderId && !avatars[msg.senderId]) {
-              fetchUserAvatar(msg.senderId);
-            }
-          });
-        }
-        
-        setLoading(false);
-      } catch (err) {
-        console.error('Error fetching messages:', err);
-        setError('Không thể tải tin nhắn');
-        setLoading(false);
-      }
-    };
+    if (fileUrl.includes('/uploads/')) {
+      return `http://localhost:8080${fileUrl.startsWith('/') ? '' : '/'}${fileUrl}`;
+    }
     
-    // Lưu trữ fetchMessages vào ref để có thể gọi từ bên ngoài
-    fetchMessagesRef.current = fetchMessages;
+    if (!fileUrl.includes('/') && !fileUrl.includes(':\\')) {
+      return `http://localhost:8080/uploads/${fileUrl}`;
+    }
     
-    // Fetch ngay lần đầu tiên
-    fetchMessages();
-    
-    // Tăng thời gian polling lên 15 giây vì đã có cơ chế refresh khi gửi tin nhắn
-    pollingIntervalRef.current = setInterval(fetchMessages, 15000);
-    
-    return () => {
-      if (pollingIntervalRef.current) {
-        clearInterval(pollingIntervalRef.current);
-      }
-    };
-  }, [chatId]);
+    return fileUrl;
+  };
 
   // Fetch user avatar
   const fetchUserAvatar = async (userId) => {
@@ -161,6 +120,7 @@ const ChatMessages = ({ chatId, newMessage }) => {
       });
 
       if (!response.ok) {
+        console.warn(`Không thể tải ảnh cho người dùng ${userId}`);
         return;
       }
       
@@ -176,150 +136,271 @@ const ChatMessages = ({ chatId, newMessage }) => {
     }
   };
 
-  // Get default avatar based on role
-  const getDefaultAvatar = (role) => {
-    if (role && role.includes('ADMIN')) {
-      return "https://cdn-icons-png.flaticon.com/512/2206/2206368.png";
-    } else if (role && role.includes('INSTRUCTOR')) {
-      return "https://cdn-icons-png.flaticon.com/512/1995/1995515.png";
-    }
-    return "https://th.bing.com/th/id/OIP.7fheetEuM-hyJg1sEyuqVwHaHa?rs=1&pid=ImgDetMain";
-  };
+  const fetchMessages = async (chatId) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("Vui lòng đăng nhập lại");
 
-  // Get default sender name based on role
-  const getDefaultSenderName = (role, isCurrentUser) => {
-    if (isCurrentUser) {
-      return 'Bạn';
-    }
-    
-    if (role && role.includes('ADMIN')) {
-      return 'Admin Support';
-    }
-    if (role && role.includes('INSTRUCTOR')) {
-      return 'Course Instructor';
-    }
-    
-    return 'Unknown User';
-  };
+      // Sử dụng API student để lấy tin nhắn
+      const response = await fetch(`http://localhost:8080/api/student/chat/${chatId}/messages`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
 
-  // Đăng ký callback khi component mount
-  useEffect(() => {
-    const updateMessages = (updater) => {
-      setMessages(updater);
-    };
-    
-    messageCallbacks.add(updateMessages);
-    
-    // Lưu trữ fetchMessages vào window để có thể gọi từ bên ngoài
-    window.currentChatMessagesInstance = {
-      fetchMessages: fetchMessagesRef.current
-    };
-    
-    return () => {
-      messageCallbacks.delete(updateMessages);
-      if (window.currentChatMessagesInstance && 
-          window.currentChatMessagesInstance.fetchMessages === fetchMessagesRef.current) {
-        window.currentChatMessagesInstance = null;
+      if (!response.ok) {
+        if (response.status === 404) {
+          setMessages([]);
+          return [];
+        }
+        throw new Error(`Không thể tải tin nhắn (${response.status})`);
       }
-    };
-  }, []);
 
-  // Xử lý khi có tin nhắn mới được gửi từ component cha
-  useEffect(() => {
-    if (newMessage) {
-      // Kiểm tra xem đây là tin nhắn tạm thời hay tin nhắn thật
-      const isTempMessage = newMessage.messageId && newMessage.messageId.toString().startsWith('temp-');
-      const tempId = newMessage.tempId; // Lấy tempId từ newMessage nếu có
+      const messageData = await response.json();
+      console.log("Raw message data:", messageData); // Log để debug
+
+      const formattedMessages = messageData.map(msg => {
+        // Xử lý nếu content là chuỗi JSON
+        let messageContent = msg.content;
+        try {
+          // Kiểm tra nếu content là JSON string, thì parse để lấy trường message
+          const parsedContent = JSON.parse(msg.content);
+          if (parsedContent && typeof parsedContent === 'object' && parsedContent.message) {
+            messageContent = parsedContent.message;
+          }
+        } catch (e) {
+          // Nếu không phải JSON, giữ nguyên content
+        }
+
+        // Format timestamp từ server - sử dụng createdAt
+        const serverTimestamp = formatServerTimestamp(msg.createdAt);
+
+        // Fetch avatar if needed
+        if (msg.senderId) {
+          fetchUserAvatar(msg.senderId);
+        }
+
+        // Đảm bảo URL file đầy đủ
+        const fullFileUrl = getFullFileUrl(msg.fileUrl);
+
+        return {
+          id: msg.messageId,
+          message: messageContent,
+          isAdmin: msg.senderId === parseInt(localStorage.getItem("userId")),
+          avatar: msg.senderAvatar || "https://th.bing.com/th/id/OIP.7fheetEuM-hyJg1sEyuqVwHaHa?rs=1&pid=ImgDetMain",
+          timestamp: serverTimestamp, // Timestamp đã format từ server
+          createdAt: msg.createdAt, // Lưu giá trị gốc để debug
+          senderId: msg.senderId,
+          senderName: msg.senderName,
+          messageType: msg.messageType || 'TEXT',
+          fileUrl: fullFileUrl
+        };
+      });
       
-      if (tempId) {
-        // Đây là cập nhật cho tin nhắn tạm thời
-        const existingTempIndex = messages.findIndex(msg => msg.id === tempId);
-        
-        if (existingTempIndex >= 0) {
-          // Cập nhật tin nhắn tạm thời thành tin nhắn thật
-          setMessages(prev => {
-            const updatedMessages = [...prev];
-            updatedMessages[existingTempIndex] = {
-              id: newMessage.messageId,
-              message: newMessage.content,
-              isAdmin: newMessage.senderRole && newMessage.senderRole.includes('ADMIN'),
-              isInstructor: newMessage.senderRole && newMessage.senderRole.includes('INSTRUCTOR'),
-              isCurrentUser: newMessage.senderId === currentUserId,
-              avatar: newMessage.senderAvatar || getDefaultAvatar(newMessage.senderRole),
-              timestamp: formatServerTimestamp(newMessage.createdAt),
-              createdAt: newMessage.createdAt,
-              senderId: newMessage.senderId,
-              senderName: newMessage.senderName || getDefaultSenderName(newMessage.senderRole, newMessage.senderId === currentUserId),
-              messageType: newMessage.messageType || 'TEXT',
-              fileUrl: newMessage.fileUrl,
-              senderRole: newMessage.senderRole
-            };
-            return updatedMessages;
-          });
-        }
-      } else if (isTempMessage) {
-        // Đây là tin nhắn tạm thời mới
-        const formattedMessage = {
-          id: newMessage.messageId,
-          message: newMessage.content,
-          isCurrentUser: true,
-          avatar: localStorage.getItem('userAvatar') || getDefaultAvatar('STUDENT'),
-          timestamp: formatServerTimestamp(newMessage.createdAt),
-          createdAt: newMessage.createdAt,
-          senderId: newMessage.senderId,
-          senderName: newMessage.senderName || 'Bạn',
-          messageType: newMessage.messageType || 'TEXT',
-          fileUrl: newMessage.fileUrl,
-          senderRole: 'STUDENT',
-          isTemp: true
-        };
-        
-        setMessages(prev => [...prev, formattedMessage]);
-      } else if (!messages.some(msg => msg.id === newMessage.messageId)) {
-        // Đây là tin nhắn thật mới
-        const formattedMessage = {
-          id: newMessage.messageId,
-          message: newMessage.content,
-          isAdmin: newMessage.senderRole && newMessage.senderRole.includes('ADMIN'),
-          isInstructor: newMessage.senderRole && newMessage.senderRole.includes('INSTRUCTOR'),
-          isCurrentUser: newMessage.senderId === currentUserId,
-          avatar: newMessage.senderAvatar || getDefaultAvatar(newMessage.senderRole),
-          timestamp: formatServerTimestamp(newMessage.createdAt),
-          createdAt: newMessage.createdAt,
-          senderId: newMessage.senderId,
-          senderName: newMessage.senderName || getDefaultSenderName(newMessage.senderRole, newMessage.senderId === currentUserId),
-          messageType: newMessage.messageType || 'TEXT',
-          fileUrl: newMessage.fileUrl,
-          senderRole: newMessage.senderRole
-        };
-        
-        setMessages(prev => [...prev, formattedMessage]);
-        
-        // Fetch avatar nếu cần
-        if (newMessage.senderId && !avatars[newMessage.senderId]) {
-          fetchUserAvatar(newMessage.senderId);
-        }
-      }
+      setMessages(formattedMessages);
+      setTimeout(scrollToBottom, 100);
+      return formattedMessages;
+    } catch (err) {
+      console.error("Error fetching messages:", err);
+      toast.error(err.message);
+      return [];
     }
-  }, [newMessage, chatId]);
+  };
 
-  // Cuộn xuống tin nhắn cuối cùng khi có tin nhắn mới
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  const handleRightClick = (e, messageId) => {
+    e.preventDefault();
+    if (messages.find(m => m.id === messageId)?.isAdmin) {
+      setSelectedMessageId(messageId);
+      setContextMenuPosition({ top: e.clientY, left: e.clientX });
+      setShowContextMenu(true);
+    }
   };
 
-  // Lấy icon dựa trên role
-  const getIcon = (role) => {
-    if (role && role.includes('ADMIN')) {
-      return <Shield className="w-4 h-4 text-red-500" />;
-    } else if (role && role.includes('INSTRUCTOR')) {
-      return <BookOpen className="w-4 h-4 text-green-500" />;
+  const handleDeleteMessage = async () => {
+    try {
+      if (!chatData?.chatId || !selectedMessageId) return;
+      
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("Vui lòng đăng nhập lại");
+
+      const response = await fetch(
+        `http://localhost:8080/api/student/chat/${chatData.chatId}/messages/${selectedMessageId}`, 
+        {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Không thể xóa tin nhắn");
+      }
+
+      // Xóa tin nhắn khỏi state
+      setMessages(prev => prev.filter(m => m.id !== selectedMessageId));
+      toast.success("Đã xóa tin nhắn");
+      
+    } catch (err) {
+      console.error("Error deleting message:", err);
+      toast.error(err.message);
+    } finally {
+      setShowContextMenu(false);
     }
-    return <User className="w-4 h-4 text-gray-500" />;
+  };
+
+  // Gửi tin nhắn
+  const addMessage = async (content, fileUrl = null, messageType = 'TEXT') => {
+    try {
+      if (!chatData?.chatId || !selectedUser) return;
+
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("Vui lòng đăng nhập lại");
+
+      // Trích xuất tin nhắn từ content (có thể là string hoặc object)
+      let messageContent = "";
+      if (typeof content === 'object') {
+        // Nếu content là object có trường message, sử dụng nó
+        if (content.message) {
+          messageContent = content.message;
+        } else {
+          // Nếu không có trường message, chuyển đổi cả object thành string
+          messageContent = JSON.stringify(content);
+        }
+      } else {
+        // Nếu content là string, sử dụng trực tiếp
+        messageContent = String(content || "");
+      }
+
+      // Đảm bảo URL file đầy đủ
+      let processedFileUrl = getFullFileUrl(fileUrl);
+
+      // RÚT GỌN fileUrl NẾU QUÁ DÀI
+      let shortenedFileUrl = processedFileUrl;
+      if (processedFileUrl && processedFileUrl.length > 200) {
+        // Chỉ lấy phần tên file từ URL đầy đủ
+        const urlParts = processedFileUrl.split('/');
+        const fileName = urlParts[urlParts.length - 1];
+        shortenedFileUrl = `/api/student/chat/files/${fileName}`;
+        console.log("URL gốc quá dài, đã rút gọn thành:", shortenedFileUrl);
+      }
+
+      // Tạo timestamp tạm cho tin nhắn trước khi gửi
+      const currentTimestamp = getCurrentTimeString();
+      
+      // Hiển thị tin nhắn tạm thời ngay lập tức
+      const tempId = "temp-" + Date.now();
+      const tempMessage = {
+        id: tempId,
+        message: messageContent,
+        isAdmin: true,
+        avatar: localStorage.getItem("userAvatar") || null,
+        timestamp: currentTimestamp,
+        senderId: parseInt(localStorage.getItem("userId")),
+        messageType: messageType,
+        fileUrl: processedFileUrl // Sử dụng URL đã xử lý
+      };
+      setMessages(prev => [...prev, tempMessage]);
+
+      // Chuẩn bị dữ liệu đúng định dạng cho API
+      const messageRequest = {
+        content: messageContent,
+        messageType: messageType,
+        fileUrl: shortenedFileUrl || null // Sử dụng URL đã rút gọn
+      };
+
+      console.log("Sending message data:", messageRequest);
+
+      // Send to server
+      const response = await fetch(`http://localhost:8080/api/student/chat/${chatData.chatId}/messages`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(messageRequest)
+      });
+
+      if (!response.ok) {
+        throw new Error(`Không thể gửi tin nhắn (${response.status})`);
+      }
+
+      // Lấy tin nhắn đã gửi từ response
+      const sentMessage = await response.json();
+      console.log("Server response for sent message:", sentMessage); // Log để debug
+      
+      // Đảm bảo URL file đầy đủ cho tin nhắn đã gửi
+      let updatedFileUrl = sentMessage.fileUrl;
+      if (updatedFileUrl) {
+        updatedFileUrl = getFullFileUrl(updatedFileUrl);
+      }
+      
+      // Cập nhật tin nhắn tạm thời với id thật và timestamp từ server
+      setMessages(prev => prev.map(msg => 
+        msg.id === tempId ? {
+          ...msg,
+          id: sentMessage.messageId,
+          message: sentMessage.content || msg.message,
+          // Sử dụng timestamp từ server nếu có
+          timestamp: formatServerTimestamp(sentMessage.createdAt) || currentTimestamp,
+          createdAt: sentMessage.createdAt,
+          fileUrl: updatedFileUrl || msg.fileUrl
+        } : msg
+      ));
+
+      // Cuộn xuống sau khi gửi tin nhắn
+      setTimeout(scrollToBottom, 100);
+      return sentMessage;
+
+    } catch (err) {
+      console.error("Error sending message:", err);
+      toast.error(err.message);
+      // Xóa tin nhắn tạm nếu gửi thất bại
+      setMessages(prev => prev.filter(msg => !msg.id.toString().startsWith("temp-")));
+      throw err;
+    }
+  };
+
+  // Send typing status
+  const sendTypingStatus = (isTyping) => {
+    if (!chatData?.chatId) return;
+    
+    const token = localStorage.getItem("token");
+    const userId = localStorage.getItem("userId");
+    
+    if (!token || !userId) return;
+    
+    try {
+      // Đây là ví dụ - phần này cần được triển khai qua WebSocket
+      const typingData = {
+        chatId: chatData.chatId,
+        userId: parseInt(userId),
+        isTyping: isTyping
+      };
+      
+      // Gửi qua WebSocket nếu được cấu hình
+      // if (stompClient && stompClient.connected) {
+      //   stompClient.send('/app/student/chat.typing', {}, JSON.stringify(typingData));
+      // }
+    } catch (err) {
+      console.error("Error sending typing status:", err);
+    }
+  };
+
+  const getRoleText = (role) => {
+    switch (role) {
+      case 'ADMIN': return 'Quản trị viên';
+      case 'ROLE_ADMIN': return 'Quản trị viên';
+      case 'INSTRUCTOR': return 'Giảng viên';
+      case 'ROLE_INSTRUCTOR': return 'Giảng viên';
+      case 'STUDENT': return 'Học viên';
+      case 'ROLE_STUDENT': return 'Học viên';
+      default: return role;
+    }
   };
 
   const enlargeImage = (imageUrl) => {
@@ -330,39 +411,98 @@ const ChatMessages = ({ chatId, newMessage }) => {
     setEnlargedImage(null);
   };
 
-  const ChatMessage = React.memo(({ id, message, isAdmin, isInstructor, isCurrentUser, avatar, timestamp, createdAt, senderName, messageType, fileUrl, senderId, senderRole }) => {
+  const ChatHeader = () => {
+    // Ưu tiên sử dụng avatar từ state nếu có
+    const userAvatar = selectedUser && avatars[selectedUser.userId] 
+      ? avatars[selectedUser.userId] 
+      : selectedUser?.avatar || "https://th.bing.com/th/id/OIP.7fheetEuM-hyJg1sEyuqVwHaHa?rs=1&pid=ImgDetMain";
+      
+    return (
+      <div className="bg-blue-500 p-4 flex items-center justify-between">
+        <div className="flex items-center space-x-3">
+          <img
+            src={userAvatar}
+            alt="User Avatar"
+            className="w-10 h-10 rounded-full object-cover"
+          />
+          <div>
+            <h3 className="font-semibold text-white">
+              {selectedUser ? `${selectedUser.firstName} ${selectedUser.lastName}` : 'Chat'}
+            </h3>
+            <span className="text-sm text-blue-50">
+              {isTyping ? 'Đang nhập...' : selectedUser ? getRoleText(selectedUser.role) : 'Đang hoạt động'}
+            </span>
+          </div>
+        </div>
+        <div className="flex items-center space-x-4">
+          <button className="p-2 text-white hover:bg-blue-600 rounded-full transition-colors">
+            <Phone className="w-6 h-6" />
+          </button>
+          <button className="p-2 text-white hover:bg-blue-600 rounded-full transition-colors">
+            <Video className="w-6 h-6" />
+          </button>
+          <button className="p-2 text-white hover:bg-blue-600 rounded-full transition-colors">
+            <MoreVertical className="w-6 h-6" />
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  const ChatMessage = ({ id, message, isAdmin, avatar, timestamp, createdAt, senderName, messageType, fileUrl, senderId }) => {
     // Ưu tiên sử dụng avatar từ state
     const userAvatar = avatars[senderId] || avatar;
     
-    // Kiểm tra file URL hợp lệ
-    const isValidFileUrl = fileUrl && typeof fileUrl === 'string' && fileUrl.trim() !== '';
+    // Thêm state để theo dõi trạng thái tải hình ảnh
+    const [imgLoaded, setImgLoaded] = useState(false);
+    const [imgError, setImgError] = useState(false);
     
     return (
-      <div className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'} mb-4`}>
-        <div className={`flex ${isCurrentUser ? 'flex-row-reverse' : 'flex-row'} items-end max-w-[70%]`}>
-          {!isCurrentUser && (
-            <div className="flex flex-col items-center mr-2 mb-1">
-              <img src={userAvatar} alt="Avatar" className="w-8 h-8 rounded-full object-cover" />
-              <span className="text-xs text-gray-500 mt-1">{senderName}</span>
-            </div>
+      <div 
+        className={`flex ${isAdmin ? 'justify-end' : 'justify-start'} mb-4`}
+        onContextMenu={(e) => handleRightClick(e, id)}
+      >
+        <div className={`flex ${isAdmin ? 'flex-row-reverse' : 'flex-row'} items-end max-w-[70%]`}>
+          {!isAdmin && (
+            <img 
+              src={userAvatar} 
+              alt="Avatar" 
+              className="w-8 h-8 rounded-full mr-2 mb-1 object-cover" 
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = "https://ui-avatars.com/api/?name=U&background=3B82F6&color=ffffff&size=128&bold=true";
+              }}
+            />
           )}
           <div>
-            {messageType === 'IMAGE' && isValidFileUrl ? (
-              <div className={`rounded-2xl overflow-hidden ${isCurrentUser ? 'ml-2' : ''}`}>
-                <img 
-                  src={fileUrl} 
-                  alt="Shared image" 
-                  className="max-w-full h-auto max-h-64 rounded-2xl cursor-pointer"
-                  onClick={() => enlargeImage(fileUrl)}
-                  onError={(e) => {
-                    console.error("Image failed to load:", fileUrl);
-                    e.target.onerror = null;
-                    e.target.src = "https://via.placeholder.com/300x200?text=Image+not+available";
-                  }} 
-                />
+            {messageType === 'IMAGE' ? (
+              <div className={`rounded-2xl overflow-hidden ${isAdmin ? 'ml-2' : ''} bg-gray-100`}>
+                {!imgLoaded && !imgError && (
+                  <div className="w-48 h-48 flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                  </div>
+                )}
+                {imgError ? (
+                  <div className="w-48 h-48 flex items-center justify-center bg-gray-200 text-gray-500 text-sm p-4 text-center">
+                    Không thể tải hình ảnh
+                  </div>
+                ) : (
+                  <img 
+                    src={fileUrl} 
+                    alt="Shared image" 
+                    className={`max-w-full h-auto max-h-64 rounded-2xl cursor-pointer ${imgLoaded ? 'block' : 'hidden'}`}
+                    onClick={() => enlargeImage(fileUrl)}
+                    onLoad={() => setImgLoaded(true)}
+                    onError={(e) => {
+                      console.error("Image failed to load:", fileUrl);
+                      setImgError(true);
+                      setImgLoaded(false);
+                    }} 
+                  />
+                )}
               </div>
-            ) : messageType === 'VIDEO' && isValidFileUrl ? (
-              <div className={`rounded-2xl overflow-hidden ${isCurrentUser ? 'ml-2' : ''}`}>
+            ) : messageType === 'VIDEO' ? (
+              <div className={`rounded-2xl overflow-hidden ${isAdmin ? 'ml-2' : ''}`}>
                 <video 
                   src={fileUrl} 
                   controls
@@ -370,48 +510,44 @@ const ChatMessages = ({ chatId, newMessage }) => {
                   onError={(e) => {
                     console.error("Video failed to load:", fileUrl);
                     e.target.onerror = null;
+                    // Hiển thị message lỗi thay vì video không load được
                     e.target.parentNode.innerHTML = `<div class="bg-gray-200 p-3 rounded-2xl text-sm text-gray-500">Video không thể hiển thị</div>`;
                   }}
                 />
               </div>
-            ) : (messageType === 'FILE' || messageType === 'DOCUMENT') && isValidFileUrl ? (
+            ) : messageType === 'FILE' || messageType === 'DOCUMENT' ? (
               <div
-                className={`p-3 rounded-2xl ${
-                  isCurrentUser
-                    ? 'bg-blue-500 text-white ml-2'
-                    : isAdmin
-                    ? 'bg-red-100 text-gray-900'
-                    : isInstructor
-                    ? 'bg-green-100 text-gray-900'
-                    : 'bg-gray-100 text-gray-900'
-                }`}
+              className={`p-3 rounded-2xl ${
+                isAdmin
+                  ? 'bg-blue-500 text-white ml-2'
+                  : 'bg-gray-100 text-gray-900'
+              }`}
+            >
+              <a 
+                href={fileUrl} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="flex items-center text-sm"
               >
-                <a 
-                  href={fileUrl} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="flex items-center text-sm"
-                >
-                  <FileUp className="w-4 h-4 mr-2" />
-                  {message || "Tập tin đính kèm"}
-                </a>
-              </div>
+                <FileUp className="w-4 h-4 mr-2" />
+                <span className="flex flex-col">
+                  <span>{message || "Tập tin đính kèm"}</span>
+                  <span className="text-xs mt-1 text-gray-300 break-all">{fileUrl}</span>
+                </span>
+              </a>
+            </div>
             ) : (
               <div
                 className={`p-3 rounded-2xl ${
-                  isCurrentUser
+                  isAdmin
                     ? 'bg-blue-500 text-white ml-2'
-                    : isAdmin
-                    ? 'bg-red-100 text-gray-900'
-                    : isInstructor
-                    ? 'bg-green-100 text-gray-900'
                     : 'bg-gray-100 text-gray-900'
                 }`}
               >
                 <p className="text-sm">{message}</p>
               </div>
             )}
-            <div className={`mt-1 ${isCurrentUser ? 'text-right' : 'text-left'}`}>
+            <div className={`mt-1 ${isAdmin ? 'text-right' : 'text-left'}`}>
               <span className="text-xs text-gray-500">
                 {timestamp || getCurrentTimeString()}
               </span>
@@ -420,64 +556,82 @@ const ChatMessages = ({ chatId, newMessage }) => {
         </div>
       </div>
     );
-  });
+  };
 
-  // Sắp xếp tin nhắn theo thời gian
-  const sortedMessages = React.useMemo(() => {
-    return [...messages].sort((a, b) => {
-      if (a.createdAt && b.createdAt) {
-        return new Date(a.createdAt) - new Date(b.createdAt);
-      }
-      return 0;
-    });
-  }, [messages]);
-
-  if (loading && messages.length === 0) {
+  const EmptyChat = () => {
+    // Ưu tiên sử dụng avatar từ state
+    const userAvatar = selectedUser && avatars[selectedUser.userId] 
+      ? avatars[selectedUser.userId] 
+      : selectedUser?.avatar || "https://th.bing.com/th/id/OIP.7fheetEuM-hyJg1sEyuqVwHaHa?rs=1&pid=ImgDetMain";
+    
     return (
-      <div className="flex-1 flex justify-center items-center bg-gray-50">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+      <div className="flex flex-col items-center justify-center h-full">
+        {selectedUser ? (
+          <>
+            <img
+              src={userAvatar}
+              alt="User Avatar"
+              className="w-32 h-32 rounded-full mb-4 object-cover"
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = "https://ui-avatars.com/api/?name=U&background=3B82F6&color=ffffff&size=128&bold=true";
+              }}
+            />
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              {`${selectedUser.firstName} ${selectedUser.lastName}`}
+            </h3>
+            <p className="text-sm text-gray-500 mb-2">
+              {getRoleText(selectedUser.role)}
+            </p>
+            <p className="text-sm text-gray-500">Hãy bắt đầu cuộc trò chuyện</p>
+          </>
+        ) : (
+          <>
+            <img
+              src="https://www.svgrepo.com/show/192262/chat.svg"
+              alt="Empty Chat"
+              className="w-32 h-32 mb-4"
+            />
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              Chưa có cuộc trò chuyện nào
+            </h3>
+            <p className="text-sm text-gray-500">
+              Chọn một người dùng từ danh sách bên trái để bắt đầu chat
+            </p>
+          </>
+        )}
       </div>
     );
-  }
+  };
 
-  if (error && messages.length === 0) {
-    return (
-      <div className="flex-1 flex justify-center items-center bg-gray-50">
-        <div className="text-red-500">{error}</div>
-      </div>
-    );
-  }
-
-  // Nếu không có chatId hoặc không có tin nhắn
-  if (!chatId || (messages.length === 0 && !loading)) {
-    return (
-      <div className="flex-1 flex justify-center items-center bg-gray-50">
-        <div className="text-gray-500">
-          {chatId ? 'Chưa có tin nhắn nào. Hãy bắt đầu cuộc trò chuyện!' : 'Chọn một cuộc trò chuyện để xem tin nhắn'}
-        </div>
-      </div>
-    );
-  }
+  // Load avatar for selected user
+  useEffect(() => {
+    if (selectedUser && selectedUser.userId) {
+      fetchUserAvatar(selectedUser.userId);
+    }
+  }, [selectedUser]);
 
   return (
-    <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50">
-      {sortedMessages.map((msg) => (
-        <ChatMessage key={`msg-${msg.id}`} {...msg} />
-      ))}
-      
-      {/* Hiển thị trạng thái typing nếu có */}
-      {typingStatus && typingStatus.isTyping && (
-        <div className="flex items-center space-x-2 text-gray-500 text-sm ml-4">
-          <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center">
-            <User className="w-4 h-4" />
+    <div className="flex flex-col h-screen bg-white relative">
+      <ChatHeader />
+
+      <div className="flex-1 overflow-y-auto p-4 bg-white">
+        {loading ? (
+          <div className="flex justify-center items-center h-full">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
           </div>
-          <div className="italic">{typingStatus.username || 'Someone'} đang nhập...</div>
-        </div>
-      )}
-      
-      {/* Điểm tham chiếu để cuộn đến tin nhắn cuối cùng */}
-      <div ref={messagesEndRef} />
-      
+        ) : messages.length > 0 ? (
+          <>
+            {messages.map((msg, index) => (
+              <ChatMessage key={msg.id || index} {...msg} />
+            ))}
+            <div ref={messagesEndRef} />
+          </>
+        ) : (
+          <EmptyChat />
+        )}
+      </div>
+
       {/* Enlarged Image Modal */}
       {enlargedImage && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75" onClick={closeEnlargedImage}>
@@ -496,90 +650,52 @@ const ChatMessages = ({ chatId, newMessage }) => {
               alt="Enlarged" 
               className="max-w-full max-h-[90vh] object-contain"
               onClick={(e) => e.stopPropagation()}
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = "https://via.placeholder.com/800x600?text=Image+not+available";
+              }}
             />
           </div>
         </div>
       )}
+
+      {/* Context Menu for Message Actions */}
+      {showContextMenu && (
+        <div 
+          className="absolute bg-white shadow-lg rounded-md py-2 z-50"
+          style={{ 
+            top: Math.min(contextMenuPosition.top, window.innerHeight - 100), 
+            left: Math.min(contextMenuPosition.left, window.innerWidth - 150) 
+          }}
+        >
+          <button 
+            className="flex items-center px-4 py-2 text-red-600 hover:bg-gray-100 w-full"
+            onClick={handleDeleteMessage}
+          >
+            <Trash2 className="w-4 h-4 mr-2" />
+            Xóa tin nhắn
+          </button>
+        </div>
+      )}
+
+      {/* Click anywhere to close context menu */}
+      {showContextMenu && (
+        <div 
+          className="fixed inset-0 z-40" 
+          onClick={() => setShowContextMenu(false)}
+        />
+      )}
+
+      <ChatInput 
+        addMessage={addMessage} 
+        setIsTyping={(isTyping) => {
+          setIsTyping(isTyping);
+          sendTypingStatus(isTyping);
+        }} 
+        disabled={!selectedUser || !chatData}
+      />
     </div>
   );
 };
 
-// Thêm phương thức refreshMessages cho component
-ChatMessages.refreshMessages = () => {
-  // Dùng window để lưu trữ tham chiếu đến instance hiện tại
-  if (window.currentChatMessagesInstance && 
-      window.currentChatMessagesInstance.fetchMessages) {
-    window.currentChatMessagesInstance.fetchMessages();
-  }
-};
-
-// Thêm các phương thức static để xử lý tin nhắn tạm thời
-ChatMessages.addTempMessage = (tempMessage) => {
-  const currentUserId = parseInt(localStorage.getItem('userId'));
-  
-  // Format tin nhắn tạm thời
-  const formattedMessage = {
-    id: tempMessage.messageId,
-    message: tempMessage.content,
-    isCurrentUser: true,
-    avatar: localStorage.getItem('userAvatar') || "https://th.bing.com/th/id/OIP.7fheetEuM-hyJg1sEyuqVwHaHa?rs=1&pid=ImgDetMain",
-    timestamp: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
-    createdAt: tempMessage.createdAt,
-    senderId: currentUserId,
-    senderName: tempMessage.senderName || 'Bạn',
-    messageType: tempMessage.messageType || 'TEXT',
-    fileUrl: tempMessage.fileUrl,
-    senderRole: 'STUDENT',
-    isTemp: true // Đánh dấu là tin nhắn tạm thời
-  };
-  
-  // Cập nhật tất cả các instance của ChatMessages
-  messageCallbacks.forEach(callback => {
-    callback(prev => [...prev, formattedMessage]);
-  });
-};
-
-ChatMessages.updateTempMessage = (tempId, realMessage) => {
-  const currentUserId = parseInt(localStorage.getItem('userId'));
-  
-  // Cập nhật tất cả các instance của ChatMessages
-  messageCallbacks.forEach(callback => {
-    callback(prev => {
-      const index = prev.findIndex(msg => msg.id === tempId);
-      if (index === -1) return prev;
-      
-      const updatedMessages = [...prev];
-      updatedMessages[index] = {
-        id: realMessage.messageId,
-        message: realMessage.content,
-        isAdmin: realMessage.senderRole && realMessage.senderRole.includes('ADMIN'),
-        isInstructor: realMessage.senderRole && realMessage.senderRole.includes('INSTRUCTOR'),
-        isCurrentUser: realMessage.senderId === currentUserId,
-        avatar: realMessage.senderAvatar || updatedMessages[index].avatar,
-        timestamp: new Date(realMessage.createdAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
-        createdAt: realMessage.createdAt,
-        senderId: realMessage.senderId,
-        senderName: realMessage.senderName || updatedMessages[index].senderName,
-        messageType: realMessage.messageType || 'TEXT',
-        fileUrl: realMessage.fileUrl,
-        senderRole: realMessage.senderRole,
-        isTemp: false
-      };
-      return updatedMessages;
-    });
-  });
-};
-
-ChatMessages.removeTempMessage = (tempId) => {
-  // Xóa tin nhắn tạm thời khỏi tất cả các instance của ChatMessages
-  messageCallbacks.forEach(callback => {
-    callback(prev => prev.filter(msg => msg.id !== tempId));
-  });
-};
-
-// Giữ lại phương thức refreshMessages để tương thích ngược
-ChatMessages.refreshMessages = () => {
-  // Không cần làm gì vì chúng ta đã xử lý tin nhắn tạm thời
-};
-
-export default ChatMessages;
+export default ChatWindow;
