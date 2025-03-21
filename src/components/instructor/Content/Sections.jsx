@@ -339,9 +339,6 @@ const Sections = () => {
                 }`}
                 placeholder="Nhập tiêu đề chương"
               />
-              <span className="border border-blue-500 text-blue-500 rounded px-2 py-1 text-sm">
-                {section.sectionOrder}
-              </span>
               <button
                 onClick={() => handleDelete(index)}
                 className="border border-red-500 text-red-500 rounded px-2 py-1 hover:bg-red-100 transition"
