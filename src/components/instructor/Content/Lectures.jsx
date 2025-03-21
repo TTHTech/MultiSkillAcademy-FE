@@ -697,7 +697,7 @@ const Lectures = ({ lectures, sectionId, instructor, section, course, triggerRef
                       rel="noopener noreferrer"
                       className="text-green-600 hover:text-green-800 transition font-semibold"
                     >
-                      Download PDF
+                      Watch PDF
                     </a>
                   )}
                   <button
