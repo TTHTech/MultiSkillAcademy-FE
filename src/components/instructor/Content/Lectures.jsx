@@ -26,6 +26,59 @@ const Lectures = ({ lectures, sectionId, triggerRefresh }) => {
     document_url: "",
     duration: "",
   });
+  const handleFileChangeForNewLecture = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setPendingFileForNewLecture(file);
+      if (file.type.startsWith("video/")) {
+        const video = document.createElement("video");
+        video.preload = "metadata";
+        video.onloadedmetadata = function () {
+          window.URL.revokeObjectURL(video.src);
+          const durationInSeconds = video.duration;
+          const minutesRounded = Math.ceil(durationInSeconds / 60);
+          setNewLecture((prev) => ({
+            ...prev,
+            duration: `${minutesRounded} mins`,
+          }));
+        };
+        video.src = URL.createObjectURL(file);
+      } else if (file.type === "application/pdf") {
+        setNewLecture((prev) => ({ ...prev, duration: "" }));
+      }
+    }
+  };
+
+  const handleFileChangeForEdit = (lectureId, e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setPendingFileForEdit((prev) => ({ ...prev, [lectureId]: file }));
+      if (file.type.startsWith("video/")) {
+        const video = document.createElement("video");
+        video.preload = "metadata";
+        video.onloadedmetadata = function () {
+          window.URL.revokeObjectURL(video.src);
+          const durationInSeconds = video.duration;
+          const minutesRounded = Math.ceil(durationInSeconds / 60);
+          setLectureList((prevList) =>
+            prevList.map((lec) =>
+              lec.lecture_id === lectureId
+                ? { ...lec, duration: `${minutesRounded} mins` }
+                : lec
+            )
+          );
+        };
+        video.src = URL.createObjectURL(file);
+      } else if (file.type === "application/pdf") {
+        setLectureList((prevList) =>
+          prevList.map((lec) =>
+            lec.lecture_id === lectureId ? { ...lec, duration: "" } : lec
+          )
+        );
+      }
+    }
+  };
+
   const handleUploadVideo = async (file) => {
     const formData = new FormData();
     formData.append("file", file);
@@ -142,7 +195,11 @@ const Lectures = ({ lectures, sectionId, triggerRefresh }) => {
   };
 
   const handleUpdateLecture = async (lecture) => {
-    if (!lecture.title.trim() || !lecture.duration.trim()) {
+    if (
+      !lecture.title.trim() ||
+      !lecture.duration.trim() ||
+      (lecture.content_type.toLowerCase() === "pdf" && !lecture.duration.trim())
+    ) {
       Swal.fire({
         icon: "warning",
         title: "Missing Fields",
@@ -150,6 +207,7 @@ const Lectures = ({ lectures, sectionId, triggerRefresh }) => {
       });
       return;
     }
+
     let file = pendingFileForEdit[lecture.lecture_id];
     let uploadedUrl = "";
     let newContentType = lecture.content_type;
@@ -284,10 +342,11 @@ const Lectures = ({ lectures, sectionId, triggerRefresh }) => {
   const handleAddLecture = async () => {
     if (
       !newLecture.title ||
+      !newLecture.duration ||
       (!newLecture.video_url &&
         !newLecture.document_url &&
         !pendingFileForNewLecture) ||
-      !newLecture.duration
+      (newLecture.content_type === "PDF" && !newLecture.duration)
     ) {
       Swal.fire({
         icon: "warning",
@@ -387,6 +446,12 @@ const Lectures = ({ lectures, sectionId, triggerRefresh }) => {
       alert("Error adding lecture");
     }
   };
+  const getDurationParts = (duration) => {
+    if (!duration) return { value: "", unit: "mins" };
+    const parts = duration.split(" ");
+    return { value: parts[0], unit: parts[1] || "mins" };
+  };
+
   if (isLoading) {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-white bg-opacity-90">
@@ -438,19 +503,53 @@ const Lectures = ({ lectures, sectionId, triggerRefresh }) => {
                         <p className="text-gray-500 text-sm italic">
                           Nhập thời gian (mins, hours).
                         </p>
-                        <input
-                          type="text"
-                          placeholder="Duration"
-                          value={lecture.duration}
-                          onChange={(e) =>
-                            setLectureList((prev) => {
-                              const updated = [...prev];
-                              updated[index].duration = e.target.value;
-                              return updated;
-                            })
-                          }
-                          className="p-2 bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-400 w-full"
-                        />
+                        <div className="flex">
+                          <input
+                            type="number"
+                            placeholder="Duration"
+                            value={getDurationParts(lecture.duration).value}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              const { unit } = getDurationParts(
+                                lecture.duration
+                              );
+                              if (!value) {
+                                setLectureList((prev) => {
+                                  const updated = [...prev];
+                                  updated[index].duration = "";
+                                  return updated;
+                                });
+                              } else {
+                                setLectureList((prev) => {
+                                  const updated = [...prev];
+                                  updated[index].duration = `${value} ${unit}`;
+                                  return updated;
+                                });
+                              }
+                            }}
+                            className="p-2 border border-gray-300 flex-1 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                          />
+                          <select
+                            value={getDurationParts(lecture.duration).unit}
+                            disabled={!getDurationParts(lecture.duration).value}
+                            onChange={(e) => {
+                              const unit = e.target.value;
+                              const { value } = getDurationParts(
+                                lecture.duration
+                              );
+                              if (!value) return;
+                              setLectureList((prev) => {
+                                const updated = [...prev];
+                                updated[index].duration = `${value} ${unit}`;
+                                return updated;
+                              });
+                            }}
+                            className="p-2 border-t border-b border-r border-gray-300 rounded-r-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                          >
+                            <option value="mins">mins</option>
+                            <option value="hours">hours</option>
+                          </select>
+                        </div>
                       </div>
                     </div>
                     <div className="flex flex-col gap-2">
@@ -472,17 +571,14 @@ const Lectures = ({ lectures, sectionId, triggerRefresh }) => {
                             type="file"
                             accept="video/*,application/pdf"
                             onChange={(e) =>
-                              setPendingFileForEdit((prev) => ({
-                                ...prev,
-                                [lecture.lecture_id]: e.target.files[0],
-                              }))
+                              handleFileChangeForEdit(lecture.lecture_id, e)
                             }
                             className="hidden"
                           />
                         </label>
                       </div>
                     </div>
-                    {/* Hiển thị file hiện tại nếu có */}
+
                     {lecture.content_type === "video" && lecture.video_url && (
                       <p className="text-sm text-gray-500">
                         Video hiện tại:
@@ -595,12 +691,14 @@ const Lectures = ({ lectures, sectionId, triggerRefresh }) => {
               Nhập tên bài học của bạn sao cho ngắn gọn và dễ hiểu.
             </p>
           </div>
-          <div>
-            <label className="block text-gray-700 font-bold">Duration</label>
-            <p className="text-gray-500 text-sm italic">
-              Nhập thời gian cần để học (mins, hours).
-            </p>
-          </div>
+          {pendingFileForNewLecture && (
+            <div>
+              <label className="block text-gray-700 font-bold">Duration</label>
+              <p className="text-gray-500 text-sm italic">
+                Nhập thời gian cần để học (mins, hours).
+              </p>
+            </div>
+          )}
         </div>
 
         <div className="flex flex-col sm:flex-row gap-4 items-center">
@@ -613,16 +711,58 @@ const Lectures = ({ lectures, sectionId, triggerRefresh }) => {
             }
             className="p-2 bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-400 w-2/3"
           />
-          <input
-            type="text"
-            placeholder="Duration (mins, hours)"
-            value={newLecture.duration}
-            onChange={(e) =>
-              setNewLecture({ ...newLecture, duration: e.target.value })
-            }
-            className="p-2 bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-400 flex-1"
-          />
+          {pendingFileForNewLecture &&
+            (pendingFileForNewLecture.type.startsWith("video/") ? (
+              <input
+                type="text"
+                value={newLecture.duration}
+                readOnly
+                className="p-2 bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-400 flex-1"
+              />
+            ) : (
+              <div className="flex">
+                <input
+                  type="number"
+                  placeholder="Duration"
+                  value={getDurationParts(newLecture.duration).value}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    const { unit } = getDurationParts(newLecture.duration);
+                    if (!value) {
+                      setNewLecture({
+                        ...newLecture,
+                        duration: "",
+                      });
+                    } else {
+                      setNewLecture({
+                        ...newLecture,
+                        duration: `${value} ${unit}`,
+                      });
+                    }
+                  }}
+                  className="p-2 border border-gray-300 flex-1 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+                <select
+                  value={getDurationParts(newLecture.duration).unit}
+                  onChange={(e) => {
+                    const unit = e.target.value;
+                    const { value } = getDurationParts(newLecture.duration);
+                    if (!value) return;
+                    setNewLecture({
+                      ...newLecture,
+                      duration: `${value} ${unit}`,
+                    });
+                  }}
+                  disabled={!getDurationParts(newLecture.duration).value}
+                  className="p-2 border-t border-b border-r border-gray-300 rounded-r-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                >
+                  <option value="mins">mins</option>
+                  <option value="hours">hours</option>
+                </select>
+              </div>
+            ))}
         </div>
+
         <div className="flex flex-col sm:flex-row gap-4 items-center">
           <div>
             <label className="block text-gray-700 font-bold">Tải file</label>
@@ -640,7 +780,7 @@ const Lectures = ({ lectures, sectionId, triggerRefresh }) => {
             <input
               type="file"
               accept="video/*,application/pdf"
-              onChange={(e) => setPendingFileForNewLecture(e.target.files[0])}
+              onChange={handleFileChangeForNewLecture}
               className="hidden"
             />
           </label>
