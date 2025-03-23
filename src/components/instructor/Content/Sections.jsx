@@ -2,6 +2,8 @@ import { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import Lectures from "./Lectures";
+import Swal from "sweetalert2";
+
 const Sections = () => {
   const { id } = useParams();
   const [course, setCourse] = useState(null);
@@ -15,6 +17,9 @@ const Sections = () => {
   const [selectedLecture, setSelectedLecture] = useState(null);
   const [refresh, setRefresh] = useState(false);
   const triggerRefresh = () => setRefresh((prev) => !prev);
+  const userId = Number(localStorage.getItem("userId"));
+  const [instructor, setInstructor] = useState(null);
+
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (
@@ -54,8 +59,33 @@ const Sections = () => {
         setLoading(false);
       }
     };
+    const fetchInstructor = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) throw new Error("No token found, please login first.");
+
+        const response = await fetch(
+          `http://localhost:8080/api/instructor/user/${userId}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (!response.ok) throw new Error("Failed to fetch instructor data");
+
+        const data = await response.json();
+        setInstructor(data);
+      } catch (err) {
+        setError(err.message);
+      }
+    };
+    fetchInstructor();
     fetchCourse();
-  }, [id, refresh]);
+  }, [id, refresh, userId]);
 
   const updateSection = async (index) => {
     const section = sections[index];
@@ -208,6 +238,50 @@ const Sections = () => {
       alert("Failed to add section: " + err.message);
     }
   };
+  const handleComposeEmail = async (index) => {
+    const section = sections[index];
+    const email = "tthoai2401.learn@gmail.com";
+    const subject = `Xác nhận phục hồi section bị khóa ${section.section_id}`;
+    const body = `ĐƠN XIN XEM XÉT PHỤC HỒI HOẠT ĐỘNG CHO SECTION\n
+    THÔNG TIN SECTION\n
+    - ID SECTION: ${section.section_id}\n
+    - TÊN SECTION: "${section.title.toUpperCase()}"\n
+    - THUỘC KHÓA HỌC: "${course.title.toUpperCase()}"\n
+    - TÊN GIẢNG VIÊN: ${instructor.firstName.toUpperCase()} ${instructor.lastName.toUpperCase()}\n
+    - Email: ${instructor.email} \n
+    - SỐ ĐIỆN THOẠI: ${instructor.phoneNumber} \n
+    LÝ DO:\n
+    - \n
+    - \n
+    VUI LÒNG XỬ LÝ SỚM. XIN CHÂN THÀNH CẢM ƠN!`;
+
+    const loginUrl = `https://accounts.google.com/AccountChooser?Email=${instructor.email}`;
+    const composeUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${email}&su=${encodeURIComponent(
+      subject
+    )}&body=${encodeURIComponent(body)}`;
+
+    const swalResult = await Swal.fire({
+      title: "Xác nhận đăng nhập",
+      text: `Bạn đã đăng nhập email?\nNên sử dụng email này "${instructor.email}" để được ưu tiên.`,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Tiếp tục",
+      cancelButtonText: "Hủy",
+    });
+
+    if (swalResult.isDismissed) {
+      return;
+    }
+
+    if (swalResult.isConfirmed) {
+      window.open(composeUrl, "_blank");
+    } else {
+      window.open(loginUrl, "_blank");
+      setTimeout(() => {
+        window.open(composeUrl, "_blank");
+      }, 3000);
+    }
+  };
 
   if (loading) {
     return (
@@ -223,23 +297,29 @@ const Sections = () => {
 
   return (
     <div className="min-h-screen bg-white-50 p-6">
-      <h2 className="text-2xl font-bold mb-2">
+      <h2 className="text-2xl font-bold">
         {selectedLecture === null
           ? "Danh sách các chương"
           : " Danh sách bài học"}
       </h2>
+      <p className="text-gray-500 text-sm italic mb-4">
+        Chú ý các chương hoặc các bài học bị đánh dấu màu đỏ là bị khóa bởi Quản
+        trị viên. Vui lòng liên hệ để được hổ trợ mở khóa.
+      </p>
       {selectedLecture === null ? (
         <div ref={audienceContainerRef} className="space-y-4">
           {sections.map((section, index) => (
             <div
               key={section.section_id}
-              className={`flex items-center space-x-2 p-4 border border-gray-300 rounded bg-white transition-all duration-300 ${
-                selectedSection === index
-                  ? "shadow-2xl transform scale-105 border-blue-400"
-                  : selectedSection !== null && selectedSection !== index
-                  ? "opacity-75"
-                  : ""
-              }`}
+              className={`flex items-center space-x-2 p-4 border border-gray-300 rounded transition-all duration-300
+          ${section.status ? "bg-white" : "bg-red-100"}
+          ${
+            selectedSection === index
+              ? "shadow-2xl transform scale-105 border-blue-400"
+              : selectedSection !== null && selectedSection !== index
+              ? "opacity-75"
+              : ""
+          }`}
               draggable
               onClick={() => setSelectedSection(index)}
               onDragStart={(e) => handleDragStart(index, e)}
@@ -254,12 +334,11 @@ const Sections = () => {
                 value={section.title}
                 onChange={(e) => handleSectionChange(index, e.target.value)}
                 onBlur={() => handleSectionBlur(index)}
-                className="flex-1 outline-none border-none text-gray-800"
+                className={`flex-1 outline-none border-none text-gray-800 ${
+                  section.status ? "bg-white" : "bg-red-100"
+                }`}
                 placeholder="Nhập tiêu đề chương"
               />
-              <span className="border border-blue-500 text-blue-500 rounded px-2 py-1 text-sm">
-                {section.sectionOrder}
-              </span>
               <button
                 onClick={() => handleDelete(index)}
                 className="border border-red-500 text-red-500 rounded px-2 py-1 hover:bg-red-100 transition"
@@ -273,6 +352,17 @@ const Sections = () => {
               >
                 ☰
               </button>
+              {!section.status && (
+                <button
+                  onClick={() => {
+                    handleComposeEmail(index);
+                  }}
+                  className="border border-blue-500 text-blue-500 rounded px-2 py-1 hover:bg-blue-100 transition"
+                  title="Gửi yêu cầu mở khóa section"
+                >
+                  ✉
+                </button>
+              )}
               <button
                 onClick={() => setSelectedLecture(index)}
                 className="border border-green-500 text-green-500 rounded px-3 py-1 hover:bg-green-100 transition flex items-center"
@@ -296,6 +386,9 @@ const Sections = () => {
           <Lectures
             lectures={sections[selectedLecture].lectures}
             sectionId={sections[selectedLecture].section_id}
+            instructor={instructor}
+            section={sections[selectedLecture]}
+            course={course}
             triggerRefresh={triggerRefresh}
           />
         </div>

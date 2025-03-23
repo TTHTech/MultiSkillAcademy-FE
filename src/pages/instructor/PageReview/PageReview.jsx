@@ -14,7 +14,10 @@ const InstructorReviews = () => {
   const [open, setOpen] = useState(true);
   const userId = Number(localStorage.getItem("userId"));
   const token = localStorage.getItem("token");
-
+  const [courses, setCourses] = useState([]);
+  useEffect(() => {
+    handleFilter();
+  }, [courseNameFilter, ratingFilter]);
   useEffect(() => {
     const fetchReviews = async () => {
       try {
@@ -30,7 +33,20 @@ const InstructorReviews = () => {
         setLoading(false);
       }
     };
-
+    const fetchCourse = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:8080/api/instructor/${userId}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        setCourses(response.data);
+      } catch (err) {
+        setError("Không thể tải dữ liệu đánh giá. Vui lòng thử lại sau.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCourse();
     fetchReviews();
   }, [token, userId]);
 
@@ -56,10 +72,9 @@ const InstructorReviews = () => {
       return matchesCourseName && matchesRating;
     });
     setFilteredReviews(filtered);
-    setCurrentPage(1); // Reset về trang đầu
+    setCurrentPage(1);
   };
 
-  // Lấy các review cho trang hiện tại
   const indexOfLastReview = currentPage * reviewsPerPage;
   const indexOfFirstReview = indexOfLastReview - reviewsPerPage;
   const currentReviews = filteredReviews.slice(
@@ -67,9 +82,7 @@ const InstructorReviews = () => {
     indexOfLastReview
   );
 
-  // Tạo danh sách các trang
   const totalPages = Math.ceil(filteredReviews.length / reviewsPerPage);
-
   const handlePageChange = (pageNumber) => {
     if (pageNumber > 0 && pageNumber <= totalPages) {
       setCurrentPage(pageNumber);
@@ -78,27 +91,23 @@ const InstructorReviews = () => {
   const getPageNumbers = () => {
     const pages = [];
     if (totalPages <= 10) {
-      // Nếu tổng số trang ít hơn hoặc bằng 10, hiển thị tất cả các trang
       for (let i = 1; i <= totalPages; i++) {
         pages.push(i);
       }
     } else {
       if (currentPage <= 4) {
-        // Nếu trang hiện tại gần đầu, hiển thị 5 trang đầu, dấu ... và 3 trang cuối
         for (let i = 1; i <= 5; i++) {
           pages.push(i);
         }
         pages.push("...");
         pages.push(totalPages - 2, totalPages - 1, totalPages);
       } else if (currentPage >= totalPages - 3) {
-        // Nếu trang hiện tại gần cuối, hiển thị 3 trang đầu, dấu ... và 5 trang cuối
         pages.push(1, 2, 3);
         pages.push("...");
         for (let i = totalPages - 4; i <= totalPages; i++) {
           pages.push(i);
         }
       } else {
-        // Nếu trang hiện tại nằm giữa
         pages.push(1, 2, 3);
         pages.push("...");
         for (let i = currentPage - 1; i <= currentPage + 1; i++) {
@@ -117,59 +126,82 @@ const InstructorReviews = () => {
         open ? "ml-72" : "ml-16"
       }`}
     >
-      {/* Sidebar */}
       <Sidebar open={open} setOpen={setOpen} className="h-full lg:w-64" />
 
-      {/* Main Content */}
       <div className="flex-1 bg-gray-100 overflow-hidden">
         <div className="p-6 lg:p-8 max-w-7xl mx-auto">
           <h1 className="text-2xl lg:text-3xl font-bold text-gray-800 mb-6">
             Danh sách đánh giá
           </h1>
 
-          {/* Bộ lọc */}
-          <div className="bg-white shadow-md rounded-md p-4 mb-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              <input
-                type="text"
-                placeholder="Nhập tên khóa học"
-                className="border rounded-md p-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={courseNameFilter}
-                onChange={(e) => setCourseNameFilter(e.target.value)}
-              />
-              <select
-                className="border rounded-md p-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={ratingFilter}
-                onChange={(e) => setRatingFilter(e.target.value)}
-              >
-                <option value="">Chọn mức đánh giá</option>
-                <option value="5">5 sao</option>
-                <option value="4">4 sao</option>
-                <option value="3">3 sao</option>
-                <option value="2">2 sao</option>
-                <option value="1">1 sao</option>
-              </select>
-              <button
-                onClick={handleFilter}
-                className="bg-blue-500 text-white px-4 py-2 rounded-md shadow hover:bg-blue-600 transition"
-              >
-                Lọc
-              </button>
+          <div className="bg-white shadow-lg rounded-md p-6 mb-8">
+            <div className="flex flex-col sm:flex-row gap-6">
+              <div className="w-full sm:w-1/2">
+                <label
+                  htmlFor="course-select"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  Chọn khóa học
+                </label>
+                <select
+                  id="course-select"
+                  className="w-full border border-gray-300 rounded-md p-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  value={courseNameFilter}
+                  onChange={(e) => setCourseNameFilter(e.target.value)}
+                >
+                  <option value="">-- Chọn khóa học --</option>
+                  {courses.map((course) => (
+                    <option key={course.courseId} value={course.title}>
+                      {course.title}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="w-full sm:w-1/2">
+                <label
+                  htmlFor="rating-select"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  Chọn mức đánh giá
+                </label>
+                <select
+                  id="rating-select"
+                  className="w-full border border-gray-300 rounded-md p-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  value={ratingFilter}
+                  onChange={(e) => setRatingFilter(e.target.value)}
+                >
+                  <option value="">Chọn mức đánh giá</option>
+                  <option value="5">5 sao</option>
+                  <option value="4">4 sao</option>
+                  <option value="3">3 sao</option>
+                  <option value="2">2 sao</option>
+                  <option value="1">1 sao</option>
+                </select>
+              </div>
             </div>
           </div>
 
-          {/* Thống kê */}
-          <div className="bg-blue-100 rounded-md p-4 mb-6 text-center sm:text-left">
-            <p className="text-lg font-semibold text-blue-700">
-              Số đánh giá: <strong>{filteredReviews.length}</strong>
-            </p>
-            <p className="text-lg font-semibold text-blue-700">
-              Đánh giá trung bình:{" "}
-              <strong>{calculateAverageRating()} ⭐</strong>
-            </p>
+          <div className="bg-gradient-to-r from-blue-200 to-blue-100 rounded-xl p-6 mb-8 shadow-md text-center sm:text-left">
+            <div className="flex flex-col sm:flex-row justify-between items-center">
+              <div className="mb-4 sm:mb-0">
+                <p className="text-xl font-semibold text-blue-800">
+                  Số đánh giá:{" "}
+                  <span className="font-bold text-blue-900">
+                    {filteredReviews.length}
+                  </span>
+                </p>
+              </div>
+              <div>
+                <p className="text-xl font-semibold text-blue-800">
+                  Đánh giá trung bình:{" "}
+                  <span className="font-bold text-blue-900">
+                    {calculateAverageRating()} ⭐
+                  </span>
+                </p>
+              </div>
+            </div>
           </div>
 
-          {/* Xử lý trạng thái */}
           {loading ? (
             <div className="text-center text-gray-500">Đang tải dữ liệu...</div>
           ) : error ? (
@@ -234,8 +266,6 @@ const InstructorReviews = () => {
                   </tbody>
                 </table>
               </div>
-
-              {/* Phân trang */}
               <div className="flex justify-center items-center mt-4">
                 <button
                   onClick={() => handlePageChange(currentPage - 1)}
