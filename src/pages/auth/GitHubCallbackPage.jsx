@@ -4,11 +4,9 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
 
-// Cấu hình Google OAuth2 
-const GOOGLE_CLIENT_ID = "979797905767-l9rt1m82le6jfmmr9v0mbpqnsh8va1es.apps.googleusercontent.com";
 const BACKEND_URL = "http://localhost:8080";
 
-const GoogleCallbackPage = () => {
+const GitHubCallbackPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [loading, setLoading] = useState(true);
@@ -29,26 +27,25 @@ const GoogleCallbackPage = () => {
     const urlParams = new URLSearchParams(location.search);
     const code = urlParams.get('code');
 
-    console.log("Google callback initiated, checking code...");
+    console.log("GitHub callback initiated, checking code...");
 
     if (!code) {
-      console.error("No Google code found in URL");
-      setError('Không nhận được mã xác thực từ Google');
+      console.error("No GitHub code found in URL");
+      setError('Không nhận được mã xác thực từ GitHub');
       setLoading(false);
       return;
     }
 
-    console.log("Google code received:", code.substring(0, 10) + "...");
+    console.log("GitHub code received:", code.substring(0, 10) + "...");
 
-    const processGoogleAuth = async () => {
-      console.log("Starting Google authentication process...");
+    const processGitHubAuth = async () => {
+      console.log("Starting GitHub authentication process...");
       try {
-        console.log("Sending request to:", `${BACKEND_URL}/api/auth/google/exchange-code`);
-        console.log("Sending Google code to backend...");
+        console.log("Sending request to:", `${BACKEND_URL}/api/auth/github/exchange-code`);
+        console.log("Sending GitHub code to backend...");
         
-        // CÁCH 1: Gửi code đến backend để xử lý với timeout
         const response = await axios.post(
-          `${BACKEND_URL}/api/auth/google/exchange-code`, 
+          `${BACKEND_URL}/api/auth/github/exchange-code`, 
           { code },
           { timeout: 10000 } // Thêm timeout để tránh request treo
         );
@@ -60,7 +57,6 @@ const GoogleCallbackPage = () => {
           userId: response.data && response.data.userId
         });
 
-        // Xử lý kết quả đăng nhập
         if (response.data && response.data.token) {
           // Lưu thông tin đăng nhập
           localStorage.setItem('token', response.data.token);
@@ -69,7 +65,7 @@ const GoogleCallbackPage = () => {
           localStorage.setItem('role', response.data.role);
           
           console.log("Auth data saved to localStorage, role:", response.data.role);
-          toast.success('Đăng nhập bằng Google thành công!');
+          toast.success('Đăng nhập bằng GitHub thành công!');
           
           // Chuyển hướng người dùng dựa trên vai trò
           setTimeout(() => {
@@ -93,44 +89,23 @@ const GoogleCallbackPage = () => {
           setLoading(false);
         }
       } catch (error) {
-        console.error('Google login error details:', {
-          message: error.message,
-          status: error.response?.status,
-          data: error.response?.data,
-          stack: error.stack
-        });
-        
-        // Kiểm tra xem mặc dù có lỗi nhưng token đã được lưu chưa
-        const token = localStorage.getItem('token');
-        const role = localStorage.getItem('role');
-        
-        if (token && role) {
-          console.log("Lỗi nhưng đã có token, có thể đăng nhập thành công từ request khác");
-          toast.warning("Có lỗi xảy ra nhưng đăng nhập vẫn thành công");
-          
-          // Chuyển hướng dựa trên role đã lưu
-          setTimeout(() => {
-            if (role === 'ROLE_STUDENT') {
-              navigate('/student/home');
-            } else if (role === 'ROLE_INSTRUCTOR') {
-              navigate('/instructor/user');
-            } else if (role === 'ROLE_ADMIN') {
-              navigate('/admin');
-            }
-          }, 100);
-          return;
-        }
+        console.error('GitHub login error details:', error);
         
         // Nếu có thông tin chi tiết về lỗi, hiển thị nó
-        const errorMessage = error.response?.data?.message || 'Đã xảy ra lỗi khi đăng nhập bằng Google';
+        const errorMessage = error.response?.data?.message || 'Đã xảy ra lỗi khi đăng nhập bằng GitHub';
         
         setError(errorMessage);
         setLoading(false);
         toast.error(errorMessage);
+        
+        if (error.response?.status === 401 || 
+            (error.response?.data?.cause && error.response?.data?.cause.includes("401"))) {
+          toast.error("Lỗi xác thực GitHub. Vui lòng thử lại hoặc sử dụng phương thức đăng nhập khác.");
+        }
       }
     };
 
-    processGoogleAuth();
+    processGitHubAuth();
   }, [location, navigate]); // Chỉ chạy khi location hoặc navigate thay đổi
 
   // Kiểm tra nếu đã đăng nhập thành công để tránh hiển thị lỗi
@@ -235,4 +210,4 @@ const GoogleCallbackPage = () => {
   return null;
 };
 
-export default GoogleCallbackPage;
+export default GitHubCallbackPage;
