@@ -64,6 +64,8 @@ import PageSection from "./pages/admin/PageSection";
 import PageLecture from "./pages/admin/PageLecture";
 import InstructorChatPage from "./pages/instructor/InstructorChatPage.jsx";
 import GoogleCallbackPage from "./pages/auth/GoogleCallbackPage";
+import GitHubCallbackPage from "./pages/auth/GitHubCallbackPage";
+
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [role, setRole] = useState("");
@@ -74,7 +76,16 @@ function App() {
     const token = localStorage.getItem("token");
     const userRole = localStorage.getItem("role");
   
-    const noAuthPages = ["/login", "/register", "/verify-otp", "/forgot-password", "/reset-password"];
+    // Cập nhật để bao gồm các trang callback OAuth
+    const noAuthPages = [
+      "/login", 
+      "/register", 
+      "/verify-otp", 
+      "/forgot-password", 
+      "/reset-password",
+      "/auth/callback",
+      "/auth/github/callback"
+    ];
   
     if (!token && !noAuthPages.includes(location.pathname)) {
       navigate("/login");
@@ -129,18 +140,24 @@ function App() {
         {/* Main Content */}
         <div className={`${isAdminRoute ? 'flex-1 overflow-auto' : 'w-full'}`}>
           <Routes>
-            {/* Auth Routes */}
+            {/* Auth Routes - Không yêu cầu đăng nhập */}
             <Route path="/login" element={<LoginForm />} />
             <Route path="/logout" element={<Logout />} />
             <Route path="/register" element={<RegisterForm />} />
             <Route path="/verify-otp" element={<OtpVerificationForm/>} />
             <Route path="/forgot-password" element={<ForgotPassForm />} />
             <Route path="/reset-password" element={<ResetPassForm />} />
-            <Route path="/student/quiz/:id" element={<QuizPage />} />
-            <Route path="/certificate" element={<CertificateGenerator />} />
+            <Route path="/auth/callback" element={<GoogleCallbackPage />} />
+            <Route path="/auth/github/callback" element={<GitHubCallbackPage />} />
+            
+            {/* Public Routes - Bất kỳ ai cũng có thể truy cập */}
             <Route path="/search" element={<SearchCoursePage />} />
             <Route path="/course/:courseId" element={<CourseDetailPage />} />
-            <Route path="/auth/callback" element={<GoogleCallbackPage />} />
+            
+            {/* Đường dẫn quan trọng - luôn available, không phụ thuộc vào điều kiện */}
+            <Route path="/student/home" element={<StudentHomePage />} />
+            <Route path="/student/quiz/:id" element={<QuizPage />} />
+            <Route path="/certificate" element={<CertificateGenerator />} />
 
             {/* Admin Routes */}
             {isLoggedIn && role === "ROLE_ADMIN" && (
@@ -166,10 +183,9 @@ function App() {
               </>
             )}
             
-            {/* Student Routes */}
+            {/* Student Routes - trừ những route đã được đặt bên ngoài */}
             {isLoggedIn && role === "ROLE_STUDENT" && (
               <>
-                <Route path="/student/home" element={<StudentHomePage />} />
                 <Route path="/student/cart" element={<CartPage />} />
                 <Route path="/student/list-my-course" element={<MyCoursesPage />} />
                 <Route path="/student/notification" element={<NotificationList/>} />
@@ -183,16 +199,15 @@ function App() {
                 <Route path="/student/result" element={<ResultPage />} />
                 <Route path="/student/profile-instructor/:id" element={<PageProfileInstructor />} />
                 <Route path="/student/reminder" element={<ReminderPage />} />
-               
               </>
             )}
+            
             {/* Instructor Routes */}
             {isLoggedIn && role === "ROLE_INSTRUCTOR" && (
               <>
                 <Route path="/instructor/user" element={<PageUser />} />
                 <Route path="/instructor/dashboard" element={<PageDashboard />} />
                 <Route path="/instructor/courses" element={<PageCourses />} />
-                {/* <Route path="/instructor/courses/:id" element={<PagneCourseDetail />} /> */}
                 <Route path="/instructor/addCourses" element={<PageAdd />} />
                 <Route path="/instructor/review" element={<PageReview />} />
                 <Route path="/instructor/students" element={<StudentList />} />
@@ -211,6 +226,5 @@ function App() {
     </>
   );
 }
-
 
 export default App;
