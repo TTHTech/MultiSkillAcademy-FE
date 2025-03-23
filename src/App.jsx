@@ -68,6 +68,8 @@ import GitHubCallbackPage from "./pages/auth/GitHubCallbackPage";
 import PageProfile from "./pages/instructor/PageProfile/PageProfile.jsx";
 
 import GoogleCallbackPage from "./pages/auth/GoogleCallbackPage";
+import GitHubCallbackPage from "./pages/auth/GitHubCallbackPage";
+
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [role, setRole] = useState("");
@@ -204,7 +206,6 @@ function App() {
                 <Route path="/student/result" element={<ResultPage />} />
                 <Route path="/student/profile-instructor/:id" element={<PageProfileInstructor />} />
                 <Route path="/student/reminder" element={<ReminderPage />} />
-               
               </>
             )}
             
