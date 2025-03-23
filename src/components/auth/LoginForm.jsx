@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { FaGoogle, FaFacebookF, FaEye, FaEyeSlash } from "react-icons/fa";
+import { FaGoogle, FaGithub, FaFacebookF, FaEye, FaEyeSlash } from "react-icons/fa";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -80,6 +80,22 @@ const LoginForm = () => {
     
     // Chuyển hướng đến trang đăng nhập Google
     window.location.href = googleAuthUrl;
+  };
+
+  // Hàm xử lý đăng nhập bằng GitHub
+  const handleGitHubLogin = () => {
+    // Sử dụng Client ID GitHub đã cấu hình
+    const githubClientId = 'Ov23liczIPidk9u5hA1o';
+    
+    // Tạo URL chuyển hướng để người dùng đăng nhập bằng GitHub
+    const redirectUri = encodeURIComponent(`${window.location.origin}/auth/github/callback`);
+    const scope = encodeURIComponent('user:email');
+    
+    // Tạo URL đầy đủ cho đăng nhập GitHub
+    const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${githubClientId}&redirect_uri=${redirectUri}&scope=${scope}`;
+    
+    // Chuyển hướng đến trang đăng nhập GitHub
+    window.location.href = githubAuthUrl;
   };
 
   // Hàm xử lý đăng nhập bằng Facebook
@@ -257,6 +273,16 @@ const LoginForm = () => {
               >
                 <FaGoogle className="text-red-500" />
                 <span className="text-sm font-medium text-gray-700">Sign in with Google</span>
+              </button>
+
+              {/* Thêm nút đăng nhập với GitHub */}
+              <button
+                type="button"
+                onClick={handleGitHubLogin}
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-white hover:bg-gray-50 flex items-center justify-center space-x-2 transition-all duration-200"
+              >
+                <FaGithub className="text-gray-800" />
+                <span className="text-sm font-medium text-gray-700">Sign in with GitHub</span>
               </button>
 
               <button

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify"; // Thêm import toast
 import { 
   User, 
   BookOpen, 
@@ -43,6 +44,56 @@ const ProfileMenu = () => {
   const [userEmail, setUserEmail] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
+
+  // Thêm hàm handleLogout
+  const handleLogout = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      
+      // Hiển thị thông báo đang đăng xuất
+      toast.info('Đang đăng xuất...');
+      
+      // Gọi API logout (tùy chọn)
+      if (token) {
+        try {
+          await axios.post('http://localhost:8080/api/auth/logout', {}, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+        } catch (error) {
+          console.error('Lỗi khi gọi API logout:', error);
+          // Tiếp tục quá trình logout ngay cả khi API gặp lỗi
+        }
+      }
+      
+      // Xóa tất cả dữ liệu từ localStorage
+      localStorage.removeItem('token');
+      localStorage.removeItem('userId');
+      localStorage.removeItem('email');
+      localStorage.removeItem('role');
+      
+      // Xóa cookies nếu có
+      document.cookie.split(";").forEach((c) => {
+        document.cookie = c
+          .replace(/^ +/, "")
+          .replace(/=.*/, `=;expires=${new Date().toUTCString()};path=/`);
+      });
+      
+      // Thông báo thành công
+      toast.success('Đăng xuất thành công');
+      
+      // Chuyển hướng đến trang đăng nhập
+      setTimeout(() => {
+        navigate('/login');
+      }, 500);
+      
+    } catch (error) {
+      console.error('Lỗi đăng xuất:', error);
+      toast.error('Đã xảy ra lỗi khi đăng xuất');
+      navigate('/login');
+    }
+  };
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -204,9 +255,10 @@ const ProfileMenu = () => {
 
             {/* Logout */}
             <MenuItem 
-              to="/logout" 
+              to="#" 
               icon={LogOut} 
               label="Đăng xuất" 
+              onClick={handleLogout}
               className="text-red-600 hover:text-red-700 hover:bg-red-50" 
             />
           </div>
