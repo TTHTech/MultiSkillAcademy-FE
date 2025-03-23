@@ -21,7 +21,7 @@ import CartPage from "./pages/student/cart/CartPage";
 import MyCoursesPage from "./pages/student/Enrollment/MyCoursesPage";
 import CourseDetailPage from "./pages/student/CoursesDetail/CourseDetailPage";
 import CategoryStudentPage from "./pages/student/category/CategoryStudentPage";
-import PageUser from "./pages/instructor/PageUser";
+// import PageUser from "./pages/instructor/PageUser";
 import PageDashboard from "./pages/instructor/PageDashboard";
 import PageCourses from "./pages/instructor/PageCourses/PageCourses";
 import PagneCourseDetail from "./pages/instructor/PageCourses/PageCourseDetail";
@@ -63,6 +63,7 @@ import PageReviewCourse from "./pages/admin/PageReviewCourse";
 import PageSection from "./pages/admin/PageSection";
 import PageLecture from "./pages/admin/PageLecture";
 import InstructorChatPage from "./pages/instructor/InstructorChatPage.jsx";
+import PageProfile from "./pages/instructor/PageProfile/PageProfile.jsx";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -187,7 +188,7 @@ function App() {
             {/* Instructor Routes */}
             {isLoggedIn && role === "ROLE_INSTRUCTOR" && (
               <>
-                <Route path="/instructor/user" element={<PageUser />} />
+                {/* <Route path="/instructor/user" element={<PageUser />} /> */}
                 <Route path="/instructor/dashboard" element={<PageDashboard />} />
                 <Route path="/instructor/courses" element={<PageCourses />} />
                 {/* <Route path="/instructor/courses/:id" element={<PagneCourseDetail />} /> */}
@@ -201,6 +202,7 @@ function App() {
                 <Route path="/instructor/search" element={<PageSearchCourse />} />
                 <Route path="/instructor/courses/:id" element={<UpdateCourse />} />
                 <Route path="/instructor/chat" element={<InstructorChatPage />} />
+                <Route path="/instructor/user" element={<PageProfile />} />
               </>
             )}
           </Routes>
