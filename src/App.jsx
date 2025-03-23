@@ -69,6 +69,7 @@ import PageProfile from "./pages/instructor/PageProfile/PageProfile.jsx";
 
 import GoogleCallbackPage from "./pages/auth/GoogleCallbackPage";
 import GitHubCallbackPage from "./pages/auth/GitHubCallbackPage";
+import PageProfile from "./pages/instructor/PageProfile/PageProfile.jsx";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
