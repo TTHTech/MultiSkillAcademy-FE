@@ -161,6 +161,7 @@ function App() {
             <Route path="/certificate" element={<CertificateGenerator />} />
             <Route path="/search" element={<SearchCoursePage />} />
             <Route path="/course/:courseId" element={<CourseDetailPage />} />
+            <Route path="/auth/callback" element={<GoogleCallbackPage />} />
 
             {/* Admin Routes */}
             {isLoggedIn && role === "ROLE_ADMIN" && (
@@ -202,7 +203,6 @@ function App() {
                 <Route path="/student/result" element={<ResultPage />} />
                 <Route path="/student/profile-instructor/:id" element={<PageProfileInstructor />} />
                 <Route path="/student/reminder" element={<ReminderPage />} />
-               
               </>
             )}
             
