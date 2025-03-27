@@ -78,7 +78,7 @@ const HeroSection = () => {
       className="py-16 px-4 relative mx-auto max-w-[1500px] overflow-hidden"
       style={{
         backgroundImage:
-          'url("https://img.freepik.com/premium-photo/social-media-bots-vector-illustration-fake-accounts-tiny-persons-concept_1029469-37979.jpg")',
+          'url("https://img-c.udemycdn.com/notices/web_carousel_slide/image/ae8f3f42-d23f-4e99-b5fe-91e62bc85ba8.png")',
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}
