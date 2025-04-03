@@ -3,7 +3,7 @@ import { Send, Paperclip, Image, FileText, Video, X, Smile } from 'lucide-react'
 import { toast } from 'react-toastify';
 import EmojiPicker from 'emoji-picker-react';
 
-const ChatInput = ({ addMessage, setIsTyping, disabled, chatId }) => {
+const ChatInput = ({ addMessage, setIsTyping, disabled }) => {
   const [message, setMessage] = useState('');
   const [showAttachmentOptions, setShowAttachmentOptions] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -117,13 +117,6 @@ const ChatInput = ({ addMessage, setIsTyping, disabled, chatId }) => {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("Vui lòng đăng nhập lại");
       
-      // Kiểm tra chatId tồn tại
-      if (!chatId) {
-        throw new Error("Không thể tải lên file: Chưa chọn cuộc trò chuyện");
-      }
-      
-      console.log("Uploading file to chatId:", chatId);
-      
       setIsUploading(true);
       setUploadProgress(0);
       
@@ -155,11 +148,7 @@ const ChatInput = ({ addMessage, setIsTyping, disabled, chatId }) => {
           reject(new Error('Network error during upload'));
         });
         
-        // Đảm bảo URL được tạo đúng với format có chatId
-        const uploadUrl = `http://localhost:8080/api/student/chat/${chatId}/upload`;
-        console.log("Upload URL:", uploadUrl);
-        
-        xhr.open('POST', uploadUrl);
+        xhr.open('POST', 'http://localhost:8080/api/admin/chat/upload');
         xhr.setRequestHeader('Authorization', `Bearer ${token}`);
         xhr.send(formData);
       });
@@ -185,13 +174,8 @@ const ChatInput = ({ addMessage, setIsTyping, disabled, chatId }) => {
     if (disabled) return;
     
     try {
-      // Nếu có file được chọn, kiểm tra chatId tồn tại
+      // Nếu có file được chọn
       if (selectedFile) {
-        if (!chatId) {
-          toast.error("Không thể gửi tin nhắn: Chưa chọn cuộc trò chuyện");
-          return;
-        }
-        
         setIsUploading(true);
         
         // Upload file lên server
@@ -213,8 +197,7 @@ const ChatInput = ({ addMessage, setIsTyping, disabled, chatId }) => {
         if (fileUrl && fileUrl.length > 200) {
           const urlParts = fileUrl.split('/');
           const fileName = urlParts[urlParts.length - 1];
-          // Thay đổi đường dẫn từ admin sang student
-          fileUrl = `/api/student/chat/files/${fileName}`;
+          fileUrl = `/api/admin/chat/files/${fileName}`;
           console.log("URL gốc quá dài, đã rút gọn thành:", fileUrl);
         }
         
@@ -267,7 +250,7 @@ const ChatInput = ({ addMessage, setIsTyping, disabled, chatId }) => {
               {isUploading && (
                 <div className="w-full bg-gray-200 rounded-full h-2.5 mt-1">
                   <div 
-                    className="bg-blue-500 h-2.5 rounded-full" 
+                    className="bg-emerald-500 h-2.5 rounded-full" 
                     style={{width: `${uploadProgress}%`}}>
                   </div>
                 </div>
@@ -304,7 +287,7 @@ const ChatInput = ({ addMessage, setIsTyping, disabled, chatId }) => {
                 className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded-md w-full text-left"
                 onClick={() => handleAttachmentClick('IMAGE')}
               >
-                <Image className="w-5 h-5 text-blue-500" />
+                <Image className="w-5 h-5 text-emerald-500" />
                 <span>Hình ảnh</span>
               </button>
               <button 
@@ -368,7 +351,7 @@ const ChatInput = ({ addMessage, setIsTyping, disabled, chatId }) => {
           ref={inputRef}
           type="text"
           placeholder={disabled ? "Chọn một người dùng để bắt đầu chat" : "Nhập tin nhắn..."}
-          className="flex-1 border rounded-full py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="flex-1 border rounded-full py-2 px-4 focus:outline-none focus:ring-2 focus:ring-emerald-500"
           value={message}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
@@ -378,7 +361,7 @@ const ChatInput = ({ addMessage, setIsTyping, disabled, chatId }) => {
         {/* Send button */}
         <button
           className={`p-2 rounded-full ${
-            !disabled && (message.trim() || selectedFile) ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-500'
+            !disabled && (message.trim() || selectedFile) ? 'bg-emerald-500 text-white' : 'bg-gray-200 text-gray-500'
           }`}
           onClick={handleSendMessage}
           disabled={disabled || isUploading || (!message.trim() && !selectedFile)}
