@@ -122,10 +122,10 @@ const AdminRevenuePolicyTable = () => {
         setPolicies(data);
         setFilteredPolicies(data);
         
-        // Calculate total pages - usually this would come from a header or metadata
-        // This is a fallback
-        const count = data.length > 0 && data[0].totalCount ? data[0].totalCount : data.length;
-        setTotalPages(Math.max(1, Math.ceil(count / policiesPerPage)));
+        // For demo purposes, we'll assume there are total pages based on the page size
+        // Ideally, the API would return total count in headers or metadata
+        const totalElements = data.length > 0 ? data.length * 5 : 0; // This should be replaced with actual total from API
+        setTotalPages(Math.max(1, Math.ceil(totalElements / policiesPerPage)));
       }
     } catch (error) {
       console.error("Error fetching policies:", error);
@@ -425,10 +425,7 @@ const AdminRevenuePolicyTable = () => {
 
   // Derived values with safety checks
   const currentPolicies = filteredPolicies && Array.isArray(filteredPolicies)
-    ? filteredPolicies.slice(
-        (currentPage - 1) * policiesPerPage,
-        currentPage * policiesPerPage
-      )
+    ? filteredPolicies
     : [];
 
   // Loading state
@@ -720,155 +717,165 @@ const AdminRevenuePolicyTable = () => {
         </button>
       </div>
 
-      {/* Form chỉnh sửa/tạo mới hiển thị ở giữa trang */}
+      {/* Form Modal */}
       {isModalOpen && (
-        <motion.div
-          className="bg-gray-800 rounded-xl p-6 mb-6 w-full border border-gray-700"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          <h3 className="text-xl font-bold text-white mb-4">
-            {formMode === "create" ? "Tạo chính sách mới" : "Chỉnh sửa chính sách"}
-          </h3>
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
+          <motion.div
+            className="bg-gray-800 rounded-xl p-6 w-full max-w-4xl border border-gray-700 max-h-[90vh] overflow-y-auto"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+          >
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-bold text-white">
+                {formMode === "create" ? "Tạo chính sách mới" : "Chỉnh sửa chính sách"}
+              </h3>
+              <button
+                onClick={closeModal}
+                className="text-gray-400 hover:text-white"
+              >
+                <X size={24} />
+              </button>
+            </div>
 
-          <form onSubmit={handleFormSubmit}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-              <div>
-                <label className="block text-gray-300 mb-2">Tên chính sách</label>
-                <input
-                  type="text"
-                  name="name"
-                  value={currentPolicy.name || ""}
-                  onChange={handleInputChange}
-                  className="bg-gray-700 text-white w-full p-2 rounded-lg"
-                  required
-                />
+            <form onSubmit={handleFormSubmit}>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                  <label className="block text-gray-300 mb-2">Tên chính sách</label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={currentPolicy.name || ""}
+                    onChange={handleInputChange}
+                    className="bg-gray-700 text-white w-full p-2 rounded-lg"
+                    required
+                  />
+                </div>
+
+                <div className="flex items-end">
+                  <button
+                    type="button"
+                    onClick={() => setShowPresets(!showPresets)}
+                    className="bg-blue-600 text-white p-2 rounded-lg w-full"
+                  >
+                    Sử dụng mẫu có sẵn
+                  </button>
+                </div>
+
+                {showPresets && (
+                  <div className="col-span-2 bg-gray-700 rounded-lg p-4">
+                    <h4 className="text-white font-bold mb-2">Chọn mẫu</h4>
+                    {presets && Array.isArray(presets) && presets.length > 0 ? (
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                        {presets.map((preset) => (
+                          <div
+                            key={preset.id || `preset-${Math.random()}`}
+                            onClick={() => applyPreset(preset)}
+                            className="bg-gray-600 p-3 rounded-lg cursor-pointer hover:bg-gray-500"
+                          >
+                            <p className="font-bold text-white">{preset.name || "Mẫu không tên"}</p>
+                            <p className="text-sm text-gray-300">{preset.percentage || 0}%</p>
+                            <p className="text-xs text-gray-400">
+                              ${preset.minCoursePrice || 0} - ${preset.maxCoursePrice || 0}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-gray-400 text-center py-2">Không có mẫu nào khả dụng</p>
+                    )}
+                  </div>
+                )}
+
+                <div className="col-span-2">
+                  <label className="block text-gray-300 mb-2">Mô tả</label>
+                  <textarea
+                    name="description"
+                    value={currentPolicy.description || ""}
+                    onChange={handleInputChange}
+                    className="bg-gray-700 text-white w-full p-2 rounded-lg min-h-20"
+                    rows="3"
+                  ></textarea>
+                </div>
+
+                <div>
+                  <label className="block text-gray-300 mb-2">Phần trăm (%)</label>
+                  <input
+                    type="number"
+                    name="percentage"
+                    value={currentPolicy.percentage || 0}
+                    onChange={handleInputChange}
+                    className="bg-gray-700 text-white w-full p-2 rounded-lg"
+                    min="0"
+                    max="100"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-gray-300 mb-2">Trạng thái</label>
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      name="active"
+                      checked={currentPolicy.active || false}
+                      onChange={handleInputChange}
+                      className="mr-2 h-5 w-5"
+                    />
+                    <span className="text-white">Hoạt động</span>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-gray-300 mb-2">
+                    Giá tối thiểu ($)
+                  </label>
+                  <input
+                    type="number"
+                    name="minCoursePrice"
+                    value={currentPolicy.minCoursePrice || 0}
+                    onChange={handleInputChange}
+                    className="bg-gray-700 text-white w-full p-2 rounded-lg"
+                    min="0"
+                    step="0.01"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-gray-300 mb-2">
+                    Giá tối đa ($)
+                  </label>
+                  <input
+                    type="number"
+                    name="maxCoursePrice"
+                    value={currentPolicy.maxCoursePrice || 0}
+                    onChange={handleInputChange}
+                    className="bg-gray-700 text-white w-full p-2 rounded-lg"
+                    min="0"
+                    step="0.01"
+                    required
+                  />
+                </div>
               </div>
 
-              <div className="flex items-end">
+              <div className="flex justify-end space-x-3 mt-6">
                 <button
                   type="button"
-                  onClick={() => setShowPresets(!showPresets)}
-                  className="bg-blue-600 text-white p-2 rounded-lg w-full"
+                  onClick={closeModal}
+                  className="bg-gray-600 text-white px-4 py-2 rounded-lg"
                 >
-                  Sử dụng mẫu có sẵn
+                  Hủy
+                </button>
+                <button
+                  type="submit"
+                  className="bg-green-600 text-white px-4 py-2 rounded-lg"
+                >
+                  {formMode === "create" ? "Tạo chính sách" : "Cập nhật"}
                 </button>
               </div>
-
-              {showPresets && (
-                <div className="col-span-2 bg-gray-700 rounded-lg p-4">
-                  <h4 className="text-white font-bold mb-2">Chọn mẫu</h4>
-                  {presets && Array.isArray(presets) && presets.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                      {presets.map((preset) => (
-                        <div
-                          key={preset.id || `preset-${Math.random()}`}
-                          onClick={() => applyPreset(preset)}
-                          className="bg-gray-600 p-3 rounded-lg cursor-pointer hover:bg-gray-500"
-                        >
-                          <p className="font-bold text-white">{preset.name || "Mẫu không tên"}</p>
-                          <p className="text-sm text-gray-300">{preset.percentage || 0}%</p>
-                          <p className="text-xs text-gray-400">
-                            ${preset.minCoursePrice || 0} - ${preset.maxCoursePrice || 0}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-gray-400 text-center py-2">Không có mẫu nào khả dụng</p>
-                  )}
-                </div>
-              )}
-
-              <div className="col-span-2">
-                <label className="block text-gray-300 mb-2">Mô tả</label>
-                <textarea
-                  name="description"
-                  value={currentPolicy.description || ""}
-                  onChange={handleInputChange}
-                  className="bg-gray-700 text-white w-full p-2 rounded-lg min-h-20"
-                  rows="3"
-                ></textarea>
-              </div>
-
-              <div>
-                <label className="block text-gray-300 mb-2">Phần trăm (%)</label>
-                <input
-                  type="number"
-                  name="percentage"
-                  value={currentPolicy.percentage || 0}
-                  onChange={handleInputChange}
-                  className="bg-gray-700 text-white w-full p-2 rounded-lg"
-                  min="0"
-                  max="100"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-gray-300 mb-2">Trạng thái</label>
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    name="active"
-                    checked={currentPolicy.active || false}
-                    onChange={handleInputChange}
-                    className="mr-2 h-5 w-5"
-                  />
-                  <span className="text-white">Hoạt động</span>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-gray-300 mb-2">
-                  Giá tối thiểu ($)
-                </label>
-                <input
-                  type="number"
-                  name="minCoursePrice"
-                  value={currentPolicy.minCoursePrice || 0}
-                  onChange={handleInputChange}
-                  className="bg-gray-700 text-white w-full p-2 rounded-lg"
-                  min="0"
-                  step="0.01"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-gray-300 mb-2">
-                  Giá tối đa ($)
-                </label>
-                <input
-                  type="number"
-                  name="maxCoursePrice"
-                  value={currentPolicy.maxCoursePrice || 0}
-                  onChange={handleInputChange}
-                  className="bg-gray-700 text-white w-full p-2 rounded-lg"
-                  min="0"
-                  step="0.01"
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="flex justify-end space-x-3 mt-6">
-              <button
-                type="button"
-                onClick={closeModal}
-                className="bg-gray-600 text-white px-4 py-2 rounded-lg"
-              >
-                Hủy
-              </button>
-              <button
-                type="submit"
-                className="bg-green-600 text-white px-4 py-2 rounded-lg"
-              >
-                {formMode === "create" ? "Tạo chính sách" : "Cập nhật"}
-              </button>
-            </div>
-          </form>
-        </motion.div>
+            </form>
+          </motion.div>
+        </div>
       )}
 
       {/* Delete Confirmation Modal */}
