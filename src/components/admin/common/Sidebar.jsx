@@ -107,6 +107,38 @@ const MENU_GROUPS = [
           }
         ]
       },
+      {
+        name: "Revenue Management",
+        icon: BarChart2,
+        color: "#60A5FA", // xanh dương
+        subItems: [
+          {
+            name: "Revenue Overview",
+            icon: LineChart,
+            href: "/admin/revenue",
+            color: "#60A5FA"
+          },
+          {
+            name: "Instructor Earnings",
+            icon: Users,
+            href: "/admin/revenue/instructors",
+            color: "#3B82F6"
+          },
+          {
+            name: "Sharing Policies",
+            icon: FileText,
+            href: "/admin/revenue-policy",
+            color: "#2563EB"
+          },
+          {
+            name: "Payout Reports",
+            icon: Archive,
+            href: "/admin/revenue/payouts",
+            color: "#1D4ED8"
+          }
+        ]
+      },
+      
       { 
         name: "Notifications", 
         icon: Bell, 
