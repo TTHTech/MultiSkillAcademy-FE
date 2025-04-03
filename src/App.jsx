@@ -66,7 +66,7 @@ import InstructorChatPage from "./pages/instructor/InstructorChatPage.jsx";
 import GoogleCallbackPage from "./pages/auth/GoogleCallbackPage";
 import GitHubCallbackPage from "./pages/auth/GitHubCallbackPage";
 import PageProfile from "./pages/instructor/PageProfile/PageProfile.jsx";
-
+import AdminRevenuePolicyTable from "./components/admin/revenue/AdminRevenuePolicyTable.jsx";
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [role, setRole] = useState("");
@@ -181,6 +181,7 @@ function App() {
                 <Route path="/admin/courses/reviews" element={<PageReviewCourse />} />
                 <Route path="/admin/courses/sections" element={<PageSection />} />
                 <Route path="/admin/courses/lectures" element={<PageLecture />} />
+                <Route path="/admin/revenue-policy" element={<AdminRevenuePolicyTable />} />
               </>
             )}
             
