@@ -7,30 +7,97 @@ const CartSummary = () => {
   const [coupon, setCoupon] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  useEffect(() => {
-    const fetchTotalAmount = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const response = await axios.get("http://localhost:8080/api/student/cart/total", {
+  const [couponMessage, setCouponMessage] = useState("");
+  const fetchTotalAmount = async (appliedCoupon = "") => {
+    try {
+      const token = localStorage.getItem("token");
+      let url = "http://localhost:8080/api/student/cart/total";
+      if (appliedCoupon) {
+        url += `?couponCode=${appliedCoupon}`;
+      }
+      const response = await axios.get(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setTotalAmount(response.data);
+    } catch (err) {
+      setError("Có lỗi xảy ra khi tải dữ liệu.");
+    } finally {
+      setLoading(false);
+    }
+  };
+  const handleApplyDiscountUsage = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const userId = localStorage.getItem("userId");
+      await axios.post(
+        `http://localhost:8080/api/student/discount-usage/applyDiscount?userId=${userId}&codeDiscount=${coupon}`,
+        null,
+        {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        });
-        setTotalAmount(response.data);
-      } catch (err) {
-        setError("Có lỗi xảy ra khi tải dữ liệu.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
+        }
+      );
+      toast.success("Discount applied successfully");
+      // Nếu cần, bạn có thể xử lý response.data ở đây
+    } catch (error) {
+      toast.error(error.response?.data || "Error applying discount");
+    }
+  };
+  
+  useEffect(() => {
     fetchTotalAmount();
   }, []);
 
-  const handlePayment = async () => {
+  const handleApplyCoupon = async () => {
     try {
       const token = localStorage.getItem("token");
+      const userId = localStorage.getItem("userId");
+      const response = await axios.post(
+        `http://localhost:8080/api/student/discount-usage/check/${coupon}/${userId}`,
+        null,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      if (response.data.apply) {
+        const courses = response.data.coursesApply;
+        const message = `Mã giảm giá hợp lệ. Áp dụng cho: ${courses
+          .map(
+            (course) =>
+              `${course.title} (giảm ${course.reducedAmount.toLocaleString(
+                "vi-VN"
+              )}₫)`
+          )
+          .join(", ")}`;
+        setCouponMessage(message);
+        toast.success("Mã giảm giá hợp lệ.");
+        fetchTotalAmount(coupon);
+      } else {
+        setCouponMessage(
+          "Mã giảm giá không áp dụng cho bất kỳ khóa học nào trong giỏ hàng của bạn."
+        );
+        toast.info("Mã giảm giá không áp dụng cho khóa học nào.");
+        fetchTotalAmount();
+      }
+    } catch (err) {
+      setCouponMessage("Có lỗi xảy ra khi kiểm tra mã giảm giá.");
+      toast.error("Có lỗi xảy ra khi kiểm tra mã giảm giá.");
+    }
+  };
+
+  const handlePayment = async () => {
+    try {
+      localStorage.setItem("appliedCoupon", coupon);
+      const discount = localStorage.getItem("appliedCoupon");
+
+      toast.error("Discount : " + discount);
+      const token = localStorage.getItem("token");
+
+      //đặt lưu người sử dụng discount
+      handleApplyDiscountUsage();
       const response = await axios.get(
         `http://localhost:8080/api/student/vn-pay?totalAmount=${totalAmount}&couponCode=${coupon}`,
         {
@@ -43,9 +110,11 @@ const CartSummary = () => {
         window.location.href = paymentUrl;
       } else {
         toast.error("Không thể tạo link thanh toán.");
+        localStorage.removeItem("appliedCoupon");
       }
     } catch (err) {
       toast.error("Có lỗi xảy ra khi tạo thanh toán.");
+      localStorage.removeItem("appliedCoupon");
     }
   };
 
@@ -79,16 +148,16 @@ const CartSummary = () => {
           Tổng thanh toán
         </h2>
         <p className="text-4xl font-bold text-purple-600 tracking-tight">
-          {totalAmount !== null 
-            ? `₫ ${totalAmount.toLocaleString('vi-VN')}` 
+          {totalAmount !== null
+            ? `₫ ${totalAmount.toLocaleString("vi-VN")}`
             : "₫ 0"}
         </p>
       </div>
 
       {/* Coupon Section with improved layout */}
       <div className="mb-8">
-        <label 
-          htmlFor="coupon" 
+        <label
+          htmlFor="coupon"
           className="block text-sm font-medium text-gray-700 mb-3"
         >
           Mã khuyến mãi
@@ -104,7 +173,8 @@ const CartSummary = () => {
                      focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200
                      hover:border-gray-300"
           />
-          <button 
+          <button
+            onClick={handleApplyCoupon}
             className="px-6 py-3 bg-gray-800 text-white rounded-xl hover:bg-gray-700 
                      transition-colors duration-200 font-medium focus:outline-none 
                      focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
@@ -112,6 +182,9 @@ const CartSummary = () => {
             Áp dụng
           </button>
         </div>
+        {couponMessage && (
+          <p className="mt-2 text-sm text-gray-600">{couponMessage}</p>
+        )}
       </div>
 
       {/* Payment Button with enhanced styling */}
@@ -129,8 +202,18 @@ const CartSummary = () => {
       {/* Footer Information with improved styling */}
       <div className="text-center space-y-3">
         <div className="flex items-center justify-center space-x-2">
-          <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+          <svg
+            className="w-5 h-5 text-green-500"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+            />
           </svg>
           <span className="text-sm text-gray-600 font-medium">
             Thanh toán an toàn qua VNPay

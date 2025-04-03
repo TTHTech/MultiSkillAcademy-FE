@@ -243,16 +243,16 @@ const MENU_GROUPS = [
         color: "#EC4899",
         subItems: [
           {
+            name: "Discount Usage",
+            icon: Ticket,
+            href: "/admin/discount-usage",
+            color: "#F59E0B"
+          },
+          {
             name: "Discounts",
             icon: Percent,
             href: "/admin/discounts",
             color: "#EC4899"
-          },
-          {
-            name: "Coupons",
-            icon: Ticket,
-            href: "/admin/coupons",
-            color: "#F59E0B"
           },
           {
             name: "Add Promotion",
