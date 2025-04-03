@@ -1,0 +1,272 @@
+import { useState } from "react";
+
+const ITEMS_PER_PAGE = 9;
+
+const DiscountUsageSummaryList = ({ discountUsages, onSelect }) => {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [currentPageWithData, setCurrentPageWithData] = useState(1);
+  const [currentPageWithoutData, setCurrentPageWithoutData] = useState(1);
+  const filteredDiscounts = discountUsages.filter((d) => {
+    const codeMatch = d.discountCode
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+    const isActive =
+      new Date(
+        d.startDate[0],
+        d.startDate[1] - 1,
+        d.startDate[2],
+        d.startDate[3],
+        d.startDate[4]
+      ) <= new Date() &&
+      new Date(
+        d.endDate[0],
+        d.endDate[1] - 1,
+        d.endDate[2],
+        d.endDate[3],
+        d.endDate[4]
+      ) >= new Date();
+    let statusMatch = true;
+    if (statusFilter === "active") {
+      statusMatch = isActive;
+    } else if (statusFilter === "expired") {
+      statusMatch = !isActive;
+    }
+    return codeMatch && statusMatch;
+  });
+
+  const discountsWithData = filteredDiscounts.filter(
+    (d) => d.usageCount > 0 || d.totalDiscountAmount > 0
+  );
+  const discountsWithoutData = filteredDiscounts.filter(
+    (d) => d.usageCount === 0 && d.totalDiscountAmount === 0
+  );
+  const totalPagesWithData = Math.ceil(
+    discountsWithData.length / ITEMS_PER_PAGE
+  );
+  const totalPagesWithoutData = Math.ceil(
+    discountsWithoutData.length / ITEMS_PER_PAGE
+  );
+  const currentDiscountsWithData = discountsWithData.slice(
+    (currentPageWithData - 1) * ITEMS_PER_PAGE,
+    currentPageWithData * ITEMS_PER_PAGE
+  );
+  const currentDiscountsWithoutData = discountsWithoutData.slice(
+    (currentPageWithoutData - 1) * ITEMS_PER_PAGE,
+    currentPageWithoutData * ITEMS_PER_PAGE
+  );
+  const generatePageNumbers = (currentPage, totalPages) => {
+    const pages = [];
+    if (totalPages === 0) return pages;
+    pages.push(1);
+    if (currentPage - 1 > 1) {
+      pages.push(currentPage - 1);
+    }
+    if (currentPage !== 1 && currentPage !== totalPages) {
+      pages.push(currentPage);
+    }
+    if (currentPage + 1 < totalPages) {
+      pages.push(currentPage + 1);
+    }
+    if (totalPages > 1) {
+      pages.push(totalPages);
+    }
+    return Array.from(new Set(pages)).sort((a, b) => a - b);
+  };
+
+  const pageNumbersWithData = generatePageNumbers(
+    currentPageWithData,
+    totalPagesWithData
+  );
+  const pageNumbersWithoutData = generatePageNumbers(
+    currentPageWithoutData,
+    totalPagesWithoutData
+  );
+
+  const handlePageChangeWithData = (page) => {
+    setCurrentPageWithData(page);
+  };
+
+  const handlePageChangeWithoutData = (page) => {
+    setCurrentPageWithoutData(page);
+  };
+
+  return (
+    <div className="mb-6">
+      <div className="mb-4 flex space-x-2">
+        <input
+          type="text"
+          placeholder="Tìm kiếm theo discount code..."
+          className="w-full p-2 rounded-md bg-gray-700 text-white placeholder-gray-400 focus:outline-none"
+          value={searchTerm}
+          onChange={(e) => {
+            setSearchTerm(e.target.value);
+            setCurrentPageWithData(1);
+            setCurrentPageWithoutData(1);
+          }}
+        />
+        <select
+          value={statusFilter}
+          onChange={(e) => {
+            setStatusFilter(e.target.value);
+            setCurrentPageWithData(1);
+            setCurrentPageWithoutData(1);
+          }}
+          className="p-2 rounded-md bg-gray-700 text-white"
+        >
+          <option value="all">Tất cả</option>
+          <option value="active">Còn hạn</option>
+          <option value="expired">Hết hạn</option>
+        </select>
+      </div>
+
+      <div className="mb-6">
+        <h3 className="text-xl font-bold text-white mb-4">
+          Discount đã được sử dụng
+        </h3>
+        {discountsWithData.length > 0 ? (
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              {currentDiscountsWithData.map((d) => (
+                <div
+                  key={d.discountId || d.discountCode}
+                  className="p-4 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600 transition-colors shadow-md"
+                  onClick={() => onSelect(d)}
+                >
+                  <div className="flex justify-between items-center mb-2">
+                    <div className="font-semibold text-white text-lg">
+                      {d.discountName}
+                    </div>
+                    {new Date(
+                      d.startDate[0],
+                      d.startDate[1] - 1,
+                      d.startDate[2],
+                      d.startDate[3],
+                      d.startDate[4]
+                    ) <= new Date() &&
+                    new Date(
+                      d.endDate[0],
+                      d.endDate[1] - 1,
+                      d.endDate[2],
+                      d.endDate[3],
+                      d.endDate[4]
+                    ) >= new Date() ? (
+                      <span className="bg-green-500 text-white px-2 py-1 text-xs font-bold rounded-full">
+                        Còn hạn
+                      </span>
+                    ) : (
+                      <span className="bg-red-500 text-white px-2 py-1 text-xs font-bold rounded-full">
+                        Hết hạn
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-sm text-gray-300 mb-1">
+                    Mã: {d.discountCode}
+                  </div>
+                  <div className="text-sm text-gray-300 mb-1">
+                    Số người sử dụng: {d.usageCount}
+                  </div>
+                  <div className="text-sm text-gray-300">
+                    Tổng số tiền giảm: {d.totalDiscountAmount}
+                  </div>
+                </div>
+              ))}
+            </div>
+            {totalPagesWithData > 1 && (
+              <div className="mt-4 flex justify-center space-x-2">
+                {pageNumbersWithData.map((page) => (
+                  <button
+                    key={page}
+                    onClick={() => handlePageChangeWithData(page)}
+                    className={`px-3 py-1 rounded-md ${
+                      page === currentPageWithData
+                        ? "bg-blue-500 text-white"
+                        : "bg-gray-600 text-gray-200 hover:bg-gray-500"
+                    }`}
+                  >
+                    {page}
+                  </button>
+                ))}
+              </div>
+            )}
+          </>
+        ) : (
+          <p className="text-gray-300">Không có discount nào có dữ liệu.</p>
+        )}
+      </div>
+
+      {discountsWithoutData.length > 0 && (
+        <div>
+          <h3 className="text-xl font-bold text-white mb-4">
+            Discount chưa được sử dụng
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            {currentDiscountsWithoutData.map((d) => (
+              <div
+                key={d.discountId || d.discountCode}
+                className="p-4 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600 transition-colors shadow-md"
+                onClick={() => onSelect(d)}
+              >
+                <div className="flex justify-between items-center mb-2">
+                  <div className="font-semibold text-white text-lg">
+                    {d.discountName}
+                  </div>
+                  {new Date(
+                    d.startDate[0],
+                    d.startDate[1] - 1,
+                    d.startDate[2],
+                    d.startDate[3],
+                    d.startDate[4]
+                  ) <= new Date() &&
+                  new Date(
+                    d.endDate[0],
+                    d.endDate[1] - 1,
+                    d.endDate[2],
+                    d.endDate[3],
+                    d.endDate[4]
+                  ) >= new Date() ? (
+                    <span className="bg-green-500 text-white px-2 py-1 text-xs font-bold rounded-full">
+                      Còn hạn
+                    </span>
+                  ) : (
+                    <span className="bg-red-500 text-white px-2 py-1 text-xs font-bold rounded-full">
+                      Hết hạn
+                    </span>
+                  )}
+                </div>
+                <div className="text-sm text-gray-300 mb-1">
+                  Mã: {d.discountCode}
+                </div>
+                <div className="text-sm text-gray-300 mb-1">
+                  Số người sử dụng: {d.usageCount || 0}
+                </div>
+                <div className="text-sm text-gray-300">
+                  Tổng số tiền giảm: {d.totalDiscountAmount || 0}
+                </div>
+              </div>
+            ))}
+          </div>
+          {totalPagesWithoutData > 1 && (
+            <div className="mt-4 flex justify-center space-x-2">
+              {pageNumbersWithoutData.map((page) => (
+                <button
+                  key={page}
+                  onClick={() => handlePageChangeWithoutData(page)}
+                  className={`px-3 py-1 rounded-md ${
+                    page === currentPageWithoutData
+                      ? "bg-blue-500 text-white"
+                      : "bg-gray-600 text-gray-200 hover:bg-gray-500"
+                  }`}
+                >
+                  {page}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default DiscountUsageSummaryList;
