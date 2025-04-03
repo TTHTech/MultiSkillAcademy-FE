@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Swal from "sweetalert2";
 
-const Lectures = ({ lectures, sectionId, triggerRefresh }) => {
+const Lectures = ({ lectures, sectionId, instructor, section, course, triggerRefresh }) => {
   const initialLectures = lectures
     .slice()
     .sort((a, b) => a.lectureOrder - b.lectureOrder);
@@ -46,6 +46,52 @@ const Lectures = ({ lectures, sectionId, triggerRefresh }) => {
       } else if (file.type === "application/pdf") {
         setNewLecture((prev) => ({ ...prev, duration: "" }));
       }
+    }
+  };
+  const handleComposeEmail = async (index) => {
+    const lecture = lectures[index];
+    const email = "tthoai2401.learn@gmail.com"; // Địa chỉ nhận email
+    const subject = `Xác nhận phục hồi bài giảng bị khóa: ${lecture.title}`;
+
+    const body = `ĐƠN XIN XEM XÉT PHỤC HỒI HOẠT ĐỘNG CHO BÀI GIẢNG\n
+    THÔNG TIN BÀI GIẢNG:\n
+    - ID BÀI GIẢNG: ${lecture.lecture_id}\n
+    - TÊN BÀI GIẢNG: "${lecture.title.toUpperCase()}"\n
+    - THUỘC CHƯƠNG: "${section.title.toUpperCase()}"\n
+    - THUỘC KHÓA HỌC: "${course.title.toUpperCase()}"\n
+    - GIẢNG VIÊN: ${instructor.firstName.toUpperCase()} ${instructor.lastName.toUpperCase()}\n
+    - Email: ${instructor.email}\n
+    - SỐ ĐIỆN THOẠI: ${instructor.phoneNumber}\n
+    LÝ DO PHỤC HỒI:\n
+    - \n
+    - \n
+    VUI LÒNG XỬ LÝ SỚM. XIN CHÂN THÀNH CẢM ƠN!`;
+
+    const loginUrl = `https://accounts.google.com/AccountChooser?Email=${instructor.email}`;
+    const composeUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${email}&su=${encodeURIComponent(
+      subject
+    )}&body=${encodeURIComponent(body)}`;
+
+    const swalResult = await Swal.fire({
+      title: "Xác nhận đăng nhập",
+      text: `Bạn đã đăng nhập email?\nNên sử dụng email này "${instructor.email}" để được ưu tiên.`,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Tiếp tục",
+      cancelButtonText: "Hủy",
+    });
+
+    if (swalResult.isDismissed) {
+      return;
+    }
+
+    if (swalResult.isConfirmed) {
+      window.open(composeUrl, "_blank");
+    } else {
+      window.open(loginUrl, "_blank");
+      setTimeout(() => {
+        window.open(composeUrl, "_blank");
+      }, 3000);
     }
   };
 
@@ -469,7 +515,8 @@ const Lectures = ({ lectures, sectionId, triggerRefresh }) => {
           lectureList.map((lecture, index) => (
             <div
               key={lecture.lecture_id}
-              className="flex flex-col sm:flex-row items-center justify-between p-4 border rounded-md hover:shadow-lg transition"
+              className={`flex flex-col sm:flex-row items-center justify-between p-4 border rounded-md hover:shadow-lg transition
+                ${lecture.status ? "bg-white" : "bg-red-100"}`}
               draggable
               onDragStart={() => handleDragStart(index)}
               onDragOver={handleDragOver}
@@ -493,7 +540,7 @@ const Lectures = ({ lectures, sectionId, triggerRefresh }) => {
                           onChange={(e) =>
                             handleTitleChange(index, e.target.value)
                           }
-                          className="p-2 bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-400 w-full"
+                          className={`p-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 w-full`}
                         />
                       </div>
                       <div>
@@ -650,7 +697,7 @@ const Lectures = ({ lectures, sectionId, triggerRefresh }) => {
                       rel="noopener noreferrer"
                       className="text-green-600 hover:text-green-800 transition font-semibold"
                     >
-                      Download PDF
+                      Watch PDF
                     </a>
                   )}
                   <button
@@ -671,6 +718,17 @@ const Lectures = ({ lectures, sectionId, triggerRefresh }) => {
                   >
                     ☰
                   </button>
+                  {!lecture.status && (
+                    <button
+                      onClick={() => {
+                        handleComposeEmail(index);
+                      }}
+                      className="border border-blue-500 text-blue-500 rounded px-2 py-1 hover:bg-blue-100 transition"
+                      title="Gửi yêu cầu mở khóa section"
+                    >
+                      ✉
+                    </button>
+                  )}
                 </div>
               )}
             </div>

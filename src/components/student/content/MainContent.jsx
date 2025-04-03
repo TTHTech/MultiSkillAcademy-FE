@@ -465,10 +465,11 @@ const MainContent = ({
               selectedLecture.document_url && (
                 <iframe
                   src={selectedLecture.document_url}
-                  className="w-full h-[500px] border mb-4"
+                  className="w-full h-screen border mb-4"
                   title={selectedLecture.title}
                 />
               )}
+
             <p className="flex items-center text-gray-600 mt-2 text-sm ml-[30px] mt-[30px]">
               <FaClock className="mr-2 text-blue-500" />{" "}
               {/* Biểu tượng thời lượng */}
@@ -558,8 +559,10 @@ const MainContent = ({
             </div>
           )}
           {selectedTab === 3 && (
-            <div  className="mt-6 mb-10">
-              <h3 className="text-2xl font-semibold ml-8 mt-8">Nhắc nhở học tập</h3>
+            <div className="mt-6 mb-10">
+              <h3 className="text-2xl font-semibold ml-8 mt-8">
+                Nhắc nhở học tập
+              </h3>
               <StudyReminder content="Nhắc nhở học tập" />
             </div>
           )}
