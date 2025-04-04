@@ -43,6 +43,7 @@ import {
   LayoutDashboard,
   Clock,
   LineChart,
+  DollarSign,
 } from "lucide-react";
 import { ChalkboardTeacher } from "phosphor-react";
 
@@ -119,10 +120,22 @@ const MENU_GROUPS = [
             color: "#60A5FA"
           },
           {
-            name: "Instructor Earnings",
+            name: "Admin Revenue Dashboard",
             icon: Users,
-            href: "/admin/revenue/instructors",
+            href: "/admin/revenue-dashboard",
             color: "#3B82F6"
+          },
+          {
+            name: "Instructor Revenue",
+            icon: DollarSign,
+            href: "/admin/instructor-revenue",
+            color: "#2563EB"
+          },
+          {
+            name: "Instructor Sales",
+            icon: TrendingUp,
+            href: "/admin/instructor-sales",
+            color: "#1D4ED8"
           },
           {
             name: "Sharing Policies",

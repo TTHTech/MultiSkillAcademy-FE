@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Search, Plus, Edit, Trash, Check, X, ChevronDown, ChevronUp } from "lucide-react";
+import { Search, Plus, Edit, Trash, X, ChevronDown, ChevronUp } from "lucide-react";
 
 // Error boundary component
 class ErrorBoundary extends React.Component {
@@ -51,6 +51,7 @@ const AdminRevenuePolicyTable = () => {
   const [filteredPolicies, setFilteredPolicies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [toast, setToast] = useState(null);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [sortField, setSortField] = useState("id");
@@ -58,6 +59,7 @@ const AdminRevenuePolicyTable = () => {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [policyCount, setPolicyCount] = useState(0);
   const policiesPerPage = 10;
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -65,11 +67,21 @@ const AdminRevenuePolicyTable = () => {
   const [currentPolicy, setCurrentPolicy] = useState({
     id: null,
     name: "",
-    description: "",
-    percentage: 0,
-    minCoursePrice: 0,
-    maxCoursePrice: 0,
+    percentage: "",
+    minCoursePrice: "",
+    maxCoursePrice: "",
     active: false,
+    instructorReferredRate: { default: 0.7 },
+    platformReferredRate: {
+      "0-10000000": 0.5,
+      "10000000-50000000": 0.6,
+      "50000000-infinity": 0.7
+    },
+    ratingBonusThreshold: 4.5,
+    ratingBonusPercentage: 0.05,
+    maxRefundRate: 0.05,
+    validFrom: formatDateForApi(new Date()),
+    validTo: formatDateForApi(addOneYear(new Date()))
   });
 
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -78,25 +90,48 @@ const AdminRevenuePolicyTable = () => {
   const [presets, setPresets] = useState([]);
   const [showPresets, setShowPresets] = useState(false);
 
-  // Initial data load
+  // Initial data load - run only once
   useEffect(() => {
-    fetchPolicies();
+    fetchPolicies(1); // Start with page 1
     fetchPresets();
   }, []);
 
+  // Error handling function
+  const handleAuthError = () => {
+    // Clear token from localStorage
+    localStorage.removeItem("token");
+    
+    // Redirect to login page
+    window.location.href = "/login";
+  };
+
+  // Hàm hiển thị toast message
+  const showToast = (type, message) => {
+    setToast({ type, message });
+    // Tự động ẩn toast sau 3 giây
+    setTimeout(() => {
+      setToast(null);
+    }, 3000);
+  };
+
   // Fetch policies with pagination
-  const fetchPolicies = async () => {
+  const fetchPolicies = async (page = currentPage) => {
     try {
       setLoading(true);
       setError(null);
       
       const token = localStorage.getItem("token");
       if (!token) {
+        handleAuthError();
         throw new Error("No token found, please login again.");
       }
 
+      // Đảm bảo page bắt đầu từ 1 cho UI nhưng API bắt đầu từ 0
+      const apiPage = Math.max(0, page - 1);
+      
+      // Gọi API lấy phần tử theo trang
       const response = await fetch(
-        `http://localhost:8080/api/admin/revenue-policies?page=${currentPage - 1}&size=${policiesPerPage}`,
+        `http://localhost:8080/api/admin/revenue-policies?page=${apiPage}&size=${policiesPerPage}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -107,32 +142,92 @@ const AdminRevenuePolicyTable = () => {
       if (!response.ok) {
         const errorText = await response.text();
         console.error("API Error Response:", errorText);
+        
+        // Kiểm tra lỗi xác thực
+        if (response.status === 401 || response.status === 403) {
+          handleAuthError();
+          throw new Error("Session expired. Please login again.");
+        }
+        
         throw new Error(`Failed to fetch policies: ${response.status}`);
       }
 
-      const data = await response.json();
+      // Lấy dữ liệu JSON từ response
+      let data;
+      try {
+        data = await response.json();
+        console.log("API response:", data);
+      } catch (jsonError) {
+        console.error("Error parsing JSON:", jsonError);
+        throw new Error("Invalid response format from server");
+      }
       
-      // Safety check
-      if (!Array.isArray(data)) {
-        console.warn("API response is not an array:", data);
+      // Xử lý các định dạng response khác nhau
+      if (data && data.content && Array.isArray(data.content)) {
+        // Spring Data có định dạng Page object
+        setPolicies(data.content);
+        setFilteredPolicies(data.content);
+        
+        // Sử dụng thông tin phân trang từ API
+        if (data.totalElements !== undefined) {
+          setPolicyCount(data.totalElements);
+        }
+        
+        // Sử dụng totalPages từ API
+        if (data.totalPages !== undefined) {
+          setTotalPages(Math.max(1, data.totalPages));
+        } else if (data.totalElements !== undefined) {
+          const calculatedTotalPages = Math.ceil(data.totalElements / policiesPerPage);
+          setTotalPages(Math.max(1, calculatedTotalPages));
+        } else {
+          setTotalPages(1);
+        }
+        
+        // API page bắt đầu từ 0
+        setCurrentPage(data.number !== undefined ? data.number + 1 : page);
+      } 
+      else if (Array.isArray(data)) {
+        // Trường hợp API trả về mảng - điều này có thể là toàn bộ dữ liệu
+        console.log(`API returned an array with ${data.length} items`);
+        
+        // Lưu toàn bộ dữ liệu
+        setPolicies(data);
+        
+        // Tổng số phần tử là độ dài của mảng
+        const totalItems = data.length;
+        setPolicyCount(totalItems);
+        
+        // Tính toán lại số trang
+        const calculatedTotalPages = Math.ceil(totalItems / policiesPerPage);
+        console.log(`Calculated total pages: ${calculatedTotalPages}`);
+        setTotalPages(Math.max(1, calculatedTotalPages));
+        
+        // Phân trang dữ liệu ở client-side
+        const startIndex = (page - 1) * policiesPerPage;
+        const endIndex = Math.min(startIndex + policiesPerPage, data.length);
+        const paginatedData = data.slice(startIndex, endIndex);
+        setFilteredPolicies(paginatedData);
+        
+        setCurrentPage(page);
+      } 
+      else {
+        console.warn("API response format not recognized:", data);
         setPolicies([]);
         setFilteredPolicies([]);
         setTotalPages(1);
-      } else {
-        setPolicies(data);
-        setFilteredPolicies(data);
-        
-        // For demo purposes, we'll assume there are total pages based on the page size
-        // Ideally, the API would return total count in headers or metadata
-        const totalElements = data.length > 0 ? data.length * 5 : 0; // This should be replaced with actual total from API
-        setTotalPages(Math.max(1, Math.ceil(totalElements / policiesPerPage)));
+        setCurrentPage(1);
+        setPolicyCount(0);
       }
+      
     } catch (error) {
       console.error("Error fetching policies:", error);
       setError(error.message);
+      showToast("error", `Lỗi khi tải dữ liệu: ${error.message}`);
       // Set empty defaults to prevent rendering errors
       setPolicies([]);
       setFilteredPolicies([]);
+      setTotalPages(1);
+      setPolicyCount(0);
     } finally {
       setLoading(false);
     }
@@ -143,6 +238,7 @@ const AdminRevenuePolicyTable = () => {
     try {
       const token = localStorage.getItem("token");
       if (!token) {
+        handleAuthError();
         throw new Error("No token found, please login again.");
       }
 
@@ -156,6 +252,15 @@ const AdminRevenuePolicyTable = () => {
       );
 
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error("API Error Response:", errorText);
+        
+        // Kiểm tra lỗi xác thực
+        if (response.status === 401 || response.status === 403) {
+          handleAuthError();
+          throw new Error("Session expired. Please login again.");
+        }
+        
         throw new Error("Failed to fetch policy presets.");
       }
 
@@ -177,6 +282,7 @@ const AdminRevenuePolicyTable = () => {
     try {
       const token = localStorage.getItem("token");
       if (!token) {
+        handleAuthError();
         throw new Error("No token found, please login again.");
       }
 
@@ -190,6 +296,15 @@ const AdminRevenuePolicyTable = () => {
       );
 
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error("API Error Response:", errorText);
+        
+        // Kiểm tra lỗi xác thực
+        if (response.status === 401 || response.status === 403) {
+          handleAuthError();
+          throw new Error("Session expired. Please login again.");
+        }
+        
         throw new Error("Failed to fetch policy details.");
       }
 
@@ -204,8 +319,14 @@ const AdminRevenuePolicyTable = () => {
   // Handle pagination
   const handlePageChange = (page) => {
     if (page < 1 || page > totalPages) return;
+
+    console.log(`Chuyển đến trang ${page} / ${totalPages}`);
+    
+    // Cập nhật state page trước
     setCurrentPage(page);
-    fetchPolicies(); // Re-fetch with new page number
+    
+    // Luôn gọi API để fetch dữ liệu trang mới
+    fetchPolicies(page);
   };
 
   // Handle search
@@ -216,17 +337,37 @@ const AdminRevenuePolicyTable = () => {
     // Safety check
     if (!policies || !Array.isArray(policies)) {
       setFilteredPolicies([]);
+      setTotalPages(0);
       return;
     }
     
-    const filtered = policies.filter((policy) => {
-      const nameMatch = policy.name && policy.name.toLowerCase().includes(term);
-      const descMatch = policy.description && policy.description.toLowerCase().includes(term);
-      return nameMatch || descMatch;
-    });
-    
-    setFilteredPolicies(filtered);
-    setCurrentPage(1);
+    if (term === "") {
+      // Nếu xóa điều kiện tìm kiếm, quay lại trang 1 và lấy dữ liệu từ API
+      setCurrentPage(1);
+      fetchPolicies(1);
+    } else {
+      // Lọc tất cả policies theo điều kiện tìm kiếm
+      const allFiltered = policies.filter((policy) => {
+        return policy.name && policy.name.toLowerCase().includes(term);
+      });
+      
+      // Tính toán số trang mới dựa trên kết quả tìm kiếm
+      const totalFilteredItems = allFiltered.length;
+      const newTotalPages = Math.max(1, Math.ceil(totalFilteredItems / policiesPerPage));
+      
+      // Cập nhật số lượng phần tử
+      setPolicyCount(totalFilteredItems);
+      
+      // Luôn về trang 1 khi thay đổi điều kiện tìm kiếm
+      setCurrentPage(1);
+      setTotalPages(newTotalPages);
+      
+      // Lấy kết quả của trang đầu tiên
+      const firstPageResults = allFiltered.slice(0, policiesPerPage);
+      setFilteredPolicies(firstPageResults);
+      
+      console.log(`Search results: ${totalFilteredItems} items, ${newTotalPages} pages`);
+    }
   };
 
   // Handle sorting
@@ -256,11 +397,21 @@ const AdminRevenuePolicyTable = () => {
     setCurrentPolicy({
       id: null,
       name: "",
-      description: "",
-      percentage: 0,
-      minCoursePrice: 0,
-      maxCoursePrice: 0,
+      percentage: "",
+      minCoursePrice: "",
+      maxCoursePrice: "",
       active: false,
+      instructorReferredRate: { default: 0.7 },
+      platformReferredRate: {
+        "0-10000000": 0.5,
+        "10000000-50000000": 0.6,
+        "50000000-infinity": 0.7
+      },
+      ratingBonusThreshold: 4.5,
+      ratingBonusPercentage: 0.05,
+      maxRefundRate: 0.05,
+      validFrom: formatDateForApi(new Date()),
+      validTo: formatDateForApi(addOneYear(new Date()))
     });
     setFormMode("create");
     setIsModalOpen(true);
@@ -292,6 +443,7 @@ const AdminRevenuePolicyTable = () => {
     try {
       const token = localStorage.getItem("token");
       if (!token) {
+        handleAuthError();
         throw new Error("No token found, please login again.");
       }
 
@@ -301,12 +453,18 @@ const AdminRevenuePolicyTable = () => {
       
       const method = formMode === "create" ? "POST" : "PUT";
       
-      // Ensure numeric fields are sent as numbers
+      // Format the policy data to match API expectations
       const policyToSend = {
-        ...currentPolicy,
-        percentage: Number(currentPolicy.percentage),
-        minCoursePrice: Number(currentPolicy.minCoursePrice),
-        maxCoursePrice: Number(currentPolicy.maxCoursePrice)
+        id: currentPolicy.id,
+        name: currentPolicy.name,
+        instructorReferredRate: currentPolicy.instructorReferredRate,
+        platformReferredRate: currentPolicy.platformReferredRate,
+        ratingBonusThreshold: Number(currentPolicy.ratingBonusThreshold),
+        ratingBonusPercentage: Number(currentPolicy.ratingBonusPercentage),
+        maxRefundRate: Number(currentPolicy.maxRefundRate),
+        validFrom: currentPolicy.validFrom,
+        validTo: currentPolicy.validTo,
+        active: currentPolicy.active
       };
       
       const response = await fetch(url, {
@@ -320,15 +478,31 @@ const AdminRevenuePolicyTable = () => {
 
       if (!response.ok) {
         const errorText = await response.text();
+        console.error("API Error Response:", errorText);
+        
+        // Kiểm tra lỗi xác thực
+        if (response.status === 401 || response.status === 403) {
+          handleAuthError();
+          throw new Error("Session expired. Please login again.");
+        }
+        
         throw new Error(`Failed to ${formMode} policy: ${errorText}`);
       }
 
-      // Refresh policies
-      fetchPolicies();
+      // Hiển thị thông báo thành công
+      showToast("success", formMode === "create" ? "Tạo chính sách thành công" : "Cập nhật chính sách thành công");
+
+      // Refresh policies - for create go to page 1, for edit stay on current page
+      if (formMode === "create") {
+        fetchPolicies(1);
+      } else {
+        fetchPolicies(currentPage);
+      }
       closeModal();
     } catch (error) {
       console.error(`Error ${formMode}ing policy:`, error);
       setError(error.message);
+      showToast("error", `Lỗi: ${error.message}`);
     }
   };
 
@@ -349,6 +523,7 @@ const AdminRevenuePolicyTable = () => {
     try {
       const token = localStorage.getItem("token");
       if (!token) {
+        handleAuthError();
         throw new Error("No token found, please login again.");
       }
 
@@ -363,48 +538,29 @@ const AdminRevenuePolicyTable = () => {
       );
 
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error("API Error Response:", errorText);
+        
+        // Kiểm tra lỗi xác thực
+        if (response.status === 401 || response.status === 403) {
+          handleAuthError();
+          throw new Error("Session expired. Please login again.");
+        }
+        
         throw new Error(`Failed to delete policy. Status: ${response.status}`);
       }
 
-      // Refresh policies and reset state
-      fetchPolicies();
+      // Hiển thị thông báo thành công
+      showToast("success", "Xóa chính sách thành công");
+
+      // Refresh policies and reset state - keep on current page if possible
+      fetchPolicies(currentPage);
       setShowDeleteConfirm(false);
       setPolicyToDelete(null);
     } catch (error) {
       console.error("Error deleting policy:", error);
       setError(error.message);
-    }
-  };
-
-  // Activate handler
-  const handleActivate = async (id) => {
-    if (!id) return;
-    
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        throw new Error("No token found, please login again.");
-      }
-
-      const response = await fetch(
-        `http://localhost:8080/api/admin/revenue-policies/${id}/activate`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to activate policy.");
-      }
-
-      // Refresh policies
-      fetchPolicies();
-    } catch (error) {
-      console.error("Error activating policy:", error);
-      setError(error.message);
+      showToast("error", `Lỗi: ${error.message}`);
     }
   };
 
@@ -415,13 +571,48 @@ const AdminRevenuePolicyTable = () => {
     setCurrentPolicy({
       ...currentPolicy,
       name: preset.name || "",
-      description: preset.description || "",
-      percentage: preset.percentage || 0,
-      minCoursePrice: preset.minCoursePrice || 0,
-      maxCoursePrice: preset.maxCoursePrice || 0,
+      instructorReferredRate: preset.instructorReferredRate || { default: 0.7 },
+      platformReferredRate: preset.platformReferredRate || {
+        "0-10000000": 0.5,
+        "10000000-50000000": 0.6,
+        "50000000-infinity": 0.7
+      },
+      ratingBonusThreshold: preset.ratingBonusThreshold || 4.5,
+      ratingBonusPercentage: preset.ratingBonusPercentage || 0.05,
+      maxRefundRate: preset.maxRefundRate || 0.05,
+      validFrom: preset.validFrom || formatDateForApi(new Date()),
+      validTo: preset.validTo || formatDateForApi(addOneYear(new Date())),
     });
     setShowPresets(false);
   };
+
+  // Helper functions for date handling
+  function formatDateForApi(date) {
+    if (!date) return null;
+    // Format to [YYYY, MM, DD, HH, MM] array format that backend expects
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;  // JS months are 0-indexed
+    const day = date.getDate();
+    return [year, month, day, 0, 0];
+  }
+
+  function addOneYear(date) {
+    const newDate = new Date(date);
+    newDate.setFullYear(newDate.getFullYear() + 1);
+    return newDate;
+  }
+
+  function formatDateForDisplay(dateArray) {
+    if (!dateArray || !Array.isArray(dateArray) || dateArray.length < 3) return "";
+    const [year, month, day] = dateArray;
+    return `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+  }
+
+  function parseDateFromInput(dateString) {
+    if (!dateString) return null;
+    const date = new Date(dateString);
+    return formatDateForApi(date);
+  }
 
   // Derived values with safety checks
   const currentPolicies = filteredPolicies && Array.isArray(filteredPolicies)
@@ -513,19 +704,8 @@ const AdminRevenuePolicyTable = () => {
                     : <ChevronDown size={14} className="inline ml-1" />
                 )}
               </th>
-              <th className="py-3 px-4">Mô tả</th>
-              <th 
-                className="py-3 px-4 cursor-pointer" 
-                onClick={() => handleSort("percentage")}
-              >
-                Phần trăm
-                {sortField === "percentage" && (
-                  sortDirection === "asc" 
-                    ? <ChevronUp size={14} className="inline ml-1" /> 
-                    : <ChevronDown size={14} className="inline ml-1" />
-                )}
-              </th>
-              <th className="py-3 px-4">Phạm vi giá</th>
+              <th className="py-3 px-4">Tỷ lệ GV</th>
+              <th className="py-3 px-4">Tỷ lệ nền tảng</th>
               <th 
                 className="py-3 px-4 cursor-pointer" 
                 onClick={() => handleSort("active")}
@@ -547,15 +727,14 @@ const AdminRevenuePolicyTable = () => {
                   <td className="py-3 px-4">{policy.id || 'N/A'}</td>
                   <td className="py-3 px-4">{policy.name || 'Chưa đặt tên'}</td>
                   <td className="py-3 px-4">
-                    {policy.description
-                      ? (policy.description.length > 50
-                        ? `${policy.description.substring(0, 50)}...`
-                        : policy.description)
-                      : 'Không có mô tả'}
+                    {policy.instructorReferredRate?.default 
+                      ? `${(policy.instructorReferredRate.default * 100).toFixed(1)}%`
+                      : 'N/A'}
                   </td>
-                  <td className="py-3 px-4">{policy.percentage || 0}%</td>
                   <td className="py-3 px-4">
-                    ${policy.minCoursePrice || 0} - ${policy.maxCoursePrice || 0}
+                    {policy.platformReferredRate 
+                      ? `${(policy.platformReferredRate["50000000-infinity"] * 100).toFixed(1)}%`
+                      : 'N/A'}
                   </td>
                   <td className="py-3 px-4">
                     <span
@@ -583,21 +762,12 @@ const AdminRevenuePolicyTable = () => {
                     >
                       <Trash size={18} />
                     </button>
-                    {!policy.active && (
-                      <button
-                        onClick={() => handleActivate(policy.id)}
-                        className="text-green-400 hover:text-green-300"
-                        title="Kích hoạt"
-                      >
-                        <Check size={18} />
-                      </button>
-                    )}
                   </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan="7" className="py-8 text-center text-gray-400">
+                <td colSpan="6" className="py-8 text-center text-gray-400">
                   Không tìm thấy chính sách nào. Tạo mới để bắt đầu.
                 </td>
               </tr>
@@ -607,33 +777,40 @@ const AdminRevenuePolicyTable = () => {
       </div>
 
       {/* Pagination - Luôn hiển thị */}
-      <div className="flex justify-between mt-4">
+      <div className="flex justify-between mt-4 items-center">
         <button
           className="bg-yellow-500 text-white px-4 py-2 rounded-lg disabled:bg-gray-600 disabled:text-gray-400"
-          onClick={() => handlePageChange(currentPage - 1)}
-          disabled={currentPage === 1}
+          onClick={() => handlePageChange(Math.max(currentPage - 1, 1))}
+          disabled={currentPage === 1 || totalPages === 0}
         >
           Trước
         </button>
 
         <div className="flex items-center">
+          {/* Hiển thị tổng số phần tử ở dưới các nút phân trang */}
+          {policyCount > 0 && (
+            <span className="text-gray-400 text-sm mr-4">
+              {policyCount} phần tử | Trang {currentPage} / {totalPages}
+            </span>
+          )}
+          
           {(() => {
-            // Nếu không có trang nào, vẫn hiển thị trang 1
-            const pages = [];
-            const displayedTotalPages = Math.max(1, totalPages || 1);
-            const maxVisiblePages = 5;
+            // Không hiển thị phân trang nếu không có dữ liệu
+            if (filteredPolicies.length === 0 && !loading) {
+              return <span className="text-gray-400">Không có dữ liệu</span>;
+            }
             
-            if (displayedTotalPages <= maxVisiblePages) {
-              // Show all pages if total is small
-              for (let i = 1; i <= displayedTotalPages; i++) {
+            const pages = [];
+            
+            if (totalPages <= 13) {
+              // Hiển thị tất cả các trang nếu tổng số trang <= 13
+              for (let i = 1; i <= totalPages; i++) {
                 pages.push(
                   <button
                     key={i}
                     onClick={() => handlePageChange(i)}
                     className={`px-4 py-2 mx-1 rounded-lg ${
-                      currentPage === i
-                        ? "bg-yellow-500 text-white"
-                        : "bg-gray-700 text-gray-300"
+                      currentPage === i ? "bg-yellow-500 text-white" : "bg-gray-700 text-gray-300"
                     }`}
                   >
                     {i}
@@ -641,66 +818,100 @@ const AdminRevenuePolicyTable = () => {
                 );
               }
             } else {
-              // Show limited pages with first/last and ellipsis
-              const showFirst = currentPage > 2;
-              const showLast = currentPage < displayedTotalPages - 1;
-              const startPage = Math.max(1, currentPage - 1);
-              const endPage = Math.min(displayedTotalPages, startPage + 2);
-              
-              if (showFirst) {
+              // Hiển thị 10 trang đầu và 3 trang cuối, với logic động
+              if (currentPage <= 10) {
+                for (let i = 1; i <= 10; i++) {
+                  pages.push(
+                    <button
+                      key={i}
+                      onClick={() => handlePageChange(i)}
+                      className={`px-4 py-2 mx-1 rounded-lg ${
+                        currentPage === i ? "bg-yellow-500 text-white" : "bg-gray-700 text-gray-300"
+                      }`}
+                    >
+                      {i}
+                    </button>
+                  );
+                }
+                pages.push(<span key="dots-end" className="px-4 py-2">...</span>);
+                for (let i = totalPages - 2; i <= totalPages; i++) {
+                  pages.push(
+                    <button
+                      key={i}
+                      onClick={() => handlePageChange(i)}
+                      className={`px-4 py-2 mx-1 rounded-lg ${
+                        currentPage === i ? "bg-yellow-500 text-white" : "bg-gray-700 text-gray-300"
+                      }`}
+                    >
+                      {i}
+                    </button>
+                  );
+                }
+              } else if (currentPage > 10 && currentPage <= totalPages - 10) {
                 pages.push(
                   <button
                     key={1}
                     onClick={() => handlePageChange(1)}
-                    className="px-4 py-2 mx-1 rounded-lg bg-gray-700 text-gray-300"
+                    className={`px-4 py-2 mx-1 rounded-lg bg-gray-700 text-gray-300`}
                   >
                     1
                   </button>
                 );
-                
-                if (startPage > 2) {
+                pages.push(<span key="dots-start" className="px-4 py-2">...</span>);
+          
+                for (let i = currentPage - 4; i <= currentPage + 4; i++) {
                   pages.push(
-                    <span key="left-dots" className="px-4 py-2">
-                      ...
-                    </span>
+                    <button
+                      key={i}
+                      onClick={() => handlePageChange(i)}
+                      className={`px-4 py-2 mx-1 rounded-lg ${
+                        currentPage === i ? "bg-yellow-500 text-white" : "bg-gray-700 text-gray-300"
+                      }`}
+                    >
+                      {i}
+                    </button>
                   );
                 }
-              }
-              
-              for (let i = startPage; i <= endPage; i++) {
-                pages.push(
-                  <button
-                    key={i}
-                    onClick={() => handlePageChange(i)}
-                    className={`px-4 py-2 mx-1 rounded-lg ${
-                      currentPage === i
-                        ? "bg-yellow-500 text-white"
-                        : "bg-gray-700 text-gray-300"
-                    }`}
-                  >
-                    {i}
-                  </button>
-                );
-              }
-              
-              if (showLast) {
-                if (endPage < displayedTotalPages - 1) {
+          
+                pages.push(<span key="dots-end" className="px-4 py-2">...</span>);
+                for (let i = totalPages - 2; i <= totalPages; i++) {
                   pages.push(
-                    <span key="right-dots" className="px-4 py-2">
-                      ...
-                    </span>
+                    <button
+                      key={i}
+                      onClick={() => handlePageChange(i)}
+                      className={`px-4 py-2 mx-1 rounded-lg ${
+                        currentPage === i ? "bg-yellow-500 text-white" : "bg-gray-700 text-gray-300"
+                      }`}
+                    >
+                      {i}
+                    </button>
                   );
                 }
-                
+              } else {
                 pages.push(
                   <button
-                    key={displayedTotalPages}
-                    onClick={() => handlePageChange(displayedTotalPages)}
-                    className="px-4 py-2 mx-1 rounded-lg bg-gray-700 text-gray-300"
+                    key={1}
+                    onClick={() => handlePageChange(1)}
+                    className={`px-4 py-2 mx-1 rounded-lg bg-gray-700 text-gray-300`}
                   >
-                    {displayedTotalPages}
+                    1
                   </button>
                 );
+                pages.push(<span key="dots-start" className="px-4 py-2">...</span>);
+          
+                for (let i = totalPages - 12; i <= totalPages; i++) {
+                  pages.push(
+                    <button
+                      key={i}
+                      onClick={() => handlePageChange(i)}
+                      className={`px-4 py-2 mx-1 rounded-lg ${
+                        currentPage === i ? "bg-yellow-500 text-white" : "bg-gray-700 text-gray-300"
+                      }`}
+                    >
+                      {i}
+                    </button>
+                  );
+                }
               }
             }
             
@@ -710,8 +921,8 @@ const AdminRevenuePolicyTable = () => {
 
         <button
           className="bg-red-500 text-white px-4 py-2 rounded-lg disabled:bg-gray-600 disabled:text-gray-400"
-          onClick={() => handlePageChange(currentPage + 1)}
-          disabled={currentPage === totalPages || totalPages === 0}
+          onClick={() => handlePageChange(Math.min(currentPage + 1, totalPages))}
+          disabled={currentPage >= totalPages || totalPages === 0}
         >
           Tiếp
         </button>
@@ -744,7 +955,7 @@ const AdminRevenuePolicyTable = () => {
                   <input
                     type="text"
                     name="name"
-                    value={currentPolicy.name || ""}
+                    value={currentPolicy.name}
                     onChange={handleInputChange}
                     className="bg-gray-700 text-white w-full p-2 rounded-lg"
                     required
@@ -773,10 +984,6 @@ const AdminRevenuePolicyTable = () => {
                             className="bg-gray-600 p-3 rounded-lg cursor-pointer hover:bg-gray-500"
                           >
                             <p className="font-bold text-white">{preset.name || "Mẫu không tên"}</p>
-                            <p className="text-sm text-gray-300">{preset.percentage || 0}%</p>
-                            <p className="text-xs text-gray-400">
-                              ${preset.minCoursePrice || 0} - ${preset.maxCoursePrice || 0}
-                            </p>
                           </div>
                         ))}
                       </div>
@@ -786,29 +993,190 @@ const AdminRevenuePolicyTable = () => {
                   </div>
                 )}
 
-                <div className="col-span-2">
-                  <label className="block text-gray-300 mb-2">Mô tả</label>
-                  <textarea
-                    name="description"
-                    value={currentPolicy.description || ""}
-                    onChange={handleInputChange}
-                    className="bg-gray-700 text-white w-full p-2 rounded-lg min-h-20"
-                    rows="3"
-                  ></textarea>
-                </div>
-
                 <div>
-                  <label className="block text-gray-300 mb-2">Phần trăm (%)</label>
+                  <label className="block text-gray-300 mb-2">Tỷ lệ giảng viên (%)</label>
                   <input
-                    type="number"
-                    name="percentage"
-                    value={currentPolicy.percentage || 0}
-                    onChange={handleInputChange}
+                    type="text"
+                    name="instructorReferredRate.default"
+                    value={currentPolicy.instructorReferredRate?.default * 100 || ""}
+                    onChange={(e) => {
+                      const value = e.target.value === '' ? '' : Number(e.target.value) / 100;
+                      setCurrentPolicy({
+                        ...currentPolicy,
+                        instructorReferredRate: {
+                          ...currentPolicy.instructorReferredRate,
+                          default: value
+                        }
+                      });
+                    }}
                     className="bg-gray-700 text-white w-full p-2 rounded-lg"
                     min="0"
                     max="100"
                     required
+                    onClick={(e) => e.target.select()}
                   />
+                </div>
+
+                <div>
+                  <label className="block text-gray-300 mb-2">Điểm đánh giá tối thiểu</label>
+                  <input
+                    type="text"
+                    name="ratingBonusThreshold"
+                    value={currentPolicy.ratingBonusThreshold || ""}
+                    onChange={handleInputChange}
+                    className="bg-gray-700 text-white w-full p-2 rounded-lg"
+                    min="0"
+                    max="5"
+                    step="0.1"
+                    required
+                    onClick={(e) => e.target.select()}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-gray-300 mb-2">Thưởng đánh giá cao (%)</label>
+                  <input
+                    type="text"
+                    name="ratingBonusPercentage"
+                    value={currentPolicy.ratingBonusPercentage * 100 || ""}
+                    onChange={(e) => {
+                      const value = e.target.value === '' ? '' : Number(e.target.value) / 100;
+                      setCurrentPolicy({
+                        ...currentPolicy,
+                        ratingBonusPercentage: value
+                      });
+                    }}
+                    className="bg-gray-700 text-white w-full p-2 rounded-lg"
+                    min="0"
+                    max="100"
+                    required
+                    onClick={(e) => e.target.select()}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-gray-300 mb-2">Tỷ lệ hoàn tiền tối đa (%)</label>
+                  <input
+                    type="text"
+                    name="maxRefundRate"
+                    value={currentPolicy.maxRefundRate * 100 || ""}
+                    onChange={(e) => {
+                      const value = e.target.value === '' ? '' : Number(e.target.value) / 100;
+                      setCurrentPolicy({
+                        ...currentPolicy,
+                        maxRefundRate: value
+                      });
+                    }}
+                    className="bg-gray-700 text-white w-full p-2 rounded-lg"
+                    min="0"
+                    max="100"
+                    required
+                    onClick={(e) => e.target.select()}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-gray-300 mb-2">Ngày bắt đầu hiệu lực</label>
+                  <input
+                    type="date"
+                    value={formatDateForDisplay(currentPolicy.validFrom)}
+                    onChange={(e) => {
+                      setCurrentPolicy({
+                        ...currentPolicy,
+                        validFrom: parseDateFromInput(e.target.value)
+                      });
+                    }}
+                    className="bg-gray-700 text-white w-full p-2 rounded-lg"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-gray-300 mb-2">Ngày kết thúc hiệu lực</label>
+                  <input
+                    type="date"
+                    value={formatDateForDisplay(currentPolicy.validTo)}
+                    onChange={(e) => {
+                      setCurrentPolicy({
+                        ...currentPolicy,
+                        validTo: parseDateFromInput(e.target.value)
+                      });
+                    }}
+                    className="bg-gray-700 text-white w-full p-2 rounded-lg"
+                    required
+                  />
+                </div>
+
+                <div className="col-span-2">
+                  <label className="block text-gray-300 mb-2">Phần trăm nền tảng theo doanh thu</label>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div>
+                      <label className="text-xs text-gray-400">0-10tr VND</label>
+                      <input
+                        type="text"
+                        value={currentPolicy.platformReferredRate?.["0-10000000"] * 100 || ""}
+                        onChange={(e) => {
+                          const value = e.target.value === '' ? '' : Number(e.target.value) / 100;
+                          setCurrentPolicy({
+                            ...currentPolicy,
+                            platformReferredRate: {
+                              ...currentPolicy.platformReferredRate,
+                              "0-10000000": value
+                            }
+                          });
+                        }}
+                        className="bg-gray-700 text-white w-full p-2 rounded-lg"
+                        min="0"
+                        max="100"
+                        required
+                        onClick={(e) => e.target.select()}
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-gray-400">10tr-50tr VND</label>
+                      <input
+                        type="text"
+                        value={currentPolicy.platformReferredRate?.["10000000-50000000"] * 100 || ""}
+                        onChange={(e) => {
+                          const value = e.target.value === '' ? '' : Number(e.target.value) / 100;
+                          setCurrentPolicy({
+                            ...currentPolicy,
+                            platformReferredRate: {
+                              ...currentPolicy.platformReferredRate,
+                              "10000000-50000000": value
+                            }
+                          });
+                        }}
+                        className="bg-gray-700 text-white w-full p-2 rounded-lg"
+                        min="0"
+                        max="100"
+                        required
+                        onClick={(e) => e.target.select()}
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-gray-400">Trên 50tr VND</label>
+                      <input
+                        type="text"
+                        value={currentPolicy.platformReferredRate?.["50000000-infinity"] * 100 || ""}
+                        onChange={(e) => {
+                          const value = e.target.value === '' ? '' : Number(e.target.value) / 100;
+                          setCurrentPolicy({
+                            ...currentPolicy,
+                            platformReferredRate: {
+                              ...currentPolicy.platformReferredRate,
+                              "50000000-infinity": value
+                            }
+                          });
+                        }}
+                        className="bg-gray-700 text-white w-full p-2 rounded-lg"
+                        min="0"
+                        max="100"
+                        required
+                        onClick={(e) => e.target.select()}
+                      />
+                    </div>
+                  </div>
                 </div>
 
                 <div>
@@ -823,38 +1191,6 @@ const AdminRevenuePolicyTable = () => {
                     />
                     <span className="text-white">Hoạt động</span>
                   </div>
-                </div>
-
-                <div>
-                  <label className="block text-gray-300 mb-2">
-                    Giá tối thiểu ($)
-                  </label>
-                  <input
-                    type="number"
-                    name="minCoursePrice"
-                    value={currentPolicy.minCoursePrice || 0}
-                    onChange={handleInputChange}
-                    className="bg-gray-700 text-white w-full p-2 rounded-lg"
-                    min="0"
-                    step="0.01"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-gray-300 mb-2">
-                    Giá tối đa ($)
-                  </label>
-                  <input
-                    type="number"
-                    name="maxCoursePrice"
-                    value={currentPolicy.maxCoursePrice || 0}
-                    onChange={handleInputChange}
-                    className="bg-gray-700 text-white w-full p-2 rounded-lg"
-                    min="0"
-                    step="0.01"
-                    required
-                  />
                 </div>
               </div>
 
@@ -909,12 +1245,12 @@ const AdminRevenuePolicyTable = () => {
         </div>
       )}
 
-      {/* Error notification */}
-      {error && (
-        <div className="fixed bottom-4 right-4 bg-red-500 text-white p-4 rounded-lg shadow-lg">
-          <p>{error}</p>
+      {/* Toast Notification */}
+      {toast && (
+        <div className={`fixed bottom-4 right-4 ${toast.type === "success" ? "bg-green-500" : "bg-red-500"} text-white p-4 rounded-lg shadow-lg z-50`}>
+          <p>{toast.message}</p>
           <button
-            onClick={() => setError(null)}
+            onClick={() => setToast(null)}
             className="absolute top-2 right-2 text-white"
           >
             <X size={16} />
@@ -924,5 +1260,6 @@ const AdminRevenuePolicyTable = () => {
     </motion.div>
   );
 };
+
 
 export default AdminRevenuePolicyTableWithErrorBoundary;
