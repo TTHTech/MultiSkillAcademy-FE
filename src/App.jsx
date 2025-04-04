@@ -67,9 +67,12 @@ import GoogleCallbackPage from "./pages/auth/GoogleCallbackPage";
 import GitHubCallbackPage from "./pages/auth/GitHubCallbackPage";
 import PageProfile from "./pages/instructor/PageProfile/PageProfile.jsx";
 import AdminRevenuePolicyTable from "./components/admin/revenue/AdminRevenuePolicyTable.jsx";
+import AdminRevenueDashboard from "./components/admin/revenue/AdminRevenueDashboard.jsx";
 import PageCreateDiscounts from "./pages/admin/PageCreateDiscount.jsx"
 import PageDiscount from "./pages/admin/PageDiscount.jsx"
 import PageDiscountUsage from "./pages/admin/PageDiscountUsage.jsx"
+import AdminInstructorRevenue from "./components/admin/revenue/AdminInstructorRevenue.jsx";
+import AdminInstructorSales from "./components/admin/revenue/AdminInstructorSales.jsx";
 
 
 function App() {
@@ -186,8 +189,10 @@ function App() {
                 <Route path="/admin/courses/reviews" element={<PageReviewCourse />} />
                 <Route path="/admin/courses/sections" element={<PageSection />} />
                 <Route path="/admin/courses/lectures" element={<PageLecture />} />
-
+                <Route path="/admin/revenue-dashboard" element={<AdminRevenueDashboard  />} />
                 <Route path="/admin/revenue-policy" element={<AdminRevenuePolicyTable />} />
+                <Route path="/admin/instructor-revenue" element={<AdminInstructorRevenue />} />
+                <Route path="/admin/instructor-sales" element={<AdminInstructorSales />} />
 
                 <Route path="/admin/discounts" element={<PageDiscount />} />
                 <Route path="/admin/promotions/add" element={<PageCreateDiscounts />} />
