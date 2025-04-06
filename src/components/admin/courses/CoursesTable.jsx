@@ -8,19 +8,59 @@ import { Navigation, Pagination as SwiperPagination } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
-import { FaUserCircle, FaBook, FaTools, FaClipboardList } from "react-icons/fa";
+import { FaUserCircle, FaBook, FaTools, FaClipboardList, FaChevronLeft, FaChevronRight, FaArrowLeft, FaCheck, FaTimes } from "react-icons/fa";
 
-// ImageGallery Component
+// Add CSS animations with more subtle transitions
+const animationStyles = `
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.98);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.4s ease-out;
+}
+
+.animate-scaleIn {
+  animation: scaleIn 0.4s ease-out;
+}
+
+.hover\\:scale-101:hover {
+  transform: scale(1.01);
+}
+`;
+
+// ImageGallery Component with refined styling
 const ImageGallery = ({ images }) => (
-  <div className="relative group flex justify-center mb-6">
+  <div className="relative group flex justify-center mb-8">
     <Swiper
       modules={[Navigation, SwiperPagination]}
-      spaceBetween={10}
+      spaceBetween={0}
       slidesPerView={1}
       loop={true}
       navigation={true}
       pagination={{ clickable: true }}
-      className="w-full h-[500px] rounded-xl overflow-hidden [&_.swiper-button-next]:text-white [&_.swiper-button-next]:opacity-0 [&_.swiper-button-next]:group-hover:opacity-100 [&_.swiper-button-prev]:text-white [&_.swiper-button-prev]:opacity-0 [&_.swiper-button-prev]:group-hover:opacity-100 [&_.swiper-pagination-bullet]:bg-white"
+      className="w-full h-[450px] rounded-md overflow-hidden 
+                [&_.swiper-button-next]:text-white [&_.swiper-button-next]:bg-black/20 [&_.swiper-button-next]:w-10 [&_.swiper-button-next]:h-10 [&_.swiper-button-next]:rounded-full
+                [&_.swiper-button-next]:opacity-0 [&_.swiper-button-next]:group-hover:opacity-70 [&_.swiper-button-next:hover]:bg-black/30
+                [&_.swiper-button-prev]:text-white [&_.swiper-button-prev]:bg-black/20 [&_.swiper-button-prev]:w-10 [&_.swiper-button-prev]:h-10 [&_.swiper-button-prev]:rounded-full
+                [&_.swiper-button-prev]:opacity-0 [&_.swiper-button-prev]:group-hover:opacity-70 [&_.swiper-button-prev:hover]:bg-black/30
+                [&_.swiper-pagination-bullet]:bg-white [&_.swiper-pagination-bullet]:opacity-50 [&_.swiper-pagination-bullet-active]:opacity-90"
     >
       {images?.map((image, index) => (
         <SwiperSlide key={index}>
@@ -28,145 +68,157 @@ const ImageGallery = ({ images }) => (
             <img
               src={image}
               alt={`Course Image ${index + 1}`}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-103"
             />
           </div>
         </SwiperSlide>
       ))}
     </Swiper>
-    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
+    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/15 to-transparent pointer-events-none" />
   </div>
 );
 
-// DetailField Component 
+// DetailField Component with refined UI
 const DetailField = ({ label, value, isTextArea = false, className = "" }) => (
-  <div className={`rounded-lg overflow-hidden ${className}`}>
-    <label className="block text-sm font-medium text-gray-400 px-4 pt-2">
+  <div className={`mb-5 bg-slate-800/30 rounded-md p-3 backdrop-blur-sm hover:bg-slate-800/40 transition-all duration-300 group border border-slate-700/20 ${className}`}>
+    <label className="block text-xs font-medium text-slate-400 mb-1.5 group-hover:text-slate-300 transition-colors">
       {label}
     </label>
     {isTextArea ? (
       <textarea
         value={value}
-        className="w-full p-4 bg-transparent text-white focus:outline-none min-h-[120px]"
+        className="w-full p-2.5 bg-slate-700/30 text-slate-200 rounded-md border border-slate-600/30 focus:border-slate-500 focus:ring-1 focus:ring-slate-500/10 transition-all min-h-[120px] font-light text-sm"
         readOnly
       />
     ) : (
       <input
         type="text"
         value={value}
-        className="w-full p-4 bg-transparent text-white focus:outline-none"
+        className="w-full p-2.5 bg-slate-700/30 text-slate-200 rounded-md border border-slate-600/30 focus:border-slate-500 focus:ring-1 focus:ring-slate-500/10 transition-all font-light text-sm"
         readOnly
       />
     )}
   </div>
 );
 
-// SearchBar Component
+// SearchBar Component with refined design
 const SearchBar = ({ searchTerm, onSearch }) => (
-  <div className="relative">
+  <div className="relative w-64">
     <input
       type="text"
       placeholder="Search courses..."
-      className="bg-gray-700 text-white placeholder-gray-400 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      className="w-full bg-slate-800/80 text-slate-200 placeholder-slate-400 rounded-md pl-9 pr-3 py-2 border border-slate-700/70 focus:outline-none focus:ring-1 focus:ring-slate-500/40 focus:border-slate-600 transition-all"
       onChange={onSearch}
       value={searchTerm}
     />
-    <Search className="absolute left-3 top-2.5 text-gray-400" size={18} />
+    <Search className="absolute left-3 top-2.5 text-slate-400" size={16} />
   </div>
 );
 
-// CourseTable Component
+// CourseTable Component with refined UI
 const CourseTable = ({ courses, onView }) => (
-  <table className="table-auto w-full text-left text-gray-100">
-    <thead>
-      <tr className="border-b bg-gray-700">
-        <th className="py-2 px-4">ID</th>
-        <th className="py-2 px-4">Name</th>
-        <th className="py-2 px-4">Duration</th>
-        <th className="py-2 px-4">Category</th>
-        <th className="py-2 px-4">Price</th>
-        <th className="py-2 px-4">Status</th>
-        <th className="py-2 px-4">Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      {courses.map((course, index) => (
-        <tr key={course.id} className="border-b bg-gray-800 hover:bg-gray-700 transition-colors">
-          <td className="py-2 px-4">{index + 1}</td>
-          <td className="py-2 px-4">{course.title}</td>
-          <td className="py-2 px-4">{course.duration}</td>
-          <td className="py-2 px-4">{course.categoryName}</td>
-          <td className="py-2 px-4">${course.price}</td>
-          <td className="py-2 px-4 text-yellow-500">{course.status}</td>
-          <td className="py-2 px-4">
-            <button
-              className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-lg transition-colors"
-              onClick={() => onView(course)}
-            >
-              View
-            </button>
-          </td>
+  <div className="overflow-hidden rounded-md border border-slate-700/40 backdrop-blur-sm">
+    <table className="w-full text-left text-slate-200">
+      <thead>
+        <tr className="bg-gradient-to-r from-slate-800/90 to-slate-800/70">
+          <th className="py-3 px-4 font-medium text-slate-400 text-xs uppercase tracking-wider">ID</th>
+          <th className="py-3 px-4 font-medium text-slate-400 text-xs uppercase tracking-wider">Name</th>
+          <th className="py-3 px-4 font-medium text-slate-400 text-xs uppercase tracking-wider">Duration</th>
+          <th className="py-3 px-4 font-medium text-slate-400 text-xs uppercase tracking-wider">Category</th>
+          <th className="py-3 px-4 font-medium text-slate-400 text-xs uppercase tracking-wider">Price</th>
+          <th className="py-3 px-4 font-medium text-slate-400 text-xs uppercase tracking-wider">Status</th>
+          <th className="py-3 px-4 font-medium text-slate-400 text-xs uppercase tracking-wider">Actions</th>
         </tr>
-      ))}
-    </tbody>
-  </table>
+      </thead>
+      <tbody className="divide-y divide-slate-700/30">
+        {courses.map((course, index) => (
+          <tr 
+            key={course.id} 
+            className="bg-slate-800/20 hover:bg-slate-700/30 transition-colors duration-200"
+          >
+            <td className="py-3 px-4 font-mono text-slate-500 text-sm">{index + 1}</td>
+            <td className="py-3 px-4 font-medium text-sm">{course.title}</td>
+            <td className="py-3 px-4 text-slate-300 text-sm">{course.duration}</td>
+            <td className="py-3 px-4">
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-slate-600/30 text-slate-300 border border-slate-600/30">
+                {course.categoryName}
+              </span>
+            </td>
+            <td className="py-3 px-4 font-medium text-teal-300 text-sm">${course.price}</td>
+            <td className="py-3 px-4">
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-900/20 text-amber-300 border border-amber-800/30">
+                {course.status}
+              </span>
+            </td>
+            <td className="py-3 px-4">
+              <button
+                onClick={() => onView(course)}
+                className="inline-flex items-center px-3 py-1.5 rounded-md bg-slate-600/90 hover:bg-slate-500 text-white transition-all duration-200 font-medium text-xs"
+              >
+                View Details
+              </button>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
 );
 
-
-// CourseInfo Component
+// CourseInfo Component with refined styling
 const CourseInfo = ({ course }) => (
-  <div className="bg-gray-800 rounded-xl p-6 mb-6">
-    <div className="flex items-center mb-6">
-      <div className="w-1 bg-blue-500 h-8 mr-3"></div>
-      <h3 className="text-xl font-semibold text-gray-100">Course Details</h3>
+  <div className="bg-slate-800/30 rounded-md p-5 mb-6 backdrop-blur-sm border border-slate-700/30">
+    <div className="flex items-center mb-5">
+      <div className="w-1 h-6 bg-slate-500 rounded-r mr-3" />
+      <h3 className="text-lg font-medium text-slate-200">Course Details</h3>
     </div>
 
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
       {/* Left Column - Basic Info */}
-      <div className="space-y-4">
+      <div className="space-y-5">
         <DetailField 
-          label="Name" 
+          label="Course Name" 
           value={course.title} 
-          className="bg-gray-700 border-l-4 border-blue-500"
+          className="border-l-2 border-slate-500"
         />
         <DetailField 
           label="Instructor" 
           value={`${course.instructorFirstName} ${course.instructorLastName}`}
-          className="bg-gray-700 border-l-4 border-green-500"
+          className="border-l-2 border-teal-700"
         />
         <DetailField 
           label="Category" 
           value={course.categoryName}
-          className="bg-gray-700 border-l-4 border-purple-500"
+          className="border-l-2 border-slate-600"
         />
         <DetailField 
           label="Price" 
           value={`$${course.price}`}
-          className="bg-gray-700 border-l-4 border-yellow-500"
+          className="border-l-2 border-teal-800"
         />
       </div>
 
       {/* Right Column - Additional Info */}
-      <div className="space-y-4">
+      <div className="space-y-5">
         <DetailField 
           label="Duration" 
           value={course.duration}
-          className="bg-gray-700 border-l-4 border-red-500"
+          className="border-l-2 border-slate-500"
         />
         <DetailField 
           label="Language" 
           value={course.language}
-          className="bg-gray-700 border-l-4 border-indigo-500"
+          className="border-l-2 border-slate-600"
         />
         <DetailField 
           label="Rating" 
           value={course.rating}
-          className="bg-gray-700 border-l-4 border-pink-500"
+          className="border-l-2 border-slate-500"
         />
         <DetailField 
           label="Level" 
           value={course.level}
-          className="bg-gray-700 border-l-4 border-orange-500"
+          className="border-l-2 border-slate-600"
         />
       </div>
 
@@ -176,55 +228,54 @@ const CourseInfo = ({ course }) => (
           label="Description" 
           value={course.description} 
           isTextArea 
-          className="bg-gray-700 border-l-4 border-teal-500"
+          className="border-l-2 border-slate-500"
         />
       </div>
     </div>
   </div>
 );
 
-// MetadataSection Component for grouping related metadata
-const MetadataSection = ({ label, items, icon: Icon, borderColor, iconColor }) => (
-  <div className={`mb-6 bg-gray-700 rounded-lg p-4 border-l-4 ${borderColor}`}>
-    <h4 className="text-lg font-medium text-gray-100 mb-4 flex items-center">
-      <Icon className={`mr-2 ${iconColor}`} size={20} />
+// MetadataSection Component with refined styling
+const MetadataSection = ({ label, items, icon: Icon }) => (
+  <div className="mb-5 bg-slate-800/30 rounded-md p-3 backdrop-blur-sm hover:bg-slate-800/40 transition-all duration-300 border border-slate-700/20">
+    <h4 className="text-sm font-medium text-slate-300 mb-3 flex items-center">
+      <Icon className="mr-2 text-slate-400" size={14} />
       {label}
     </h4>
-    <ul className="space-y-3">
+    <ul className="space-y-2">
       {items?.map((item, idx) => (
-        <li key={idx} className="flex items-start gap-3 text-gray-300 hover:text-white transition-colors">
-          <div className={`mt-1 w-2 h-2 rounded-full ${iconColor.replace('text-', 'bg-')}`} />
-          <span className="flex-1">{item}</span>
+        <li 
+          key={idx} 
+          className="flex items-start gap-2.5 p-2.5 bg-slate-700/30 rounded-md hover:bg-slate-700/50 transition-colors group"
+        >
+          <div className="mt-1 flex-shrink-0 w-1.5 h-1.5 rounded-full bg-slate-500" />
+          <span className="flex-1 text-slate-300 text-xs">{item}</span>
         </li>
       ))}
     </ul>
   </div>
 );
 
-// CourseMetadata Component
+// CourseMetadata Component with refined styling
 const CourseMetadata = ({ course }) => (
-  <div className="bg-gray-800 rounded-xl p-6">
-    <div className="flex items-center mb-6">
-      <div className="w-1 bg-purple-500 h-8 mr-3"></div>
-      <h3 className="text-xl font-semibold text-gray-100">Course Information</h3>
+  <div className="bg-slate-800/30 rounded-md p-5 mb-6 backdrop-blur-sm border border-slate-700/30">
+    <div className="flex items-center mb-5">
+      <div className="w-1 h-6 bg-slate-500 rounded-r mr-3" />
+      <h3 className="text-lg font-medium text-slate-200">Course Information</h3>
     </div>
 
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
       {/* Left Column */}
       <div>
         <MetadataSection
           label="Target Audience"
           items={course.targetAudience}
           icon={FaUserCircle}
-          borderColor="border-blue-500"
-          iconColor="text-blue-500"
         />
         <MetadataSection
           label="Requirements"
           items={course.requirements}
           icon={FaClipboardList}
-          borderColor="border-green-500"
-          iconColor="text-green-500"
         />
       </div>
 
@@ -234,51 +285,60 @@ const CourseMetadata = ({ course }) => (
           label="Course Content"
           items={course.courseContent}
           icon={FaBook}
-          borderColor="border-yellow-500"
-          iconColor="text-yellow-500"
         />
         <MetadataSection
           label="Resources"
           items={course.resourceDescription}
           icon={FaTools}
-          borderColor="border-pink-500"
-          iconColor="text-pink-500"
         />
       </div>
     </div>
   </div>
 );
 
-// ActionButtons Component
+// ActionButtons Component with refined styling
 const ActionButtons = ({ courseId, onAccept, onReject, onCancel }) => (
-  <div className="flex gap-4 mt-6">
+  <div className="flex gap-3 pt-4 border-t border-slate-700/30">
     <button
-      className="flex-1 bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg transition-colors flex items-center justify-center gap-2"
+      className="flex-1 bg-teal-900 hover:bg-teal-800 text-slate-200 px-4 py-2.5 rounded-md transition-all flex items-center justify-center gap-2 font-medium text-sm transform hover:scale-101"
       onClick={() => onAccept(courseId)}
     >
-      <span>Accept</span>
+      <FaCheck size={12} />
+      <span>Approve</span>
     </button>
     <button
-      className="flex-1 bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-lg transition-colors flex items-center justify-center gap-2"
+      className="flex-1 bg-red-900 hover:bg-red-800 text-slate-200 px-4 py-2.5 rounded-md transition-all flex items-center justify-center gap-2 font-medium text-sm transform hover:scale-101"
       onClick={() => onReject(courseId)}
     >
+      <FaTimes size={12} />
       <span>Reject</span>
     </button>
     <button
-      className="flex-1 bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg transition-colors flex items-center justify-center gap-2"
+      className="flex-1 bg-slate-700 hover:bg-slate-600 text-slate-200 px-4 py-2.5 rounded-md transition-all flex items-center justify-center gap-2 font-medium text-sm transform hover:scale-101"
       onClick={onCancel}
     >
-      <span>Cancel</span>
+      <FaArrowLeft size={12} />
+      <span>Back</span>
     </button>
   </div>
 );
 
-// CourseDetailView Component
+// CourseDetailView Component with refined styling
 const CourseDetailView = ({ course, onAccept, onReject, onCancel }) => {
   const { courseId } = course;
   
   return (
-    <div className="bg-gray-900 p-6 rounded-xl">
+    <div className="bg-slate-800/30 rounded-md p-6 backdrop-blur-sm border border-slate-700/30 animate-fadeIn">
+      <div className="flex items-center mb-5">
+        <button
+          onClick={onCancel}
+          className="mr-3 p-1.5 rounded-md bg-slate-700/50 hover:bg-slate-700 text-slate-300 transition-colors"
+        >
+          <FaArrowLeft size={14} />
+        </button>
+        <h3 className="text-xl font-medium text-slate-200">Course Review</h3>
+      </div>
+    
       <ImageGallery images={course.imageUrls} />
       <CourseInfo course={course} />
       <CourseMetadata course={course} />
@@ -292,26 +352,26 @@ const CourseDetailView = ({ course, onAccept, onReject, onCancel }) => {
   );
 };
 
-// PageButton Component
+// PageButton Component with refined UI
 const PageButton = ({ page, currentPage, onClick }) => (
   <button
     onClick={onClick}
-    className={`px-4 py-2 mx-1 rounded-lg transition-colors ${
+    className={`w-8 h-8 mx-1 rounded-md flex items-center justify-center transition-all text-sm ${
       currentPage === page 
-        ? "bg-yellow-500 text-white"
-        : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+        ? "bg-slate-600 text-white" 
+        : "bg-slate-800 text-slate-300 hover:bg-slate-700"
     }`}
   >
     {page}
   </button>
 );
 
-// Pagination Component
+// Pagination Component with refined UI
 const Pagination = ({ currentPage, totalPages, onPageChange }) => {
   const renderPageNumbers = () => {
     const pages = [];
 
-    if (totalPages <= 13) {
+    if (totalPages <= 7) {
       for (let i = 1; i <= totalPages; i++) {
         pages.push(
           <PageButton
@@ -323,9 +383,9 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
         );
       }
     } else {
-      if (currentPage <= 10) {
-        // First 10 pages
-        for (let i = 1; i <= 10; i++) {
+      if (currentPage <= 4) {
+        // First 5 pages
+        for (let i = 1; i <= 5; i++) {
           pages.push(
             <PageButton
               key={i}
@@ -335,20 +395,17 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
             />
           );
         }
-        pages.push(<span key="dots-end" className="px-4 py-2">...</span>);
-        // Last 3 pages
-        for (let i = totalPages - 2; i <= totalPages; i++) {
-          pages.push(
-            <PageButton
-              key={i}
-              page={i}
-              currentPage={currentPage}
-              onClick={() => onPageChange(i)}
-            />
-          );
-        }
-      } else if (currentPage > 10 && currentPage <= totalPages - 10) {
-        // Middle section
+        pages.push(<span key="dots-end" className="px-2 py-2 text-slate-500">…</span>);
+        // Last page
+        pages.push(
+          <PageButton
+            key={totalPages}
+            page={totalPages}
+            currentPage={currentPage}
+            onClick={() => onPageChange(totalPages)}
+          />
+        );
+      } else if (currentPage > 4 && currentPage <= totalPages - 4) {
         pages.push(
           <PageButton
             key={1}
@@ -357,9 +414,9 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
             onClick={() => onPageChange(1)}
           />
         );
-        pages.push(<span key="dots-start" className="px-4 py-2">...</span>);
+        pages.push(<span key="dots-start" className="px-2 py-2 text-slate-500">…</span>);
 
-        for (let i = currentPage - 4; i <= currentPage + 4; i++) {
+        for (let i = currentPage - 2; i <= currentPage + 2; i++) {
           pages.push(
             <PageButton
               key={i}
@@ -370,19 +427,16 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
           );
         }
 
-        pages.push(<span key="dots-end" className="px-4 py-2">...</span>);
-        for (let i = totalPages - 2; i <= totalPages; i++) {
-          pages.push(
-            <PageButton
-              key={i}
-              page={i}
-              currentPage={currentPage}
-              onClick={() => onPageChange(i)}
-            />
-          );
-        }
+        pages.push(<span key="dots-end" className="px-2 py-2 text-slate-500">…</span>);
+        pages.push(
+          <PageButton
+            key={totalPages}
+            page={totalPages}
+            currentPage={currentPage}
+            onClick={() => onPageChange(totalPages)}
+          />
+        );
       } else {
-        // Last section
         pages.push(
           <PageButton
             key={1}
@@ -391,9 +445,9 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
             onClick={() => onPageChange(1)}
           />
         );
-        pages.push(<span key="dots-start" className="px-4 py-2">...</span>);
+        pages.push(<span key="dots-start" className="px-2 py-2 text-slate-500">…</span>);
 
-        for (let i = totalPages - 12; i <= totalPages; i++) {
+        for (let i = totalPages - 4; i <= totalPages; i++) {
           pages.push(
             <PageButton
               key={i}
@@ -410,23 +464,25 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
   };
 
   return (
-    <div className="flex justify-between mt-6">
+    <div className="flex justify-between items-center mt-6">
       <button
-        className="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        className="bg-slate-700 hover:bg-slate-600 text-slate-200 px-4 py-2 rounded-md transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center space-x-2"
         onClick={() => onPageChange(Math.max(currentPage - 1, 1))}
         disabled={currentPage === 1}
       >
-        Prev
+        <FaChevronLeft size={12} />
+        <span className="text-sm">Previous</span>
       </button>
 
       <div className="flex items-center">{renderPageNumbers()}</div>
 
       <button
-        className="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        className="bg-slate-700 hover:bg-slate-600 text-slate-200 px-4 py-2 rounded-md transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center space-x-2"
         onClick={() => onPageChange(Math.min(currentPage + 1, totalPages))}
         disabled={currentPage === totalPages}
       >
-        Next
+        <span className="text-sm">Next</span>
+        <FaChevronRight size={12} />
       </button>
     </div>
   );
@@ -436,6 +492,17 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
 const ITEMS_PER_PAGE = 10;
 
 const CoursesTable = () => {
+  // Inject animation styles
+  useEffect(() => {
+    const styleElement = document.createElement('style');
+    styleElement.textContent = animationStyles;
+    document.head.appendChild(styleElement);
+    
+    return () => {
+      document.head.removeChild(styleElement);
+    };
+  }, []);
+
   const [courses, setCourses] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -485,7 +552,7 @@ const CoursesTable = () => {
   );
 
   const handleSearch = (e) => {
-    const term = e.target.value.toLowerCase();
+    const term = e.target.value;
     setSearchTerm(term);
     setCurrentPage(1);
   };
@@ -513,11 +580,9 @@ const CoursesTable = () => {
         throw new Error(`Failed to ${status.toLowerCase()} course.`);
       }
 
-      toast.success(`Course ${status.toLowerCase()}ed successfully!`);
+      toast.success(`Course ${status === 'Active' ? 'approved' : 'rejected'} successfully!`);
       setCourses((prevCourses) =>
-        prevCourses.map((course) =>
-          course.courseId === courseId ? { ...course, status } : course
-        )
+        prevCourses.filter((course) => course.courseId !== courseId)
       );
       setEditingCourse(null);
     } catch (error) {
@@ -532,30 +597,37 @@ const CoursesTable = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+        <div className="flex flex-col items-center">
+          <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-slate-400"></div>
+          <p className="mt-4 text-slate-400 text-sm">Loading courses...</p>
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="bg-red-500 bg-opacity-10 border border-red-500 text-red-500 rounded-xl p-4">
-        Error: {error}
+      <div className="bg-red-900/10 border border-red-900/30 text-red-300 rounded-md p-4">
+        <h3 className="font-medium text-base mb-1">Error</h3>
+        <p className="text-sm">{error}</p>
       </div>
     );
   }
 
   return (
     <motion.div
-      className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-700 mb-8"
-      initial={{ opacity: 0, y: 20 }}
+      className="bg-gradient-to-br from-slate-900/90 to-slate-800/90 backdrop-blur-md rounded-md p-6 border border-slate-700/40 mb-6"
+      initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.2 }}
+      transition={{ delay: 0.1 }}
     >
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-semibold text-gray-100">
-          Courses Pending Review and Approval
-        </h2>
+        <div className="flex items-center">
+          <div className="w-1 h-6 bg-slate-500 rounded-r mr-3" />
+          <h2 className="text-xl font-medium text-slate-200">
+            Pending Review
+          </h2>
+        </div>
         <SearchBar 
           searchTerm={searchTerm} 
           onSearch={handleSearch} 
@@ -570,17 +642,27 @@ const CoursesTable = () => {
           onCancel={() => setEditingCourse(null)}
         />
       ) : (
-        <CourseTable
-          courses={currentCourses}
-          onView={setEditingCourse}
-        />
+        <>
+          <CourseTable
+            courses={currentCourses}
+            onView={setEditingCourse}
+          />
+          
+          {filteredCourses.length > ITEMS_PER_PAGE && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
+          )}
+          
+          {filteredCourses.length === 0 && (
+            <div className="text-center py-10 bg-slate-800/20 rounded-md mt-5 border border-slate-700/20">
+              <p className="text-slate-400 text-sm">No courses match your search criteria.</p>
+            </div>
+          )}
+        </>
       )}
-
-      <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={setCurrentPage}
-      />
     </motion.div>
   );
 };
