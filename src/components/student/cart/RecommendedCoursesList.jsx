@@ -188,18 +188,20 @@ const RecommendedCoursesSection = () => {
   }
 
   return (
-    <section className="py-12 px-6 bg-gradient-to-r from-indigo-50 to-violet-50">
+    <section className="py-8 px-6 bg-white border-t border-gray-100">
       <div className="max-w-[1500px] mx-auto">
-        {/* Section Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-start gap-4">
-            <Crown className="w-12 h-12 text-indigo-600 mt-1" />
+        {/* Section Header - Simplified for cart context */}
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-purple-50 rounded-xl">
+              <Crown className="w-6 h-6 text-purple-600" />
+            </div>
             <div>
-              <h2 className="text-4xl font-extrabold bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">
-                Các Khóa Học Hàng Đầu
+              <h2 className="text-xl font-bold text-gray-800">
+                Có thể bạn quan tâm
               </h2>
-              <p className="text-gray-700 mt-2 font-medium">
-                Được đề xuất dựa trên số lượng học viên đăng ký và đánh giá từ học viên
+              <p className="text-sm text-gray-600">
+                Các khóa học phổ biến được nhiều học viên lựa chọn
               </p>
             </div>
           </div>
@@ -207,25 +209,25 @@ const RecommendedCoursesSection = () => {
           <div className="flex gap-2">
             <button
               onClick={scrollLeft}
-              className={`p-3 rounded-md transition-all duration-300 ${
+              className={`p-2 rounded-xl transition-all duration-200 ${
                 isLeftVisible
-                  ? 'bg-white shadow-lg hover:shadow-xl text-gray-800 hover:bg-indigo-50'
-                  : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                  ? 'bg-purple-50 hover:bg-purple-100 text-purple-600'
+                  : 'bg-gray-100 text-gray-400 cursor-not-allowed'
               }`}
               disabled={!isLeftVisible}
             >
-              <ChevronLeft className="w-6 h-6" />
+              <ChevronLeft className="w-5 h-5" />
             </button>
             <button
               onClick={scrollRight}
-              className={`p-3 rounded-md transition-all duration-300 ${
+              className={`p-2 rounded-xl transition-all duration-200 ${
                 isRightVisible
-                  ? 'bg-white shadow-lg hover:shadow-xl text-gray-800 hover:bg-indigo-50'
-                  : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                  ? 'bg-purple-50 hover:bg-purple-100 text-purple-600'
+                  : 'bg-gray-100 text-gray-400 cursor-not-allowed'
               }`}
               disabled={!isRightVisible}
             >
-              <ChevronRight className="w-6 h-6" />
+              <ChevronRight className="w-5 h-5" />
             </button>
           </div>
         </div>
@@ -234,9 +236,9 @@ const RecommendedCoursesSection = () => {
         <motion.div
           ref={scrollContainer}
           className="flex gap-4 overflow-x-auto overflow-y-hidden scroll-smooth pb-4 hide-scrollbar"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5 }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
           onScroll={checkScroll}
           style={{
             scrollbarWidth: 'none',
@@ -248,23 +250,22 @@ const RecommendedCoursesSection = () => {
             <Link
               to={`/course/${course.courseId}`}
               key={index}
-              className="flex-none w-[300px] bg-white rounded-md shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group"
+              className="flex-none w-[280px] bg-white rounded-2xl border border-gray-100 hover:border-purple-200 hover:shadow-lg transition-all duration-300 overflow-hidden group"
             >
               {/* Course Image */}
-              <div className="relative h-[180px] overflow-hidden">
+              <div className="relative h-[160px] overflow-hidden">
                 <img
                   src={course.imageUrls?.[0] || "default-image-url.jpg"}
                   alt={course.title}
-                  className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-300"
+                  className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-300"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 <div className="absolute top-2 left-2 flex gap-2">
                   {course.isNew && (
-                    <span className="bg-indigo-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                    <span className="bg-purple-600 text-white text-xs font-semibold px-2 py-1 rounded-lg">
                       Mới
                     </span>
                   )}
-                  <span className={`flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-full ${
+                  <span className={`flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-lg ${
                     course.tag === 'Bestseller' ? 'bg-yellow-500 text-white' : 'bg-orange-500 text-white'
                   }`}>
                     {course.tag === 'Bestseller' ? (
@@ -275,40 +276,46 @@ const RecommendedCoursesSection = () => {
                     {course.tag}
                   </span>
                 </div>
-                <div className="absolute top-2 right-2">
-                  <span className="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-                    -{course.discount}%
-                  </span>
-                </div>
               </div>
 
               {/* Course Content */}
               <div className="p-4">
-                {/* Title */}
-                <h3 className="text-lg font-semibold text-gray-900 mb-1 line-clamp-2">
+                <h3 className="text-base font-semibold text-gray-800 mb-2 line-clamp-2 min-h-[48px]">
                   {course.title}
                 </h3>
 
-                {/* Instructor */}
-                <p className="text-gray-600 mb-2 flex items-center gap-2 text-sm">
-                  <Crown className="w-4 h-4 text-indigo-600" />
-                  <span>{course.instructorFirstName} {course.instructorLastName}</span>
-                </p>
-
-                {/* Stats */}
-                <div className="flex items-center mb-2">
-                  <span className="text-gray-900 font-bold text-lg mr-2">{course.rating.toFixed(1)}</span>
-                  <div className="flex gap-1">{renderStars(course.rating)}</div>
-                  <span className="text-gray-500 ml-2">({course.reviews || course.numberReview})</span>
+                <div className="flex items-center gap-2 mb-3">
+                  <img
+                    src={course.instructorAvatar || "default-avatar.jpg"}
+                    alt={course.instructorFirstName}
+                    className="w-6 h-6 rounded-full object-cover"
+                  />
+                  <span className="text-sm text-gray-600">
+                    {course.instructorFirstName} {course.instructorLastName}
+                  </span>
                 </div>
 
-                {/* Price */}
-                <div className="flex items-baseline gap-2">
-                  <span className="text-sm line-through text-gray-500">
-                    đ{course.originalPrice?.toLocaleString("vi-VN")}
+                <div className="flex items-center mb-3">
+                  <span className="text-sm font-semibold text-gray-800 mr-1">
+                    {course.rating.toFixed(1)}
                   </span>
-                  <span className="text-xl font-bold text-indigo-600">
-                    đ{course.discountedPrice.toLocaleString("vi-VN")}
+                  <div className="flex gap-0.5">{renderStars(course.rating)}</div>
+                  <span className="text-xs text-gray-500 ml-1">
+                    ({course.reviews || course.numberReview})
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div className="flex flex-col">
+                    <span className="text-xs text-gray-500 line-through">
+                      đ{course.originalPrice?.toLocaleString("vi-VN")}
+                    </span>
+                    <span className="text-lg font-bold text-purple-600">
+                      đ{course.discountedPrice.toLocaleString("vi-VN")}
+                    </span>
+                  </div>
+                  <span className="bg-purple-100 text-purple-600 text-xs font-semibold px-2 py-1 rounded-lg">
+                    -{course.discount}%
                   </span>
                 </div>
               </div>

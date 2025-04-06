@@ -5,21 +5,21 @@ import { motion, AnimatePresence } from "framer-motion";
 
 const LoadingSkeleton = () => {
   return (
-    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 mb-5">
       {[1, 2, 3, 4].map((i) => (
         <div
           key={i}
-          className="bg-gradient-to-r from-[#343D4A] to-[#3B4A59] rounded-xl p-6"
+          className="bg-gradient-to-r from-[#343D4A] to-[#3B4A59] rounded-lg p-4"
         >
           <div className="animate-pulse">
             <div className="flex items-center justify-between">
               <div className="space-y-2">
-                <div className="h-4 w-24 bg-gray-600 rounded"></div>
-                <div className="h-8 w-32 bg-gray-600 rounded"></div>
+                <div className="h-3 w-20 bg-gray-600 rounded"></div>
+                <div className="h-6 w-28 bg-gray-600 zrounded"></div>
               </div>
-              <div className="h-12 w-12 bg-gray-600 rounded-full"></div>
+              <div className="h-10 w-10 bg-gray-600 rounded-full"></div>
             </div>
-            <div className="mt-4 h-4 w-20 bg-gray-600 rounded"></div>
+            <div className="mt-3 h-3 w-16 bg-gray-600 rounded"></div>
           </div>
         </div>
       ))}
@@ -33,27 +33,27 @@ const StatCard = ({ name, icon: Icon, value, color, trend }) => {
 
   return (
     <motion.div
-      className="bg-gradient-to-r from-[#343D4A] to-[#3B4A59] rounded-xl shadow-lg p-6 transform transition-all duration-300 hover:scale-105 hover:shadow-2xl"
+      className="bg-gradient-to-r from-[#343D4A] to-[#3B4A59] rounded-lg shadow p-4 transform transition-all duration-300 hover:scale-102 hover:shadow-lg"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
+      transition={{ duration: 0.4 }}
     >
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-medium text-gray-300">{name}</h3>
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-xs font-medium text-gray-300">{name}</h3>
         <div
-          className="p-3 rounded-full bg-opacity-20"
+          className="p-2 rounded-full bg-opacity-20"
           style={{ backgroundColor: color }}
         >
-          <Icon className="text-white" size={24} />
+          <Icon className="text-white" size={18} />
         </div>
       </div>
 
-      <div className="space-y-2">
-        <p className="text-2xl font-bold text-white">{value}</p>
+      <div className="space-y-1">
+        <p className="text-xl font-bold text-white">{value}</p>
         {trend !== undefined && (
           <div className="flex items-center space-x-1">
-            <TrendIcon size={16} className={trendColor} />
-            <span className={`text-sm ${trendColor}`}>
+            <TrendIcon size={14} className={trendColor} />
+            <span className={`text-xs ${trendColor}`}>
               {Math.abs(trend)}% vs last month
             </span>
           </div>
@@ -67,7 +67,7 @@ const ErrorMessage = ({ message }) => (
   <motion.div
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
-    className="bg-red-500 bg-opacity-10 border border-red-500 text-red-500 p-4 rounded-lg mb-8"
+    className="bg-red-500 bg-opacity-10 border border-red-500 text-red-500 p-3 rounded-lg mb-5 text-sm"
   >
     {message}
   </motion.div>
@@ -177,11 +177,11 @@ const OverviewCards = () => {
   return (
     <AnimatePresence>
       <motion.div
-        className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8"
+        className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 mb-5"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{
-          duration: 0.5,
+          duration: 0.4,
           staggerChildren: 0.1
         }}
       >

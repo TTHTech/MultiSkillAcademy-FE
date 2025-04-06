@@ -30,30 +30,30 @@ const ANIMATIONS = {
   container: {
     initial: { opacity: 0, y: 20 },
     animate: { opacity: 1, y: 0 },
-    transition: { duration: 0.5 }
+    transition: { duration: 0.4 }
   },
   chart: {
     initial: { opacity: 0, scale: 0.95 },
     animate: { opacity: 1, scale: 1 },
-    transition: { delay: 0.2, duration: 0.4 }
+    transition: { delay: 0.15, duration: 0.3 }
   }
 };
 
 // Components
 const LoadingSpinner = () => (
-  <div className="flex flex-col items-center justify-center h-full space-y-3">
-    <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
-    <p className="text-gray-400 text-sm">Loading sales data...</p>
+  <div className="flex flex-col items-center justify-center h-full space-y-2">
+    <Loader2 className="w-6 h-6 text-blue-500 animate-spin" />
+    <p className="text-gray-400 text-xs">Loading sales data...</p>
   </div>
 );
 
 const ErrorMessage = ({ message, onRetry }) => (
-  <div className="flex flex-col items-center justify-center h-full space-y-4">
-    <AlertCircle className="w-10 h-10 text-red-400" />
-    <p className="text-red-400 font-medium">{message}</p>
+  <div className="flex flex-col items-center justify-center h-full space-y-3">
+    <AlertCircle className="w-8 h-8 text-red-400" />
+    <p className="text-red-400 text-sm font-medium">{message}</p>
     <button
       onClick={onRetry}
-      className="px-4 py-2 bg-gray-700 text-gray-200 rounded-lg hover:bg-gray-600 transition-colors"
+      className="px-3 py-1.5 bg-gray-700 text-gray-200 rounded-lg hover:bg-gray-600 transition-colors text-xs"
     >
       Try Again
     </button>
@@ -64,12 +64,12 @@ const CustomTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null;
 
   return (
-    <div className="bg-gray-800 p-4 rounded-lg shadow-lg border border-gray-700">
-      <h3 className="text-gray-200 font-medium mb-2">{label}</h3>
+    <div className="bg-gray-800 p-3 rounded-lg shadow-lg border border-gray-700 text-xs">
+      <h3 className="text-gray-200 font-medium mb-1">{label}</h3>
       {payload.map((item, index) => (
         <div key={index} className="flex items-center space-x-2">
           <div 
-            className="w-3 h-3 rounded-full"
+            className="w-2 h-2 rounded-full"
             style={{ backgroundColor: item.fill }}
           />
           <p className="text-gray-300">
@@ -134,23 +134,23 @@ const SalesChannelChart = () => {
   // Memoize chart configurations
   const chartConfig = useMemo(() => ({
     yAxisDomain: [0, Math.max(...salesData.map(item => item.value)) + 5],
-    barSize: 40
+    barSize: 30
   }), [salesData]);
 
   return (
     <motion.div
-      className="bg-gray-800 rounded-xl p-6 border border-gray-700 shadow-lg"
+      className="bg-gray-800 rounded-lg p-4 border border-gray-700 shadow-lg"
       {...ANIMATIONS.container}
     >
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-4">
         <div>
-          <div className="flex items-center space-x-2">
-            <TrendingUp className="text-blue-500" size={24} />
-            <h2 className="text-xl font-semibold text-gray-100">
+          <div className="flex items-center space-x-1.5">
+            <TrendingUp className="text-blue-500" size={18} />
+            <h2 className="text-lg font-semibold text-gray-100">
               Sales by Category
             </h2>
           </div>
-          <p className="text-gray-400 text-sm mt-1">
+          <p className="text-gray-400 text-xs mt-0.5">
             Revenue distribution across categories
           </p>
         </div>
@@ -159,17 +159,17 @@ const SalesChannelChart = () => {
           <button
             onClick={() => fetchSalesData(true)}
             disabled={refreshing}
-            className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
+            className="p-1.5 hover:bg-gray-700 rounded-lg transition-colors"
           >
             <RefreshCcw 
-              size={20}
+              size={16}
               className={`text-gray-400 ${refreshing ? 'animate-spin' : 'hover:text-gray-200'}`}
             />
           </button>
         )}
       </div>
 
-      <div className="h-80">
+      <div className="h-72">
         {loading && <LoadingSpinner />}
         {error && <ErrorMessage message={error} onRetry={() => fetchSalesData(true)} />}
         
@@ -185,24 +185,30 @@ const SalesChannelChart = () => {
                 <XAxis 
                   dataKey="name"
                   stroke="#9CA3AF"
-                  tick={{ fill: '#9CA3AF' }}
+                  tick={{ fill: '#9CA3AF', fontSize: 11 }}
                   axisLine={{ stroke: '#4B5563' }}
+                  tickLine={{ stroke: '#4B5563' }}
+                  dy={5}
                 />
                 <YAxis 
                   stroke="#9CA3AF"
-                  tick={{ fill: '#9CA3AF' }}
+                  tick={{ fill: '#9CA3AF', fontSize: 11 }}
                   axisLine={{ stroke: '#4B5563' }}
+                  tickLine={{ stroke: '#4B5563' }}
                   domain={chartConfig.yAxisDomain}
                   unit="%"
+                  width={35}
                 />
                 <Tooltip content={<CustomTooltip />} />
                 <Legend 
-                  wrapperStyle={{ paddingTop: '20px' }}
-                  formatter={(value) => <span className="text-gray-300">{value}</span>}
+                  wrapperStyle={{ paddingTop: '10px' }}
+                  formatter={(value) => <span className="text-gray-300 text-xs">{value}</span>}
+                  iconSize={8}
+                  iconType="circle"
                 />
                 <Bar 
                   dataKey="value"
-                  radius={[4, 4, 0, 0]}
+                  radius={[3, 3, 0, 0]}
                 >
                   {salesData.map((entry, index) => (
                     <Cell 
@@ -218,11 +224,11 @@ const SalesChannelChart = () => {
         )}
 
         {!loading && !error && salesData.length === 0 && (
-          <div className="flex flex-col items-center justify-center h-full text-gray-400">
+          <div className="flex flex-col items-center justify-center h-full text-gray-400 text-sm">
             <p>No sales data available</p>
             <button
               onClick={() => fetchSalesData(true)}
-              className="mt-2 text-blue-400 hover:text-blue-300 text-sm"
+              className="mt-2 text-blue-400 hover:text-blue-300 text-xs"
             >
               Refresh data
             </button>

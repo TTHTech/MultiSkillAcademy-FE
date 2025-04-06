@@ -1,3 +1,4 @@
+import React, { useEffect } from "react";
 import NavBar from "../../../components/student/common/NavBar";
 import Footer from "../../../components/student/common/Footer";
 import CourseViewer from "../../../components/student/content/CourseViewer.jsx"; // Đảm bảo import đúng
@@ -6,18 +7,34 @@ import { useParams } from "react-router-dom";
 const CourseViewerPage = () => {
   const { id } = useParams(); // Lấy id khóa học từ URL
 
+  // Thêm padding-bottom cho body khi component mount
+  useEffect(() => {
+    // Lưu lại giá trị cũ của padding-bottom
+    const originalPaddingBottom = document.body.style.paddingBottom;
+    
+    // Thêm padding-bottom để tạo không gian cho sidebar
+    document.body.style.paddingBottom = "0";
+    
+    // Clean up khi component unmount
+    return () => {
+      document.body.style.paddingBottom = originalPaddingBottom;
+    };
+  }, []);
+
   return (
-    <div className="flex flex-col min-h-screen ">
+    <div className="flex flex-col min-h-screen">
       {/* Navbar */}
-      <NavBar />
+      <div className="sticky top-0 z-50">
+        <NavBar />
+      </div>
 
       {/* Content */}
-      <div className="flex-grow bg-gray-100">
+      <div className="flex-grow bg-gray-100 pb-0">
         <CourseViewer id={id} /> {/* Truyền id khóa học cho CourseViewer */}
       </div>
 
       {/* Footer */}
-      <Footer className="mt-auto" /> {/* Đảm bảo footer luôn ở cuối */}
+      <Footer />
     </div>
   );
 };

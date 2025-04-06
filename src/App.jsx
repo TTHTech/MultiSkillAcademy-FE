@@ -66,6 +66,14 @@ import InstructorChatPage from "./pages/instructor/InstructorChatPage.jsx";
 import GoogleCallbackPage from "./pages/auth/GoogleCallbackPage";
 import GitHubCallbackPage from "./pages/auth/GitHubCallbackPage";
 import PageProfile from "./pages/instructor/PageProfile/PageProfile.jsx";
+import AdminRevenuePolicyTable from "./components/admin/revenue/AdminRevenuePolicyTable.jsx";
+import AdminRevenueDashboard from "./components/admin/revenue/AdminRevenueDashboard.jsx";
+import PageCreateDiscounts from "./pages/admin/PageCreateDiscount.jsx"
+import PageDiscount from "./pages/admin/PageDiscount.jsx"
+import PageDiscountUsage from "./pages/admin/PageDiscountUsage.jsx"
+import AdminInstructorRevenue from "./components/admin/revenue/AdminInstructorRevenue.jsx";
+import AdminInstructorSales from "./components/admin/revenue/AdminInstructorSales.jsx";
+
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -126,7 +134,7 @@ function App() {
         theme="colored"
       />
 
-      <div className={shouldShowAdminLayout ? "flex h-screen overflow-hidden" : ""}>
+      <div className={shouldShowAdminLayout ? "flex h-screen overflow-visible relative" : ""}>
         {/* Gradient background chỉ dành cho admin routes */}
         {isAdminRoute && (
           <div className="fixed inset-0 -z-10">
@@ -139,7 +147,7 @@ function App() {
         {shouldShowSidebar && <Sidebar />}
 
         {/* Main Content */}
-        <div className={`${isAdminRoute ? 'flex-1 overflow-auto' : 'w-full'}`}>
+        <div className={`${isAdminRoute ? 'flex-1 overflow-auto z-10' : 'w-full'}`}>
           <Routes>
             {/* Auth Routes - Không yêu cầu đăng nhập */}
             <Route path="/login" element={<LoginForm />} />
@@ -181,6 +189,14 @@ function App() {
                 <Route path="/admin/courses/reviews" element={<PageReviewCourse />} />
                 <Route path="/admin/courses/sections" element={<PageSection />} />
                 <Route path="/admin/courses/lectures" element={<PageLecture />} />
+                <Route path="/admin/revenue-dashboard" element={<AdminRevenueDashboard  />} />
+                <Route path="/admin/revenue-policy" element={<AdminRevenuePolicyTable />} />
+                <Route path="/admin/instructor-revenue" element={<AdminInstructorRevenue />} />
+                <Route path="/admin/instructor-sales" element={<AdminInstructorSales />} />
+
+                <Route path="/admin/discounts" element={<PageDiscount />} />
+                <Route path="/admin/promotions/add" element={<PageCreateDiscounts />} />
+                <Route path="/admin/discount-usage" element={<PageDiscountUsage />} />
               </>
             )}
             

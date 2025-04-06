@@ -96,7 +96,7 @@ const CustomVideoPlayer = ({
   };
 
   return (
-    <div ref={playerRef} className="relative w-full h-full bg-black group">
+    <div ref={playerRef} className="relative w-full h-full bg-black group max-w-full overflow-hidden">
       {/* Video Title Overlay */}
       <div className="absolute top-0 left-0 right-0 p-4 bg-gradient-to-b from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
         <h3 className="text-white text-lg font-medium truncate">
@@ -224,6 +224,10 @@ const MainContent = ({
   setSelectedLecture,
   lectures,
   updateProgress,
+  toggleSidebar,
+  isSidebarOpen,
+  setIsHoveringButton,
+  isHoveringButton
 }) => {
   const { id } = useParams();
   const [selectedTab, setSelectedTab] = useState(0);
@@ -236,26 +240,63 @@ const MainContent = ({
     if (selectedLecture) {
       const fetchProgress = async () => {
         try {
+          // Đặt lại video trước khi tải tiến độ mới
+          if (videoRef.current) {
+            videoRef.current.pause();
+            videoRef.current.currentTime = 0;
+          }
+          
+          const token = localStorage.getItem("token");
+          // Kiểm tra token trước khi gọi API
+          if (!token) {
+            console.error("No authentication token found");
+            return;
+          }
+          
+          const userId = localStorage.getItem("userId");
           const response = await fetch(
             `http://localhost:8080/api/student/lecture-progress/${id}/${selectedLecture.lecture_id}`,
             {
               method: "GET",
               headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json",
               },
             }
           );
-          if (!response.ok) throw new Error("Failed to fetch progress.");
+          
+          if (!response.ok) {
+            // Xử lý khi response không OK
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          
+          // Kiểm tra content-type
+          const contentType = response.headers.get("content-type");
+          if (!contentType || !contentType.includes("application/json")) {
+            throw new Error("Received non-JSON response from server");
+          }
+          
           const data = await response.json();
           setProgress(data.progress || 0);
           setLastWatchedTime(data.lastWatchedTime || 0);
 
           // Đặt thời gian bắt đầu cho video
           if (videoRef.current && data.lastWatchedTime) {
-            videoRef.current.currentTime = data.lastWatchedTime;
+            // Đảm bảo video đã tải xong
+            videoRef.current.onloadedmetadata = () => {
+              videoRef.current.currentTime = data.lastWatchedTime;
+            };
           }
         } catch (error) {
           console.error("Error fetching progress:", error);
+          // Tiếp tục xử lý video ngay cả khi API lỗi
+          setProgress(0);
+          setLastWatchedTime(0);
+        } finally {
+          // Đảm bảo video được tải
+          if (videoRef.current && selectedLecture.video_url) {
+            videoRef.current.load();
+          }
         }
       };
 
@@ -439,28 +480,64 @@ const MainContent = ({
   };
 
   return (
-    <div
-      className="w-full h-full bg-white overflow-y-auto flex flex-col mt-[90px]"
-      style={{
-        scrollbarWidth: "none" /* Firefox */,
-        msOverflowStyle: "none" /* IE và Edge */,
-      }}
-    >
+    <div className="w-full h-full bg-white overflow-y-auto flex flex-col mt-[90px]">
       {selectedLecture ? (
         <div className="flex flex-col flex-grow">
-          <div className="flex flex-col flex-grow">
-            {selectedLecture.content_type.toLowerCase() === "video" &&
-              selectedLecture.video_url && (
-                <div className="w-full md:w-[1370px] md:h-[500px]  border-black rounded-lg shadow-lg">
-                  <CustomVideoPlayer
-                    videoRef={videoRef}
-                    selectedLecture={selectedLecture}
-                    handleSeeking={handleSeeking}
-                    handleTimeUpdate={handleTimeUpdate}
-                    handleVideoEnd={handleVideoEnd}
-                  />
-                </div>
-              )}
+          <div className="flex flex-col flex-grow relative">
+            {/* Video container with sidebar toggle button positioned absolutely within */}
+            <div className="w-full relative">
+              {selectedLecture.content_type.toLowerCase() === "video" &&
+                selectedLecture.video_url && (
+                  <div className="w-full md:h-[500px] bg-black rounded-none overflow-hidden">
+                    <CustomVideoPlayer
+                      videoRef={videoRef}
+                      selectedLecture={selectedLecture}
+                      handleSeeking={handleSeeking}
+                      handleTimeUpdate={handleTimeUpdate}
+                      handleVideoEnd={handleVideoEnd}
+                    />
+                    
+                    {/* Sidebar toggle button - chỉ hiện trong container video */}
+                    {!isSidebarOpen && (
+                      <div 
+                        className="absolute right-0 top-1/2 transform -translate-y-1/2 group z-10"
+                        onMouseEnter={() => setIsHoveringButton(true)}
+                        onMouseLeave={() => setIsHoveringButton(false)}
+                      >
+                        <button
+                          onClick={toggleSidebar}
+                          className="bg-purple-600 hover:bg-purple-700 text-white py-3 px-2 rounded-l-md shadow-md flex items-center overflow-hidden transition-all duration-300"
+                          style={{ 
+                            width: isHoveringButton ? 'auto' : '40px',
+                            paddingRight: isHoveringButton ? '12px' : '2px'
+                          }}
+                        >
+                          <svg 
+                            xmlns="http://www.w3.org/2000/svg" 
+                            className="h-6 w-6 mr-2" 
+                            fill="none" 
+                            viewBox="0 0 24 24" 
+                            stroke="currentColor"
+                          >
+                            <path 
+                              strokeLinecap="round" 
+                              strokeLinejoin="round" 
+                              strokeWidth={2} 
+                              d="M15 19l-7-7 7-7" 
+                            />
+                          </svg>
+                          <span className={`whitespace-nowrap transition-opacity duration-300 ${
+                            isHoveringButton ? 'opacity-100' : 'opacity-0'
+                          }`}>
+                            Nội dung khóa học
+                          </span>
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+            </div>
+            
             {selectedLecture.content_type.toLowerCase() === "pdf" &&
               selectedLecture.document_url && (
                 <iframe
@@ -470,28 +547,28 @@ const MainContent = ({
                 />
               )}
 
-            <p className="flex items-center text-gray-600 mt-2 text-sm ml-[30px] mt-[30px]">
-              <FaClock className="mr-2 text-blue-500" />{" "}
-              {/* Biểu tượng thời lượng */}
-              <span className="font-semibold text-gray-700">Thời lượng:</span>
-              <span className="ml-1 text-gray-800">
-                {selectedLecture.duration}
-              </span>
-            </p>
+            <div className="mt-4">
+              <p className="flex items-center text-gray-600 text-sm ml-[30px] mt-[30px]">
+                <FaClock className="mr-2 text-blue-500" />
+                <span className="font-semibold text-gray-700">Thời lượng:</span>
+                <span className="ml-1 text-gray-800">
+                  {selectedLecture.duration}
+                </span>
+              </p>
 
-            <p className="flex items-center text-gray-600 mt-1 text-sm ml-[30px] ">
-              <FaChartLine className="mr-2 text-green-500" />{" "}
-              {/* Biểu tượng tiến độ */}
-              <span className="font-semibold text-gray-700">Tiến độ:</span>
-              <span className="ml-1 text-gray-800">
-                {Math.round(progress)}%
-              </span>
-            </p>
+              <p className="flex items-center text-gray-600 text-sm ml-[30px]">
+                <FaChartLine className="mr-2 text-green-500" />
+                <span className="font-semibold text-gray-700">Tiến độ:</span>
+                <span className="ml-1 text-gray-800">
+                  {Math.round(progress)}%
+                </span>
+              </p>
+            </div>
           </div>
         </div>
       ) : (
         <div className="flex justify-center items-center h-full mt-[200px] mb-[200px]">
-          <p className="text-gray-500">Vui lòng chọn một bài học để bắt đầu.</p>
+          <p className="text-gray-500">Đang tải bài học...</p>
         </div>
       )}
 

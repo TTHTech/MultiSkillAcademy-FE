@@ -17,16 +17,16 @@ const COLORS = {
 };
 
 const ANIMATIONS = {
-  initial: { opacity: 0, y: 20 },
+  initial: { opacity: 0, y: 15 },
   animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.5, ease: "easeOut" }
+  transition: { duration: 0.4, ease: "easeOut" }
 };
 
 // Custom Components
 const LoadingSpinner = () => (
   <div className="flex items-center justify-center h-full">
-    <Loader2 className="w-8 h-8 text-gray-400 animate-spin" />
-    <span className="ml-2 text-gray-300">Loading data...</span>
+    <Loader2 className="w-6 h-6 text-gray-400 animate-spin" />
+    <span className="ml-2 text-gray-300 text-xs">Loading data...</span>
   </div>
 );
 
@@ -35,8 +35,8 @@ const ErrorMessage = ({ message }) => (
     className="flex flex-col items-center justify-center h-full text-center"
     {...ANIMATIONS}
   >
-    <p className="text-red-400 mb-2">⚠️ Error loading data</p>
-    <p className="text-gray-400 text-sm">{message}</p>
+    <p className="text-red-400 mb-1 text-sm">⚠️ Error loading data</p>
+    <p className="text-gray-400 text-xs">{message}</p>
   </motion.div>
 );
 
@@ -45,7 +45,7 @@ const CustomTooltip = ({ active, payload }) => {
 
   const data = payload[0];
   return (
-    <div className="bg-gray-800 border border-gray-700 rounded-lg p-3 shadow-lg">
+    <div className="bg-gray-800 border border-gray-700 rounded-lg p-3 shadow-lg text-xs">
       <p className="text-gray-200 font-medium">{data.name}</p>
       <p className="text-gray-400">
         Count: <span className="text-gray-200">{data.value}</span>
@@ -102,35 +102,40 @@ const CategoryDistributionChart = () => {
   // Memoize the chart configuration
   const chartConfig = useMemo(() => ({
     label: ({ name, percent }) => (
-      `${name} (${(percent * 100).toFixed(1)}%)`
+      `${name.length > 12 ? name.substring(0, 12) + '...' : name} (${(percent * 100).toFixed(1)}%)`
     ),
     legendFormatter: (value) => (
-      <span className="text-gray-300">{value}</span>
+      <span className="text-gray-300 text-xs">{value}</span>
     )
   }), []);
 
   return (
     <motion.div
-      className="bg-gray-800 rounded-xl p-6 border border-gray-700 shadow-lg"
+      className="bg-gray-800 rounded-lg p-4 border border-gray-700 shadow-lg"
       initial={ANIMATIONS.initial}
       animate={ANIMATIONS.animate}
       transition={ANIMATIONS.transition}
     >
-      <header className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-semibold text-gray-100">
-          Category Distribution
-        </h2>
+      <header className="flex items-center justify-between mb-4">
+        <div>
+          <h2 className="text-lg font-semibold text-gray-100">
+            Category Distribution
+          </h2>
+          <p className="text-gray-400 text-xs mt-0.5">Categories by course count</p>
+        </div>
         {!loading && !error && (
           <button 
             onClick={fetchCategoryData}
-            className="text-gray-400 hover:text-gray-200 transition-colors"
+            className="text-gray-400 hover:text-gray-200 transition-colors p-1.5"
           >
-            ↻ Refresh
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
           </button>
         )}
       </header>
 
-      <div className="h-80">
+      <div className="h-72">
         {loading && <LoadingSpinner />}
         {error && <ErrorMessage message={error} />}
         
@@ -142,10 +147,11 @@ const CategoryDistributionChart = () => {
                 cx="50%"
                 cy="50%"
                 labelLine={false}
-                outerRadius={100}
+                outerRadius={85}
                 fill="#8884d8"
                 dataKey="value"
                 label={chartConfig.label}
+                fontSize={11}
               >
                 {categoryData.map((entry, index) => (
                   <Cell 
@@ -155,13 +161,20 @@ const CategoryDistributionChart = () => {
                 ))}
               </Pie>
               <Tooltip content={<CustomTooltip />} />
-              <Legend formatter={chartConfig.legendFormatter} />
+              <Legend 
+                formatter={chartConfig.legendFormatter} 
+                iconSize={8}
+                iconType="circle"
+                layout="vertical" 
+                align="right"
+                verticalAlign="middle"
+              />
             </PieChart>
           </ResponsiveContainer>
         )}
 
         {!loading && !error && categoryData.length === 0 && (
-          <div className="flex items-center justify-center h-full text-gray-400">
+          <div className="flex items-center justify-center h-full text-gray-400 text-xs">
             No data available
           </div>
         )}
