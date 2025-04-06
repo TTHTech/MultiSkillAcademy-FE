@@ -18,23 +18,23 @@ const COLORS = {
 const CHART_ANIMATIONS = {
   initial: { opacity: 0, scale: 0.9 },
   animate: { opacity: 1, scale: 1 },
-  transition: { duration: 0.5, ease: "easeOut" }
+  transition: { duration: 0.4, ease: "easeOut" }
 };
 
 // Loading Spinner Component
 const LoadingSpinner = () => (
-  <div className="flex flex-col items-center justify-center h-full space-y-3">
-    <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
-    <span className="text-gray-300 text-sm">Loading revenue data...</span>
+  <div className="flex flex-col items-center justify-center h-full space-y-2">
+    <Loader2 className="w-6 h-6 text-blue-500 animate-spin" />
+    <span className="text-gray-300 text-xs">Loading revenue data...</span>
   </div>
 );
 
 // Error Message Component
 const ErrorDisplay = ({ message }) => (
-  <div className="flex flex-col items-center justify-center h-full text-center p-4">
-    <span className="text-red-400 text-lg mb-2">⚠️</span>
-    <p className="text-red-400 font-medium">{message}</p>
-    <p className="text-gray-400 text-sm mt-2">Please try again later</p>
+  <div className="flex flex-col items-center justify-center h-full text-center p-3">
+    <span className="text-red-400 text-base mb-1">⚠️</span>
+    <p className="text-red-400 text-sm font-medium">{message}</p>
+    <p className="text-gray-400 text-xs mt-1">Please try again later</p>
   </div>
 );
 
@@ -44,15 +44,15 @@ const CustomTooltip = ({ active, payload }) => {
 
   const data = payload[0];
   return (
-    <div className="bg-gray-800 p-4 rounded-lg shadow-lg border border-gray-700">
-      <h3 className="text-gray-200 font-medium mb-2">{data.name}</h3>
-      <div className="flex items-center text-gray-300 space-x-2">
-        <DollarSign size={16} className="text-green-400" />
+    <div className="bg-gray-800 p-3 rounded-lg shadow-lg border border-gray-700 text-xs">
+      <h3 className="text-gray-200 font-medium mb-1">{data.name}</h3>
+      <div className="flex items-center text-gray-300 space-x-1">
+        <DollarSign size={14} className="text-green-400" />
         <span className="font-mono">
           {(data.value).toFixed(2)}%
         </span>
       </div>
-      <p className="text-gray-400 text-sm mt-1">
+      <p className="text-gray-400 text-xs mt-0.5">
         of total revenue
       </p>
     </div>
@@ -111,24 +111,24 @@ const CoursesRevenueChart = () => {
   // Memoize chart configuration
   const chartConfig = useMemo(() => ({
     customLabel: ({ name, value }) => (
-      `${name.length > 20 ? name.substring(0, 20) + '...' : name} (${value.toFixed(1)}%)`
+      `${name.length > 15 ? name.substring(0, 15) + '...' : name} (${value.toFixed(1)}%)`
     ),
     legendFormatter: (value) => (
-      <span className="text-gray-300 text-sm">{value}</span>
+      <span className="text-gray-300 text-xs">{value}</span>
     )
   }), []);
 
   return (
     <motion.div
-      className="bg-gray-800 rounded-xl p-6 border border-gray-700 shadow-lg relative"
+      className="bg-gray-800 rounded-lg p-4 border border-gray-700 shadow-lg relative"
       {...CHART_ANIMATIONS}
     >
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-4">
         <div>
-          <h2 className="text-xl font-semibold text-gray-100">
+          <h2 className="text-lg font-semibold text-gray-100">
             Course Revenue Distribution
           </h2>
-          <p className="text-gray-400 text-sm mt-1">
+          <p className="text-gray-400 text-xs mt-0.5">
             Revenue percentage by course
           </p>
         </div>
@@ -137,17 +137,17 @@ const CoursesRevenueChart = () => {
           <button
             onClick={() => fetchCourseData(true)}
             disabled={refreshing}
-            className="p-2 hover:bg-gray-700 rounded-lg transition-colors duration-200"
+            className="p-1.5 hover:bg-gray-700 rounded-lg transition-colors duration-200"
           >
             <RefreshCcw 
-              size={20} 
+              size={16} 
               className={`text-gray-400 ${refreshing ? 'animate-spin' : 'hover:text-gray-200'}`}
             />
           </button>
         )}
       </div>
 
-      <div className="h-80">
+      <div className="h-72">
         {loading && <LoadingSpinner />}
         {error && <ErrorDisplay message={error} />}
         
@@ -159,8 +159,8 @@ const CoursesRevenueChart = () => {
                 cx="50%"
                 cy="50%"
                 labelLine={false}
-                outerRadius={100}
-                innerRadius={60}
+                outerRadius={85}
+                innerRadius={50}
                 paddingAngle={2}
                 dataKey="value"
                 label={chartConfig.customLabel}
@@ -179,17 +179,20 @@ const CoursesRevenueChart = () => {
                 layout="vertical"
                 align="right"
                 verticalAlign="middle"
+                iconSize={8}
+                iconType="circle"
+                wrapperStyle={{ fontSize: '11px', paddingLeft: '10px' }}
               />
             </PieChart>
           </ResponsiveContainer>
         )}
 
         {!loading && !error && courseData.length === 0 && (
-          <div className="flex flex-col items-center justify-center h-full text-gray-400">
+          <div className="flex flex-col items-center justify-center h-full text-gray-400 text-sm">
             <p>No revenue data available</p>
             <button
               onClick={() => fetchCourseData(true)}
-              className="mt-2 text-blue-400 hover:text-blue-300 text-sm"
+              className="mt-1 text-blue-400 hover:text-blue-300 text-xs"
             >
               Refresh data
             </button>

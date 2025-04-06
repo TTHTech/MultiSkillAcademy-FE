@@ -134,7 +134,7 @@ function App() {
         theme="colored"
       />
 
-      <div className={shouldShowAdminLayout ? "flex h-screen overflow-hidden" : ""}>
+      <div className={shouldShowAdminLayout ? "flex h-screen overflow-visible relative" : ""}>
         {/* Gradient background chỉ dành cho admin routes */}
         {isAdminRoute && (
           <div className="fixed inset-0 -z-10">
@@ -147,7 +147,7 @@ function App() {
         {shouldShowSidebar && <Sidebar />}
 
         {/* Main Content */}
-        <div className={`${isAdminRoute ? 'flex-1 overflow-auto' : 'w-full'}`}>
+        <div className={`${isAdminRoute ? 'flex-1 overflow-auto z-10' : 'w-full'}`}>
           <Routes>
             {/* Auth Routes - Không yêu cầu đăng nhập */}
             <Route path="/login" element={<LoginForm />} />
