@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import axios from "axios";
-import DiscountUsageSummaryList from "./DiscountUsageSummaryList";
-import DiscountUsageDetail from "./DiscountUsageDetail";
+import DiscountUsageSummaryList from "./DiscountUsageAdminSummaryList";
+import DiscountUsageDetail from "./DiscountUsageAdminDetail";
 
 const DiscountUsageDashboard = () => {
   const [discountUsages, setDiscountUsages] = useState([]);
@@ -37,8 +37,8 @@ const DiscountUsageDashboard = () => {
   if (error) return <p className="text-red-500 p-4">{error}</p>;
 
   return (
-    <div className="p-6 bg-gray-800 rounded-lg shadow-lg mt-4 text-white">
-      <h2 className="text-2xl font-bold mb-6">Discount Usage Dashboard</h2>
+    <div className="p-6 bg-gray-800 mt-4 text-white">
+      <h2 className="text-2xl font-bold mb-6">Discount Admin Usage Dashboard</h2>
       <DiscountUsageSummaryList
         discountUsages={discountUsages}
         onSelect={setSelectedDiscount}

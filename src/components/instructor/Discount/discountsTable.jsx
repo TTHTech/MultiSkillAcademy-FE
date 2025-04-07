@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import EditDiscount from "./editDiscount";
+import ViewDetail from "./ViewDetail";
 
 const DiscountsTable = () => {
   const [discounts, setDiscounts] = useState([]);
@@ -17,6 +17,7 @@ const DiscountsTable = () => {
   };
   const [searchCode, setSearchCode] = useState("");
   const [searchStatus, setSearchStatus] = useState("");
+  const userId = Number(localStorage.getItem("userId"));
 
   const getPaginationItems = () => {
     const pages = [];
@@ -46,7 +47,7 @@ const DiscountsTable = () => {
     const fetchDiscounts = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:8080/api/admin/discounts",
+          `http://localhost:8080/api/instructor/discounts/list-discounts/${userId}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -59,8 +60,7 @@ const DiscountsTable = () => {
       }
     };
     fetchDiscounts();
-  }, [token, refresh]);
-  // Sau khi lấy dữ liệu từ API và setDiscounts
+  }, [token, refresh, userId]);
   const filteredDiscounts = discounts.filter((discount) => {
     const codeMatch = discount.code
       .toLowerCase()
@@ -77,16 +77,16 @@ const DiscountsTable = () => {
   );
 
   return (
-    <div className="overflow-x-auto p-6 bg-gray-800 rounded-lg shadow-lg mt-4">
+    <div className="p-6 bg-white rounded-lg shadow-lg mt-4">
       {editingDiscountId ? (
-        <EditDiscount
+        <ViewDetail
           discountId={editingDiscountId}
           onCancel={() => setEditingDiscountId(null)}
           triggerRefresh={triggerRefresh}
         />
       ) : (
         <>
-          <h2 className="text-2xl font-bold mb-4 text-white">
+          <h2 className="text-2xl font-bold mb-4 text-gray-900">
             Danh sách Discounts
           </h2>
           <div className="w-full flex flex-col sm:flex-row items-center gap-4 mb-6 px-4">
@@ -98,7 +98,7 @@ const DiscountsTable = () => {
                 setSearchCode(e.target.value);
                 setCurrentPage(1);
               }}
-              className="w-full sm:max-w-md px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full sm:max-w-md px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800 text-sm"
             />
             <select
               value={searchStatus}
@@ -106,39 +106,47 @@ const DiscountsTable = () => {
                 setSearchStatus(e.target.value);
                 setCurrentPage(1);
               }}
-              className="w-full sm:max-w-xs px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full sm:max-w-xs px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800 text-sm"
             >
               <option value="">Tất cả trạng thái</option>
-              <option value="ACTIVE">ACTIVE</option>
-              <option value="INACTIVE">INACTIVE</option>
+              <option value="ACTIVE">Đang hoạt động</option>
+              <option value="INACTIVE">Không hoạt động</option>
+              <option value="PENDING">Đang chờ duyệt</option>
+              <option value="DECLINED">Bị từ chối</option>
             </select>
           </div>
 
           {loading ? (
-            <p className="text-white">Đang tải dữ liệu...</p>
+            <p className="text-gray-800 text-sm">Đang tải dữ liệu...</p>
           ) : error ? (
-            <p className="text-red-500">{error}</p>
+            <p className="text-red-600 text-sm">{error}</p>
           ) : (
             <>
-              <table className="w-full text-white border-collapse">
+              <table className="w-full text-gray-800 border-collapse">
                 <thead>
-                  <tr className="bg-gray-700 border-b border-gray-600">
-                    <th className="py-3 px-4 border-r border-gray-600">STT</th>
-                    <th className="py-3 px-4 border-r border-gray-600">Tên</th>
-                    <th className="py-3 px-4 border-r border-gray-600">Mã</th>
-                    <th className="py-3 px-4 border-r border-gray-600">
+                  <tr className="bg-gray-100 border-b border-gray-300">
+                    <th className="py-3 px-4 border-r border-gray-300 text-sm">
+                      STT
+                    </th>
+                    <th className="py-3 px-4 border-r border-gray-300 text-sm">
+                      Tên
+                    </th>
+                    <th className="py-3 px-4 border-r border-gray-300 text-sm">
+                      Mã
+                    </th>
+                    <th className="py-3 px-4 border-r border-gray-300 text-sm">
                       Giá trị
                     </th>
-                    <th className="py-3 px-4 border-r border-gray-600">
+                    <th className="py-3 px-4 border-r border-gray-300 text-sm">
                       Ngày bắt đầu
                     </th>
-                    <th className="py-3 px-4 border-r border-gray-600">
+                    <th className="py-3 px-4 border-r border-gray-300 text-sm">
                       Ngày kết thúc
                     </th>
-                    <th className="py-3 px-4 border-r border-gray-600">
+                    <th className="py-3 px-4 border-r border-gray-300 text-sm">
                       Trạng thái
                     </th>
-                    <th className="py-3 px-4">Hành động</th>
+                    <th className="py-3 px-4 text-sm">Hành động</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -148,49 +156,49 @@ const DiscountsTable = () => {
                     return (
                       <tr
                         key={discount.discountId}
-                        className="hover:bg-gray-700 transition-colors duration-200"
+                        className="hover:bg-gray-50 transition-colors duration-200"
                       >
-                        <td className="py-3 px-4 border-r border-gray-600 text-center">
+                        <td className="py-3 px-4 border-r border-gray-300 text-center text-sm">
                           {serialNumber}
                         </td>
-                        <td className="py-3 px-4 border-r border-gray-600">
+                        <td className="py-3 px-4 border-r border-gray-300 text-sm">
                           {discount.name}
                         </td>
-                        <td className="py-3 px-4 border-r border-gray-600">
+                        <td className="py-3 px-4 border-r border-gray-300 text-sm">
                           {discount.code}
                         </td>
-                        <td className="py-3 px-4 border-r border-gray-600 text-center">
+                        <td className="py-3 px-4 border-r border-gray-300 text-center text-sm">
                           {discount.discountType === "PERCENTAGE"
                             ? `${discount.value}%`
                             : `${discount.value} VND`}
                         </td>
-                        <td className="py-3 px-4 border-r border-gray-600 text-center">
+                        <td className="py-3 px-4 border-r border-gray-300 text-center text-sm">
                           {new Date(...discount.startDate).toLocaleDateString(
                             "vi-VN"
                           )}
                         </td>
-                        <td className="py-3 px-4 border-r border-gray-600 text-center">
+                        <td className="py-3 px-4 border-r border-gray-300 text-center text-sm">
                           {new Date(...discount.endDate).toLocaleDateString(
                             "vi-VN"
                           )}
                         </td>
-                        <td className="py-3 px-4 border-r border-gray-600 text-center">
+                        <td className="py-3 px-4 border-r border-gray-300 text-center text-sm">
                           <span
-                            className={`px-2 py-1 rounded text-sm font-medium ${
+                            className={`px-2 py-1 rounded text-xs font-medium ${
                               discount.status === "ACTIVE"
-                                ? "bg-green-500"
-                                : "bg-red-500"
+                                ? "bg-green-100 text-green-800"
+                                : "bg-red-100 text-red-800"
                             }`}
                           >
                             {discount.status}
                           </span>
                         </td>
-                        <td className="py-3 px-4 text-center">
+                        <td className="py-3 px-4 text-center text-sm">
                           <button
                             onClick={() =>
                               setEditingDiscountId(discount.discountId)
                             }
-                            className="bg-yellow-500 text-white px-4 py-1 rounded mr-2 hover:bg-yellow-600 transition-colors"
+                            className="bg-yellow-400 text-gray-900 px-4 py-1 rounded hover:bg-yellow-500 transition-colors text-xs"
                           >
                             Xem chi tiết
                           </button>
@@ -200,17 +208,17 @@ const DiscountsTable = () => {
                   })}
                 </tbody>
               </table>
-              <div className="mt-4 flex justify-center items-center space-x-2 text-white">
+              <div className="mt-4 flex justify-center items-center space-x-2">
                 {getPaginationItems().map((item, index) => (
                   <button
                     key={index}
                     onClick={() =>
                       typeof item === "number" && handlePageChange(item)
                     }
-                    className={`px-3 py-1 rounded ${
+                    className={`px-3 py-1 rounded text-sm ${
                       item === currentPage
-                        ? "bg-blue-600"
-                        : "bg-gray-600 hover:bg-gray-500"
+                        ? "bg-blue-600 text-white"
+                        : "bg-gray-200 text-gray-800 hover:bg-gray-300"
                     }`}
                     disabled={item === "..."}
                   >
@@ -225,5 +233,4 @@ const DiscountsTable = () => {
     </div>
   );
 };
-
 export default DiscountsTable;

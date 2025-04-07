@@ -1,6 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
-import TableCategoryAndCourses from "./tableCategoryAndCourses";
+import TableCategoryAndCourses from "./tableCategoryAndCoursesCreate";
 import Swal from "sweetalert2";
 
 const CreateDiscount = () => {
@@ -16,7 +16,7 @@ const CreateDiscount = () => {
     startDate: "",
     endDate: "",
     usageLimit: "",
-    status: "ACTIVE",
+    status: "INACTIVE",
     applicableCategories: [],
     applicableCourses: [],
   });
@@ -121,11 +121,15 @@ const CreateDiscount = () => {
     };
 
     try {
-      await axios.post("http://localhost:8080/api/admin/discounts", payload, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      await axios.post(
+        "http://localhost:8080/api/instructor/discounts",
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       Swal.fire("Thành công", "Discount đã được tạo thành công!", "success");
       setDiscountData({
         createdBy: 1,
@@ -139,7 +143,7 @@ const CreateDiscount = () => {
         startDate: "",
         endDate: "",
         usageLimit: "",
-        status: "ACTIVE",
+        status: "INACTIVE",
         applicableCategories: [],
         applicableCourses: [],
       });
@@ -158,59 +162,66 @@ const CreateDiscount = () => {
     setLoading(false);
   };
   return (
-    <div className="overflow-x-auto p-6 bg-gray-800 rounded-lg shadow-lg mt-4">
-      <h2 className="text-2xl font-bold mb-4 text-white">Tạo Discount</h2>
-      {error && <p className="text-red-400 mb-4">{error}</p>}
+    <div className="overflow-x-auto p-6 bg-white rounded-lg shadow-lg mt-4">
+      <h2 className="text-2xl font-bold mb-4 text-gray-800">Tạo Discount</h2>
+      {error && <p className="text-red-600 mb-4 text-sm">{error}</p>}
       <form onSubmit={handleSubmit}>
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Cột thông tin Discount */}
           <div>
             <div className="mb-4">
-              <label className="block text-gray-300 mb-1">Tên Discount:</label>
+              <label className="block text-gray-700 mb-1 text-sm">
+                Tên Discount:
+              </label>
               <input
                 type="text"
                 name="name"
                 value={discountData.name}
                 onChange={handleChange}
-                className="w-full p-2 bg-gray-700 text-white rounded"
+                className="w-full p-2 bg-white text-gray-800 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-300 text-sm"
                 required
               />
             </div>
             <div className="mb-4">
-              <label className="block text-gray-300 mb-1">Mã Code:</label>
+              <label className="block text-gray-700 mb-1 text-sm">
+                Mã Code:
+              </label>
               <input
                 type="text"
                 name="code"
                 value={discountData.code}
                 onChange={handleChange}
-                className="w-full p-2 bg-gray-700 text-white rounded"
+                className="w-full p-2 bg-white text-gray-800 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-300 text-sm"
                 required
               />
             </div>
             <div className="mb-4">
-              <label className="block text-gray-300 mb-1">Mô tả:</label>
+              <label className="block text-gray-700 mb-1 text-sm">Mô tả:</label>
               <textarea
                 name="description"
                 value={discountData.description}
                 onChange={handleChange}
-                className="w-full p-2 bg-gray-700 text-white rounded"
+                className="w-full p-2 bg-white text-gray-800 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-300 text-sm"
                 rows="3"
               ></textarea>
             </div>
             <div className="mb-4">
-              <label className="block text-gray-300 mb-1">Dạng giảm giá:</label>
+              <label className="block text-gray-700 mb-1 text-sm">
+                Dạng giảm giá:
+              </label>
               <select
                 name="discountType"
                 value={discountData.discountType}
                 onChange={handleChange}
-                className="w-full p-2 bg-gray-700 text-white rounded"
+                className="w-full p-2 bg-white text-gray-800 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-300 text-sm"
               >
                 <option value="PERCENTAGE">Giảm theo phần trăm</option>
-                <option value="FIXED_AMOUNT">Giảm theo số tiềm cố định</option>
+                <option value="FIXED_AMOUNT">Giảm theo số tiền cố định</option>
               </select>
             </div>
             <div className="grid grid-cols-2 gap-4 mb-4">
               <div>
-                <label className="block text-gray-300 mb-1">
+                <label className="block text-gray-700 mb-1 text-sm">
                   Giá trị{" "}
                   {discountData.discountType === "PERCENTAGE"
                     ? "(%):"
@@ -221,13 +232,13 @@ const CreateDiscount = () => {
                   name="value"
                   value={discountData.value}
                   onChange={handleChange}
-                  className="w-full p-2 bg-gray-700 text-white rounded"
+                  className="w-full p-2 bg-white text-gray-800 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-300 text-sm"
                   required
                 />
               </div>
               {discountData.discountType === "PERCENTAGE" && (
                 <div>
-                  <label className="block text-gray-300 mb-1">
+                  <label className="block text-gray-700 mb-1 text-sm">
                     Số tiền tối đa giảm được:
                   </label>
                   <input
@@ -235,7 +246,7 @@ const CreateDiscount = () => {
                     name="maxDiscount"
                     value={discountData.maxDiscount}
                     onChange={handleChange}
-                    className="w-full p-2 bg-gray-700 text-white rounded"
+                    className="w-full p-2 bg-white text-gray-800 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-300 text-sm"
                     required
                   />
                 </div>
@@ -243,7 +254,7 @@ const CreateDiscount = () => {
             </div>
             <div className="grid grid-cols-2 gap-4 mb-4">
               <div>
-                <label className="block text-gray-300 mb-1">
+                <label className="block text-gray-700 mb-1 text-sm">
                   Ngày bắt đầu:
                 </label>
                 <input
@@ -251,12 +262,12 @@ const CreateDiscount = () => {
                   name="startDate"
                   value={discountData.startDate}
                   onChange={handleChange}
-                  className="w-full p-2 bg-gray-700 text-white rounded"
+                  className="w-full p-2 bg-white text-gray-800 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-300 text-sm"
                   required
                 />
               </div>
               <div>
-                <label className="block text-gray-300 mb-1">
+                <label className="block text-gray-700 mb-1 text-sm">
                   Ngày kết thúc:
                 </label>
                 <input
@@ -264,13 +275,13 @@ const CreateDiscount = () => {
                   name="endDate"
                   value={discountData.endDate}
                   onChange={handleChange}
-                  className="w-full p-2 bg-gray-700 text-white rounded"
+                  className="w-full p-2 bg-white text-gray-800 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-300 text-sm"
                   required
                 />
               </div>
             </div>
             <div className="mb-4">
-              <label className="block text-gray-300 mb-1">
+              <label className="block text-gray-700 mb-1 text-sm">
                 Số người dùng có thể sử dụng:
               </label>
               <input
@@ -278,40 +289,26 @@ const CreateDiscount = () => {
                 name="usageLimit"
                 value={discountData.usageLimit}
                 onChange={handleChange}
-                className="w-full p-2 bg-gray-700 text-white rounded"
+                className="w-full p-2 bg-white text-gray-800 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-300 text-sm"
                 required
               />
             </div>
-            <div className="grid grid-cols-2 gap-4 mb-4">
+            <div className="grid grid-cols-1 gap-4 mb-4">
               <div>
-                <label className="block text-gray-300 mb-1">
+                <label className="block text-gray-700 mb-1 text-sm">
                   Điều kiện người dùng sử dụng:
                 </label>
                 <select
                   name="eligibleUsers"
                   value={discountData.eligibleUsers}
                   onChange={handleChange}
-                  className="w-full p-2 bg-gray-700 text-white rounded"
+                  className="w-full p-2 bg-white text-gray-800 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-300 text-sm"
                 >
                   <option value="NEW_USERS">Khách hàng mới</option>
-                  <option value="ALL_USERS">
-                    Không giới hạn khách hàng sử dụng và số lần sử dụng
-                  </option>
+                  <option value="ALL_USERS">Không giới hạn khách hàng sử dụng và số lần sử dụng</option>
                   <option value="ONE_TIME_PER_USER">
                     Mỗi khách hàng chỉ dùng 1 lần
                   </option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-gray-300 mb-1">Trạng thái:</label>
-                <select
-                  name="status"
-                  value={discountData.status}
-                  onChange={handleChange}
-                  className="w-full p-2 bg-gray-700 text-white rounded"
-                >
-                  <option value="ACTIVE">Hoạt động</option>
-                  <option value="INACTIVE">Không hoạt động</option>
                 </select>
               </div>
             </div>
@@ -338,7 +335,7 @@ const CreateDiscount = () => {
         <button
           type="submit"
           disabled={loading}
-          className="mt-6 py-2 px-6 w-full max-w-xs mx-auto block bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded text-center"
+          className="mt-6 py-2 px-6 w-full max-w-xs mx-auto block bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded text-sm"
         >
           {loading ? "Đang tạo..." : "Tạo Discount"}
         </button>

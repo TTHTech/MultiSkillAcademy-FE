@@ -1,4 +1,28 @@
+import { useState } from "react";
+
 const DiscountUsageDetail = ({ discount, onClose }) => {
+  const [coursesSearchTerm, setCoursesSearchTerm] = useState("");
+  const [usagesSearchTerm, setUsagesSearchTerm] = useState("");
+
+  const filteredCourses = discount.appliedCourseIds.filter((course) => {
+    const lowerCaseSearch = coursesSearchTerm.toLowerCase();
+    return (
+      course.title.toLowerCase().includes(lowerCaseSearch) ||
+      course.courseId.toLowerCase().includes(lowerCaseSearch)
+    );
+  });
+
+  const filteredUsages = discount.userDiscountUsages.filter((usage) => {
+    const lowerSearch = usagesSearchTerm.toLowerCase();
+    return (
+      usage.userId.toString().toLowerCase().includes(lowerSearch) ||
+      usage.username.toLowerCase().includes(lowerSearch) ||
+      usage.email.toLowerCase().includes(lowerSearch) ||
+      usage.courseTitle.toLowerCase().includes(lowerSearch) ||
+      usage.courseId.toLowerCase().includes(lowerSearch)
+    );
+  });
+
   return (
     <div className="mt-8 border-t border-gray-600 pt-4">
       <div className="flex justify-between items-center mb-4">
@@ -47,14 +71,30 @@ const DiscountUsageDetail = ({ discount, onClose }) => {
         <div className="md:w-1/2">
           {discount.appliedCourseIds && discount.appliedCourseIds.length > 0 ? (
             <div>
-              <h4 className="font-semibold text-lg">Applied Courses:</h4>
-              <ul className="list-disc ml-5 text-sm">
-                {discount.appliedCourseIds.map((course) => (
-                  <li key={course.courseId} className="mt-1">
-                    {course.title} ({course.courseId})
-                  </li>
-                ))}
-              </ul>
+              <div className="flex items-center gap-x-2">
+                <h4 className="font-semibold text-lg">Applied Courses:</h4>
+                <input
+                  type="text"
+                  className="p-1 border border-gray-300 rounded text-sm text-gray-800 focus:outline-none focus:ring focus:border-blue-300"
+                  placeholder="Search..."
+                  value={coursesSearchTerm}
+                  onChange={(e) => setCoursesSearchTerm(e.target.value)}
+                />
+              </div>
+              <div className="max-h-60 overflow-y-auto mt-2">
+                <ul className="list-disc ml-5 text-sm">
+                  {filteredCourses.map((course) => (
+                    <li key={course.courseId} className="mt-1">
+                      {course.title} ({course.courseId})
+                    </li>
+                  ))}
+                  {filteredCourses.length === 0 && (
+                    <li className="mt-1 text-gray-400">
+                      No matching courses found.
+                    </li>
+                  )}
+                </ul>
+              </div>
             </div>
           ) : (
             <p className="text-sm text-gray-300">
@@ -67,7 +107,16 @@ const DiscountUsageDetail = ({ discount, onClose }) => {
       {discount.userDiscountUsages &&
         discount.userDiscountUsages.length > 0 && (
           <div>
-            <h4 className="font-semibold mb-2 mt-4">User Discount Usages:</h4>
+            <div className="flex items-center gap-x-2 mb-2 mt-4">
+              <h4 className="font-semibold">User Discount Usages:</h4>
+              <input
+                type="text"
+                placeholder="Search..."
+                value={usagesSearchTerm}
+                onChange={(e) => setUsagesSearchTerm(e.target.value)}
+                className="p-1 border border-gray-300 rounded text-sm text-gray-800 focus:outline-none focus:ring focus:border-blue-300"
+              />
+            </div>
             <div className="overflow-x-auto">
               <table className="min-w-full text-white text-sm border-collapse">
                 <thead>
@@ -89,7 +138,7 @@ const DiscountUsageDetail = ({ discount, onClose }) => {
                   </tr>
                 </thead>
                 <tbody>
-                  {discount.userDiscountUsages.map((usage, idx) => (
+                  {filteredUsages.map((usage, idx) => (
                     <tr
                       key={`${usage.userId}-${idx}`}
                       className="hover:bg-gray-600 transition-colors duration-200"
@@ -114,6 +163,16 @@ const DiscountUsageDetail = ({ discount, onClose }) => {
                       </td>
                     </tr>
                   ))}
+                  {filteredUsages.length === 0 && (
+                    <tr>
+                      <td
+                        colSpan="6"
+                        className="py-1 px-2 border border-gray-600 text-center text-gray-400"
+                      >
+                        No matching usages found.
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>
