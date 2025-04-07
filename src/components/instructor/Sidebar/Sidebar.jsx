@@ -13,6 +13,7 @@ import { FaCircleDollarToSlot } from "react-icons/fa6";
 import { GrScorecard } from "react-icons/gr";
 import { BiBookAdd } from "react-icons/bi";
 import { GiBookshelf } from "react-icons/gi";
+import { FaTags } from 'react-icons/fa';
 
 const Sidebar = ({ open, setOpen }) => {
   const location = useLocation();
@@ -22,6 +23,7 @@ const Sidebar = ({ open, setOpen }) => {
     // { name: "Dashboard", link: "/instructor/dashboard", icon: MdOutlineDashboard },
     { name: "Courses", link: "/instructor/courses", icon: ImBook },
     { name: "Search Course", link: "/instructor/search", icon: GiBookshelf },
+    { name: "Discount", link: "/instructor/discount", icon: FaTags },
     { name: "Add New Courses", link: "/instructor/addCourses", icon: BiBookAdd },
     { name: "Review", link: "/instructor/review", icon: MdOutlineReviews },
     { name: "Test", link: "/instructor/tests", icon: LuFileSignature },
