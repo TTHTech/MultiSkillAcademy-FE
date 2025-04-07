@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import TableCategoryAndCourses from "./tableCategoryAndCourses";
+import TableCategoryAndCourses from "./tableCategoryAndCoursesInstructor";
 import Swal from "sweetalert2";
 
 const EditDiscount = ({ discountId, onCancel, triggerRefresh }) => {
@@ -16,11 +16,19 @@ const EditDiscount = ({ discountId, onCancel, triggerRefresh }) => {
     startDate: "",
     endDate: "",
     usageLimit: "",
-    status: "ACTIVE",
+    status: "",
     applicableCategories: [],
     applicableCourses: [],
   });
+  const statusLabelMap = {
+    ACTIVE: "Đang hoạt động",
+    INACTIVE: "Không hoạt động",
+    PENDING: "Chờ xét duyệt",
+    DECLINED: "Bị từ chối",
+  };
 
+  const [declinedReason, setDeclinedReason] = useState("");
+  const [showDeclinedInput, setShowDeclinedInput] = useState(false);
   useEffect(() => {
     const token = localStorage.getItem("token");
     const fetchDiscountData = async () => {
@@ -208,6 +216,39 @@ const EditDiscount = ({ discountId, onCancel, triggerRefresh }) => {
     }
     setLoading(false);
   };
+  const handleChangeStatus = async (newStatus) => {
+    let reason = "";
+    if (newStatus === "DECLINED") {
+      if (!declinedReason.trim()) {
+        alert("Vui lòng nhập lý do từ chối!");
+        return;
+      }
+      reason = declinedReason;
+    }
+    const token = localStorage.getItem("token");
+
+    try {
+      const response = await axios.put(
+        `http://localhost:8080/api/admin/discounts/${discountId}/status`,
+        {
+          status: newStatus,
+          declinedReason: reason,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      alert(response.data);
+      triggerRefresh();
+      setDeclinedReason("");
+      setShowDeclinedInput(false);
+      onCancel();
+    } catch (error) {
+      alert(error.response?.data || "Có lỗi xảy ra khi cập nhật trạng thái!");
+    }
+  };
   return (
     <div className="overflow-x-auto p-6">
       <button
@@ -216,8 +257,7 @@ const EditDiscount = ({ discountId, onCancel, triggerRefresh }) => {
       >
         &larr; Quay lại danh sách Discount
       </button>
-
-      <h2 className="text-2xl font-bold mb-4 text-white">
+      <h2 className="text-3xl font-bold text-white mb-4">
         View And Edit Discount:
       </h2>
       {error && <p className="text-red-400 mb-4">{error}</p>}
@@ -232,7 +272,7 @@ const EditDiscount = ({ discountId, onCancel, triggerRefresh }) => {
                 value={discountData.name}
                 onChange={handleChange}
                 className="w-full p-2 bg-gray-700 text-white rounded"
-                required
+                disabled
               />
             </div>
             <div className="mb-4">
@@ -243,7 +283,7 @@ const EditDiscount = ({ discountId, onCancel, triggerRefresh }) => {
                 value={discountData.code}
                 onChange={handleChange}
                 className="w-full p-2 bg-gray-700 text-white rounded"
-                required
+                disabled
               />
             </div>
             <div className="mb-4">
@@ -254,6 +294,7 @@ const EditDiscount = ({ discountId, onCancel, triggerRefresh }) => {
                 onChange={handleChange}
                 className="w-full p-2 bg-gray-700 text-white rounded"
                 rows="3"
+                disabled
               ></textarea>
             </div>
             <div className="mb-4">
@@ -263,6 +304,7 @@ const EditDiscount = ({ discountId, onCancel, triggerRefresh }) => {
                 value={discountData.discountType}
                 onChange={handleChange}
                 className="w-full p-2 bg-gray-700 text-white rounded"
+                disabled
               >
                 <option value="PERCENTAGE">Giảm theo phần trăm</option>
                 <option value="FIXED_AMOUNT">Giảm theo số tiềm cố định</option>
@@ -282,7 +324,7 @@ const EditDiscount = ({ discountId, onCancel, triggerRefresh }) => {
                   value={discountData.value}
                   onChange={handleChange}
                   className="w-full p-2 bg-gray-700 text-white rounded"
-                  required
+                  disabled
                 />
               </div>
               {discountData.discountType === "PERCENTAGE" && (
@@ -296,7 +338,7 @@ const EditDiscount = ({ discountId, onCancel, triggerRefresh }) => {
                     value={discountData.maxDiscount}
                     onChange={handleChange}
                     className="w-full p-2 bg-gray-700 text-white rounded"
-                    required
+                    disabled
                   />
                 </div>
               )}
@@ -312,7 +354,7 @@ const EditDiscount = ({ discountId, onCancel, triggerRefresh }) => {
                   value={getDateTimeLocalValue(discountData.startDate)}
                   onChange={handleChange}
                   className="w-full p-2 bg-gray-700 text-white rounded"
-                  required
+                  disabled
                 />
               </div>
               <div>
@@ -325,7 +367,7 @@ const EditDiscount = ({ discountId, onCancel, triggerRefresh }) => {
                   value={getDateTimeLocalValue(discountData.endDate)}
                   onChange={handleChange}
                   className="w-full p-2 bg-gray-700 text-white rounded"
-                  required
+                  disabled
                 />
               </div>
             </div>
@@ -339,7 +381,7 @@ const EditDiscount = ({ discountId, onCancel, triggerRefresh }) => {
                 value={discountData.usageLimit}
                 onChange={handleChange}
                 className="w-full p-2 bg-gray-700 text-white rounded"
-                required
+                disabled
               />
             </div>
             <div className="grid grid-cols-2 gap-4 mb-4">
@@ -352,15 +394,18 @@ const EditDiscount = ({ discountId, onCancel, triggerRefresh }) => {
                   value={discountData.eligibleUsers}
                   onChange={handleChange}
                   className="w-full p-2 bg-gray-700 text-white rounded"
+                  disabled
                 >
-                  <option value="NEW_USERS">Người dùng mới</option>
-                  <option value="ALL_USERS">Tất cả người dùng</option>
+                  <option value="NEW_USERS">Khách hàng mới</option>
+                  <option value="ALL_USERS">
+                    Không giới hạn khách hàng sử dụng và số lần sử dụng
+                  </option>
                   <option value="ONE_TIME_PER_USER">
-                    Mỗi người dùng 1 lần
+                    Mỗi khách hàng chỉ dùng 1 lần
                   </option>
                 </select>
               </div>
-              <div>
+              {/* <div>
                 <label className="block text-gray-300 mb-1">Trạng thái:</label>
                 <select
                   name="status"
@@ -371,7 +416,7 @@ const EditDiscount = ({ discountId, onCancel, triggerRefresh }) => {
                   <option value="ACTIVE">Hoạt động</option>
                   <option value="INACTIVE">Không hoạt động</option>
                 </select>
-              </div>
+              </div> */}
             </div>
           </div>
           <div>
@@ -394,23 +439,105 @@ const EditDiscount = ({ discountId, onCancel, triggerRefresh }) => {
           </div>
         </div>
         <div className="flex justify-center space-x-4 mt-6">
-          <button
+          {/* <button
             type="submit"
             disabled={loading}
             className="py-2 px-6 w-full max-w-xs bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded text-center"
           >
             {loading ? "Đang Lưu..." : "Lưu Thay Đổi"}
-          </button>
-          <button
+          </button> */}
+          {/* <button
             type="button"
             disabled={loading}
             onClick={handleDelete}
             className="py-2 px-6 w-full max-w-xs bg-red-600 hover:bg-red-700 text-white font-semibold rounded text-center"
           >
             {loading ? "Đang Xóa..." : "Xóa Discount"}
-          </button>
+          </button> */}
         </div>
       </form>
+      <div className="flex justify-center space-x-4 mt-6">
+        <div className="p-6">
+          <div className="flex flex-col md:flex-row items-start justify-between mb-6">
+            <div className="bg-gray-900 p-4 rounded-lg shadow-lg">
+              <h3 className="text-lg font-medium text-white mb-2">
+                Trạng thái hiện tại:{" "}
+                {statusLabelMap[discountData.status] || "Không xác định"}
+              </h3>
+              <div className="flex flex-wrap gap-2 justify-center">
+                {discountData.status === "ACTIVE" && (
+                  <button
+                    onClick={() => handleChangeStatus("INACTIVE")}
+                    className="bg-red-500 hover:bg-red-600 text-white text-sm px-4 py-2 rounded-lg shadow-md hover:scale-105 transition-transform duration-200 flex items-center gap-2"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                    Dừng hoạt động
+                  </button>
+                )}
+                {discountData.status === "PENDING" && (
+                  <>
+                    <button
+                      onClick={() => handleChangeStatus("ACTIVE")}
+                      className="bg-green-500 hover:bg-green-600 transition-all duration-200 text-white text-sm px-4 py-2 rounded-lg"
+                    >
+                      Cho phép hoạt động
+                    </button>
+                    <button
+                      onClick={() => setShowDeclinedInput(true)}
+                      className="bg-red-500 hover:bg-red-600 transition-all duration-200 text-white text-sm px-4 py-2 rounded-lg"
+                    >
+                      Từ chối hoạt động
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+          {showDeclinedInput && (
+            <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-60">
+              <div className="bg-gray-800 p-6 rounded-xl shadow-2xl w-full max-w-md">
+                <h3 className="text-white text-xl font-semibold mb-4">
+                  Nhập lý do từ chối
+                </h3>
+                <input
+                  type="text"
+                  placeholder="Nhập lý do từ chối"
+                  value={declinedReason}
+                  onChange={(e) => setDeclinedReason(e.target.value)}
+                  className="border border-gray-600 bg-gray-700 text-white text-sm p-3 rounded-md w-full mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <div className="flex justify-end space-x-3">
+                  <button
+                    onClick={() => setShowDeclinedInput(false)}
+                    className="bg-gray-600 hover:bg-gray-500 transition-all duration-200 text-white text-sm px-4 py-2 rounded-lg"
+                  >
+                    Hủy
+                  </button>
+                  <button
+                    onClick={() => handleChangeStatus("DECLINED")}
+                    className="bg-red-500 hover:bg-red-600 transition-all duration-200 text-white text-sm px-4 py-2 rounded-lg"
+                  >
+                    Xác nhận
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 };

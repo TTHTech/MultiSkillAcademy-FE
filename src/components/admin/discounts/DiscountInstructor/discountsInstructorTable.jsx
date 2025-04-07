@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import EditDiscount from "./editDiscount";
+import EditDiscount from "./editDiscountInstructor";
 
 const DiscountsTable = () => {
   const [discounts, setDiscounts] = useState([]);
@@ -46,7 +46,7 @@ const DiscountsTable = () => {
     const fetchDiscounts = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:8080/api/admin/discounts",
+          "http://localhost:8080/api/admin/discounts/instructor",
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -60,7 +60,6 @@ const DiscountsTable = () => {
     };
     fetchDiscounts();
   }, [token, refresh]);
-  // Sau khi lấy dữ liệu từ API và setDiscounts
   const filteredDiscounts = discounts.filter((discount) => {
     const codeMatch = discount.code
       .toLowerCase()
@@ -87,7 +86,7 @@ const DiscountsTable = () => {
       ) : (
         <>
           <h2 className="text-2xl font-bold mb-4 text-white">
-            Danh sách Discounts
+            Danh sách Discounts Giảng Viên tạo
           </h2>
           <div className="w-full flex flex-col sm:flex-row items-center gap-4 mb-6 px-4">
             <input
@@ -109,8 +108,10 @@ const DiscountsTable = () => {
               className="w-full sm:max-w-xs px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Tất cả trạng thái</option>
-              <option value="ACTIVE">ACTIVE</option>
-              <option value="INACTIVE">INACTIVE</option>
+              <option value="ACTIVE">Đang hoạt động </option>
+              <option value="INACTIVE">Không hoạt động </option>
+              <option value="PENDING">Đang chờ xét duyệt </option>
+              <option value="DECLINED">Bị từ chối </option>
             </select>
           </div>
 

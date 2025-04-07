@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
-import TableCategoryAndCourses from "./tableCategoryAndCourses";
+import TableCategoryAndCourses from "./tableCategoryAndCoursesAdmin";
 import Swal from "sweetalert2";
 
-const CreateDiscount = () => {
+const EditDiscount = ({ discountId, onCancel, triggerRefresh }) => {
   const [discountData, setDiscountData] = useState({
     createdBy: 1,
     name: "",
@@ -21,6 +21,27 @@ const CreateDiscount = () => {
     applicableCourses: [],
   });
 
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const fetchDiscountData = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:8080/api/admin/discounts/${discountId}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        setDiscountData(response.data);
+      } catch (error) {
+        console.error("Error fetching discount data", error);
+      }
+    };
+
+    if (discountId) {
+      fetchDiscountData();
+    }
+  }, [discountId]);
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -36,7 +57,48 @@ const CreateDiscount = () => {
       setDiscountData({ ...discountData, [name]: value });
     }
   };
+  const getDateTimeLocalValue = (dateValue) => {
+    if (!dateValue) return "";
+    if (Array.isArray(dateValue)) {
+      return new Date(...dateValue).toISOString().slice(0, 16);
+    }
+    return dateValue;
+  };
+  const handleDelete = async () => {
+    const token = localStorage.getItem("token");
+    try {
+      const confirmResult = await Swal.fire({
+        title: "Bạn có chắc muốn xóa discount này không?",
+        text: "Hành động này không thể hoàn tác!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Có, xóa ngay!",
+        cancelButtonText: "Hủy",
+      });
 
+      if (confirmResult.isConfirmed) {
+        await axios
+          .delete(`http://localhost:8080/api/admin/discounts/${discountId}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          })
+          .then(() => {
+            Swal.fire("Đã xóa", "Discount đã được xóa thành công.", "success");
+            triggerRefresh();
+            onCancel();
+          })
+          .catch((error) => {
+            if (error.response && error.response.status === 400) {
+              Swal.fire("Không thể xóa", error.response.data, "warning");
+            } else {
+              Swal.fire("Lỗi", "Có lỗi xảy ra khi xóa discount.", "error");
+            }
+          });
+      }
+    } catch (error) {
+      console.error(error);
+      Swal.fire("Lỗi", "Có lỗi xảy ra khi xóa discount.", "error");
+    }
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -85,7 +147,7 @@ const CreateDiscount = () => {
       return;
     }
     const confirmResult = await Swal.fire({
-      title: "Bạn có muốn thêm Discount?",
+      title: "Bạn có muốn lưu thay đổi Discount?",
       icon: "question",
       showCancelButton: true,
       confirmButtonText: "Có",
@@ -121,28 +183,17 @@ const CreateDiscount = () => {
     };
 
     try {
-      await axios.post("http://localhost:8080/api/admin/discounts", payload, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      Swal.fire("Thành công", "Discount đã được tạo thành công!", "success");
-      setDiscountData({
-        createdBy: 1,
-        name: "",
-        code: "",
-        description: "",
-        eligibleUsers: "ALL_USERS",
-        discountType: "PERCENTAGE",
-        value: "",
-        maxDiscount: "",
-        startDate: "",
-        endDate: "",
-        usageLimit: "",
-        status: "ACTIVE",
-        applicableCategories: [],
-        applicableCourses: [],
-      });
+      await axios.put(
+        `http://localhost:8080/api/admin/discounts/${discountId}`,
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      Swal.fire("Thành công", "Discount đã được lưu thành công!", "success");
+      triggerRefresh();
     } catch (err) {
       console.error(err);
       if (err.response && err.response.status === 409) {
@@ -150,7 +201,7 @@ const CreateDiscount = () => {
       } else {
         Swal.fire(
           "Lỗi",
-          "Có lỗi xảy ra khi tạo discount: " + err.message,
+          "Có lỗi xảy ra khi lưu discount: " + err.message,
           "error"
         );
       }
@@ -158,8 +209,17 @@ const CreateDiscount = () => {
     setLoading(false);
   };
   return (
-    <div className="overflow-x-auto p-6 bg-gray-800 rounded-lg shadow-lg mt-4">
-      <h2 className="text-2xl font-bold mb-4 text-white">Tạo Discount</h2>
+    <div className="overflow-x-auto p-6">
+      <button
+        onClick={onCancel}
+        className="mb-4 bg-gradient-to-r from-gray-500 to-gray-700 hover:from-gray-600 hover:to-gray-800 text-white font-semibold px-6 py-2 rounded shadow-md transition-all duration-200"
+      >
+        &larr; Quay lại danh sách Discount
+      </button>
+
+      <h2 className="text-2xl font-bold mb-4 text-white">
+        View And Edit Discount:
+      </h2>
       {error && <p className="text-red-400 mb-4">{error}</p>}
       <form onSubmit={handleSubmit}>
         <div className="grid grid-cols-2 gap-6">
@@ -249,7 +309,7 @@ const CreateDiscount = () => {
                 <input
                   type="datetime-local"
                   name="startDate"
-                  value={discountData.startDate}
+                  value={getDateTimeLocalValue(discountData.startDate)}
                   onChange={handleChange}
                   className="w-full p-2 bg-gray-700 text-white rounded"
                   required
@@ -262,7 +322,7 @@ const CreateDiscount = () => {
                 <input
                   type="datetime-local"
                   name="endDate"
-                  value={discountData.endDate}
+                  value={getDateTimeLocalValue(discountData.endDate)}
                   onChange={handleChange}
                   className="w-full p-2 bg-gray-700 text-white rounded"
                   required
@@ -335,15 +395,25 @@ const CreateDiscount = () => {
             />
           </div>
         </div>
-        <button
-          type="submit"
-          disabled={loading}
-          className="mt-6 py-2 px-6 w-full max-w-xs mx-auto block bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded text-center"
-        >
-          {loading ? "Đang tạo..." : "Tạo Discount"}
-        </button>
+        <div className="flex justify-center space-x-4 mt-6">
+          <button
+            type="submit"
+            disabled={loading}
+            className="py-2 px-6 w-full max-w-xs bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded text-center"
+          >
+            {loading ? "Đang Lưu..." : "Lưu Thay Đổi"}
+          </button>
+          <button
+            type="button"
+            disabled={loading}
+            onClick={handleDelete}
+            className="py-2 px-6 w-full max-w-xs bg-red-600 hover:bg-red-700 text-white font-semibold rounded text-center"
+          >
+            {loading ? "Đang Xóa..." : "Xóa Discount"}
+          </button>
+        </div>
       </form>
     </div>
   );
 };
-export default CreateDiscount;
+export default EditDiscount;

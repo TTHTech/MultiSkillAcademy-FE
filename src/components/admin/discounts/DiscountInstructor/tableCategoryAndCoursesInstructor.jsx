@@ -178,6 +178,7 @@ const TableCategoryAndCourses = ({
                         )
                       }
                       onChange={() => handleCategoryChange(category)}
+                      disabled
                     />
                   </td>
                   <td className="border px-2 py-1">{category.categoryId}</td>
@@ -232,6 +233,7 @@ const TableCategoryAndCourses = ({
                         )
                       }
                       onChange={() => handleCourseChange(course)}
+                      disabled
                     />
                   </td>
                   <td className="border px-2 py-1">{course.courseId}</td>
