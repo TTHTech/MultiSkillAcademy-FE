@@ -73,7 +73,7 @@ import PageDiscount from "./pages/admin/PageDiscount.jsx"
 import PageDiscountUsage from "./pages/admin/PageDiscountUsage.jsx"
 import AdminInstructorRevenue from "./components/admin/revenue/AdminInstructorRevenueContainer.jsx";
 import AdminInstructorSales from "./components/admin/revenue/AdminInstructorSales.jsx";
-
+import PageDiscountInstructor from "./pages/instructor/PageDiscount/PageDiscount.jsx";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -236,6 +236,7 @@ function App() {
                 <Route path="/instructor/courses/:id" element={<UpdateCourse />} />
                 <Route path="/instructor/chat" element={<InstructorChatPage />} />
                 <Route path="/instructor/user" element={<PageProfile />} />
+                <Route path="/instructor/discount" element={<PageDiscountInstructor />} />
               </>
             )}
           </Routes>
