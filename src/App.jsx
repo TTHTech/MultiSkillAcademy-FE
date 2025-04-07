@@ -71,7 +71,7 @@ import AdminRevenueDashboard from "./components/admin/revenue/AdminRevenueDashbo
 import PageCreateDiscounts from "./pages/admin/PageCreateDiscount.jsx"
 import PageDiscount from "./pages/admin/PageDiscount.jsx"
 import PageDiscountUsage from "./pages/admin/PageDiscountUsage.jsx"
-import AdminInstructorRevenue from "./components/admin/revenue/AdminInstructorRevenue.jsx";
+import AdminInstructorRevenue from "./components/admin/revenue/AdminInstructorRevenueContainer.jsx";
 import AdminInstructorSales from "./components/admin/revenue/AdminInstructorSales.jsx";
 
 
