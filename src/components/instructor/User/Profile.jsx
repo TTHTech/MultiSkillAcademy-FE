@@ -130,23 +130,6 @@ const ProfileEdit = () => {
   };
 
   const handleSave = async () => {
-    if (
-      !instructor.firstName ||
-      !instructor.lastName ||
-      !instructor.email ||
-      !instructor.phoneNumber ||
-      !instructor.address ||
-      !instructor.bio ||
-      !instructor.dateOfBirth
-    ) {
-      await Swal.fire({
-        title: "Thông báo",
-        text: "Vui lòng điền đầy đủ thông tin trước khi lưu!",
-        icon: "warning",
-        confirmButtonText: "OK",
-      });
-      return;
-    }
     const confirmResult = await Swal.fire({
       title: "Xác nhận lưu thông tin",
       text: "Bạn có chắc chắn muốn lưu thông tin không?",
@@ -201,7 +184,7 @@ const ProfileEdit = () => {
       await Swal.fire({
         title: "error",
         text: "Cập nhật thông tin không thành công!",
-        icon: "success",
+        icon: "error",
         confirmButtonText: "Yes",
       });
       setIsLoading(false);
@@ -389,6 +372,17 @@ const ProfileEdit = () => {
           </div>
         </div>
       </div>
+      {hasChanges && (
+        <div className="flex justify-end">
+          <button
+            onClick={handleSave}
+            className="inline-flex items-center gap-2 border-2 border-blue-500 text-blue-600 hover:bg-blue-50 transition px-8 py-2 rounded-md"
+          >
+            Lưu
+          </button>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
         <div>
           <label className="block text-gray-600 font-semibold mb-1">Họ</label>
@@ -472,14 +466,6 @@ const ProfileEdit = () => {
           className="border p-2 rounded w-full"
         ></textarea>
       </div>
-      {hasChanges && (
-        <button
-          onClick={handleSave}
-          className="inline-flex items-center gap-2 border-2 border-blue-500 text-blue-600 hover:bg-blue-50 transition px-4 py-2 rounded-md"
-        >
-          Lưu
-        </button>
-      )}
     </div>
   );
 };
