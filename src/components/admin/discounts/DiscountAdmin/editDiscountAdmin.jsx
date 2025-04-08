@@ -113,15 +113,24 @@ const EditDiscount = ({ discountId, onCancel, triggerRefresh }) => {
       discountData.usageLimit < 0 ||
       discountData.value < 0 ||
       (discountData.discountType === "PERCENTAGE" &&
-        (!discountData.maxDiscount ||
-          discountData.maxDiscount < 0 ||
-          discountData.value < 0 ||
-          discountData.value > 100)) ||
+        (!discountData.maxDiscount || discountData.maxDiscount < 0)) ||
       discountData.applicableCourses.length === 0
     ) {
       Swal.fire(
         "Lỗi",
         "Vui lòng nhập đầy đủ thông tin, chọn ít nhất 1 khóa học và đảm bảo giá trị discount hợp lệ",
+        "error"
+      );
+      setLoading(false);
+      return;
+    }
+    if (
+      (discountData.discountType === "PERCENTAGE" && discountData.value < 5) ||
+      discountData.value > 100
+    ) {
+      Swal.fire(
+        "Lỗi",
+        "Giá trị Discount không được nhỏ hơn 5% và lớn hơn 100% giá trị khóa học.",
         "error"
       );
       setLoading(false);

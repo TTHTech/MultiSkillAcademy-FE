@@ -43,6 +43,7 @@ import {
   LayoutDashboard,
   Clock,
   LineChart,
+  BadgePercent,
   DollarSign,
 } from "lucide-react";
 import { ChalkboardTeacher } from "phosphor-react";
@@ -274,6 +275,12 @@ const MENU_GROUPS = [
             name: "Discounts",
             icon: Percent,
             href: "/admin/discounts",
+            color: "#ec4899"
+          },
+          {
+            name: "Browse Discounts",
+            icon: BadgePercent,
+            href: "/admin/browsed-discounts",
             color: "#ec4899"
           },
           {

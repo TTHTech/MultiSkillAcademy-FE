@@ -59,12 +59,9 @@ const EditDiscount = ({ discountId, onCancel, triggerRefresh }) => {
           "Bạn có chắc chắn muốn gửi Discount lên cho quản trị viên duyệt không?";
         break;
       case "PENDING":
-        Swal.fire(
-          "Không thể thực hiện",
-          "Bạn không có quyền thay đổi trạng thái khi Discount đang chờ duyệt.",
-          "warning"
-        );
-        return;
+        nextStatusText = "Không hoạt động";
+        confirmMessage = "Bạn có chắc chắn muốn hủy xét duyệt không?";
+        break;
       default:
         Swal.fire("Lỗi", "Trạng thái không hợp lệ", "error");
         return;
@@ -163,12 +160,8 @@ const EditDiscount = ({ discountId, onCancel, triggerRefresh }) => {
     e.preventDefault();
     setLoading(true);
     setError("");
-    if (discountData.status ==="ACTIVE"){
-      Swal.fire(
-        "Lỗi",
-        "Bạn không thể sử discount đang hoạt động",
-        "error"
-      );
+    if (discountData.status === "ACTIVE") {
+      Swal.fire("Lỗi", "Bạn không thể sử discount đang hoạt động", "error");
       setLoading(false);
       return;
     }
@@ -191,6 +184,18 @@ const EditDiscount = ({ discountId, onCancel, triggerRefresh }) => {
       Swal.fire(
         "Lỗi",
         "Vui lòng nhập đầy đủ thông tin, chọn ít nhất 1 khóa học và đảm bảo giá trị discount hợp lệ",
+        "error"
+      );
+      setLoading(false);
+      return;
+    }
+    if (
+      (discountData.discountType === "PERCENTAGE" && discountData.value < 5) ||
+      discountData.value > 70
+    ) {
+      Swal.fire(
+        "Lỗi",
+        "Giá trị Discount không được nhỏ hơn 5% và lớn hơn 70% giá trị khóa học.",
         "error"
       );
       setLoading(false);
@@ -288,16 +293,24 @@ const EditDiscount = ({ discountId, onCancel, triggerRefresh }) => {
           <div>
             <div className="mb-4 flex items-center space-x-2">
               <label className="text-gray-700 text-sm">
-                Trạng thái hoạt động:
+                {discountData.status === "ACTIVE"
+                  ? "Trạng thái đang hoạt động"
+                  : discountData.status === "INACTIVE"
+                  ? "Trạng thái không hoạt động"
+                  : discountData.status === "PENDING"
+                  ? "Đã gửi lên cho quản trị viên duyệt"
+                  : discountData.status === "DECLINED"
+                  ? "Bị quản trị viên từ chối"
+                  : "Trạng thái không xác định"}
               </label>
               <button
                 type="button"
                 onClick={handleToggleStatus}
                 className={`px-4 py-1 rounded font-semibold text-sm ${
                   discountData.status === "ACTIVE"
-                    ? "bg-green-100 text-green-800 border border-green-500"
-                    : discountData.status === "INACTIVE"
                     ? "bg-red-100 text-red-800 border border-red-500"
+                    : discountData.status === "INACTIVE"
+                    ? "bg-green-100 text-green-800 border border-green-500"
                     : discountData.status === "PENDING"
                     ? "bg-yellow-100 text-yellow-800 border border-yellow-500"
                     : discountData.status === "DECLINED"
@@ -306,16 +319,17 @@ const EditDiscount = ({ discountId, onCancel, triggerRefresh }) => {
                 }`}
               >
                 {discountData.status === "ACTIVE"
-                  ? "Đang hoạt động"
+                  ? "Dừng hoạt động"
                   : discountData.status === "INACTIVE"
-                  ? "Không hoạt động"
+                  ? "Kích hoạt"
                   : discountData.status === "PENDING"
-                  ? "Đã gửi lên cho quản trị viên duyệt"
+                  ? "Hủy gửi duyệt"
                   : discountData.status === "DECLINED"
-                  ? "Bị quản trị viên từ chối"
+                  ? "Kích hoạt lại"
                   : ""}
               </button>
             </div>
+
             {discountData.status === "DECLINED" && (
               <div className="mt-2 p-4 bg-red-50 border border-red-300 rounded mb-4">
                 <p className="text-red-700 text-sm">
@@ -368,7 +382,7 @@ const EditDiscount = ({ discountId, onCancel, triggerRefresh }) => {
                 className="w-full p-2 bg-white text-gray-800 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-300 text-sm"
               >
                 <option value="PERCENTAGE">Giảm theo phần trăm</option>
-                <option value="FIXED_AMOUNT">Giảm theo số tiền cố định</option>
+                {/* <option value="FIXED_AMOUNT">Giảm theo số tiền cố định</option> */}
               </select>
             </div>
             <div className="grid grid-cols-2 gap-4 mb-4">
@@ -452,7 +466,9 @@ const EditDiscount = ({ discountId, onCancel, triggerRefresh }) => {
                   className="w-full p-2 bg-white text-gray-800 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-300 text-sm"
                 >
                   <option value="NEW_USERS">Khách hàng mới</option>
-                  <option value="ALL_USERS">Không giới hạn khách hàng sử dụng và số lần sử dụng</option>
+                  <option value="ALL_USERS">
+                    Không giới hạn khách hàng sử dụng và số lần sử dụng
+                  </option>
                   <option value="ONE_TIME_PER_USER">
                     Mỗi khách hàng chỉ dùng 1 lần
                   </option>

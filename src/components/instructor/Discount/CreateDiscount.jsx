@@ -65,6 +65,18 @@ const CreateDiscount = () => {
       setLoading(false);
       return;
     }
+    if(
+      (discountData.discountType === "PERCENTAGE" && discountData.value < 5 ||
+        discountData.value > 70)
+    ) {
+      Swal.fire(
+        "Lỗi",
+        "Giá trị Discount không được nhỏ hơn 5% và lớn hơn 70% giá trị khóa học.",
+        "error"
+      );
+      setLoading(false);
+      return;
+    }
     const startDate = new Date(discountData.startDate);
     const endDate = new Date(discountData.endDate);
     const now = new Date();
@@ -216,7 +228,7 @@ const CreateDiscount = () => {
                 className="w-full p-2 bg-white text-gray-800 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-300 text-sm"
               >
                 <option value="PERCENTAGE">Giảm theo phần trăm</option>
-                <option value="FIXED_AMOUNT">Giảm theo số tiền cố định</option>
+                {/* <option value="FIXED_AMOUNT">Giảm theo số tiền cố định</option> */}
               </select>
             </div>
             <div className="grid grid-cols-2 gap-4 mb-4">
