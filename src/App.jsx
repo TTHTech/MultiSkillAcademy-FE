@@ -66,7 +66,7 @@ import InstructorChatPage from "./pages/instructor/InstructorChatPage.jsx";
 import GoogleCallbackPage from "./pages/auth/GoogleCallbackPage";
 import GitHubCallbackPage from "./pages/auth/GitHubCallbackPage";
 import PageProfile from "./pages/instructor/PageProfile/PageProfile.jsx";
-import AdminRevenuePolicyTable from "./components/admin/revenue/AdminRevenuePolicyTable.jsx";
+import AdminRevenuePolicyTable from "./components/admin/revenue/AdminRevenuePolicyContainer.jsx";
 import AdminRevenueDashboard from "./components/admin/revenue/AdminRevenueDashboard.jsx";
 import PageCreateDiscounts from "./pages/admin/PageCreateDiscount.jsx"
 import PageDiscount from "./pages/admin/PageDiscount.jsx"
