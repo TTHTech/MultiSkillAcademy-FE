@@ -169,6 +169,24 @@ const DiscountUsageSummaryList = ({ discountUsages, onSelect }) => {
                   <div className="text-sm text-gray-300">
                     Tổng số tiền giảm: {d.totalDiscountAmount}
                   </div>
+                  <div
+                    className={`text-sm font-semibold ${
+                      d.status === "ACTIVE"
+                        ? "text-green-500"
+                        : d.status === "DECLINED"
+                        ? "text-gray-400"
+                        : d.status === "INACTIVE"
+                        ? "text-red-500"
+                        : d.status === "PENDING"
+                        ? "text-yellow-500"
+                        : "text-gray-300"
+                    }`}
+                  >
+                    {d.status === "ACTIVE" && "Đang hoạt động"}
+                    {d.status === "DECLINED" && "Bị từ chối"}
+                    {d.status === "INACTIVE" && "Không hoạt động"}
+                    {d.status === "PENDING" && "Đang chờ xét duyệt"}
+                  </div>
                 </div>
               ))}
             </div>
@@ -242,6 +260,24 @@ const DiscountUsageSummaryList = ({ discountUsages, onSelect }) => {
                 </div>
                 <div className="text-sm text-gray-300">
                   Tổng số tiền giảm: {d.totalDiscountAmount || 0}
+                </div>
+                <div
+                  className={`text-sm font-semibold ${
+                    d.status === "ACTIVE"
+                      ? "text-green-500"
+                      : d.status === "DECLINED"
+                      ? "text-gray-400"
+                      : d.status === "INACTIVE"
+                      ? "text-red-500"
+                      : d.status === "PENDING"
+                      ? "text-yellow-500"
+                      : "text-gray-300"
+                  }`}
+                >
+                  {d.status === "ACTIVE" && "Đang hoạt động"}
+                  {d.status === "DECLINED" && "Bị từ chối"}
+                  {d.status === "INACTIVE" && "Không hoạt động"}
+                  {d.status === "PENDING" && "Đang chờ xét duyệt"}
                 </div>
               </div>
             ))}
