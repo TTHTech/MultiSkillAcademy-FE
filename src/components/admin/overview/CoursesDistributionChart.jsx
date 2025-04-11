@@ -249,8 +249,7 @@ const CoursesRevenueChart = () => {
                     <Pie
                       data={courseData}
                       cx="50%"
-                      cy="50%"
-                      labelLine={true}
+                      cy="50%" 
                       labelLine={{ stroke: '#475569', strokeWidth: 1 }}
                       outerRadius={courseData.length > 10 ? 70 : 80}
                       innerRadius={40}
