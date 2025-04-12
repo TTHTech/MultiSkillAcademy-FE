@@ -95,7 +95,7 @@ const App = () => {
     ) {
       await Swal.fire({
         title: "Missing Fields",
-        text: "Hãy điền đầy đủ thông tin khóa họchọc",
+        text: "Hãy điền đầy đủ thông tin khóa học",
         icon: "warning",
         confirmButtonText: "OK",
       });
@@ -116,6 +116,8 @@ const App = () => {
       } else {
         return;
       }
+    } else {
+      handleFinish();
     }
     
   };

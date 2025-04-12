@@ -17,6 +17,7 @@ import {
   FaCompress,
   FaExpand,
 } from "react-icons/fa";
+import SupplementaryLectures from "./SupplementaryLectures";
 
 const CustomVideoPlayer = ({
   videoRef,
@@ -96,7 +97,10 @@ const CustomVideoPlayer = ({
   };
 
   return (
-    <div ref={playerRef} className="relative w-full h-full bg-black group max-w-full overflow-hidden">
+    <div
+      ref={playerRef}
+      className="relative w-full h-full bg-black group max-w-full overflow-hidden"
+    >
       {/* Video Title Overlay */}
       <div className="absolute top-0 left-0 right-0 p-4 bg-gradient-to-b from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
         <h3 className="text-white text-lg font-medium truncate">
@@ -227,7 +231,7 @@ const MainContent = ({
   toggleSidebar,
   isSidebarOpen,
   setIsHoveringButton,
-  isHoveringButton
+  isHoveringButton,
 }) => {
   const { id } = useParams();
   const [selectedTab, setSelectedTab] = useState(0);
@@ -245,37 +249,37 @@ const MainContent = ({
             videoRef.current.pause();
             videoRef.current.currentTime = 0;
           }
-          
+
           const token = localStorage.getItem("token");
           // Kiểm tra token trước khi gọi API
           if (!token) {
             console.error("No authentication token found");
             return;
           }
-          
+
           const userId = localStorage.getItem("userId");
           const response = await fetch(
             `http://localhost:8080/api/student/lecture-progress/${id}/${selectedLecture.lecture_id}`,
             {
               method: "GET",
               headers: {
-                "Authorization": `Bearer ${token}`,
+                Authorization: `Bearer ${token}`,
                 "Content-Type": "application/json",
               },
             }
           );
-          
+
           if (!response.ok) {
             // Xử lý khi response không OK
             throw new Error(`HTTP error! Status: ${response.status}`);
           }
-          
+
           // Kiểm tra content-type
           const contentType = response.headers.get("content-type");
           if (!contentType || !contentType.includes("application/json")) {
             throw new Error("Received non-JSON response from server");
           }
-          
+
           const data = await response.json();
           setProgress(data.progress || 0);
           setLastWatchedTime(data.lastWatchedTime || 0);
@@ -496,10 +500,10 @@ const MainContent = ({
                       handleTimeUpdate={handleTimeUpdate}
                       handleVideoEnd={handleVideoEnd}
                     />
-                    
+
                     {/* Sidebar toggle button - chỉ hiện trong container video */}
                     {!isSidebarOpen && (
-                      <div 
+                      <div
                         className="absolute right-0 top-1/2 transform -translate-y-1/2 group z-10"
                         onMouseEnter={() => setIsHoveringButton(true)}
                         onMouseLeave={() => setIsHoveringButton(false)}
@@ -507,28 +511,30 @@ const MainContent = ({
                         <button
                           onClick={toggleSidebar}
                           className="bg-purple-600 hover:bg-purple-700 text-white py-3 px-2 rounded-l-md shadow-md flex items-center overflow-hidden transition-all duration-300"
-                          style={{ 
-                            width: isHoveringButton ? 'auto' : '40px',
-                            paddingRight: isHoveringButton ? '12px' : '2px'
+                          style={{
+                            width: isHoveringButton ? "auto" : "40px",
+                            paddingRight: isHoveringButton ? "12px" : "2px",
                           }}
                         >
-                          <svg 
-                            xmlns="http://www.w3.org/2000/svg" 
-                            className="h-6 w-6 mr-2" 
-                            fill="none" 
-                            viewBox="0 0 24 24" 
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-6 w-6 mr-2"
+                            fill="none"
+                            viewBox="0 0 24 24"
                             stroke="currentColor"
                           >
-                            <path 
-                              strokeLinecap="round" 
-                              strokeLinejoin="round" 
-                              strokeWidth={2} 
-                              d="M15 19l-7-7 7-7" 
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M15 19l-7-7 7-7"
                             />
                           </svg>
-                          <span className={`whitespace-nowrap transition-opacity duration-300 ${
-                            isHoveringButton ? 'opacity-100' : 'opacity-0'
-                          }`}>
+                          <span
+                            className={`whitespace-nowrap transition-opacity duration-300 ${
+                              isHoveringButton ? "opacity-100" : "opacity-0"
+                            }`}
+                          >
                             Nội dung khóa học
                           </span>
                         </button>
@@ -537,7 +543,7 @@ const MainContent = ({
                   </div>
                 )}
             </div>
-            
+
             {selectedLecture.content_type.toLowerCase() === "pdf" &&
               selectedLecture.document_url && (
                 <iframe
@@ -614,6 +620,16 @@ const MainContent = ({
           >
             Nhắc nhở học tập
           </button>
+          <button
+            onClick={() => setSelectedTab(4)}
+            className={`py-2 px-4 ${
+              selectedTab === 2
+                ? "border-b-2 border-blue-500 font-semibold"
+                : "text-gray-600"
+            }`}
+          >
+            Tài liệu học tập
+          </button>
         </div>
 
         <div className="mt-2">
@@ -641,6 +657,14 @@ const MainContent = ({
                 Nhắc nhở học tập
               </h3>
               <StudyReminder content="Nhắc nhở học tập" />
+            </div>
+          )}
+          {selectedTab === 4 && (
+            <div className="mt-6 mb-10">
+              <h3 className="text-2xl font-semibold ml-8 mt-8">
+                Tài liệu học tập
+              </h3>
+              <SupplementaryLectures courseId={id} />
             </div>
           )}
         </div>

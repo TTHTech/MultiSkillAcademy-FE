@@ -8,6 +8,7 @@ import ResourceDescription from "../../../components/instructor/Content/Resource
 import SectionsAndLectures from "../../../components/instructor/Content/SectionsAndLectures";
 import TargetAudience from "../../../components/instructor/Content/TargetAudience";
 import ChangeStatus from "../../../components/instructor/Content/ChangeStatus";
+import SupplementaryLectures from "../../../components/instructor/Content/SupplementaryLectures";
 
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -63,6 +64,7 @@ const UpdateCourse = () => {
     Requirements: <Requirements />,
     ManageFreeLectures: <ManageFreeLectures />,
     SectionsAndLectures: <SectionsAndLectures />,
+    SupplementaryLectures: <SupplementaryLectures courseId={course?.courseId}/>,
     ChangeStatus: <ChangeStatus title={course?.title} courseId={course?.courseId} status={course?.status}  triggerRefresh={triggerRefresh} />,
   };
   if (error) {

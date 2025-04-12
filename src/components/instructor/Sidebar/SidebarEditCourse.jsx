@@ -14,6 +14,7 @@ const SidebarEditCourse = ({ onSelect }) => {
   const publishItems = [
     { label: "Bài học miễn phí", key: "ManageFreeLectures" },
     { label: "Nội dung khóa học", key: "SectionsAndLectures" },
+    { label: "Tài liệu học tập", key: "SupplementaryLectures" },
   ];
   const actionItems = [
     { label: "Chuyển đổi trạng thái", key: "ChangeStatus" },
