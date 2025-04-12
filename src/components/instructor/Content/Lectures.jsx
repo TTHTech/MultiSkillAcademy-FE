@@ -475,6 +475,7 @@ const Lectures = ({ lectures, sectionId, instructor, section, course, triggerRef
               : "",
           duration: newLecture.duration,
           lectureOrder: lectureOrder,
+          status: "true"
         },
       ]);
       setNewLecture({
