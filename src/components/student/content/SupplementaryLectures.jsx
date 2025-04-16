@@ -48,7 +48,314 @@ const StudentLectures = ({ courseId }) => {
       </div>
     );
   }
+  const getFileLabel = (type) => {
+    switch (type) {
+      case "video":
+        return "Watch Video";
+      case "pdf":
+        return "PDF";
+      case "txt":
+        return "Text";
+      // lập trình
+      case "py":
+        return "Python";
+      case "js":
+        return "JavaScript";
+      case "ts":
+        return "TypeScript";
+      case "jsx":
+        return "React (JSX)";
+      case "tsx":
+        return "React (TSX)";
+      case "java":
+        return "Java";
+      case "c":
+        return "C";
+      case "cpp":
+      case "cc":
+        return "C++";
+      case "cs":
+        return "C#";
+      case "php":
+        return "PHP";
+      case "rb":
+        return "Ruby";
+      case "go":
+        return "Go";
+      case "rs":
+        return "Rust";
+      case "sh":
+        return "Shell Script";
+      case "swift":
+        return "Swift";
+      case "kt":
+      case "kts":
+        return "Kotlin";
+      case "r":
+        return "R";
+      case "scala":
+        return "Scala";
+      case "sql":
+        return "SQL";
+      case "html":
+      case "htm":
+        return "HTML";
+      case "css":
+        return "CSS";
+      case "scss":
+      case "sass":
+        return "SASS/SCSS";
+      case "xml":
+        return "XML";
+      case "json":
+        return "JSON";
+      case "yaml":
+      case "yml":
+        return "YAML";
 
+      // Word
+      case "doc":
+        return "Word";
+      case "docx":
+        return "Word";
+      case "docm":
+        return "Word";
+      case "dot ":
+        return "Word";
+      case "dotx":
+        return "Word";
+      case "dotm":
+        return "Word";
+
+      // Excel
+      case "xltx ":
+        return "Excel";
+      case "xltm":
+        return "Excel";
+      case "xlt":
+        return "Excel";
+      case "xls":
+        return "Excel";
+      case "xlsx":
+        return "Excel";
+      case "xlsm":
+        return "Excel";
+      case "xlsb":
+        return "Excel";
+      default:
+        return type.toUpperCase();
+    }
+  };
+  const getFileColorClass = (type) => {
+    switch (type) {
+      case "video":
+        return "bg-blue-600 hover:bg-blue-700";
+      case "pdf":
+        return "bg-red-600 hover:bg-red-700";
+
+      // Word
+      case "doc":
+      case "docx":
+      case "docm":
+      case "dot":
+      case "dotx":
+      case "dotm":
+        return "bg-blue-500 hover:bg-blue-600";
+
+      // Excel
+      case "xltx":
+      case "xltm":
+      case "xlt":
+      case "xls":
+      case "xlsx":
+      case "xlsm":
+      case "xlsb":
+        return "bg-green-600 hover:bg-green-700";
+
+      // Python
+      case "py":
+        return "bg-purple-600 hover:bg-purple-700";
+
+      // JavaScript / TypeScript / React
+      case "js":
+      case "jsx":
+        return "bg-yellow-500 hover:bg-yellow-600";
+      case "ts":
+      case "tsx":
+        return "bg-blue-400 hover:bg-blue-500";
+
+      // Java
+      case "java":
+        return "bg-red-500 hover:bg-red-600";
+
+      // C / C++
+      case "c":
+      case "cpp":
+      case "cc":
+        return "bg-gray-700 hover:bg-gray-800";
+
+      // C#
+      case "cs":
+        return "bg-indigo-600 hover:bg-indigo-700";
+
+      // PHP
+      case "php":
+        return "bg-indigo-500 hover:bg-indigo-600";
+
+      // Ruby
+      case "rb":
+        return "bg-pink-500 hover:bg-pink-600";
+
+      // Go
+      case "go":
+        return "bg-cyan-600 hover:bg-cyan-700";
+
+      // Rust
+      case "rs":
+        return "bg-orange-700 hover:bg-orange-800";
+
+      // Shell
+      case "sh":
+        return "bg-gray-600 hover:bg-gray-700";
+
+      // Swift
+      case "swift":
+        return "bg-orange-500 hover:bg-orange-600";
+
+      // Kotlin
+      case "kt":
+      case "kts":
+        return "bg-purple-500 hover:bg-purple-600";
+
+      // R
+      case "r":
+        return "bg-blue-800 hover:bg-blue-900";
+
+      // Scala
+      case "scala":
+        return "bg-red-600 hover:bg-red-700";
+
+      // SQL
+      case "sql":
+        return "bg-teal-600 hover:bg-teal-700";
+
+      // Web
+      case "html":
+      case "htm":
+        return "bg-orange-500 hover:bg-orange-600";
+      case "css":
+        return "bg-blue-300 hover:bg-blue-400";
+      case "scss":
+      case "sass":
+        return "bg-pink-400 hover:bg-pink-500";
+
+      // Data
+      case "xml":
+        return "bg-yellow-600 hover:bg-yellow-700";
+      case "json":
+        return "bg-orange-400 hover:bg-orange-500";
+      case "yaml":
+      case "yml":
+        return "bg-amber-600 hover:bg-amber-700";
+
+      default:
+        return "bg-gray-600 hover:bg-gray-700";
+    }
+  };
+
+  const getFileTextColorClass = (type) => {
+    switch (type) {
+      case "pdf":
+        return "text-red-500";
+
+      // Word
+      case "doc":
+      case "docx":
+      case "docm":
+      case "dot":
+      case "dotx":
+      case "dotm":
+        return "text-blue-500";
+
+      // Excel
+      case "xltx":
+      case "xltm":
+      case "xlt":
+      case "xls":
+      case "xlsx":
+      case "xlsm":
+      case "xlsb":
+        return "text-green-600";
+
+      case "py":
+        return "text-purple-600";
+      case "js":
+      case "jsx":
+        return "text-yellow-500";
+      case "ts":
+      case "tsx":
+        return "text-blue-400";
+      case "java":
+        return "text-red-500";
+      case "c":
+      case "cpp":
+      case "cc":
+        return "text-gray-700";
+      case "cs":
+        return "text-indigo-600";
+      case "php":
+        return "text-indigo-500";
+      case "rb":
+        return "text-pink-500";
+      case "go":
+        return "text-cyan-600";
+      case "rs":
+        return "text-orange-700";
+      case "sh":
+        return "text-gray-600";
+      case "swift":
+        return "text-orange-500";
+      case "kt":
+      case "kts":
+        return "text-purple-500";
+      case "r":
+        return "text-blue-800";
+      case "scala":
+        return "text-red-600";
+      case "sql":
+        return "text-teal-600";
+      case "html":
+      case "htm":
+        return "text-orange-500";
+      case "css":
+        return "text-blue-300";
+      case "scss":
+      case "sass":
+        return "text-pink-400";
+      case "xml":
+        return "text-yellow-600";
+      case "json":
+        return "text-orange-400";
+      case "yaml":
+      case "yml":
+        return "text-amber-600";
+
+      default:
+        return "text-gray-500";
+    }
+  };
+  async function downloadFile(url, filename) {
+    const response = await fetch(url, { mode: "cors" });
+    const blob = await response.blob();
+    const blobUrl = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = blobUrl;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(blobUrl);
+  }
   return (
     <div className="px-4 sm:px-6 lg:px-8">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
@@ -74,20 +381,13 @@ const StudentLectures = ({ courseId }) => {
                 </div>
               ) : (
                 <div className="w-full h-48 bg-gray-100 flex items-center justify-center rounded-md">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-16 w-16 text-red-500"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
+                  <span
+                    className={`text-5xl font-bold ${getFileTextColorClass(
+                      lecture.content_type
+                    )}`}
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 12h6m-6 4h6M9 8h6m2 12H7a2 2 0 01-2-2V5a2 2 0 012-2h5l2 2h5a2 2 0 012 2v13a2 2 0 01-2 2z"
-                    />
-                  </svg>
+                    {getFileLabel(lecture.content_type)}
+                  </span>
                 </div>
               )}
             </div>
@@ -97,19 +397,37 @@ const StudentLectures = ({ courseId }) => {
                   href={lecture.video_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded transition-colors duration-300"
+                  className={`inline-block ${getFileColorClass(
+                    "video"
+                  )} text-white font-medium py-2 px-4 rounded transition-colors duration-300`}
                 >
-                  Xem Video
+                  {getFileLabel("video")}
                 </a>
-              ) : (
+              ) : lecture.content_type === "pdf" ? (
                 <a
                   href={lecture.document_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-block bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded transition-colors duration-300"
+                  className={`inline-block ${getFileColorClass(
+                    "pdf"
+                  )} text-white font-medium py-2 px-4 rounded transition-colors duration-300`}
                 >
-                  Xem Tài Liệu
+                  View {getFileLabel("pdf")}
                 </a>
+              ) : (
+                <button
+                  onClick={() =>
+                    downloadFile(
+                      lecture.document_url,
+                      `${lecture.title}.${lecture.content_type}`
+                    )
+                  }
+                  className={`inline-block ${getFileColorClass(
+                    lecture.content_type
+                  )} text-white font-medium py-2 px-4 rounded transition-colors duration-300`}
+                >
+                  Download {getFileLabel(lecture.content_type)}
+                </button>
               )}
             </div>
           </div>
