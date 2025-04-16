@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Line } from "react-chartjs-2";
-import Sidebar from "../../components/instructor/Sidebar/Sidebar";
+import Sidebar from "../../../components/instructor/Sidebar/Sidebar";
+import { useNavigate } from "react-router-dom";
+import PageSalesCourse from "./PageSalesCourse";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -39,6 +41,7 @@ const InstructorDashboard = () => {
   const [open, setOpen] = useState(true);
   const userId = Number(localStorage.getItem("userId"));
   const token = localStorage.getItem("token");
+  const [selectedCourseItem, setSelectedCourseItem] = useState(null);
 
   useEffect(() => {
     const fetchSalesData = async () => {
@@ -160,7 +163,7 @@ const InstructorDashboard = () => {
       ...salesData.map((item) => [
         item.courseId,
         item.courseName,
-        item.totalSales.toLocaleString() + " VND",
+        Math.floor(item.totalSales).toLocaleString() + " VND",
         item.salesSummary,
       ]),
     ];
@@ -242,113 +245,133 @@ const InstructorDashboard = () => {
 
       <div className="flex-1 bg-gray-100 overflow-hidden">
         <div className="p-6 lg:p-8 max-w-7xl mx-auto">
-          <h1 className="text-2xl lg:text-3xl font-bold text-gray-800 mb-6">
-            Doanh Thu Các Khóa Học
-          </h1>
-<div className="flex justify-end space-x-2 mb-2">
-  <button
-    onClick={exportToExcel}
-    className="p-2 bg-green-500 text-white rounded-md hover:bg-green-600 flex items-center"
-  >
-    <AiFillFileExcel className="text-xl" />
-    Xuất Excel
-  </button>
-  <button
-    onClick={exportToPDF}
-    className="p-2 bg-red-500 text-white rounded-md hover:bg-red-600 flex items-center"
-  >
-    <AiFillFilePdf className="text-xl" />
-    Xuất PDF
-  </button>
-</div>
-          {loading ? (
-            <div className="flex justify-center items-center">
-              <div className="animate-spin h-12 w-12 border-4 border-blue-500 border-t-transparent rounded-full"></div>
-            </div>
-          ) : error ? (
-            <div className="text-center text-red-500">{error}</div>
+          {selectedCourseItem ? (
+            <PageSalesCourse
+              courseItem={selectedCourseItem}
+              onClose={() => setSelectedCourseItem(null)}
+            />
           ) : (
-            <div>
-              <div className="mb-8 h-96">
-                <Line data={chartData} options={chartOptions} />
-              </div>
-
-              <div className="overflow-x-auto shadow-lg rounded-xl">
-                <table className="min-w-full border-collapse bg-white rounded-xl">
-                  <thead className="bg-gradient-to-r from-blue-700 to-blue-500 text-white">
-                    <tr>
-                      <th className="px-6 py-3 text-left font-semibold uppercase tracking-wide">
-                        Mã Khóa Học
-                      </th>
-                      <th className="px-6 py-3 text-left font-semibold uppercase tracking-wide">
-                        Tên Khóa Học
-                      </th>
-                      <th className="px-6 py-3 text-right font-semibold uppercase tracking-wide">
-                        Tổng Doanh Thu
-                      </th>
-                      <th className="px-6 py-3 text-right font-semibold uppercase tracking-wide">
-                        Số lượt mua
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {currentData.map((item, index) => (
-                      <tr
-                        key={index}
-                        className={`border-b transition ${
-                          index % 2 === 0 ? "bg-gray-50" : "bg-white"
-                        } hover:bg-blue-100`}
-                      >
-                        <td className="px-6 py-4 text-gray-800">
-                          {item.courseId}
-                        </td>
-                        <td className="px-6 py-4 text-gray-800">
-                          {item.courseName}
-                        </td>
-                        <td className="px-6 py-4 text-right font-medium text-green-600">
-                          {item.totalSales.toLocaleString()} ₫
-                        </td>
-                        <td className="px-6 py-4 text-right font-medium">
-                          {item.salesSummary}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              <div className="flex justify-between items-center mt-4">
+            <>
+              <h1 className="text-2xl lg:text-3xl font-bold text-gray-800 mb-6">
+                Doanh Thu Các Khóa Học
+              </h1>
+              <div className="flex justify-end space-x-2 mb-2">
                 <button
-                  disabled={currentPage === 1}
-                  onClick={() =>
-                    setCurrentPage((prev) => Math.max(prev - 1, 1))
-                  }
-                  className={`px-4 py-2 bg-blue-500 text-white rounded-md ${
-                    currentPage === 1
-                      ? "opacity-50 cursor-not-allowed"
-                      : "hover:bg-blue-600"
-                  }`}
+                  onClick={exportToExcel}
+                  className="p-2 bg-green-500 text-white rounded-md hover:bg-green-600 flex items-center"
                 >
-                  Trang trước
+                  <AiFillFileExcel className="text-xl" />
+                  Xuất Excel
                 </button>
-                <span className="text-gray-700">
-                  Trang {currentPage} / {totalPages}
-                </span>
                 <button
-                  disabled={currentPage === totalPages}
-                  onClick={() =>
-                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                  }
-                  className={`px-4 py-2 bg-blue-500 text-white rounded-md ${
-                    currentPage === totalPages
-                      ? "opacity-50 cursor-not-allowed"
-                      : "hover:bg-blue-600"
-                  }`}
+                  onClick={exportToPDF}
+                  className="p-2 bg-red-500 text-white rounded-md hover:bg-red-600 flex items-center"
                 >
-                  Trang sau
+                  <AiFillFilePdf className="text-xl" />
+                  Xuất PDF
                 </button>
               </div>
-            </div>
+              {loading ? (
+                <div className="flex justify-center items-center">
+                  <div className="animate-spin h-12 w-12 border-4 border-blue-500 border-t-transparent rounded-full"></div>
+                </div>
+              ) : error ? (
+                <div className="text-center text-red-500">{error}</div>
+              ) : (
+                <>
+                  <div className="mb-8 h-96">
+                    <Line data={chartData} options={chartOptions} />
+                  </div>
+
+                  <div className="overflow-x-auto shadow-lg rounded-lg">
+                    <table className="min-w-full border-collapse bg-white rounded-lg">
+                      <thead className="bg-gradient-to-r from-blue-700 to-blue-500 text-white">
+                        <tr>
+                          <th className="px-4 py-2 text-left font-medium uppercase tracking-wider text-sm">
+                            Mã Khóa Học
+                          </th>
+                          <th className="px-4 py-2 text-left font-medium uppercase tracking-wider text-sm">
+                            Tên Khóa Học
+                          </th>
+                          <th className="px-4 py-2 text-right font-medium uppercase tracking-wider text-sm">
+                            Tổng Doanh Thu
+                          </th>
+                          <th className="px-4 py-2 text-right font-medium uppercase tracking-wider text-sm">
+                            Số lượt mua
+                          </th>
+                          <th className="px-4 py-2 text-center font-medium uppercase tracking-wider text-sm">
+                            Chi Tiết
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {currentData.map((item, index) => (
+                          <tr
+                            key={index}
+                            className={`border-b transition-colors duration-200 ${
+                              index % 2 === 0 ? "bg-gray-50" : "bg-white"
+                            } hover:bg-blue-100`}
+                          >
+                            <td className="px-4 py-2 text-gray-800 text-sm">
+                              {item.courseId}
+                            </td>
+                            <td className="px-4 py-2 text-gray-800 text-sm">
+                              {item.courseName}
+                            </td>
+                            <td className="px-4 py-2 text-right text-green-600 font-semibold text-sm">
+                              {Math.floor(item.totalSales).toLocaleString()} ₫
+                            </td>
+                            <td className="px-4 py-2 text-right text-gray-800 font-semibold text-sm">
+                              {item.salesSummary}
+                            </td>
+                            <td className="px-4 py-2 text-center">
+                              <button
+                                onClick={() => setSelectedCourseItem(item)}
+                                className="px-3 py-1 text-sm bg-indigo-500 text-white rounded hover:bg-indigo-600 transition-colors duration-200"
+                              >
+                                Chi tiết
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <div className="flex justify-between items-center mt-4">
+                    <button
+                      disabled={currentPage === 1}
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.max(prev - 1, 1))
+                      }
+                      className={`px-4 py-2 bg-blue-500 text-white rounded-md ${
+                        currentPage === 1
+                          ? "opacity-50 cursor-not-allowed"
+                          : "hover:bg-blue-600"
+                      }`}
+                    >
+                      Trang trước
+                    </button>
+                    <span className="text-gray-700">
+                      Trang {currentPage} / {totalPages}
+                    </span>
+                    <button
+                      disabled={currentPage === totalPages}
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                      }
+                      className={`px-4 py-2 bg-blue-500 text-white rounded-md ${
+                        currentPage === totalPages
+                          ? "opacity-50 cursor-not-allowed"
+                          : "hover:bg-blue-600"
+                      }`}
+                    >
+                      Trang sau
+                    </button>
+                  </div>
+                </>
+              )}
+            </>
           )}
         </div>
       </div>
