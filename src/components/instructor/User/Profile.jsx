@@ -21,6 +21,10 @@ const ProfileEdit = () => {
     bio: "",
     dateOfBirth: "",
     profileImage: "",
+    websiteUrl: "",
+    facebookUrl: "",
+    tiktokUrl: "",
+    youtubeUrl: "",
   });
   const [selectedFile, setSelectedFile] = useState(null);
   const [hasChanges, setHasChanges] = useState(false);
@@ -142,7 +146,7 @@ const ProfileEdit = () => {
     if (!confirmResult.isConfirmed) {
       return;
     }
-
+    setIsLoading(true);
     let imageUrl = instructor.profileImage;
     if (selectedFile) {
       imageUrl = await handleUpload(selectedFile);
@@ -157,10 +161,13 @@ const ProfileEdit = () => {
       address: instructor.address,
       bio: instructor.bio,
       dateOfBirth: instructor.dateOfBirth,
+      websiteUrl: instructor.websiteUrl,
+      facebookUrl: instructor.facebookUrl,
+      tiktokUrl: instructor.tiktokUrl,
+      youtubeUrl: instructor.youtubeUrl,
     };
 
     try {
-      setIsLoading(true);
       const response = await axios.put(
         `http://localhost:8080/api/instructor/edit-user/${userId}`,
         updatedData,
@@ -324,16 +331,17 @@ const ProfileEdit = () => {
               </div>
             </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
               <label className="block text-gray-600 font-semibold mb-1">
                 Trang web
               </label>
               <input
+                name="websiteUrl"
                 type="text"
                 className="border border-gray-300 p-2 w-full rounded"
-                value={instructor.website || ""}
-                readOnly
+                value={instructor.websiteUrl || ""}
+                onChange={handleChange}
               />
             </div>
             <div>
@@ -341,10 +349,11 @@ const ProfileEdit = () => {
                 Facebook
               </label>
               <input
+                name="facebookUrl"
                 type="text"
                 className="border border-gray-300 p-2 w-full rounded"
-                value={instructor.facebook || ""}
-                readOnly
+                value={instructor.facebookUrl || ""}
+                onChange={handleChange}
               />
             </div>
             <div>
@@ -352,10 +361,11 @@ const ProfileEdit = () => {
                 TikTok
               </label>
               <input
+                name="tiktokUrl"
                 type="text"
                 className="border border-gray-300 p-2 w-full rounded"
-                value={instructor.tiktok || ""}
-                readOnly
+                value={instructor.tiktokUrl || ""}
+                onChange={handleChange}
               />
             </div>
             <div>
@@ -363,10 +373,11 @@ const ProfileEdit = () => {
                 YouTube
               </label>
               <input
+                name="youtubeUrl"
                 type="text"
                 className="border border-gray-300 p-2 w-full rounded"
-                value={instructor.youtube || ""}
-                readOnly
+                value={instructor.youtubeUrl || ""}
+                onChange={handleChange}
               />
             </div>
           </div>
