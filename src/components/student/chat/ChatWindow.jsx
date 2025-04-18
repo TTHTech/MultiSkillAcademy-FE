@@ -66,23 +66,28 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
     
     // Log để debug
     console.log("Processing file URL:", fileUrl);
-    
-    // Chuyển hướng từ API instructor sang API student
-    if (fileUrl && fileUrl.includes('/api/instructor/chat/files/')) {
-      const fileName = fileUrl.split('/').pop();
-      return `http://localhost:8080/api/student/chat/files/${fileName}`;
+    if (fileUrl && fileUrl.includes('%20')) {
+      // URL đã được encode - cần giữ nguyên format
+      return fileUrl.startsWith('http') ? fileUrl : `http://localhost:8080${fileUrl.startsWith('/') ? '' : '/api/student/chat/files/'}${fileUrl}`;
     }
     
+    // Chuyển hướng từ API instructor sang API student
+    // if (fileUrl && fileUrl.includes('/api/instructor/chat/files/')) {
+    //   const fileName = fileUrl.split('/').pop();
+    //   return `http://localhost:8080/api/student/chat/files/${fileName}`;
+    // }
+    
     // Chuyển hướng từ API admin sang API student
-    if (fileUrl && fileUrl.includes('/api/admin/chat/files/')) {
+    if (fileUrl && fileUrl.includes('/api/student/chat/files/')) {
       const fileName = fileUrl.split('/').pop();
-      return `http://localhost:8080/api/student/chat/files/${fileName}`;
+      return `http://localhost:8080/api/admin/chat/files/${fileName}`;
     }
     
     // Chuyển hướng tương tự cho các URL ngắn (image_XXXX)
+    // Sửa tại ChatWindow.jsx
     if (fileUrl && fileUrl.includes('image_')) {
       const imageId = fileUrl.includes('/') ? fileUrl.split('/').pop() : fileUrl;
-      return `http://localhost:8080/api/student/chat/files/${imageId}`;
+      return `http://localhost:8080/api/admin/chat/files/${imageId}`;
     }
     
     // Các trường hợp khác giữ nguyên
@@ -687,13 +692,14 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
       )}
 
       <ChatInput 
-        addMessage={addMessage} 
-        setIsTyping={(isTyping) => {
-          setIsTyping(isTyping);
-          sendTypingStatus(isTyping);
-        }} 
-        disabled={!selectedUser || !chatData}
-      />
+  addMessage={addMessage} 
+  setIsTyping={(isTyping) => {
+    setIsTyping(isTyping);
+    sendTypingStatus(isTyping);
+  }} 
+  disabled={!selectedUser || !chatData}
+  chatId={chatData?.chatId} // Thêm dòng này để truyền chatId
+/>
     </div>
   );
 };
