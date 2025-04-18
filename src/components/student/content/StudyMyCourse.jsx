@@ -133,7 +133,7 @@ const CourseViewer = () => {
   return (
     <div className="flex h-screen">
       {/* Sidebar */}
-      <div className="w-1/4 bg-gray-100 p-4 border-r overflow-y-auto">
+      <div className="w-1/4 bg-white p-4 border-r overflow-y-auto">
         <div className="mb-6">
           <img
             src={course.images[0]}
