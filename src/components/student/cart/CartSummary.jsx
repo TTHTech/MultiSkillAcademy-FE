@@ -41,9 +41,8 @@ const CartSummary = () => {
         }
       );
       toast.success("Discount applied successfully");
-      // Nếu cần, bạn có thể xử lý response.data ở đây
     } catch (error) {
-      toast.error(error.response?.data || "Error applying discount");
+      // toast.error(error.response?.data || "Error applying discount");
     }
   };
   
@@ -91,9 +90,8 @@ const CartSummary = () => {
   const handlePayment = async () => {
     try {
       localStorage.setItem("appliedCoupon", coupon);
-      const discount = localStorage.getItem("appliedCoupon");
-
-      toast.error("Discount : " + discount);
+      // const discount = localStorage.getItem("appliedCoupon");
+      // toast.error("Discount : " + discount);
       const token = localStorage.getItem("token");
 
       //đặt lưu người sử dụng discount
