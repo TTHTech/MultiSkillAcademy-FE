@@ -40,7 +40,7 @@ const ReviewCard = ({ review }) => (
             <RatingStars rating={review.rating} />
           </div>
           <span className="text-sm text-gray-500">
-            {new Date(review.createdAt).toLocaleDateString('vi-VN')}
+            {new Date(review.created_at).toLocaleDateString('vi-VN')}
           </span>
         </div>
         <p className="text-gray-600 leading-relaxed">
