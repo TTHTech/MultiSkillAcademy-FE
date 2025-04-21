@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import Swal from "sweetalert2";
+import { Flag } from "lucide-react";
 
 const TabComment = ({ courseId }) => {
   const [reviews, setReviews] = useState([]);
@@ -89,14 +91,14 @@ const TabComment = ({ courseId }) => {
       const response = await axios.get(
         `http://localhost:8080/api/student/reviews/${courseId}`
       );
-      setShowAddReview(false)
+      setShowAddReview(false);
       setReviews(response.data); // Update reviews list
       setNewComment(""); // Reset the comment field
       setNewRating(5); // Reset the rating to default (5 stars)
     } catch (error) {
       if (error.response && error.response.status === 400) {
         alert(error.response.data);
-        setShowAddReview(false)
+        setShowAddReview(false);
         setNewComment("");
         setNewRating(5);
       } else {
@@ -106,49 +108,81 @@ const TabComment = ({ courseId }) => {
       setSubmitLoading(false);
     }
   };
+  const handleReport = async (review) => {
+    console.log(review);
+    const { value: reason } = await Swal.fire({
+      title: "Báo cáo đánh giá",
+      input: "textarea",
+      inputLabel: "Lý do báo cáo",
+      inputPlaceholder: "Nhập lý do tại đây...",
+      showCancelButton: true,
+      confirmButtonText: "Gửi",
+      cancelButtonText: "Hủy",
+      preConfirm: (val) => {
+        if (!val) Swal.showValidationMessage("Bạn phải nhập lý do!");
+        return val;
+      },
+    });
+    if (!reason) return;
+    const token = localStorage.getItem("token");
 
+    try {
+      await axios.post(
+        "http://localhost:8080/api/student/reviews/report",
+        {
+          idUserReport: userId,
+          review_id: review.review_id,
+          reason,
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      await Swal.fire("Thành công", "Báo cáo đã được gửi!", "success");
+    } catch (err) {
+      console.error(err);
+      await Swal.fire("Lỗi", "Không gửi được báo cáo, thử lại sau.", "error");
+    }
+  };
   return (
     <div className="bg-white p-6 rounded-lg shadow-lg mt-4">
-
       {/* Add Review Form */}
       {showAddReview && (
-      <div className="mt-6">
-        <h3 className="text-xl font-semibold text-gray-900 mb-4">
-          Thêm đánh giá của bạn
-        </h3>
-        <div className="flex items-center mb-4">
-          <span className="mr-2">Đánh giá:</span>
-          {[1, 2, 3, 4, 5].map((star) => (
+        <div className="mt-6">
+          <h3 className="text-xl font-semibold text-gray-900 mb-4">
+            Thêm đánh giá của bạn
+          </h3>
+          <div className="flex items-center mb-4">
+            <span className="mr-2">Đánh giá:</span>
+            {[1, 2, 3, 4, 5].map((star) => (
+              <button
+                key={star}
+                onClick={() => setNewRating(star)}
+                className={`text-xl ${
+                  newRating >= star ? "text-yellow-500" : "text-gray-400"
+                }`}
+              >
+                ★
+              </button>
+            ))}
+          </div>
+
+          <textarea
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+            placeholder="Chia sẻ cảm nhận của bạn về khóa học..."
+            className="p-4 border rounded-md w-full"
+            rows="4"
+          ></textarea>
+
+          <div className="flex justify-end mt-4">
             <button
-              key={star}
-              onClick={() => setNewRating(star)}
-              className={`text-xl ${
-                newRating >= star ? "text-yellow-500" : "text-gray-400"
-              }`}
+              onClick={handleSubmitReview}
+              disabled={submitLoading}
+              className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition duration-200 ease-in-out"
             >
-              ★
+              {submitLoading ? "Đang gửi..." : "Gửi đánh giá"}
             </button>
-          ))}
+          </div>
         </div>
-
-        <textarea
-          value={newComment}
-          onChange={(e) => setNewComment(e.target.value)}
-          placeholder="Chia sẻ cảm nhận của bạn về khóa học..."
-          className="p-4 border rounded-md w-full"
-          rows="4"
-        ></textarea>
-
-        <div className="flex justify-end mt-4">
-          <button
-            onClick={handleSubmitReview}
-            disabled={submitLoading}
-            className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition duration-200 ease-in-out"
-          >
-            {submitLoading ? "Đang gửi..." : "Gửi đánh giá"}
-          </button>
-        </div>
-      </div>
       )}
       {/* Filter, Sort, and Search Section */}
       <div className="flex justify-between mt-4 mb-4">
@@ -202,16 +236,26 @@ const TabComment = ({ courseId }) => {
               key={index}
               className="border p-6 rounded-lg bg-gray-50 shadow-md hover:shadow-xl hover:border-blue-500 transition-all duration-300 ease-in-out"
             >
-              <div className="flex items-center mb-2">
-                <img
-                  src={review.profileImage}
-                  alt={`${review.studentFirstName} ${review.studentLastName}`}
-                  className="w-10 h-10 rounded-full mr-4 object-cover"
-                />
-                <span className="font-semibold mr-2 text-gray-900">
-                  {review.studentFirstName} {review.studentLastName}
-                </span>
-                <span className="text-yellow-500">{review.rating} ★</span>
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center">
+                  <img
+                    src={review.profileImage}
+                    alt={`${review.studentFirstName} ${review.studentLastName}`}
+                    className="w-10 h-10 rounded-full mr-4 object-cover"
+                  />
+                  <span className="font-semibold mr-2 text-gray-900">
+                    {review.studentFirstName} {review.studentLastName}
+                  </span>
+                  <span className="text-yellow-500">{review.rating} ★</span>
+                </div>
+
+                <button
+                  onClick={() => handleReport(review)}
+                  className="p-2 text-red-500 hover:text-red-600 transition"
+                  title="Báo cáo"
+                >
+                  <Flag size={24} />
+                </button>
               </div>
               <p className="text-gray-800">{review.comment}</p>
             </div>
