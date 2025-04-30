@@ -5,7 +5,8 @@ import debounce from "lodash.debounce";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import ProfileMenu from "../../../components/student/profile/ProfileMenu";
 import NotificationList from "../../../components/student/notification/NotificationList";
-
+// Import Logo component
+import Logo from "../../../components/student/common/Logo";
 const Navbar = () => {
   const [isMenuOpen, setMenuOpen] = useState(false);
   const [categories, setCategories] = useState([]);
@@ -131,17 +132,13 @@ const Navbar = () => {
       <div className="container mx-auto px-6 py-4 flex items-center justify-between">
         {/* Logo and Categories */}
         <div
-          className="flex items-center space-x-6 relative"
+          className="flex items-center space-x-0 relative"
           onMouseEnter={handleMouseOver}
           onMouseLeave={handleMouseOut}
         >
-          <Link to="/student/home" className="transform hover:scale-105 transition-all duration-300">
-            <img
-              src="https://firebasestorage.googleapis.com/v0/b/appgallery-30bf7.appspot.com/o/images%2FIronix.png?alt=media&token=53c29853-9052-43a4-95b4-b4cfd3ee2efa"
-              alt="Logo"
-              className="w-16"
-            />
-          </Link>
+        <Link to="/student/home" className="flex-shrink-0">
+        <Logo className="w-40 h-auto" />
+      </Link>
           <button className="text-gray-700 text-lg font-medium hover:text-blue-600 transition-colors duration-300 flex items-center gap-2">
             <span>Thể loại</span>
             <i className="fas fa-chevron-down text-sm transition-transform duration-300"></i>
