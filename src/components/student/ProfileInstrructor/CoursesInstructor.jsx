@@ -17,9 +17,11 @@ const CoursesInstructor = ({ id }) => {
         const response = await axios.get(`http://localhost:8080/api/student/courses/instructor/${id}`);
         const shuffledCourses = response.data.sort(() => 0.5 - Math.random());
         const updatedCourses = shuffledCourses.map(course => {
-          const originalPrice = course.price || 500000;
-          const discount = course.discount || 30;
-          const discountedPrice = Math.floor(originalPrice * (1 - (discount / 100)));
+          const originalPrice = Math.floor(course.price);
+          const discount = course.discount;
+          const discountedPrice = Math.floor(
+            originalPrice * (1 - discount / 100)
+          );
 
           return {
             ...course,

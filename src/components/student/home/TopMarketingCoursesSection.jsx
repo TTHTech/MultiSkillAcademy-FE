@@ -1,7 +1,15 @@
 import React, { useRef, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import { Star, ChevronLeft, ChevronRight, Trophy, Flame, TrendingUp, Loader2 } from 'lucide-react';
+import {
+  Star,
+  ChevronLeft,
+  ChevronRight,
+  Trophy,
+  Flame,
+  TrendingUp,
+  Loader2,
+} from "lucide-react";
 import { motion } from "framer-motion";
 
 const TopMarketingCoursesSection = () => {
@@ -23,19 +31,24 @@ const TopMarketingCoursesSection = () => {
           `http://localhost:8080/api/student/courses/category/${categoryId}`
         );
         const { categoryName, courses: fetchedCourses } = response.data;
-        
-        const enhancedCourses = fetchedCourses.map(course => {
-          const originalPrice = Math.floor(course.price || 500000);
-          const discount = course.discount || 30;
-          const discountedPrice = Math.floor(originalPrice * (1 - (discount / 100)));
+
+        const enhancedCourses = fetchedCourses.map((course) => {
+          const originalPrice = Math.floor(course.price);
+          const discount = course.discount;
+          const discountedPrice = Math.floor(
+            originalPrice * (1 - discount / 100)
+          );
 
           return {
             ...course,
             originalPrice,
             discount,
             discountedPrice,
-            tag: course.rating >= 4.5 ? 'Bestseller' : 'Hot',
-            isNew: course.createdAt && new Date(course.createdAt) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+            tag: course.rating >= 4.5 ? "Bestseller" : "Hot",
+            isNew:
+              course.createdAt &&
+              new Date(course.createdAt) >
+                new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
           };
         });
 
@@ -68,20 +81,21 @@ const TopMarketingCoursesSection = () => {
   useEffect(() => {
     const container = scrollContainer.current;
     if (container) {
-      container.addEventListener('scroll', checkScroll);
+      container.addEventListener("scroll", checkScroll);
       // Initial check
       checkScroll();
-      return () => container.removeEventListener('scroll', checkScroll);
+      return () => container.removeEventListener("scroll", checkScroll);
     }
   }, [courses]);
 
   useEffect(() => {
     let autoScrollInterval;
-    
+
     const startAutoScroll = () => {
       autoScrollInterval = setInterval(() => {
         if (scrollContainer.current) {
-          const { scrollLeft, scrollWidth, clientWidth } = scrollContainer.current;
+          const { scrollLeft, scrollWidth, clientWidth } =
+            scrollContainer.current;
           if (scrollLeft + clientWidth >= scrollWidth) {
             scrollContainer.current.scrollTo({ left: 0, behavior: "smooth" });
           } else {
@@ -123,7 +137,8 @@ const TopMarketingCoursesSection = () => {
     if (scrollContainer.current) {
       const newScrollLeft = Math.min(
         scrollContainer.current.scrollLeft + scrollAmount,
-        scrollContainer.current.scrollWidth - scrollContainer.current.clientWidth
+        scrollContainer.current.scrollWidth -
+          scrollContainer.current.clientWidth
       );
       scrollContainer.current.scrollTo({
         left: newScrollLeft,
@@ -150,9 +165,17 @@ const TopMarketingCoursesSection = () => {
       } else if (i === fullStars && hasHalfStar) {
         stars.push(
           <div key={i} className="relative">
-            <Star className="w-5 h-5 text-gray-300" fill="none" strokeWidth={1.5} />
+            <Star
+              className="w-5 h-5 text-gray-300"
+              fill="none"
+              strokeWidth={1.5}
+            />
             <div className="absolute inset-0 overflow-hidden w-1/2">
-              <Star className="w-5 h-5 text-yellow-400" fill="currentColor" strokeWidth={1.5} />
+              <Star
+                className="w-5 h-5 text-yellow-400"
+                fill="currentColor"
+                strokeWidth={1.5}
+              />
             </div>
           </div>
         );
@@ -207,7 +230,8 @@ const TopMarketingCoursesSection = () => {
                 Marketing & Chiến Lược
               </h2>
               <p className="text-gray-700 mt-2 font-medium">
-                Khám phá các khóa học marketing được đánh giá cao từ các chuyên gia
+                Khám phá các khóa học marketing được đánh giá cao từ các chuyên
+                gia
               </p>
             </div>
           </div>
@@ -217,8 +241,8 @@ const TopMarketingCoursesSection = () => {
               onClick={scrollLeft}
               className={`p-3 rounded-md transition-all duration-300 ${
                 isLeftVisible
-                  ? 'bg-white shadow-lg hover:shadow-xl text-gray-800 hover:bg-emerald-50'
-                  : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                  ? "bg-white shadow-lg hover:shadow-xl text-gray-800 hover:bg-emerald-50"
+                  : "bg-gray-200 text-gray-400 cursor-not-allowed"
               }`}
               disabled={!isLeftVisible}
             >
@@ -228,8 +252,8 @@ const TopMarketingCoursesSection = () => {
               onClick={scrollRight}
               className={`p-3 rounded-md transition-all duration-300 ${
                 isRightVisible
-                  ? 'bg-white shadow-lg hover:shadow-xl text-gray-800 hover:bg-emerald-50'
-                  : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                  ? "bg-white shadow-lg hover:shadow-xl text-gray-800 hover:bg-emerald-50"
+                  : "bg-gray-200 text-gray-400 cursor-not-allowed"
               }`}
               disabled={!isRightVisible}
             >
@@ -247,9 +271,9 @@ const TopMarketingCoursesSection = () => {
           transition={{ duration: 0.5 }}
           onScroll={checkScroll}
           style={{
-            scrollbarWidth: 'none',
-            msOverflowStyle: 'none',
-            WebkitOverflowScrolling: 'touch'
+            scrollbarWidth: "none",
+            msOverflowStyle: "none",
+            WebkitOverflowScrolling: "touch",
           }}
         >
           {courses.map((course, index) => (
@@ -272,10 +296,14 @@ const TopMarketingCoursesSection = () => {
                       Mới
                     </span>
                   )}
-                  <span className={`flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-full ${
-                    course.tag === 'Bestseller' ? 'bg-yellow-500 text-white' : 'bg-orange-500 text-white'
-                  }`}>
-                    {course.tag === 'Bestseller' ? (
+                  <span
+                    className={`flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-full ${
+                      course.tag === "Bestseller"
+                        ? "bg-yellow-500 text-white"
+                        : "bg-orange-500 text-white"
+                    }`}
+                  >
+                    {course.tag === "Bestseller" ? (
                       <Trophy className="w-3 h-3" />
                     ) : (
                       <Flame className="w-3 h-3" />
@@ -283,11 +311,13 @@ const TopMarketingCoursesSection = () => {
                     {course.tag}
                   </span>
                 </div>
-                <div className="absolute top-2 right-2">
-                  <span className="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-                    -{course.discount}%
-                  </span>
-                </div>
+                {course.discount !== 0 && (
+                  <div className="absolute top-2 right-2">
+                    <span className="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                      -{course.discount}%
+                    </span>
+                  </div>
+                )}
               </div>
 
               {/* Course Content */}
@@ -300,22 +330,30 @@ const TopMarketingCoursesSection = () => {
                 {/* Instructor */}
                 <p className="text-gray-600 mb-2 flex items-center gap-2 text-sm">
                   <TrendingUp className="w-4 h-4 text-emerald-500" />
-                  <span>{course.instructorFirstName} {course.instructorLastName}</span>
+                  <span>
+                    {course.instructorFirstName} {course.instructorLastName}
+                  </span>
                 </p>
 
                 {/* Stats */}
                 <div className="flex items-center mb-2">
-                  <span className="text-gray-900 font-bold text-lg mr-2">{course.rating.toFixed(1)}</span>
+                  <span className="text-gray-900 font-bold text-lg mr-2">
+                    {course.rating.toFixed(1)}
+                  </span>
                   <div className="flex gap-1">{renderStars(course.rating)}</div>
-                  <span className="text-gray-500 ml-2">({course.reviews || course.numberReview})</span>
+                  <span className="text-gray-500 ml-2">
+                    ({course.reviews || course.numberReview})
+                  </span>
                 </div>
 
                 {/* Price */}
                 <div className="flex items-baseline gap-2">
-                  <span className="text-sm line-through text-gray-500">
-                    đ{Math.floor(course.originalPrice).toLocaleString("vi-VN")}
-                  </span>
-                  <span className="text-xl font-bold text-emerald-600">
+                  {course.originalPrice !== course.discountedPrice && (
+                    <span className="text-sm line-through text-gray-500">
+                      đ{course.originalPrice?.toLocaleString("vi-VN")}
+                    </span>
+                  )}
+                  <span className="text-xl font-bold text-rose-600">
                     đ{course.discountedPrice.toLocaleString("vi-VN")}
                   </span>
                 </div>
