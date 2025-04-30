@@ -139,6 +139,8 @@ const CourseDetailPage = () => {
           >
             <CourseMedia
               price={courseData.price}
+              promotion={courseData.discount}
+              enddate={courseData.endDate}
               thumbnail={courseData.imageUrls?.[0] || "default-image-url.jpg"}
               onAddToCart={handleAddToCart}
               onBuyNow={() => alert("Mua ngay")}
