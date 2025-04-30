@@ -8,6 +8,8 @@ const CartSummary = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [couponMessage, setCouponMessage] = useState("");
+  const [coursesApplyPromotion, setCourseApplyPromotion] = useState();
+
   const fetchTotalAmount = async (appliedCoupon = "") => {
     try {
       const token = localStorage.getItem("token");
@@ -27,6 +29,24 @@ const CartSummary = () => {
       setLoading(false);
     }
   };
+  const getCourseApplyPromotion = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const userId = localStorage.getItem("userId");
+      const response = await axios.get(
+        `http://localhost:8080/api/student/cart/course-apply-promotion/${userId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setCourseApplyPromotion(response.data);
+      console.log(response.data);
+    } catch (error) {
+      // toast.error(error.response?.data || "Error applying discount");
+    }
+  }
   const handleApplyDiscountUsage = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -40,14 +60,45 @@ const CartSummary = () => {
           },
         }
       );
+      
       toast.success("Discount applied successfully");
     } catch (error) {
       // toast.error(error.response?.data || "Error applying discount");
     }
   };
-
+  const handleApplyPromotionUsage = async () => {
+    const token = localStorage.getItem("token");
+    const userId = localStorage.getItem("userId");
+    const validCourses = coursesApplyPromotion.filter(item => item.promotionId != null);
+    if (validCourses.length === 0) {
+      alert("Không có khuyến mãi nào để áp dụng");
+      return;
+    }
+    try {
+      const requests = validCourses.map(item => {
+        return axios.post(
+          'http://localhost:8080/api/student/promotion/applyPromotion',
+          null,
+          {
+            params: {
+              userId,
+              promotionId: item.promotionId,
+              courseId: item.courseId,
+            },
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+      });
+      await Promise.all(requests);
+    } catch (error) {
+      console.error(error);
+    }
+  };
   useEffect(() => {
     fetchTotalAmount();
+    getCourseApplyPromotion();
   }, []);
 
   const handleApplyCoupon = async () => {
@@ -63,6 +114,12 @@ const CartSummary = () => {
       );
       if (response.data.apply) {
         const courses = response.data.coursesApply;
+        const slimCourses = courses.map(({ courseId, promotionId }) => ({
+          courseId,
+          promotionId,
+        }));
+        setCourseApplyPromotion(null);
+        setCourseApplyPromotion(slimCourses);
         const message = `Mã giảm giá hợp lệ. Áp dụng cho: ${courses
           .map((course) => {
             const discount = `${Math.round(course.reducedAmount).toLocaleString(
@@ -88,6 +145,7 @@ const CartSummary = () => {
         setCouponMessage(message);
         toast.success("Mã giảm giá hợp lệ.");
         fetchTotalAmount(coupon);
+        console.log(coursesApplyPromotion);
       } else {
         setCouponMessage(
           "Mã giảm giá không áp dụng cho bất kỳ khóa học nào trong giỏ hàng của bạn."
@@ -110,6 +168,8 @@ const CartSummary = () => {
 
       //đặt lưu người sử dụng discount
       handleApplyDiscountUsage();
+      handleApplyPromotionUsage();
+
       const response = await axios.get(
         `http://localhost:8080/api/student/vn-pay?totalAmount=${totalAmount}&couponCode=${coupon}`,
         {
