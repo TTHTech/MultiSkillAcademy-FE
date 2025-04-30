@@ -45,7 +45,7 @@ const CartSummary = () => {
       // toast.error(error.response?.data || "Error applying discount");
     }
   };
-  
+
   useEffect(() => {
     fetchTotalAmount();
   }, []);
@@ -64,12 +64,26 @@ const CartSummary = () => {
       if (response.data.apply) {
         const courses = response.data.coursesApply;
         const message = `Mã giảm giá hợp lệ. Áp dụng cho: ${courses
-          .map(
-            (course) =>
-              `${course.title} (giảm ${course.reducedAmount.toLocaleString(
-                "vi-VN"
-              )}₫)`
-          )
+          .map((course) => {
+            const discount = `${Math.round(course.reducedAmount).toLocaleString(
+              "vi-VN"
+            )}₫`;
+            let promotionNote = "";
+            if (course.applyWithPromotion === true) {
+              promotionNote =
+                " (giảm " +
+                discount +
+                ", Discount có áp dụng chung với khuyến mãi)";
+            } else if (course.applyWithPromotion === false) {
+              promotionNote =
+                " (giảm " +
+                discount +
+                ", Discount không áp dụng chung với khuyến mãi)";
+            } else {
+              promotionNote = " (giảm " + discount + ")";
+            }
+            return `${course.title}${promotionNote}`;
+          })
           .join(", ")}`;
         setCouponMessage(message);
         toast.success("Mã giảm giá hợp lệ.");
@@ -147,7 +161,7 @@ const CartSummary = () => {
         </h2>
         <p className="text-4xl font-bold text-purple-600 tracking-tight">
           {totalAmount !== null
-            ? `₫ ${totalAmount.toLocaleString("vi-VN")}`
+            ? `₫ ${Math.round(totalAmount).toLocaleString("vi-VN")}`
             : "₫ 0"}
         </p>
       </div>
