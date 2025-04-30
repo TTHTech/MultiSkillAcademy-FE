@@ -11,7 +11,7 @@ const PromotionsTable = () => {
   const pageSize = 10;
   const [editingPromotionId, setEditingPromotionId] = useState(null);
   const [refresh, setRefresh] = useState(false);
-  const triggerRefresh = () => setRefresh(prev => !prev);
+  const triggerRefresh = () => setRefresh((prev) => !prev);
   const [searchName, setSearchName] = useState("");
   const [searchStatus, setSearchStatus] = useState("");
 
@@ -49,15 +49,20 @@ const PromotionsTable = () => {
     fetchPromotions();
   }, [token, refresh]);
 
-  const filteredPromotions = promotions.filter(promo => {
-    const nameMatch = promo.name.toLowerCase().includes(searchName.toLowerCase());
+  const filteredPromotions = promotions.filter((promo) => {
+    const nameMatch = promo.name
+      .toLowerCase()
+      .includes(searchName.toLowerCase());
     const statusMatch = searchStatus ? promo.status === searchStatus : true;
     return nameMatch && statusMatch;
   });
 
   const totalPages = Math.ceil(filteredPromotions.length / pageSize);
   const startIndex = (currentPage - 1) * pageSize;
-  const currentPromotions = filteredPromotions.slice(startIndex, startIndex + pageSize);
+  const currentPromotions = filteredPromotions.slice(
+    startIndex,
+    startIndex + pageSize
+  );
 
   return (
     <div className="overflow-x-auto p-6 bg-gray-800 rounded-lg shadow-lg mt-4">
@@ -77,12 +82,18 @@ const PromotionsTable = () => {
               type="text"
               placeholder="Tìm theo tên promotion..."
               value={searchName}
-              onChange={e => { setSearchName(e.target.value); setCurrentPage(1); }}
+              onChange={(e) => {
+                setSearchName(e.target.value);
+                setCurrentPage(1);
+              }}
               className="w-full sm:max-w-md px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <select
               value={searchStatus}
-              onChange={e => { setSearchStatus(e.target.value); setCurrentPage(1); }}
+              onChange={(e) => {
+                setSearchStatus(e.target.value);
+                setCurrentPage(1);
+              }}
               className="w-full sm:max-w-xs px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Tất cả trạng thái</option>
@@ -102,11 +113,21 @@ const PromotionsTable = () => {
                   <tr className="bg-gray-700 border-b border-gray-600">
                     <th className="py-3 px-4 border-r border-gray-600">STT</th>
                     <th className="py-3 px-4 border-r border-gray-600">Tên</th>
-                    <th className="py-3 px-4 border-r border-gray-600">%	Giảm</th>
-                    <th className="py-3 px-4 border-r border-gray-600">Max Giảm</th>
-                    <th className="py-3 px-4 border-r border-gray-600">Ngày bắt đầu</th>
-                    <th className="py-3 px-4 border-r border-gray-600">Ngày kết thúc</th>
-                    <th className="py-3 px-4 border-r border-gray-600">Trạng thái</th>
+                    <th className="py-3 px-4 border-r border-gray-600">
+                      % Giảm
+                    </th>
+                    <th className="py-3 px-4 border-r border-gray-600">
+                      Max Giảm
+                    </th>
+                    <th className="py-3 px-4 border-r border-gray-600">
+                      Ngày bắt đầu
+                    </th>
+                    <th className="py-3 px-4 border-r border-gray-600">
+                      Ngày kết thúc
+                    </th>
+                    <th className="py-3 px-4 border-r border-gray-600">
+                      Trạng thái
+                    </th>
                     <th className="py-3 px-4">Hành động</th>
                   </tr>
                 </thead>
@@ -114,19 +135,48 @@ const PromotionsTable = () => {
                   {currentPromotions.map((promo, idx) => {
                     const sn = startIndex + idx + 1;
                     return (
-                      <tr key={promo.promotionId} className="hover:bg-gray-700 transition-colors duration-200">
-                        <td className="py-3 px-4 border-r border-gray-600 text-center">{sn}</td>
-                        <td className="py-3 px-4 border-r border-gray-600">{promo.name}</td>
-                        <td className="py-3 px-4 border-r border-gray-600 text-center">{promo.percentage}%</td>
-                        <td className="py-3 px-4 border-r border-gray-600 text-center">{promo.maxPromotion || '-'}</td>
-                        <td className="py-3 px-4 border-r border-gray-600 text-center">{new Date(...promo.startDate).toLocaleString('vi-VN')}</td>
-                        <td className="py-3 px-4 border-r border-gray-600 text-center">{new Date(...promo.endDate).toLocaleString('vi-VN')}</td>
+                      <tr
+                        key={promo.promotionId}
+                        className="hover:bg-gray-700 transition-colors duration-200"
+                      >
                         <td className="py-3 px-4 border-r border-gray-600 text-center">
-                          <span className={`px-2 py-1 rounded text-sm font-medium ${promo.status === 'ACTIVE' ? 'bg-green-500' : 'bg-red-500'}`}>{promo.status}</span>
+                          {sn}
+                        </td>
+                        <td className="py-3 px-4 border-r border-gray-600">
+                          {promo.name}
+                        </td>
+                        <td className="py-3 px-4 border-r border-gray-600 text-center">
+                          {promo.percentage}%
+                        </td>
+                        <td className="py-3 px-4 border-r border-gray-600 text-center">
+                          {promo.maxPromotion
+                            ? `${new Intl.NumberFormat("vi-VN").format(
+                                promo.maxPromotion
+                              )} VND`
+                            : "-"}
+                        </td>{" "}
+                        <td className="py-3 px-4 border-r border-gray-600 text-center">
+                          {new Date(...promo.startDate).toLocaleString("vi-VN")}
+                        </td>
+                        <td className="py-3 px-4 border-r border-gray-600 text-center">
+                          {new Date(...promo.endDate).toLocaleString("vi-VN")}
+                        </td>
+                        <td className="py-3 px-4 border-r border-gray-600 text-center">
+                          <span
+                            className={`px-2 py-1 rounded text-sm font-medium ${
+                              promo.status === "ACTIVE"
+                                ? "bg-green-500"
+                                : "bg-red-500"
+                            }`}
+                          >
+                            {promo.status}
+                          </span>
                         </td>
                         <td className="py-3 px-4 text-center">
                           <button
-                            onClick={() => setEditingPromotionId(promo.promotionId)}
+                            onClick={() =>
+                              setEditingPromotionId(promo.promotionId)
+                            }
                             className="bg-yellow-500 text-white px-4 py-1 rounded mr-2 hover:bg-yellow-600 transition-colors"
                           >
                             Xem chi tiết
@@ -142,9 +192,15 @@ const PromotionsTable = () => {
                 {getPaginationItems().map((item, i) => (
                   <button
                     key={i}
-                    onClick={() => typeof item === 'number' && setCurrentPage(item)}
-                    className={`px-3 py-1 rounded ${item === currentPage ? 'bg-blue-600' : 'bg-gray-600 hover:bg-gray-500'}`}
-                    disabled={item === '...'}
+                    onClick={() =>
+                      typeof item === "number" && setCurrentPage(item)
+                    }
+                    className={`px-3 py-1 rounded ${
+                      item === currentPage
+                        ? "bg-blue-600"
+                        : "bg-gray-600 hover:bg-gray-500"
+                    }`}
+                    disabled={item === "..."}
                   >
                     {item}
                   </button>
