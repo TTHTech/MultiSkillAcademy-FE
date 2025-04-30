@@ -126,7 +126,7 @@ const EditDiscount = ({ discountId, onCancel, triggerRefresh }) => {
     }
     if (
       (discountData.discountType === "PERCENTAGE" && discountData.value < 5) ||
-      discountData.value > 100
+      discountData.discountType === "PERCENTAGE" && discountData.value > 100
     ) {
       Swal.fire(
         "Lỗi",
@@ -274,7 +274,7 @@ const EditDiscount = ({ discountId, onCancel, triggerRefresh }) => {
                 className="w-full p-2 bg-gray-700 text-white rounded"
               >
                 <option value="PERCENTAGE">Giảm theo phần trăm</option>
-                <option value="FIXED_AMOUNT">Giảm theo số tiềm cố định</option>
+                <option value="FIXED_AMOUNT">Giảm theo số tiền cố định</option>
               </select>
             </div>
             <div className="grid grid-cols-2 gap-4 mb-4">

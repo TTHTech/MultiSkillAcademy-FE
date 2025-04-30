@@ -64,7 +64,7 @@ const CreateDiscount = () => {
     }
     if (
       (discountData.discountType === "PERCENTAGE" && discountData.value < 5) ||
-      discountData.value > 100
+      discountData.discountType === "PERCENTAGE" && discountData.value > 100
     ) {
       Swal.fire(
         "Lỗi",

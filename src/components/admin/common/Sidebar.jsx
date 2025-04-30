@@ -284,6 +284,24 @@ const MENU_GROUPS = [
             color: "#ec4899",
           },
           {
+            name: "Add Discount",
+            icon: PlusCircle,
+            href: "/admin/discount/add",
+            color: "#10b981",
+          },
+          {
+            name: "Promotion Usage",
+            icon: Ticket,
+            href: "/admin/promotions-usage",
+            color: "#f59e0b",
+          },
+          {
+            name: "Promotions",
+            icon: Percent,
+            href: "/admin/promotions",
+            color: "#ec4899",
+          },
+          {
             name: "Add Promotion",
             icon: PlusCircle,
             href: "/admin/promotions/add",
