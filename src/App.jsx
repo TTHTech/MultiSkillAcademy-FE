@@ -76,7 +76,9 @@ import AdminInstructorSales from "./components/admin/revenue/AdminInstructorSale
 import PageDiscountInstructor from "./pages/instructor/PageDiscount/PageDiscount.jsx";
 import PageBrowseDiscount from "./pages/admin/PageBrowseDiscount.jsx";
 import PageReportReviewCourse from "./pages/admin/PageReportReviewCourse.jsx";
-
+import PageCreatePromotion from "./pages/admin/PageCreatePromotion.jsx";
+import PagePromotion from "./pages/admin/PagePromotion.jsx"
+import PagePromotionUsage from "./pages/admin/PagePromotionUsage.jsx"
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -198,10 +200,13 @@ function App() {
                 <Route path="/admin/instructor-sales" element={<AdminInstructorSales />} />
 
                 <Route path="/admin/discounts" element={<PageDiscount />} />
-                <Route path="/admin/promotions/add" element={<PageCreateDiscounts />} />
+                <Route path="/admin/discount/add" element={<PageCreateDiscounts />} />
                 <Route path="/admin/discount-usage" element={<PageDiscountUsage />} />
                 <Route path="/admin/browsed-discounts" element={<PageBrowseDiscount />} />
                 <Route path="/admin/report/review-course" element={<PageReportReviewCourse/>} />
+                <Route path="/admin/promotions/add" element={<PageCreatePromotion />} />
+                <Route path="/admin/promotions" element={<PagePromotion />} />
+                <Route path="/admin/promotions-usage" element={<PagePromotionUsage />} />
               </>
             )}
             
