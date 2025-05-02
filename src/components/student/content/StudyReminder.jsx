@@ -3,6 +3,7 @@ import CreateStudyReminder from "./AddStudyReminder";
 import UpdateStudyReminder from "./UpdateStudyReminder";
 import { useParams } from "react-router-dom";
 import axios from "axios";
+import { decodeId } from '../../../utils/hash';
 
 const StudyReminderList = () => {
   const [reminders, setReminders] = useState([]);
@@ -13,7 +14,8 @@ const StudyReminderList = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [selectedReminder, setSelectedReminder] = useState(null);
-  const { id } = useParams();
+  const { courseHash } = useParams();
+  const id = decodeId(courseHash);
   const userId = localStorage.getItem("userId");
   const [refresh, setRefresh] = useState(false);
 

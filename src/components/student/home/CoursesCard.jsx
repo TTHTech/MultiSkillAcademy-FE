@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Star } from 'lucide-react';
+import { encodeId } from '../../../utils/hash';
 
 const CoursesCard = ({ course }) => {
   const {
@@ -19,7 +20,8 @@ const CoursesCard = ({ course }) => {
 
   return (
     <Link
-      to={`/course/${courseId}`}
+    to={`/course/${encodeId(courseId)}`}
+    
       className="block bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 w-[250px] h-auto" // Cố định chiều ngang, cho phép chiều cao tự động
     >
       {/* Image Section */}

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import { encodeId } from '../../../utils/hash';
 
 const CoursesInstructor = ({ id }) => {
   const [courses, setCourses] = useState([]);
@@ -127,7 +128,7 @@ const CoursesInstructor = ({ id }) => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {currentCourses.map((course, index) => (
             <Link
-              to={`/course/${course.courseId}`}
+              to={`/course/${encodeId(course.courseId)}`}
               key={index}
               className="group block bg-white rounded-lg shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 overflow-hidden border border-gray-100"
             >

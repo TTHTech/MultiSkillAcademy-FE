@@ -12,6 +12,7 @@ import {
   Trash2,
   ChevronRight,
 } from "lucide-react";
+import { encodeId } from '../../../utils/hash';
 
 const CartItems = () => {
   const [cartItems, setCartItems] = useState([]);
@@ -116,7 +117,7 @@ const CartItems = () => {
   });
 
   const handleClickItemItem = (courseId) => {
-    navigate(`/course/${courseId}`);
+    navigate(`/course/${encodeId(courseId)}`);
   };
 
   if (loading) {

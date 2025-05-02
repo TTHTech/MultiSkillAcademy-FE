@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import CourseCard from './CourseCard';
+import { encodeId } from '../../../utils/hash';
 
 const CourseList = ({ categoryId, filter }) => {
   const [courses, setCourses] = useState([]);
@@ -66,7 +67,7 @@ const CourseList = ({ categoryId, filter }) => {
       ) : (
         <>
           {currentCourses.map((course, index) => (
-            <Link key={index} to={`/course/${course.courseId}`} className="w-full">
+            <Link key={index} to={`/course/${encodeId(course.courseId)}`} className="w-full">
               <CourseCard course={course} />
             </Link>
           ))}

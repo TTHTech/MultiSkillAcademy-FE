@@ -166,8 +166,8 @@ function App() {
             
             {/* Public Routes - Bất kỳ ai cũng có thể truy cập */}
             <Route path="/search" element={<SearchCoursePage />} />
-            <Route path="/course/:courseId" element={<CourseDetailPage />} />
-            
+            <Route path="/course/:courseHash" element={<CourseDetailPage />} />
+
             {/* Đường dẫn quan trọng - luôn available, không phụ thuộc vào điều kiện */}
             <Route path="/student/home" element={<StudentHomePage />} />
             <Route path="/student/quiz/:id" element={<QuizPage />} />
@@ -218,7 +218,7 @@ function App() {
                 <Route path="/student/notification" element={<NotificationList/>} />
                 <Route path="/student/profile" element={<ProfilePage />} />
                 <Route path="/category/:categoryId" element={<CategoryStudentPage />} />
-                <Route path="/student/study/:progress/:id" element={<CourseViewerPage />} />
+                <Route path="/student/study/:progressHash/:courseHash" element={<CourseViewerPage />} />
                 <Route path="/student/wishlist" element={<Wishlist />} />
                 <Route path="/student/chat" element={<ChatPage />} />
                 <Route path="/student/Success" element={<SuccessPage />} />
