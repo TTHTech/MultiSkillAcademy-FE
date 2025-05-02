@@ -208,7 +208,7 @@ const ProfileEdit = () => {
     );
   }
   return (
-    <div className="max-w-5xl mx-auto p-4 bg-white shadow-md rounded-md mt-5">
+    <div className="w-full p-4 mx-4 bg-white shadow-md rounded-md mt-5">
       <h2 className="text-3xl font-bold mb-6 flex items-center gap-3">
         Instructor Profile Details
         {instructor.active ? (
