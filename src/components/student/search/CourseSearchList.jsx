@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import CourseCard from "./CourseCard";
+import { encodeId } from '../../../utils/hash';
 
 const CourseSearchList = ({ searchQuery }) => {
   const [courses, setCourses] = useState([]); // List of courses
@@ -77,7 +78,7 @@ const CourseSearchList = ({ searchQuery }) => {
             {currentCourses.map((course, index) => (
               <Link
                 key={index}
-                to={`/course/${course.courseId}`}
+                to={`/course/${encodeId(course.courseId)}`}
                 className="w-full"
               >
                 <CourseCard course={course} />

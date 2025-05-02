@@ -18,6 +18,7 @@ import {
   FaExpand,
 } from "react-icons/fa";
 import SupplementaryLectures from "./SupplementaryLectures";
+import { decodeId } from '../../../utils/hash';
 
 const CustomVideoPlayer = ({
   videoRef,
@@ -233,7 +234,8 @@ const MainContent = ({
   setIsHoveringButton,
   isHoveringButton,
 }) => {
-  const { id } = useParams();
+  const { courseHash } = useParams();
+  const id = decodeId(courseHash);
   const [selectedTab, setSelectedTab] = useState(0);
   const [progress, setProgress] = useState(0); // Tiến độ xem video (theo %)
   const [lastWatchedTime, setLastWatchedTime] = useState(0); // Thời gian cuối cùng đã xem (giây)

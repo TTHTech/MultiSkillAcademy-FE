@@ -3,13 +3,18 @@ import { useParams, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import Sidebar from "../../student/content/CourseSidebar.jsx";
 import MainContent from "../../student/content/MainContent.jsx";
+import { decodeId } from '../../../utils/hash';
+import { encodeId } from '../../../utils/hash';
 
 const CourseViewer = () => {
   const [course, setCourse] = useState(null); // Dữ liệu khóa học
   const [selectedSection, setSelectedSection] = useState(null); // Phần được chọn
   const [selectedLecture, setSelectedLecture] = useState(null); // Bài học được chọn
   const [isLoading, setIsLoading] = useState(true); // Trạng thái tải dữ liệu
-  const { id, progress } = useParams(); // Lấy id và tiến độ từ URL
+  const { courseHash, progressHash } = useParams(); // Lấy id và tiến độ từ URL
+  const id = decodeId(courseHash);
+  const progress = decodeId(progressHash);
+
   const navigate = useNavigate();
   const userId = Number(localStorage.getItem("userId")); // Lấy userId từ localStorage
   const videoRef = React.useRef(null);
@@ -19,6 +24,7 @@ const CourseViewer = () => {
   // Fetch dữ liệu khóa học khi component được mount
   useEffect(() => {
     const fetchCourseData = async () => {
+      console.log(progress)
       try {
         const response = await fetch(
           `http://localhost:8080/api/student/study-courses/${id}/${userId}`,
@@ -99,7 +105,7 @@ const CourseViewer = () => {
       confirmButtonText: "Có",
       cancelButtonText: "Không",
     });
-    if (swalResult.isConfirmed) navigate(`/course/${id}`);
+    if (swalResult.isConfirmed) navigate(`/course/${encodeId(id)}`);
   };
 
   useEffect(() => {

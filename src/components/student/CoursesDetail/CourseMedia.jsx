@@ -25,6 +25,7 @@ import {
   Users,
   Trophy,
 } from "lucide-react";
+import { decodeId } from '../../../utils/hash';
 
 const getResourceIcon = (description) => {
   const lowerDesc = description.toLowerCase();
@@ -106,7 +107,8 @@ const CourseMedia = ({
   }
 
   const userId = Number(localStorage.getItem("userId"));
-  const { courseId } = useParams();
+  const { courseHash } = useParams();
+  const courseId = decodeId(courseHash);
   const [error, setError] = useState(null);
   const [checkCart, setCheckCart] = useState(false);
   const [checkFavorite, setCheckFavorite] = useState(false);

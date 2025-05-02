@@ -11,6 +11,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { motion } from "framer-motion";
+import { encodeId } from '../../../utils/hash';
 
 const RecommendedCoursesSection = () => {
   const [courses, setCourses] = useState([]);
@@ -273,7 +274,7 @@ const RecommendedCoursesSection = () => {
         >
           {courses.map((course, index) => (
             <Link
-              to={`/course/${course.courseId}`}
+            to={`/course/${encodeId(course.courseId)}`}
               key={index}
               className="flex-none w-[280px] bg-white rounded-2xl border border-gray-100 hover:border-purple-200 hover:shadow-lg transition-all duration-300 overflow-hidden group"
             >

@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Star, Clock, Calendar } from 'lucide-react';
+import { encodeId } from '../../../utils/hash';
 
 const renderStars = (rating) => {
   const fullStars = Math.floor(rating);
@@ -49,7 +50,7 @@ const CourseCard = ({ course }) => {
   const navigate = useNavigate();
 
   const handleCardClick = () => {
-    navigate(`/student/study/${course.progress}/${course.courseId}`);
+    navigate(`/student/study/${encodeId(course.progress)}/${encodeId(course.courseId)}`);
   };
 
   return (

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
+import { decodeId } from '../../../utils/hash';
 
 const CreateStudyReminder = ({ closeModal, triggerRefresh }) => {
   const [step, setStep] = useState(1);
@@ -13,7 +14,8 @@ const CreateStudyReminder = ({ closeModal, triggerRefresh }) => {
     selectedDays: [],
     isActive: true,
   });
-  const { id } = useParams();
+  const { courseHash } = useParams();
+  const id = decodeId(courseHash);
   const [showCustomInput, setShowCustomInput] = useState(false);
   const [isContentSelected, setIsContentSelected] = useState(false);
   useEffect(() => {
