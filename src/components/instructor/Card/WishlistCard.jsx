@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Clock, Star, Trash2, AlertTriangle, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { encodeId } from '../../../utils/hash';
 
 const WishlistCard = ({ course, onDelete }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -47,7 +48,7 @@ const WishlistCard = ({ course, onDelete }) => {
   };
 
   const handleCardClick = () => {
-    navigate(`/course/${course.courseId}`);
+    navigate(`/course/${encodeId(course.courseId)}`);
   };
 
   const formatPrice = (price) => {

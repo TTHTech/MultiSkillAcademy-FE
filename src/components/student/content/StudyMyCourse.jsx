@@ -2,19 +2,23 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import QuestionsAndAnswers from "../../../pages/student/courses/QuestionAndAnswers";
 import Swal from "sweetalert2";
+import { decodeId } from '../../../utils/hash';
 
 const CourseViewer = () => {
   const [course, setCourse] = useState(null);
   const [selectedSection, setSelectedSection] = useState(null);
   const [selectedLecture, setSelectedLecture] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const { id, progress } = useParams();
+  const { courseHash, progressHash } = useParams();
+  const id = decodeId(courseHash);
+  const progress = decodeId(progressHash);
   const navigate = useNavigate();
   const userId = Number(localStorage.getItem("userId"));
 
   // Fetch thông tin khóa học
   useEffect(() => {
     const fetchCourseData = async () => {
+      console.log(progress)
       try {
         const response = await fetch(
           `http://localhost:8080/api/student/study-courses/${id}/${userId}`,
@@ -133,7 +137,7 @@ const CourseViewer = () => {
   return (
     <div className="flex h-screen">
       {/* Sidebar */}
-      <div className="w-1/4 bg-gray-100 p-4 border-r overflow-y-auto">
+      <div className="w-1/4 bg-white p-4 border-r overflow-y-auto">
         <div className="mb-6">
           <img
             src={course.images[0]}

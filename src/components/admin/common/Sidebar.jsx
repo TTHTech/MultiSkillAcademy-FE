@@ -43,6 +43,7 @@ import {
   LayoutDashboard,
   Clock,
   LineChart,
+  BadgePercent,
   DollarSign,
 } from "lucide-react";
 import { ChalkboardTeacher } from "phosphor-react";
@@ -93,21 +94,21 @@ const MENU_GROUPS = [
             name: "Dashboard",
             icon: LayoutDashboard,
             href: "/admin",
-            color: "#4f46e5"
+            color: "#4f46e5",
           },
           {
             name: "Quick Stats",
             icon: LineChart,
             href: "/admin/quick-stats",
-            color: "#818cf8"
+            color: "#818cf8",
           },
           {
             name: "Recent Activity",
             icon: Clock,
-            href: "/admin/recent-activity", 
-            color: "#4f46e5"
-          }
-        ]
+            href: "/admin/recent-activity",
+            color: "#4f46e5",
+          },
+        ],
       },
       {
         name: "Statistics",
@@ -118,28 +119,28 @@ const MENU_GROUPS = [
             name: "Sales Table",
             icon: BarChart,
             href: "/admin/statistics",
-            color: "#10b981"
+            color: "#10b981",
           },
           {
             name: "Sale By Instructors",
             icon: Users,
             href: "/admin/sale-by-instructor",
-            color: "#34d399"
+            color: "#34d399",
           },
-        
+
           {
             name: "Statistics Reviews",
             icon: Activity,
             href: "/admin/statistics/performance",
-            color: "#10b981"
+            color: "#10b981",
           },
           {
             name: "Reports",
             icon: FileText,
             href: "/admin/statistics/reports",
-            color: "#059669"
-          }
-        ]
+            color: "#059669",
+          },
+        ],
       },
       {
         name: "Revenue Management",
@@ -150,114 +151,114 @@ const MENU_GROUPS = [
             name: "Revenue Overview",
             icon: LineChart,
             href: "/admin/revenue",
-            color: "#3b82f6"
+            color: "#3b82f6",
           },
           {
             name: "Admin Revenue Dashboard",
             icon: Users,
             href: "/admin/revenue-dashboard",
-            color: "#3b82f6"
+            color: "#3b82f6",
           },
           {
             name: "Instructor Revenue",
             icon: DollarSign,
             href: "/admin/instructor-revenue",
-            color: "#2563eb"
+            color: "#2563eb",
           },
           {
             name: "Instructor Sales",
             icon: TrendingUp,
             href: "/admin/instructor-sales",
-            color: "#1d4ed8"
+            color: "#1d4ed8",
           },
           {
             name: "Sharing Policies",
             icon: FileText,
             href: "/admin/revenue-policy",
-            color: "#2563eb"
+            color: "#2563eb",
           },
           {
             name: "Payout Reports",
             icon: Archive,
             href: "/admin/revenue/payouts",
-            color: "#1d4ed8"
-          }
-        ]
+            color: "#1d4ed8",
+          },
+        ],
       },
-      
-      { 
-        name: "Notifications", 
-        icon: Bell, 
+
+      {
+        name: "Notifications",
+        icon: Bell,
         color: "#f59e0b",
         subItems: [
           {
             name: "All Notifications",
             icon: Inbox,
             href: "/admin/notification",
-            color: "#f59e0b"
+            color: "#f59e0b",
           },
           {
             name: "Create Notification",
             icon: Mail,
             href: "/admin/add-notification",
-            color: "#ef4444"
-          }
-        ]
-      }
-    ]
+            color: "#ef4444",
+          },
+        ],
+      },
+    ],
   },
   {
     label: "COURSE MANAGEMENT",
     items: [
-      { 
-        name: "Courses", 
-        icon: BookOpen, 
+      {
+        name: "Courses",
+        icon: BookOpen,
         color: "#8b5cf6",
         subItems: [
-          { 
-            name: "All Courses", 
-            icon: ListFilter, 
+          {
+            name: "All Courses",
+            icon: ListFilter,
             href: "/admin/courses",
-            color: "#8b5cf6"
+            color: "#8b5cf6",
           },
-          { 
-            name: "Course Reviews", 
-            icon: MessageSquare, 
+          {
+            name: "Course Reviews",
+            icon: MessageSquare,
             href: "/admin/courses/reviews",
-            color: "#ec4899"
+            color: "#ec4899",
           },
-          { 
-            name: "Sections", 
-            icon: FolderTree, 
+          {
+            name: "Sections",
+            icon: FolderTree,
             href: "/admin/courses/sections",
-            color: "#4f46e5"
+            color: "#4f46e5",
           },
-          { 
-            name: "Lectures", 
-            icon: Video, 
+          {
+            name: "Lectures",
+            icon: Video,
             href: "/admin/courses/lectures",
-            color: "#8b5cf6"
-          }
-        ]
+            color: "#8b5cf6",
+          },
+        ],
       },
-      { 
-        name: "Categories", 
-        icon: Layers, 
-        color: "#f97316", 
+      {
+        name: "Categories",
+        icon: Layers,
+        color: "#f97316",
         subItems: [
           {
             name: "All Categories",
             icon: ListFilter,
             href: "/admin/category",
-            color: "#f97316"
+            color: "#f97316",
           },
           {
             name: "Add Category",
             icon: FolderPlus,
             href: "/admin/category/add",
-            color: "#10b981"
-          }
-        ]
+            color: "#10b981",
+          },
+        ],
       },
       {
         name: "Promotions",
@@ -268,123 +269,166 @@ const MENU_GROUPS = [
             name: "Discount Usage",
             icon: Ticket,
             href: "/admin/discount-usage",
-            color: "#f59e0b"
+            color: "#f59e0b",
           },
           {
             name: "Discounts",
             icon: Percent,
             href: "/admin/discounts",
-            color: "#ec4899"
+            color: "#ec4899",
+          },
+          {
+            name: "Browse Discounts",
+            icon: BadgePercent,
+            href: "/admin/browsed-discounts",
+            color: "#ec4899",
+          },
+          {
+            name: "Add Discount",
+            icon: PlusCircle,
+            href: "/admin/discount/add",
+            color: "#10b981",
+          },
+          {
+            name: "Promotion Usage",
+            icon: Ticket,
+            href: "/admin/promotions-usage",
+            color: "#f59e0b",
+          },
+          {
+            name: "Promotions",
+            icon: Percent,
+            href: "/admin/promotions",
+            color: "#ec4899",
           },
           {
             name: "Add Promotion",
             icon: PlusCircle,
             href: "/admin/promotions/add",
-            color: "#10b981"
-          }
-        ]
-      }
-    ]
+            color: "#10b981",
+          },
+        ],
+      },
+      {
+        name: "Reports",
+        icon: AlertTriangle,
+        color: "#f97316",
+        subItems: [
+          {
+            name: "Report Review Course",
+            icon: MessageCircle,
+            href: "/admin/report/review-course",
+            color: "#f97316",
+          },
+          {
+            name: "Report Course",
+            icon: Ticket,
+            href: "/admin/report/course",
+            color: "#10b981",
+          },
+        ],
+      },
+    ],
   },
   {
     label: "USER MANAGEMENT",
     items: [
-      { 
-        name: "Users", 
-        icon: Users, 
+      {
+        name: "Users",
+        icon: Users,
         color: "#ec4899",
         subItems: [
-          { 
-            name: "Students", 
-            icon: GraduationCap, 
+          {
+            name: "Students",
+            icon: GraduationCap,
             href: "/admin/student",
-            color: "#ec4899"
+            color: "#ec4899",
           },
-          { 
-            name: "Instructors", 
-            icon: ChalkboardTeacher, 
+          {
+            name: "Instructors",
+            icon: ChalkboardTeacher,
             href: "/admin/instructor",
-            color: "#ec4899"
+            color: "#ec4899",
           },
-          { 
-            name: "Add User", 
-            icon: Plus, 
+          {
+            name: "Add User",
+            icon: Plus,
             href: "/admin/add-user",
-            color: "#10b981"
+            color: "#10b981",
           },
-        ]
-      }
-    ]
+        ],
+      },
+    ],
   },
   {
     label: "COMMUNICATION",
     items: [
-      { 
-        name: "Messages", 
-        icon: MessageCircle, 
+      {
+        name: "Messages",
+        icon: MessageCircle,
         color: "#10b981",
         subItems: [
           {
             name: "Chat",
             icon: MessagesSquare,
             href: "/admin/chat",
-            color: "#10b981"
+            color: "#10b981",
           },
           {
             name: "Announcements",
             icon: Megaphone,
             href: "/admin/announcements",
-            color: "#f59e0b"
+            color: "#f59e0b",
           },
           {
             name: "Support",
             icon: HeadphonesIcon,
             href: "/admin/support",
-            color: "#ec4899"
-          }
-        ]
-      }
-    ]
+            color: "#ec4899",
+          },
+        ],
+      },
+    ],
   },
   {
     label: "ADMINISTRATION",
     items: [
-      { 
-        name: "Settings", 
-        icon: Settings, 
+      {
+        name: "Settings",
+        icon: Settings,
         color: "#64748b",
         subItems: [
           {
             name: "General",
             icon: Sliders,
             href: "/admin/settings/general",
-            color: "#64748b"
+            color: "#64748b",
           },
           {
             name: "Appearance",
             icon: Palette,
             href: "/admin/settings/appearance",
-            color: "#8b5cf6"
+            color: "#8b5cf6",
           },
           {
             name: "Security",
             icon: Shield,
             href: "/admin/settings/security",
-            color: "#10b981"
-          }
-        ]
+            color: "#10b981",
+          },
+        ],
       },
-    ]
-  }
+    ],
+  },
 ];
 
 const UserProfile = ({ isOpen }) => (
-  <motion.div 
+  <motion.div
     className="flex items-center p-4 mb-4 bg-slate-700/40 hover:bg-slate-700/60 rounded-lg transition-colors border border-slate-600/30 shadow-sm"
     initial={false}
-    animate={{ 
+    animate={{
       height: isOpen ? "auto" : "64px",
-      transition: { duration: 0.2 }
+      transition: { duration: 0.2 },
     }}
   >
     <div className="flex-shrink-0">
@@ -408,30 +452,41 @@ const UserProfile = ({ isOpen }) => (
   </motion.div>
 );
 
-const MenuItem = ({ item, isOpen, isActive, isSubmenuOpen, onToggleSubmenu }) => {
+const MenuItem = ({
+  item,
+  isOpen,
+  isActive,
+  isSubmenuOpen,
+  onToggleSubmenu,
+}) => {
   const hasSubItems = item.subItems && item.subItems.length > 0;
-  const isParentOfActive = item.subItems?.some(subItem => 
-    window.location.pathname === subItem.href
+  const isParentOfActive = item.subItems?.some(
+    (subItem) => window.location.pathname === subItem.href
   );
 
   return (
     <div className="relative">
       <motion.div
         className={`flex items-center p-2.5 text-sm font-medium rounded-md transition-all duration-200 cursor-pointer
-          ${(isActive || isParentOfActive) ? 
-            'bg-slate-700/60 border border-slate-600/30 shadow-sm' : 
-            'hover:bg-slate-700/40 border border-transparent'
+          ${
+            isActive || isParentOfActive
+              ? "bg-slate-700/60 border border-slate-600/30 shadow-sm"
+              : "hover:bg-slate-700/40 border border-transparent"
           }`}
         onClick={hasSubItems ? onToggleSubmenu : undefined}
         whileHover={{ scale: 1.01 }}
         whileTap={{ scale: 0.99 }}
       >
-        <div className={`p-1.5 rounded-md ${isActive || isParentOfActive ? 'bg-slate-600/40' : 'bg-slate-700/30'}`}>
-          <item.icon 
-            size={18} 
-            style={{ 
+        <div
+          className={`p-1.5 rounded-md ${
+            isActive || isParentOfActive ? "bg-slate-600/40" : "bg-slate-700/30"
+          }`}
+        >
+          <item.icon
+            size={18}
+            style={{
               color: item.color,
-              minWidth: "18px"
+              minWidth: "18px",
             }}
           />
         </div>
@@ -484,19 +539,26 @@ const MenuItem = ({ item, isOpen, isActive, isSubmenuOpen, onToggleSubmenu }) =>
                 <Link key={subItem.href} to={subItem.href}>
                   <motion.div
                     className={`flex items-center p-2 text-sm font-medium rounded-md transition-all duration-200
-                      ${window.location.pathname === subItem.href ? 
-                        'bg-slate-700/60 border border-slate-600/30' : 
-                        'hover:bg-slate-700/40 border border-transparent'
+                      ${
+                        window.location.pathname === subItem.href
+                          ? "bg-slate-700/60 border border-slate-600/30"
+                          : "hover:bg-slate-700/40 border border-transparent"
                       }`}
                     whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.99 }}
                   >
-                    <div className={`p-1 rounded-md ${window.location.pathname === subItem.href ? 'bg-slate-600/40' : 'bg-slate-700/30'}`}>
-                      <subItem.icon 
-                        size={16} 
-                        style={{ 
+                    <div
+                      className={`p-1 rounded-md ${
+                        window.location.pathname === subItem.href
+                          ? "bg-slate-600/40"
+                          : "bg-slate-700/30"
+                      }`}
+                    >
+                      <subItem.icon
+                        size={16}
+                        style={{
                           color: subItem.color,
-                          minWidth: "16px"
+                          minWidth: "16px",
                         }}
                       />
                     </div>
@@ -520,15 +582,15 @@ const MenuItem = ({ item, isOpen, isActive, isSubmenuOpen, onToggleSubmenu }) =>
 const Sidebar = () => {
   // Inject animation styles
   useEffect(() => {
-    const styleElement = document.createElement('style');
+    const styleElement = document.createElement("style");
     styleElement.textContent = animationStyles;
     document.head.appendChild(styleElement);
-    
+
     return () => {
       document.head.removeChild(styleElement);
     };
   }, []);
-  
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [openSubmenuIndex, setOpenSubmenuIndex] = useState(null);
   const [mounted, setMounted] = useState(false);
@@ -553,9 +615,9 @@ const Sidebar = () => {
     <motion.div
       className="relative z-10 h-screen sticky top-0"
       initial={false}
-      animate={{ 
+      animate={{
         width: isSidebarOpen ? 240 : 76,
-        transition: { duration: 0.3, ease: "easeInOut" }
+        transition: { duration: 0.3, ease: "easeInOut" },
       }}
     >
       <div className="h-full bg-slate-800/80 backdrop-blur-lg flex flex-col border-r border-slate-700/30 shadow-lg">
@@ -618,8 +680,12 @@ const Sidebar = () => {
                             item={item}
                             isOpen={isSidebarOpen}
                             isActive={location.pathname === item.href}
-                            isSubmenuOpen={openSubmenuIndex === `${groupIndex}-${itemIndex}`}
-                            onToggleSubmenu={() => toggleSubmenu(`${groupIndex}-${itemIndex}`)}
+                            isSubmenuOpen={
+                              openSubmenuIndex === `${groupIndex}-${itemIndex}`
+                            }
+                            onToggleSubmenu={() =>
+                              toggleSubmenu(`${groupIndex}-${itemIndex}`)
+                            }
                           />
                         </Link>
                       ) : (
@@ -627,8 +693,12 @@ const Sidebar = () => {
                           item={item}
                           isOpen={isSidebarOpen}
                           isActive={false}
-                          isSubmenuOpen={openSubmenuIndex === `${groupIndex}-${itemIndex}`}
-                          onToggleSubmenu={() => toggleSubmenu(`${groupIndex}-${itemIndex}`)}
+                          isSubmenuOpen={
+                            openSubmenuIndex === `${groupIndex}-${itemIndex}`
+                          }
+                          onToggleSubmenu={() =>
+                            toggleSubmenu(`${groupIndex}-${itemIndex}`)
+                          }
                         />
                       )}
                     </div>

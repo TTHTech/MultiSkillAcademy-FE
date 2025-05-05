@@ -3,13 +3,15 @@ import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 import { Loader2, Clock, FileText, ChevronLeft } from "lucide-react";
 import StudentScores from "./ViewListTestScores";
+import { decodeId } from '../../../utils/hash';
 
 const TabListTest = () => {
   const [tests, setTests] = useState([]);
   const [selectedTest, setSelectedTest] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { id } = useParams();
+  const { courseHash } = useParams();
+  const id = decodeId(courseHash);
   const navigate = useNavigate();
 
   useEffect(() => {

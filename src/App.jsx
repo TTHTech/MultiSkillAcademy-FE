@@ -36,7 +36,7 @@ import ResetPassPage from "./pages/auth/ResetPassPage";
 import SuccessPage from "./pages/student/cart/SuccessPage";
 import Logout from "./components/auth/Logout.jsx";
 import PageReview from "./pages/instructor/PageReview/PageReview";
-import PageSales from "./pages/instructor/PageSales";
+import PageSales from "./pages/instructor/PageSales/PageSales.jsx";
 import ProfilePage from "./pages/student/profile/ProfilePage.jsx";
 import QuizPage from "./pages/student/quiz/QuizPage";
 import ResultPage from "./pages/student/quiz/ResultPage";
@@ -66,7 +66,7 @@ import InstructorChatPage from "./pages/instructor/InstructorChatPage.jsx";
 import GoogleCallbackPage from "./pages/auth/GoogleCallbackPage";
 import GitHubCallbackPage from "./pages/auth/GitHubCallbackPage";
 import PageProfile from "./pages/instructor/PageProfile/PageProfile.jsx";
-import AdminRevenuePolicyTable from "./components/admin/revenue/AdminRevenuePolicyTable.jsx";
+import AdminRevenuePolicyTable from "./components/admin/revenue/AdminRevenuePolicyContainer.jsx";
 import AdminRevenueDashboard from "./components/admin/revenue/AdminRevenueDashboard.jsx";
 import PageCreateDiscounts from "./pages/admin/PageCreateDiscount.jsx"
 import PageDiscount from "./pages/admin/PageDiscount.jsx"
@@ -74,6 +74,11 @@ import PageDiscountUsage from "./pages/admin/PageDiscountUsage.jsx"
 import AdminInstructorRevenue from "./components/admin/revenue/AdminInstructorRevenueContainer.jsx";
 import AdminInstructorSales from "./components/admin/revenue/AdminInstructorSales.jsx";
 import PageDiscountInstructor from "./pages/instructor/PageDiscount/PageDiscount.jsx";
+import PageBrowseDiscount from "./pages/admin/PageBrowseDiscount.jsx";
+import PageReportReviewCourse from "./pages/admin/PageReportReviewCourse.jsx";
+import PageCreatePromotion from "./pages/admin/PageCreatePromotion.jsx";
+import PagePromotion from "./pages/admin/PagePromotion.jsx"
+import PagePromotionUsage from "./pages/admin/PagePromotionUsage.jsx"
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -161,8 +166,8 @@ function App() {
             
             {/* Public Routes - Bất kỳ ai cũng có thể truy cập */}
             <Route path="/search" element={<SearchCoursePage />} />
-            <Route path="/course/:courseId" element={<CourseDetailPage />} />
-            
+            <Route path="/course/:courseHash" element={<CourseDetailPage />} />
+
             {/* Đường dẫn quan trọng - luôn available, không phụ thuộc vào điều kiện */}
             <Route path="/student/home" element={<StudentHomePage />} />
             <Route path="/student/quiz/:id" element={<QuizPage />} />
@@ -195,8 +200,13 @@ function App() {
                 <Route path="/admin/instructor-sales" element={<AdminInstructorSales />} />
 
                 <Route path="/admin/discounts" element={<PageDiscount />} />
-                <Route path="/admin/promotions/add" element={<PageCreateDiscounts />} />
+                <Route path="/admin/discount/add" element={<PageCreateDiscounts />} />
                 <Route path="/admin/discount-usage" element={<PageDiscountUsage />} />
+                <Route path="/admin/browsed-discounts" element={<PageBrowseDiscount />} />
+                <Route path="/admin/report/review-course" element={<PageReportReviewCourse/>} />
+                <Route path="/admin/promotions/add" element={<PageCreatePromotion />} />
+                <Route path="/admin/promotions" element={<PagePromotion />} />
+                <Route path="/admin/promotions-usage" element={<PagePromotionUsage />} />
               </>
             )}
             
@@ -208,7 +218,7 @@ function App() {
                 <Route path="/student/notification" element={<NotificationList/>} />
                 <Route path="/student/profile" element={<ProfilePage />} />
                 <Route path="/category/:categoryId" element={<CategoryStudentPage />} />
-                <Route path="/student/study/:progress/:id" element={<CourseViewerPage />} />
+                <Route path="/student/study/:progressHash/:courseHash" element={<CourseViewerPage />} />
                 <Route path="/student/wishlist" element={<Wishlist />} />
                 <Route path="/student/chat" element={<ChatPage />} />
                 <Route path="/student/Success" element={<SuccessPage />} />

@@ -25,6 +25,7 @@ import {
   Users,
   Trophy,
 } from "lucide-react";
+import { decodeId } from '../../../utils/hash';
 
 const getResourceIcon = (description) => {
   const lowerDesc = description.toLowerCase();
@@ -86,17 +87,28 @@ const getResourceIcon = (description) => {
 
 const CourseMedia = ({
   price,
+  promotion,
+  enddate,
   thumbnail = "default-thumbnail.jpg",
   onAddToCart,
   resourceDescription = [],
 }) => {
   // Tính giá sau giảm giá
-  const discount = 30; // Mặc định giảm giá 30%
-  const discountedPrice = Math.floor(price * (1 - discount / 100));
-  const daysLeft = 3;
+  const discount = promotion;
+  const discountAmount = Math.min((price * discount) / 100);
+  const discountedPrice = Math.floor(price - discountAmount);
+  let daysLeft = null;
+  if (Array.isArray(enddate) && enddate.length >= 3) {
+    const [year, month, day, hour = 0, minute = 0] = enddate;
+    const endDateObj = new Date(year, month - 1, day, hour, minute);
+    const now = new Date();
+    const diffTime = endDateObj.setHours(0, 0, 0, 0) - now.setHours(0, 0, 0, 0);
+    daysLeft = Math.max(Math.floor(diffTime / (1000 * 60 * 60 * 24)), 0);
+  }
 
   const userId = Number(localStorage.getItem("userId"));
-  const { courseId } = useParams();
+  const { courseHash } = useParams();
+  const courseId = decodeId(courseHash);
   const [error, setError] = useState(null);
   const [checkCart, setCheckCart] = useState(false);
   const [checkFavorite, setCheckFavorite] = useState(false);
@@ -104,7 +116,6 @@ const CourseMedia = ({
   const [showPreview, setShowPreview] = useState(false);
   const [lectures, setLectures] = useState([]);
   const [activeCourse, setActiveCourse] = useState([]);
-
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -131,7 +142,6 @@ const CourseMedia = ({
             `http://localhost:8080/api/student/courses/${courseId}/status`
           ),
         ]);
-
         setCheckCart(cartResponse.data);
         setCheckFavorite(favoriteResponse.data);
         setCheckOnStudy(studyResponse.data);
@@ -209,25 +219,31 @@ const CourseMedia = ({
 
       <div className="p-6">
         {/* Price Section */}
-        <div className="mb-6">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="text-3xl font-bold text-gray-900">
-              đ{discountedPrice.toLocaleString("vi-VN")}
-            </span>
+        <div className="flex items-center gap-2 mb-2">
+          <span className="text-3xl font-bold text-gray-900">
+            đ{discountedPrice.toLocaleString("vi-VN")}
+          </span>
+          {discountedPrice !== price && (
             <span className="text-lg text-gray-500 line-through">
               đ{price.toLocaleString("vi-VN")}
             </span>
-          </div>
+          )}
+        </div>
+
+        {discountedPrice !== price && (
           <div className="flex items-center gap-2 mb-2">
             <span className="text-red-500 font-semibold">Giảm {discount}%</span>
           </div>
-          <div className="flex items-center gap-2 text-red-500">
+        )}
+
+        {discountedPrice !== price && (
+          <div className="flex items-center gap-2 text-red-500 mb-2">
             <BsClock className="w-4 h-4" />
             <span className="text-sm font-medium">
               {daysLeft} ngày còn lại với mức giá này!
             </span>
           </div>
-        </div>
+        )}
 
         {/* Action Buttons */}
         <div className="space-y-3 mb-6">

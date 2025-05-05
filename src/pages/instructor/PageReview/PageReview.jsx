@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Sidebar from "../../../components/instructor/Sidebar/Sidebar";
+import { FileText, Star } from "lucide-react";
+import Swal from "sweetalert2";
 
 const InstructorReviews = () => {
   const [reviews, setReviews] = useState([]);
@@ -120,6 +122,59 @@ const InstructorReviews = () => {
     return pages;
   };
 
+  const handleReport = async (review) => {
+    console.log("Review object:", review);
+    const { value: reason } = await Swal.fire({
+      title: "Báo cáo đánh giá",
+      input: "textarea",
+      inputLabel: "Lý do báo cáo",
+      inputPlaceholder: "Nhập lý do tại đây...",
+      inputAttributes: {
+        "aria-label": "Nhập lý do báo cáo",
+      },
+      showCancelButton: true,
+      confirmButtonText: "Gửi báo cáo",
+      cancelButtonText: "Hủy",
+      preConfirm: (val) => {
+        if (!val) {
+          Swal.showValidationMessage("Bạn phải nhập lý do báo cáo!");
+        }
+        return val;
+      },
+    });
+
+    if (!reason) {
+      return;
+    }
+
+    try {
+      await axios.post(
+        `http://localhost:8080/api/instructor/reviews/${userId}/report`,
+        {
+          idUserReport: userId,
+          review_id: review.id ?? review.reviewId ?? review.review_id,
+          reason: reason,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      await Swal.fire({
+        icon: "success",
+        title: "Đã gửi báo cáo",
+        text: "Báo cáo của bạn đã được gửi thành công!",
+        confirmButtonText: "OK",
+      });
+    } catch (err) {
+      console.error(err);
+      await Swal.fire({
+        icon: "error",
+        title: "Gửi báo cáo thất bại",
+        text: "Không thể gửi báo cáo. Vui lòng thử lại sau.",
+        confirmButtonText: "OK",
+      });
+    }
+  };
   return (
     <section
       className={`m-3 text-xl text-gray-900 font-semibold duration-300 flex-1 bg-gradient-to-b from-gray-100 to-gray-100 min-h-screen ${
@@ -134,70 +189,96 @@ const InstructorReviews = () => {
             Danh sách đánh giá
           </h1>
 
-          <div className="bg-white shadow-lg rounded-md p-6 mb-8">
-            <div className="flex flex-col sm:flex-row gap-6">
-              <div className="w-full sm:w-1/2">
-                <label
-                  htmlFor="course-select"
-                  className="block text-sm font-medium text-gray-700 mb-2"
-                >
-                  Chọn khóa học
-                </label>
-                <select
-                  id="course-select"
-                  className="w-full border border-gray-300 rounded-md p-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  value={courseNameFilter}
-                  onChange={(e) => setCourseNameFilter(e.target.value)}
-                >
-                  <option value="">-- Chọn khóa học --</option>
-                  {courses.map((course) => (
-                    <option key={course.courseId} value={course.title}>
-                      {course.title}
-                    </option>
-                  ))}
-                </select>
+          <div className="mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div className="bg-gradient-to-br from-purple-300 to-purple-100 p-1 rounded-2xl shadow-lg">
+                <div className="bg-white rounded-xl p-5">
+                  <label
+                    htmlFor="course-select"
+                    className="block text-sm font-semibold text-gray-700 mb-2"
+                  >
+                    <span className="text-purple-600">🎓</span> Chọn khóa học
+                  </label>
+                  <select
+                    id="course-select"
+                    className="w-full border border-gray-300 rounded-md p-2.5 shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
+                    value={courseNameFilter}
+                    onChange={(e) => setCourseNameFilter(e.target.value)}
+                  >
+                    <option value="">-- Tất cả khóa học --</option>
+                    {courses.map((course) => (
+                      <option key={course.courseId} value={course.title}>
+                        {course.title}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
-              <div className="w-full sm:w-1/2">
-                <label
-                  htmlFor="rating-select"
-                  className="block text-sm font-medium text-gray-700 mb-2"
-                >
-                  Chọn mức đánh giá
-                </label>
-                <select
-                  id="rating-select"
-                  className="w-full border border-gray-300 rounded-md p-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  value={ratingFilter}
-                  onChange={(e) => setRatingFilter(e.target.value)}
-                >
-                  <option value="">Chọn mức đánh giá</option>
-                  <option value="5">5 sao</option>
-                  <option value="4">4 sao</option>
-                  <option value="3">3 sao</option>
-                  <option value="2">2 sao</option>
-                  <option value="1">1 sao</option>
-                </select>
+
+              <div className="bg-gradient-to-br from-pink-300 to-pink-100 p-1 rounded-2xl shadow-lg">
+                <div className="bg-white rounded-xl p-5">
+                  <label
+                    htmlFor="rating-select"
+                    className="block text-sm font-semibold text-gray-700 mb-2"
+                  >
+                    <span className="text-yellow-500">⭐</span> Chọn mức đánh
+                    giá
+                  </label>
+                  <select
+                    id="rating-select"
+                    className="w-full border border-gray-300 rounded-md p-2.5 shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-500 transition"
+                    value={ratingFilter}
+                    onChange={(e) => setRatingFilter(e.target.value)}
+                  >
+                    <option value="">-- Tất cả mức đánh giá --</option>
+                    <option value="5">5 sao</option>
+                    <option value="4">4 sao</option>
+                    <option value="3">3 sao</option>
+                    <option value="2">2 sao</option>
+                    <option value="1">1 sao</option>
+                  </select>
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="bg-gradient-to-r from-blue-200 to-blue-100 rounded-xl p-6 mb-8 shadow-md text-center sm:text-left">
-            <div className="flex flex-col sm:flex-row justify-between items-center">
-              <div className="mb-4 sm:mb-0">
-                <p className="text-xl font-semibold text-blue-800">
-                  Số đánh giá:{" "}
-                  <span className="font-bold text-blue-900">
-                    {filteredReviews.length}
-                  </span>
-                </p>
+          <div className="mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div className="bg-gradient-to-br from-blue-300 to-blue-100 p-1 rounded-2xl shadow-lg">
+                <div className="bg-white rounded-xl p-6 flex items-center space-x-4">
+                  <div className="flex-shrink-0">
+                    <span className="inline-block p-3 bg-blue-100 rounded-full">
+                      <FileText className="w-6 h-6 text-blue-500" />
+                    </span>
+                  </div>
+                  <div className="text-center sm:text-left">
+                    <p className="text-sm text-gray-500 uppercase tracking-wide">
+                      Số đánh giá
+                    </p>
+                    <p className="mt-1 text-2xl font-bold text-blue-700">
+                      {filteredReviews.length}
+                    </p>
+                  </div>
+                </div>
               </div>
-              <div>
-                <p className="text-xl font-semibold text-blue-800">
-                  Đánh giá trung bình:{" "}
-                  <span className="font-bold text-blue-900">
-                    {calculateAverageRating()} ⭐
-                  </span>
-                </p>
+
+              <div className="bg-gradient-to-br from-indigo-300 to-indigo-100 p-1 rounded-2xl shadow-lg">
+                <div className="bg-white rounded-xl p-6 flex items-center space-x-4">
+                  <div className="flex-shrink-0">
+                    <span className="inline-block p-3 bg-indigo-100 rounded-full">
+                      <Star className="w-6 h-6 text-indigo-500" />
+                    </span>
+                  </div>
+                  <div className="text-center sm:text-left">
+                    <p className="text-sm text-gray-500 uppercase tracking-wide">
+                      Đánh giá trung bình
+                    </p>
+                    <p className="mt-1 text-2xl font-bold text-indigo-700 flex items-center justify-center sm:justify-start">
+                      {calculateAverageRating()}
+                      <Star className="w-5 h-5 ml-1 text-yellow-400" />
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -208,56 +289,88 @@ const InstructorReviews = () => {
             <div className="text-center text-red-500">{error}</div>
           ) : (
             <>
-              <div className="overflow-auto shadow-md rounded-md max-h-screen">
-                <table className="w-full border-collapse bg-white text-left text-sm lg:text-base">
-                  <thead className="bg-gray-200 sticky top-0">
+              <div className="shadow-md rounded-md">
+                <table className="w-full table-auto border-collapse bg-white text-left text-sm lg:text-base">
+                  <thead className="bg-gray-200">
                     <tr>
-                      <th className="border p-3 font-medium text-gray-700">
+                      <th className="border px-4 py-3 font-medium text-gray-700 whitespace-nowrap">
                         Khóa Học
                       </th>
-                      <th className="border p-3 font-medium text-gray-700">
+                      <th className="border px-4 py-3 font-medium text-gray-700 whitespace-nowrap">
                         Tên Khóa Học
                       </th>
-                      <th className="border p-3 font-medium text-gray-700">
+                      <th className="border px-4 py-3 font-medium text-gray-700 whitespace-nowrap">
                         Tên Học Viên
                       </th>
-                      <th className="border p-3 font-medium text-gray-700">
+                      <th className="border px-4 py-3 font-medium text-gray-700 whitespace-nowrap text-center">
                         Đánh Giá
                       </th>
-                      <th className="border p-3 font-medium text-gray-700">
+                      <th className="border px-4 py-3 font-medium text-gray-700 whitespace-nowrap">
                         Bình Luận
                       </th>
-                      <th className="border p-3 font-medium text-gray-700">
+                      <th className="border px-4 py-3 font-medium text-gray-700 whitespace-nowrap">
                         Ngày Tạo
+                      </th>
+                      <th className="border px-4 py-3 font-medium text-gray-700 whitespace-nowrap text-center">
+                        Hành Động
                       </th>
                     </tr>
                   </thead>
                   <tbody>
                     {currentReviews.length > 0 ? (
-                      currentReviews.map((review, index) => (
+                      currentReviews.map((review, idx) => (
                         <tr
-                          key={index}
-                          className="hover:bg-gray-100 transition"
+                          key={idx}
+                          className={idx % 2 === 0 ? "bg-white" : "bg-gray-50"}
                         >
-                          <td className="border p-3">{review.courseId}</td>
-                          <td className="border p-3">{review.courseName}</td>
-                          <td className="border p-3">
+                          <td className="border px-4 py-3 whitespace-nowrap">
+                            {review.courseId}
+                          </td>
+                          <td
+                            className="border px-4 py-3 truncate max-w-[150px] whitespace-nowrap"
+                            title={review.courseName}
+                          >
+                            {review.courseName}
+                          </td>
+                          <td className="border px-4 py-3 whitespace-nowrap">
                             {`${review.studentFirstName} ${review.studentLastName}`}
                           </td>
-                          <td className="border p-3 text-center">
-                            {review.rating} ⭐
+                          <td className="border px-4 py-3 text-center whitespace-nowrap">
+                            <span className="inline-flex items-center text-yellow-500">
+                              {Array.from({ length: review.rating }).map(
+                                (_, i) => (
+                                  <span key={i}>★</span>
+                                )
+                              )}
+                            </span>
                           </td>
-                          <td className="border p-3">{review.comment}</td>
-                          <td className="border p-3">
-                            {new Date(review.created_at).toLocaleDateString()}
+                          <td
+                            className="border px-4 py-3 truncate max-w-[200px] whitespace-nowrap"
+                            title={review.comment}
+                          >
+                            {review.comment}
+                          </td>
+                          <td className="border px-4 py-3 whitespace-nowrap">
+                            {new Date(review.created_at).toLocaleDateString(
+                              "vi-VN"
+                            )}
+                          </td>
+                          <td className="border px-4 py-3 text-center whitespace-nowrap">
+                            <button
+                              className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 focus:outline-none transition"
+                              aria-label="Báo cáo review"
+                              onClick={() => handleReport(review)}
+                            >
+                              Báo cáo
+                            </button>
                           </td>
                         </tr>
                       ))
                     ) : (
                       <tr>
                         <td
-                          colSpan="6"
-                          className="border p-3 text-center text-gray-500"
+                          colSpan={7}
+                          className="border px-4 py-6 text-center text-gray-500"
                         >
                           Không có đánh giá nào.
                         </td>
@@ -266,6 +379,7 @@ const InstructorReviews = () => {
                   </tbody>
                 </table>
               </div>
+
               <div className="flex justify-center items-center mt-4">
                 <button
                   onClick={() => handlePageChange(currentPage - 1)}

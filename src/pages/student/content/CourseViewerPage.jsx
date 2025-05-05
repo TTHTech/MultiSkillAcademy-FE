@@ -3,9 +3,11 @@ import NavBar from "../../../components/student/common/NavBar";
 import Footer from "../../../components/student/common/Footer";
 import CourseViewer from "../../../components/student/content/CourseViewer.jsx"; // Đảm bảo import đúng
 import { useParams } from "react-router-dom";
+import { decodeId } from '../../../utils/hash';
 
 const CourseViewerPage = () => {
-  const { id } = useParams(); // Lấy id khóa học từ URL
+  const { courseHash } = useParams();
+  const id = decodeId(courseHash);
 
   // Thêm padding-bottom cho body khi component mount
   useEffect(() => {

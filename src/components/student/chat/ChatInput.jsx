@@ -3,7 +3,7 @@ import { Send, Paperclip, Image, FileText, Video, X, Smile } from 'lucide-react'
 import { toast } from 'react-toastify';
 import EmojiPicker from 'emoji-picker-react';
 
-const ChatInput = ({ addMessage, setIsTyping, disabled }) => {
+const ChatInput = ({ addMessage, setIsTyping, disabled, chatId }) => {
   const [message, setMessage] = useState('');
   const [showAttachmentOptions, setShowAttachmentOptions] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -117,6 +117,12 @@ const ChatInput = ({ addMessage, setIsTyping, disabled }) => {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("Vui lòng đăng nhập lại");
       
+      // Kiểm tra chatId tồn tại
+      if (!chatId) {
+        console.error("Thiếu chatId khi upload file");
+        throw new Error("Không thể tải lên file: thiếu chatId");
+      }
+      
       setIsUploading(true);
       setUploadProgress(0);
       
@@ -135,20 +141,30 @@ const ChatInput = ({ addMessage, setIsTyping, disabled }) => {
           }
         });
         
-        xhr.addEventListener('load', () => {
-          if (xhr.status >= 200 && xhr.status < 300) {
-            const response = JSON.parse(xhr.responseText);
-            resolve(response);
-          } else {
-            reject(new Error(`Upload failed: ${xhr.status}`));
-          }
-        });
+        // Trong ChatInput.jsx, hàm uploadFile:
+xhr.addEventListener('load', () => {
+  if (xhr.status >= 200 && xhr.status < 300) {
+    try {
+      const response = JSON.parse(xhr.responseText);
+      console.log("Upload successful, full response:", response);
+      resolve(response);
+    } catch (error) {
+      console.error("Error parsing JSON:", error);
+      console.log("Raw response:", xhr.responseText);
+      reject(new Error("Invalid response format"));
+    }
+  } else {
+    console.error("Upload failed with status:", xhr.status);
+    reject(new Error(`Upload failed: ${xhr.status}`));
+  }
+});
         
         xhr.addEventListener('error', () => {
           reject(new Error('Network error during upload'));
         });
         
-        xhr.open('POST', 'http://localhost:8080/api/admin/chat/upload');
+        // Sử dụng chatId trong URL để phù hợp với API backend
+        xhr.open('POST', `http://localhost:8080/api/student/chat/${chatId}/upload`);
         xhr.setRequestHeader('Authorization', `Bearer ${token}`);
         xhr.send(formData);
       });
@@ -193,13 +209,17 @@ const ChatInput = ({ addMessage, setIsTyping, disabled }) => {
         }
         
         // Rút gọn URL nếu quá dài
-        let fileUrl = uploadResponse.fileDownloadUri;
-        if (fileUrl && fileUrl.length > 200) {
-          const urlParts = fileUrl.split('/');
-          const fileName = urlParts[urlParts.length - 1];
-          fileUrl = `/api/admin/chat/files/${fileName}`;
-          console.log("URL gốc quá dài, đã rút gọn thành:", fileUrl);
-        }
+        let fileUrl = uploadResponse.fileDownloadUri || uploadResponse.fileUrl;
+
+// Thêm log để kiểm tra cấu trúc response
+console.log('Full upload response:', JSON.stringify(uploadResponse));
+if (fileUrl && fileUrl.length > 200) {
+  const urlParts = fileUrl.split('/');
+  const fileName = urlParts[urlParts.length - 1];
+  // Sử dụng đúng định dạng URL mà server mong đợi
+  fileUrl = `/api/student/chat/files/${fileName}`;
+  console.log("URL rút gọn:", fileUrl);
+}
         
         // Gửi tin nhắn với file URL
         await addMessage(messageContent, fileUrl, fileType);

@@ -13,9 +13,11 @@ import CourseContentDetails from "../../../components/student/CoursesDetail/Cour
 import CourseRequirements from "../../../components/student/CoursesDetail/CourseRequirements";
 import CourseReviews from "../../../components/student/CoursesDetail/CourseReviews";
 import CourseInstructor from "../../../components/student/CoursesDetail/CourseInstructor";
+import { decodeId } from '../../../utils/hash';
 
 const CourseDetailPage = () => {
-  const { courseId } = useParams();
+  const { courseHash } = useParams();
+  const courseId = decodeId(courseHash);
   const [courseData, setCourseData] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -23,6 +25,10 @@ const CourseDetailPage = () => {
   const [instructorDetail, setInstructorDetail] = useState([]);
 
   useEffect(() => {
+    console.log("CourseId" + courseId)
+    if (!courseId) {
+      return;
+    }
     const fetchCourseDetails = async () => {
       try {
         const courseResponse = await axios.get(
@@ -139,6 +145,8 @@ const CourseDetailPage = () => {
           >
             <CourseMedia
               price={courseData.price}
+              promotion={courseData.discount}
+              enddate={courseData.endDate}
               thumbnail={courseData.imageUrls?.[0] || "default-image-url.jpg"}
               onAddToCart={handleAddToCart}
               onBuyNow={() => alert("Mua ngay")}

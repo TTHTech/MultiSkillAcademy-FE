@@ -221,6 +221,14 @@ const Sections = () => {
       sectionOrder: sections.length + 1,
       lectures: [],
     };
+    const newSectionupdate = {
+      sectionId: Date.now().toString(),
+      title: newSection,
+      courseId: course.courseId,
+      sectionOrder: sections.length + 1,
+      lectures: [],
+      status: "true"
+    };
     try {
       await axios.post(
         `http://localhost:8080/api/instructor/add-section`,
@@ -231,7 +239,7 @@ const Sections = () => {
           },
         }
       );
-      const updated = [...sections, newSectionObj];
+      const updated = [...sections, newSectionupdate];
       setSections(updated);
       setNewSection("");
     } catch (err) {
