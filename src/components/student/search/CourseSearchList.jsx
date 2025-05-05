@@ -3,6 +3,7 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import CourseCard from "./CourseCard";
 import { encodeId } from '../../../utils/hash';
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const CourseSearchList = ({ searchQuery }) => {
   const [courses, setCourses] = useState([]); // List of courses
@@ -24,7 +25,7 @@ const CourseSearchList = ({ searchQuery }) => {
       try {
         setLoading(true);
         const response = await axios.get(
-          "http://localhost:8080/api/student/courses/search",
+          `${baseUrl}/api/student/courses/search`,
           {
             params: { query: searchQuery },
           }

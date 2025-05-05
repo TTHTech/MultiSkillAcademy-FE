@@ -4,6 +4,7 @@ import { Search, Loader, Plus, X, Edit, Trash2, ChevronLeft, ChevronRight, Check
 import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 // Animation styles
 const animationStyles = `
@@ -78,7 +79,7 @@ const CategoryTable = () => {
       }
 
       const response = await axios.get(
-        "http://localhost:8080/api/admin/categories",
+        `${baseUrl}/api/admin/categories`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -149,7 +150,7 @@ const CategoryTable = () => {
       }
 
       const response = await axios.post(
-        "http://localhost:8080/api/admin/categories",
+        `${baseUrl}/api/admin/categories`,
         newCategory,
         {
           headers: {
@@ -200,7 +201,7 @@ const CategoryTable = () => {
       }
 
       const response = await axios.put(
-        `http://localhost:8080/api/admin/categories/update/${editingCategory.categoryId}`,
+        `${baseUrl}/api/admin/categories/update/${editingCategory.categoryId}`,
         editingCategory,
         {
           headers: {
@@ -246,7 +247,7 @@ const CategoryTable = () => {
       }
 
       await axios.delete(
-        `http://localhost:8080/api/admin/categories/${categoryId}`,
+        `${baseUrl}/api/admin/categories/${categoryId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

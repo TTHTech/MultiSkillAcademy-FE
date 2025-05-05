@@ -18,6 +18,9 @@ import moment from "moment";
 import Swal from "sweetalert2";
 import CourseDetails from "./EditableList";
 import LecturesFree from "../../../components/instructor/LecturesFree/LecturesFree";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
+
+
 const PageCourseDetail = () => {
   const [open, setOpen] = useState(true);
   const { id } = useParams();
@@ -48,7 +51,7 @@ const PageCourseDetail = () => {
       console.log(localStorage.getItem("token"));
       try {
         const response = await fetch(
-          `http://localhost:8080/api/instructor/courses/${id}`,
+          `${baseUrl}/api/instructor/courses/${id}`,
           {
             method: "GET",
             headers: {
@@ -74,7 +77,7 @@ const PageCourseDetail = () => {
         }
 
         const response = await fetch(
-          "http://localhost:8080/api/instructor/categories",
+          `${baseUrl}/api/instructor/categories`,
           {
             method: "GET",
             headers: {
@@ -168,7 +171,7 @@ const PageCourseDetail = () => {
     };
     try {
       const response = await fetch(
-        `http://localhost:8080/api/instructor/update-course/${course.courseId}`,
+        `${baseUrl}/api/instructor/update-course/${course.courseId}`,
         {
           method: "PUT",
           headers: {
@@ -228,7 +231,7 @@ const PageCourseDetail = () => {
     };
     try {
       const response = await fetch(
-        "http://localhost:8080/api/instructor/add-section",
+        `${baseUrl}/api/instructor/add-section`,
         {
           method: "POST",
           headers: {
@@ -285,7 +288,7 @@ const PageCourseDetail = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:8080/api/instructor/update-section/${section_id}`,
+        `${baseUrl}/api/instructor/update-section/${section_id}`,
         {
           method: "PUT",
           headers: {
@@ -335,7 +338,7 @@ const PageCourseDetail = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:8080/api/instructor/delete-section/${section_id}`,
+        `${baseUrl}/api/instructor/delete-section/${section_id}`,
         {
           method: "DELETE",
           headers: {
@@ -430,7 +433,7 @@ const PageCourseDetail = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:8080/api/instructor/update-lecture/${lecture_id}`,
+        `${baseUrl}/api/instructor/update-lecture/${lecture_id}`,
         {
           method: "PUT",
           headers: {
@@ -478,7 +481,7 @@ const PageCourseDetail = () => {
     }
     try {
       const response = await fetch(
-        `http://localhost:8080/api/instructor/delete-lecture/${lecture_id}`,
+        `${baseUrl}/api/instructor/delete-lecture/${lecture_id}`,
         {
           method: "DELETE",
           headers: {
@@ -543,7 +546,7 @@ const PageCourseDetail = () => {
 
     try {
       const response = await fetch(
-        "http://localhost:8080/api/instructor/add-lecture",
+        `${baseUrl}/api/instructor/add-lecture`,
         {
           method: "POST",
           headers: {
@@ -600,7 +603,7 @@ const PageCourseDetail = () => {
           name: "Image " + course.courseId,
         };
         const response = await fetch(
-          `http://localhost:8080/api/instructor/addImage/${course.courseId}`,
+          `${baseUrl}/api/instructor/addImage/${course.courseId}`,
           {
             method: "POST",
             headers: {
@@ -643,7 +646,7 @@ const PageCourseDetail = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:8080/api/instructor/deleteImage/${course.courseId}`,
+        `${baseUrl}/api/instructor/deleteImage/${course.courseId}`,
         {
           method: "DELETE",
           headers: {
@@ -705,7 +708,7 @@ const PageCourseDetail = () => {
       };
       try {
         const response = await fetch(
-          `http://localhost:8080/api/instructor/updateImage/${course.courseId}`,
+          `${baseUrl}/api/instructor/updateImage/${course.courseId}`,
           {
             method: "PUT",
             headers: {

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 // Constants
 const BACKGROUND_IMAGE = "https://toigingiuvedep.vn/wp-content/uploads/2021/02/background-may-dep-cho-khai-giang.jpg";
@@ -83,7 +84,7 @@ const OtpVerificationForm = () => {
 
     setLoading(true);
     try {
-      const response = await axios.post("http://localhost:8080/api/auth/verify-otp-register", {
+      const response = await axios.post(`${baseUrl}/api/auth/verify-otp-register`, {
         email,
         otp: otpCode,
       });
@@ -112,7 +113,7 @@ const OtpVerificationForm = () => {
 
     try {
       setLoading(true);
-      await axios.post("http://localhost:8080/api/auth/resend-otp", { email });
+      await axios.post(`${baseUrl}/api/auth/resend-otp`, { email });
       toast.success("New OTP sent successfully!");
       setTimeLeft(OTP_TIMER_DURATION);
       setCanResend(false);

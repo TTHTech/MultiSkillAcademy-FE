@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Swal from "sweetalert2";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const Lectures = ({ lectures, sectionId, instructor, section, course, triggerRefresh }) => {
   const initialLectures = lectures
@@ -130,7 +131,7 @@ const Lectures = ({ lectures, sectionId, instructor, section, course, triggerRef
     formData.append("file", file);
     try {
       const response = await fetch(
-        "http://localhost:8080/api/cloudinary/upload/video",
+        `${baseUrl}/api/cloudinary/upload/video`,
         {
           method: "POST",
           headers: {
@@ -153,7 +154,7 @@ const Lectures = ({ lectures, sectionId, instructor, section, course, triggerRef
     formData.append("file", file);
     try {
       const response = await fetch(
-        "http://localhost:8080/api/cloudinary/upload/pdf",
+        `${baseUrl}/api/cloudinary/upload/pdf`,
         {
           method: "POST",
           headers: {
@@ -224,7 +225,7 @@ const Lectures = ({ lectures, sectionId, instructor, section, course, triggerRef
       };
       try {
         await fetch(
-          `http://localhost:8080/api/instructor/update-lecture/${lecture.lecture_id}`,
+          `${baseUrl}/api/instructor/update-lecture/${lecture.lecture_id}`,
           {
             method: "PUT",
             headers: {
@@ -290,7 +291,7 @@ const Lectures = ({ lectures, sectionId, instructor, section, course, triggerRef
 
     try {
       const response = await fetch(
-        `http://localhost:8080/api/instructor/update-lecture/${lecture.lecture_id}`,
+        `${baseUrl}/api/instructor/update-lecture/${lecture.lecture_id}`,
         {
           method: "PUT",
           headers: {
@@ -355,7 +356,7 @@ const Lectures = ({ lectures, sectionId, instructor, section, course, triggerRef
     try {
       setIsLoading(true);
       const response = await fetch(
-        `http://localhost:8080/api/instructor/delete-lecture/${lectureId}`,
+        `${baseUrl}/api/instructor/delete-lecture/${lectureId}`,
         {
           method: "DELETE",
           headers: {
@@ -438,7 +439,7 @@ const Lectures = ({ lectures, sectionId, instructor, section, course, triggerRef
 
     try {
       const response = await fetch(
-        "http://localhost:8080/api/instructor/add-lecture",
+        `${baseUrl}/api/instructor/add-lecture`,
         {
           method: "POST",
           headers: {

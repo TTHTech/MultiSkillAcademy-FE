@@ -6,6 +6,7 @@ import vi from 'date-fns/locale/vi';
 import SockJS from 'sockjs-client';
 import { Stomp } from '@stomp/stompjs';
 import { toast } from 'react-toastify';
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const ChatSidebar = () => {
   const [activeUser, setActiveUser] = useState(null);
@@ -25,7 +26,7 @@ const ChatSidebar = () => {
           throw new Error("No token found, please login first.");
         }
 
-        const socket = new SockJS(`http://localhost:8080/ws?token=${token}`);
+        const socket = new SockJS(`${baseUrl}/ws?token=${token}`);
         const stompClient = Stomp.over(socket);
 
         stompClient.connect(
@@ -62,7 +63,7 @@ const ChatSidebar = () => {
           throw new Error("No token found, please login first.");
         }
 
-        const response = await fetch('http://localhost:8080/api/admin/chat', {
+        const response = await fetch(`${baseUrl}/api/admin/chat`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',

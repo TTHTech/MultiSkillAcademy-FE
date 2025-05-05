@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Camera, Loader2, Save, X, Edit3, User, Mail, Phone, Calendar, MapPin } from "lucide-react";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const Alert = ({ variant = "default", children }) => (
   <div className={`p-4 rounded-lg ${
@@ -80,7 +81,7 @@ const ProfileInfo = () => {
       }
 
       const response = await fetch(
-        `http://localhost:8080/api/student/profile/${userId}`,
+        `${baseUrl}/api/student/profile/${userId}`,
         {
           headers: { Authorization: `Bearer ${token}` }
         }
@@ -137,7 +138,7 @@ const ProfileInfo = () => {
       }
 
       const response = await fetch(
-        `http://localhost:8080/api/student/profile/${userId}`,
+        `${baseUrl}/api/student/profile/${userId}`,
         {
           method: 'PUT',
           headers: { 

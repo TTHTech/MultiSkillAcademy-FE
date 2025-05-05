@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { BookOpen, CheckCircle, XCircle, AlertCircle, Folder, BookMarked } from "lucide-react";
 import { useState, useEffect } from "react";
 import axios from "axios";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 // Animated skeleton loader for cards
 const SkeletonCard = () => (
@@ -90,10 +91,10 @@ const OverviewCards = () => {
       try {
         // Fetch both API endpoints in parallel
         const [categoryResponse, courseResponse] = await Promise.all([
-          axios.get("http://localhost:8080/api/admin/categories/stats", {
+          axios.get(`${baseUrl}/api/admin/categories/stats`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
-          axios.get("http://localhost:8080/api/admin/courses/stats", {
+          axios.get(`${baseUrl}/api/admin/courses/stats`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
         ]);

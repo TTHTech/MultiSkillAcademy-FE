@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 import { Flag } from "lucide-react";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const TabComment = ({ courseId }) => {
   const [reviews, setReviews] = useState([]);
@@ -23,7 +24,7 @@ const TabComment = ({ courseId }) => {
     const fetchReviews = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8080/api/student/reviews/${courseId}`
+          `${baseUrl}/api/student/reviews/${courseId}`
         );
         setReviews(response.data); // Set the reviews data
         console.log(response.data);
@@ -83,13 +84,13 @@ const TabComment = ({ courseId }) => {
 
       // Make the API call to submit the new review
       await axios.post(
-        "http://localhost:8080/api/student/add-review",
+        `${baseUrl}/api/student/add-review`,
         newReview
       );
 
       // Re-fetch the reviews after submission
       const response = await axios.get(
-        `http://localhost:8080/api/student/reviews/${courseId}`
+        `${baseUrl}/api/student/reviews/${courseId}`
       );
       setShowAddReview(false);
       setReviews(response.data); // Update reviews list
@@ -128,7 +129,7 @@ const TabComment = ({ courseId }) => {
 
     try {
       await axios.post(
-        "http://localhost:8080/api/student/reviews/report",
+        `${baseUrl}/api/student/reviews/report`,
         {
           idUserReport: userId,
           review_id: review.review_id,

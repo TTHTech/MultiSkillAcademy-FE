@@ -8,6 +8,7 @@ import {
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import * as XLSX from "xlsx";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const SalesTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -108,7 +109,7 @@ const SalesTable = () => {
         throw new Error("No token found, please login again.");
       }
 
-      const response = await fetch("http://localhost:8080/api/admin/sales", {
+      const response = await fetch(`${baseUrl}/api/admin/sales`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

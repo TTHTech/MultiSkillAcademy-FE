@@ -2,8 +2,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import { useEffect, useState, useMemo } from "react";
 import { Loader2, RefreshCcw, PieChart as PieChartIcon, AlertCircle } from "lucide-react";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
-const API_URL = "http://localhost:8080/api/admin/stats";
+const API_URL = `${baseUrl}/api/admin/stats`;
 
 // Vibrant distinctive colors for categories
 const DISTINCT_COLORS = [

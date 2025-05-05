@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Send, Paperclip, Image, FileText, Video, X, Smile } from 'lucide-react';
 import { toast } from 'react-toastify';
 import EmojiPicker from 'emoji-picker-react';
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const ChatInput = ({ addMessage, setIsTyping, disabled, chatId }) => {
   const [message, setMessage] = useState('');
@@ -164,7 +165,7 @@ xhr.addEventListener('load', () => {
         });
         
         // Sử dụng chatId trong URL để phù hợp với API backend
-        xhr.open('POST', `http://localhost:8080/api/student/chat/${chatId}/upload`);
+        xhr.open('POST', `${baseUrl}/api/student/chat/${chatId}/upload`);
         xhr.setRequestHeader('Authorization', `Bearer ${token}`);
         xhr.send(formData);
       });

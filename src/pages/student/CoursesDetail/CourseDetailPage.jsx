@@ -14,6 +14,7 @@ import CourseRequirements from "../../../components/student/CoursesDetail/Course
 import CourseReviews from "../../../components/student/CoursesDetail/CourseReviews";
 import CourseInstructor from "../../../components/student/CoursesDetail/CourseInstructor";
 import { decodeId } from '../../../utils/hash';
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const CourseDetailPage = () => {
   const { courseHash } = useParams();
@@ -32,22 +33,22 @@ const CourseDetailPage = () => {
     const fetchCourseDetails = async () => {
       try {
         const courseResponse = await axios.get(
-          `http://localhost:8080/api/student/courses/${courseId}`
+          `${baseUrl}/api/student/courses/${courseId}`
         );
         setCourseData(courseResponse.data);
 
         const studentResponse = await axios.get(
-          `http://localhost:8080/api/student/number-student/${courseId}`
+          `${baseUrl}/api/student/number-student/${courseId}`
         );
         setStudent(studentResponse.data);
 
         const instructorDetailResponse = await axios.get(
-          `http://localhost:8080/api/student/number-detail/${courseId}`
+          `${baseUrl}/api/student/number-detail/${courseId}`
         );
         setInstructorDetail(instructorDetailResponse.data);
 
         const reviewsResponse = await axios.get(
-          `http://localhost:8080/api/student/reviews/${courseId}`
+          `${baseUrl}/api/student/reviews/${courseId}`
         );
         setReviews(reviewsResponse.data);
       } catch (error) {
@@ -64,7 +65,7 @@ const CourseDetailPage = () => {
     try {
       const token = localStorage.getItem("token");
       await axios.post(
-        `http://localhost:8080/api/student/cart/add/${courseId}`,
+        `${baseUrl}/api/student/cart/add/${courseId}`,
         {},
         {
           headers: {

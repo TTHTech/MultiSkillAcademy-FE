@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import QuestionsAndAnswers from "../../../pages/student/courses/QuestionAndAnswers";
 import Swal from "sweetalert2";
 import { decodeId } from '../../../utils/hash';
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const CourseViewer = () => {
   const [course, setCourse] = useState(null);
@@ -21,7 +22,7 @@ const CourseViewer = () => {
       console.log(progress)
       try {
         const response = await fetch(
-          `http://localhost:8080/api/student/study-courses/${id}/${userId}`,
+          `${baseUrl}/api/student/study-courses/${id}/${userId}`,
           {
             method: "GET",
             headers: {
@@ -81,7 +82,7 @@ const CourseViewer = () => {
 
   const updateProgress = async (lectureId) => {
     try {
-      const response = await fetch("http://localhost:8080/api/student/update-progress", {
+      const response = await fetch(`${baseUrl}/api/student/update-progress`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

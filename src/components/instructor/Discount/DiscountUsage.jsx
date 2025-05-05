@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const DiscountUsageUI = ({discountId}) => {
   const [discount, setDiscount] = useState(null);
@@ -16,7 +17,7 @@ const DiscountUsageUI = ({discountId}) => {
   useEffect(() => {
     const token = localStorage.getItem("token");
     axios
-      .get(`http://localhost:8080/api/instructor/discounts/discount-usage/${userId}/${discountId}`, {
+      .get(`${baseUrl}/api/instructor/discounts/discount-usage/${userId}/${discountId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

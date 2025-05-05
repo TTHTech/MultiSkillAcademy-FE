@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import Details from "./Details";
 import Images from "./Images";
 import Swal from "sweetalert2";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const CourseDetails = () => {
   const { id } = useParams();
@@ -41,7 +42,7 @@ const CourseDetails = () => {
     const fetchCourse = async () => {
       try {
         const response = await fetch(
-          `http://localhost:8080/api/instructor/courses/${id}`,
+          `${baseUrl}/api/instructor/courses/${id}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -67,7 +68,7 @@ const CourseDetails = () => {
         }
 
         const response = await fetch(
-          "http://localhost:8080/api/instructor/categories",
+          `${baseUrl}/api/instructor/categories`,
           {
             method: "GET",
             headers: {

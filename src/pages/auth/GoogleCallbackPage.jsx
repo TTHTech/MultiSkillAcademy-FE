@@ -3,10 +3,11 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 // Cấu hình Google OAuth2 
 const GOOGLE_CLIENT_ID = "979797905767-l9rt1m82le6jfmmr9v0mbpqnsh8va1es.apps.googleusercontent.com";
-const BACKEND_URL = "http://localhost:8080";
+const BACKEND_URL = `${baseUrl}`;
 
 const GoogleCallbackPage = () => {
   const navigate = useNavigate();

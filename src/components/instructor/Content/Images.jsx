@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import Swal from "sweetalert2";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const Images = ({ images = [], courseId, triggerRefresh}) => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -46,7 +47,7 @@ const Images = ({ images = [], courseId, triggerRefresh}) => {
     formData.append("file", file);
     try {
       const response = await fetch(
-        "http://localhost:8080/api/cloudinary/upload/image",
+        `${baseUrl}/api/cloudinary/upload/image`,
         {
           method: "POST",
           headers: {
@@ -77,7 +78,7 @@ const Images = ({ images = [], courseId, triggerRefresh}) => {
           name: "Image " + courseId,
         };
         const response = await fetch(
-          `http://localhost:8080/api/instructor/addImage/${courseId}`,
+          `${baseUrl}/api/instructor/addImage/${courseId}`,
           {
             method: "POST",
             headers: {
@@ -112,7 +113,7 @@ const Images = ({ images = [], courseId, triggerRefresh}) => {
     setIsLoading(true);
     try {
       const response = await fetch(
-        `http://localhost:8080/api/instructor/deleteImage/${courseId}`,
+        `${baseUrl}/api/instructor/deleteImage/${courseId}`,
         {
           method: "DELETE",
           headers: {
@@ -155,7 +156,7 @@ const Images = ({ images = [], courseId, triggerRefresh}) => {
       };
       try {
         const response = await fetch(
-          `http://localhost:8080/api/instructor/updateImage/${courseId}`,
+          `${baseUrl}/api/instructor/updateImage/${courseId}`,
           {
             method: "PUT",
             headers: {

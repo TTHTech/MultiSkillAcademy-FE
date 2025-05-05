@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Search, Camera, Edit, Trash2, ChevronLeft, ChevronRight, Loader, AlertTriangle, X } from "lucide-react";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const ITEMS_PER_PAGE = 5;
 
@@ -151,7 +152,7 @@ const UsersTable = () => {
         }
 
         const response = await fetch(
-          "http://localhost:8080/api/admin/students",
+          `${baseUrl}/api/admin/students`,
           {
             method: "GET",
             headers: {
@@ -222,7 +223,7 @@ const UsersTable = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `http://localhost:8080/api/admin/students/${userToDelete.id}`,
+        `${baseUrl}/api/admin/students/${userToDelete.id}`,
         {
           method: "DELETE",
           headers: {
@@ -276,7 +277,7 @@ const UsersTable = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `http://localhost:8080/api/admin/students/${editingUser.id}`,
+        `${baseUrl}/api/admin/students/${editingUser.id}`,
         {
           method: "PUT",
           headers: {

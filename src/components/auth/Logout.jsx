@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const Logout = () => {
   const navigate = useNavigate();
@@ -14,7 +15,7 @@ const Logout = () => {
         // 1. Gọi API logout (nếu đã triển khai)
         if (token) {
           try {
-            await axios.post('http://localhost:8080/api/auth/logout', {}, {
+            await axios.post(`${baseUrl}/api/auth/logout`, {}, {
               headers: {
                 'Authorization': `Bearer ${token}`
               }

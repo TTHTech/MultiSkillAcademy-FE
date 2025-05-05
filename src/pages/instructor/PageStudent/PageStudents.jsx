@@ -3,6 +3,7 @@ import Sidebar from "../../../components/instructor/Sidebar/Sidebar";
 import axios from "axios";
 import moment from "moment";
 import CourseFilter from "./CourseFilter";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const userId = Number(localStorage.getItem("userId"));
 const StudentList = () => {
@@ -47,7 +48,7 @@ const StudentList = () => {
 
     try {
       await axios.post(
-        "http://localhost:8080/api/instructor/send-email",
+        `${baseUrl}/api/instructor/send-email`,
         formData,
         {
           headers: {
@@ -67,7 +68,7 @@ const StudentList = () => {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:8080/api/instructor/students/${userId}`, {
+      .get(`${baseUrl}/api/instructor/students/${userId}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },

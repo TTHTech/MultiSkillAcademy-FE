@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import Sidebar from "../../../components/instructor/Sidebar/Sidebar";
 import ListCard from "../../../components/instructor/Card/ListCoursesCard";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const userId = localStorage.getItem("userId");
 
@@ -27,7 +28,7 @@ const PageCourses = () => {
       setError(null);
       try {
         const resp = await fetch(
-          `http://localhost:8080/api/instructor/${userId}`,
+          `${baseUrl}/api/instructor/${userId}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,

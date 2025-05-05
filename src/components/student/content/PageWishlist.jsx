@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Search, SlidersHorizontal, Loader2, RefreshCw, Heart, X, AlertTriangle } from "lucide-react";
 import WishlistList from "../../instructor/Card/WishlistListCard";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const ITEMS_PER_PAGE = 4;
 
@@ -25,7 +26,7 @@ const PageWishlist = () => {
     
     try {
       const response = await fetch(
-        `http://localhost:8080/api/student/wishlist/${userId}`
+        `${baseUrl}/api/student/wishlist/${userId}`
       );
       
       if (!response.ok) {

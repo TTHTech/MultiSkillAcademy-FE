@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const FilterCourse = ({ onFilter }) => {
   const [filter, setFilter] = useState({
@@ -55,7 +56,7 @@ const FilterCourse = ({ onFilter }) => {
         }
 
         const response = await fetch(
-          "http://localhost:8080/api/instructor/categories",
+          `${baseUrl}/api/instructor/categories`,
           {
             method: "GET",
             headers: {

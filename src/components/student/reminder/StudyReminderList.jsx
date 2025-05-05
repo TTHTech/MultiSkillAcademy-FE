@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import CreateStudyReminder from "./AddStudyReminder";
 import UpdateStudyReminder from "./UpdateStudyReminder";
 import axios from "axios";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const StudyReminderList = ({ courseId, nameCourse }) => {
   const [reminders, setReminders] = useState([]);
@@ -18,7 +19,7 @@ const StudyReminderList = ({ courseId, nameCourse }) => {
   useEffect(() => {
     if (userId) {
       fetch(
-        `http://localhost:8080/api/student/reminders/user/${userId}/course/${courseId}`
+        `${baseUrl}/api/student/reminders/user/${userId}/course/${courseId}`
       )
         .then((response) => response.json())
         .then((data) => {
@@ -44,7 +45,7 @@ const StudyReminderList = ({ courseId, nameCourse }) => {
     if (window.confirm("Bạn có chắc chắn muốn xóa nhắc nhở này?")) {
       try {
         await axios.delete(
-          `http://localhost:8080/api/student/reminders/${reminderId}`
+          `${baseUrl}/api/student/reminders/${reminderId}`
         );
         setReminders(
           reminders.filter((reminder) => reminder.id !== reminderId)
@@ -93,7 +94,7 @@ const StudyReminderList = ({ courseId, nameCourse }) => {
   const changeActive = async (reminderId) => {
     try {
       const response = await axios.patch(
-        `http://localhost:8080/api/student/reminders/${reminderId}/status`
+        `${baseUrl}/api/student/reminders/${reminderId}/status`
       );
 
       console.log(response.data);

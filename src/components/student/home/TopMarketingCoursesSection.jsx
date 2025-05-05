@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { encodeId } from '../../../utils/hash';
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const TopMarketingCoursesSection = () => {
   const [courses, setCourses] = useState([]);
@@ -29,7 +30,7 @@ const TopMarketingCoursesSection = () => {
       try {
         setLoading(true);
         const response = await axios.get(
-          `http://localhost:8080/api/student/courses/category/${categoryId}`
+          `${baseUrl}/api/student/courses/category/${categoryId}`
         );
         const { categoryName, courses: fetchedCourses } = response.data;
 

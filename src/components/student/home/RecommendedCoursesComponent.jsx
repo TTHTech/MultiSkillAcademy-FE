@@ -1,9 +1,19 @@
 import React, { useRef, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import { Star, ChevronLeft, ChevronRight, Trophy, Flame, Crown, Loader2, BookOpen } from 'lucide-react';
+import {
+  Star,
+  ChevronLeft,
+  ChevronRight,
+  Trophy,
+  Flame,
+  Crown,
+  Loader2,
+  BookOpen,
+} from "lucide-react";
 import { motion } from "framer-motion";
-import { encodeId } from '../../../utils/hash';
+import { encodeId } from "../../../utils/hash";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const RecommendedCoursesComponent = ({ categoryId }) => {
   const [courses, setCourses] = useState([]);
@@ -19,8 +29,8 @@ const RecommendedCoursesComponent = ({ categoryId }) => {
       try {
         setLoading(true);
         // Get auth token from localStorage or your auth context
-        const token = localStorage.getItem('token'); // Adjust based on your auth implementation
-        
+        const token = localStorage.getItem("token"); // Adjust based on your auth implementation
+
         if (!token) {
           setError("Vui lòng đăng nhập để xem khóa học được đề xuất.");
           setLoading(false);
@@ -28,26 +38,28 @@ const RecommendedCoursesComponent = ({ categoryId }) => {
         }
 
         // Determine which API endpoint to use based on categoryId
-        let url = "http://localhost:8080/api/student/recommendations";
+        let url = `${baseUrl}/api/student/recommendations`;
         if (categoryId) {
-          url = `http://localhost:8080/api/student/recommendations/category/${categoryId}`;
+          url = `${baseUrl}/api/student/recommendations/category/${categoryId}`;
         }
 
         // Make API request with auth token
         const response = await axios.get(url, {
           headers: {
-            'Authorization': `Bearer ${token}`
+            Authorization: `Bearer ${token}`,
           },
           params: {
-            count: 10 // Request 10 recommendations
-          }
+            count: 10, // Request 10 recommendations
+          },
         });
 
         // Process the courses data
-        const fetchedCourses = response.data.map(course => {
-          const originalPrice = course.price || 500000;
-          const discount = course.discount || 30;
-          const discountedPrice = originalPrice * (1 - (discount / 100));
+        const fetchedCourses = response.data.map((course) => {
+          const originalPrice = Math.floor(course.price);
+          const discount = course.discount;
+          const discountedPrice = Math.floor(
+            originalPrice * (1 - discount / 100)
+          );
 
           return {
             ...course,
@@ -55,13 +67,21 @@ const RecommendedCoursesComponent = ({ categoryId }) => {
             originalPrice,
             discount,
             discountedPrice,
-            tag: (course.rating >= 4.5) ? 'Bestseller' : (course.enrollmentCount > 50 ? 'Hot' : ''),
-            isNew: course.createdAt && new Date(course.createdAt) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+            tag:
+              course.rating >= 4.5
+                ? "Bestseller"
+                : course.enrollmentCount > 50
+                ? "Hot"
+                : "",
+            isNew:
+              course.createdAt &&
+              new Date(course.createdAt) >
+                new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
           };
         });
 
         setCourses(fetchedCourses);
-        
+
         // Check scroll buttons visibility after courses are loaded
         setTimeout(() => {
           checkScroll();
@@ -92,20 +112,21 @@ const RecommendedCoursesComponent = ({ categoryId }) => {
   useEffect(() => {
     const container = scrollContainer.current;
     if (container) {
-      container.addEventListener('scroll', checkScroll);
+      container.addEventListener("scroll", checkScroll);
       // Initial check
       checkScroll();
-      return () => container.removeEventListener('scroll', checkScroll);
+      return () => container.removeEventListener("scroll", checkScroll);
     }
   }, [courses]);
 
   useEffect(() => {
     let autoScrollInterval;
-    
+
     const startAutoScroll = () => {
       autoScrollInterval = setInterval(() => {
         if (scrollContainer.current) {
-          const { scrollLeft, scrollWidth, clientWidth } = scrollContainer.current;
+          const { scrollLeft, scrollWidth, clientWidth } =
+            scrollContainer.current;
           if (scrollLeft + clientWidth >= scrollWidth) {
             scrollContainer.current.scrollTo({ left: 0, behavior: "smooth" });
           } else {
@@ -147,7 +168,8 @@ const RecommendedCoursesComponent = ({ categoryId }) => {
     if (scrollContainer.current) {
       const newScrollLeft = Math.min(
         scrollContainer.current.scrollLeft + scrollAmount,
-        scrollContainer.current.scrollWidth - scrollContainer.current.clientWidth
+        scrollContainer.current.scrollWidth -
+          scrollContainer.current.clientWidth
       );
       scrollContainer.current.scrollTo({
         left: newScrollLeft,
@@ -174,9 +196,17 @@ const RecommendedCoursesComponent = ({ categoryId }) => {
       } else if (i === fullStars && hasHalfStar) {
         stars.push(
           <div key={i} className="relative">
-            <Star className="w-5 h-5 text-gray-300" fill="none" strokeWidth={1.5} />
+            <Star
+              className="w-5 h-5 text-gray-300"
+              fill="none"
+              strokeWidth={1.5}
+            />
             <div className="absolute inset-0 overflow-hidden w-1/2">
-              <Star className="w-5 h-5 text-yellow-400" fill="currentColor" strokeWidth={1.5} />
+              <Star
+                className="w-5 h-5 text-yellow-400"
+                fill="currentColor"
+                strokeWidth={1.5}
+              />
             </div>
           </div>
         );
@@ -225,8 +255,12 @@ const RecommendedCoursesComponent = ({ categoryId }) => {
         <div className="max-w-[1500px] mx-auto flex justify-center items-center min-h-[300px]">
           <div className="flex flex-col items-center gap-4 text-center">
             <BookOpen className="w-12 h-12 text-indigo-600" />
-            <p className="text-gray-700 font-medium">Chưa có khóa học được đề xuất cho bạn.</p>
-            <p className="text-gray-500">Hãy khám phá thêm các khóa học để nhận được đề xuất phù hợp hơn.</p>
+            <p className="text-gray-700 font-medium">
+              Chưa có khóa học được đề xuất cho bạn.
+            </p>
+            <p className="text-gray-500">
+              Hãy khám phá thêm các khóa học để nhận được đề xuất phù hợp hơn.
+            </p>
           </div>
         </div>
       </section>
@@ -242,12 +276,14 @@ const RecommendedCoursesComponent = ({ categoryId }) => {
             <Crown className="w-12 h-12 text-indigo-600 mt-1" />
             <div>
               <h2 className="text-4xl font-extrabold bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">
-                {categoryId ? 'Khóa Học Đề Xuất Theo Danh Mục' : 'Khóa Học Dành Cho Bạn'}
+                {categoryId
+                  ? "Khóa Học Đề Xuất Theo Danh Mục"
+                  : "Khóa Học Dành Cho Bạn"}
               </h2>
               <p className="text-gray-700 mt-2 font-medium">
-                {categoryId 
-                  ? 'Được đề xuất dựa trên sở thích của bạn trong danh mục này' 
-                  : 'Được đề xuất dựa trên lịch sử học tập và sở thích của bạn'}
+                {categoryId
+                  ? "Được đề xuất dựa trên sở thích của bạn trong danh mục này"
+                  : "Được đề xuất dựa trên lịch sử học tập và sở thích của bạn"}
               </p>
             </div>
           </div>
@@ -257,8 +293,8 @@ const RecommendedCoursesComponent = ({ categoryId }) => {
               onClick={scrollLeft}
               className={`p-3 rounded-md transition-all duration-300 ${
                 isLeftVisible
-                  ? 'bg-white shadow-lg hover:shadow-xl text-gray-800 hover:bg-indigo-50'
-                  : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                  ? "bg-white shadow-lg hover:shadow-xl text-gray-800 hover:bg-indigo-50"
+                  : "bg-gray-200 text-gray-400 cursor-not-allowed"
               }`}
               disabled={!isLeftVisible}
             >
@@ -268,8 +304,8 @@ const RecommendedCoursesComponent = ({ categoryId }) => {
               onClick={scrollRight}
               className={`p-3 rounded-md transition-all duration-300 ${
                 isRightVisible
-                  ? 'bg-white shadow-lg hover:shadow-xl text-gray-800 hover:bg-indigo-50'
-                  : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                  ? "bg-white shadow-lg hover:shadow-xl text-gray-800 hover:bg-indigo-50"
+                  : "bg-gray-200 text-gray-400 cursor-not-allowed"
               }`}
               disabled={!isRightVisible}
             >
@@ -287,21 +323,25 @@ const RecommendedCoursesComponent = ({ categoryId }) => {
           transition={{ duration: 0.5 }}
           onScroll={checkScroll}
           style={{
-            scrollbarWidth: 'none',
-            msOverflowStyle: 'none',
-            WebkitOverflowScrolling: 'touch'
+            scrollbarWidth: "none",
+            msOverflowStyle: "none",
+            WebkitOverflowScrolling: "touch",
           }}
         >
           {courses.map((course, index) => (
             <Link
-            to={`/course/${encodeId(course.courseId)}`}
-            key={index}
+              to={`/course/${encodeId(course.courseId)}`}
+              key={index}
               className="flex-none w-[300px] bg-white rounded-md shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group"
             >
               {/* Course Image */}
               <div className="relative h-[180px] overflow-hidden">
                 <img
-                  src={course.thumbnail || course.imageUrls?.[0] || "/default-course-image.jpg"}
+                  src={
+                    course.thumbnail ||
+                    course.imageUrls?.[0] ||
+                    "/default-course-image.jpg"
+                  }
                   alt={course.title}
                   className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-300"
                 />
@@ -313,10 +353,14 @@ const RecommendedCoursesComponent = ({ categoryId }) => {
                     </span>
                   )}
                   {course.tag && (
-                    <span className={`flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-full ${
-                      course.tag === 'Bestseller' ? 'bg-yellow-500 text-white' : 'bg-orange-500 text-white'
-                    }`}>
-                      {course.tag === 'Bestseller' ? (
+                    <span
+                      className={`flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-full ${
+                        course.tag === "Bestseller"
+                          ? "bg-yellow-500 text-white"
+                          : "bg-orange-500 text-white"
+                      }`}
+                    >
+                      {course.tag === "Bestseller" ? (
                         <Trophy className="w-3 h-3" />
                       ) : (
                         <Flame className="w-3 h-3" />
@@ -325,7 +369,7 @@ const RecommendedCoursesComponent = ({ categoryId }) => {
                     </span>
                   )}
                 </div>
-                {course.discount > 0 && (
+                {course.discount !== 0 && (
                   <div className="absolute top-2 right-2">
                     <span className="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">
                       -{course.discount}%
@@ -345,8 +389,12 @@ const RecommendedCoursesComponent = ({ categoryId }) => {
                 <p className="text-gray-600 mb-2 flex items-center gap-2 text-sm">
                   <Crown className="w-4 h-4 text-indigo-600" />
                   <span>
-                    {course.instructorFirstName || course.instructorName || 'Giảng viên'} 
-                    {course.instructorLastName ? ` ${course.instructorLastName}` : ''}
+                    {course.instructorFirstName ||
+                      course.instructorName ||
+                      "Giảng viên"}
+                    {course.instructorLastName
+                      ? ` ${course.instructorLastName}`
+                      : ""}
                   </span>
                 </p>
 
@@ -355,7 +403,9 @@ const RecommendedCoursesComponent = ({ categoryId }) => {
                   <span className="text-gray-900 font-bold text-lg mr-2">
                     {(course.rating || 0).toFixed(1)}
                   </span>
-                  <div className="flex gap-1">{renderStars(course.rating || 0)}</div>
+                  <div className="flex gap-1">
+                    {renderStars(course.rating || 0)}
+                  </div>
                   <span className="text-gray-500 ml-2">
                     ({course.reviews || course.numberReview || 0})
                   </span>
@@ -370,10 +420,12 @@ const RecommendedCoursesComponent = ({ categoryId }) => {
 
                 {/* Price */}
                 <div className="flex items-baseline gap-2">
-                  <span className="text-sm line-through text-gray-500">
-                    đ{course.originalPrice?.toLocaleString("vi-VN")}
-                  </span>
-                  <span className="text-xl font-bold text-indigo-600">
+                  {course.originalPrice !== course.discountedPrice && (
+                    <span className="text-sm line-through text-gray-500">
+                      đ{course.originalPrice?.toLocaleString("vi-VN")}
+                    </span>
+                  )}
+                  <span className="text-xl font-bold text-rose-600">
                     đ{course.discountedPrice.toLocaleString("vi-VN")}
                   </span>
                 </div>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Loader2, ChevronLeft, ChevronRight, Trophy, PenTool } from "lucide-react";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const StudentScores = ({ test, navigate }) => {
   const [scores, setScores] = useState([]);
@@ -17,7 +18,7 @@ const StudentScores = ({ test, navigate }) => {
     const fetchScores = async () => {
       try {
         const response = await fetch(
-          `http://localhost:8080/api/student/scores/details/tests/${test.id}`
+          `${baseUrl}/api/student/scores/details/tests/${test.id}`
         );
         if (!response.ok) {
           throw new Error("Không thể tải dữ liệu điểm số");

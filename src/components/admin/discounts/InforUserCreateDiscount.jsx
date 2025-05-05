@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const DiscountCreator = ({discountId}) => {
   const [creator, setCreator] = useState(null);
@@ -8,7 +9,7 @@ const DiscountCreator = ({discountId}) => {
   useEffect(() => {
     const token = localStorage.getItem("token");
 
-    fetch(`http://localhost:8080/api/admin/discounts/instructor/${discountId}`, {
+    fetch(`${baseUrl}/api/admin/discounts/instructor/${discountId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",

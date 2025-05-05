@@ -3,6 +3,8 @@ import axios from "axios";
 import TableCategoryAndCourses from "./tableCategoryAndCoursesInstructor";
 import Swal from "sweetalert2";
 import DiscountCreator from "../InforUserCreateDiscount";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
+
 const EditDiscount = ({ discountId, onCancel, triggerRefresh }) => {
   const [discountData, setDiscountData] = useState({
     createdBy: 1,
@@ -34,7 +36,7 @@ const EditDiscount = ({ discountId, onCancel, triggerRefresh }) => {
     const fetchDiscountData = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8080/api/admin/discounts/${discountId}`,
+          `${baseUrl}/api/admin/discounts/${discountId}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -86,7 +88,7 @@ const EditDiscount = ({ discountId, onCancel, triggerRefresh }) => {
 
       if (confirmResult.isConfirmed) {
         await axios
-          .delete(`http://localhost:8080/api/admin/discounts/${discountId}`, {
+          .delete(`${baseUrl}/api/admin/discounts/${discountId}`, {
             headers: { Authorization: `Bearer ${token}` },
           })
           .then(() => {
@@ -192,7 +194,7 @@ const EditDiscount = ({ discountId, onCancel, triggerRefresh }) => {
 
     try {
       await axios.put(
-        `http://localhost:8080/api/admin/discounts/${discountId}`,
+        `${baseUrl}/api/admin/discounts/${discountId}`,
         payload,
         {
           headers: {
@@ -229,7 +231,7 @@ const EditDiscount = ({ discountId, onCancel, triggerRefresh }) => {
 
     try {
       const response = await axios.put(
-        `http://localhost:8080/api/admin/discounts/${discountId}/status`,
+        `${baseUrl}/api/admin/discounts/${discountId}/status`,
         {
           status: newStatus,
           declinedReason: reason,

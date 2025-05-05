@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import TableCategoryAndCourses from "./tableCategoryAndCourses";
 import Swal from "sweetalert2";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const EditPromotion = ({ promotionId, onCancel, triggerRefresh }) => {
   const [promoData, setPromoData] = useState({
@@ -24,7 +25,7 @@ const EditPromotion = ({ promotionId, onCancel, triggerRefresh }) => {
       try {
         const token = localStorage.getItem("token");
         const res = await axios.get(
-          `http://localhost:8080/api/admin/promotion/${promotionId}`,
+          `${baseUrl}/api/admin/promotion/${promotionId}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         const data = res.data;
@@ -111,7 +112,7 @@ const EditPromotion = ({ promotionId, onCancel, triggerRefresh }) => {
     try {
       const token = localStorage.getItem("token");
       await axios.put(
-        `http://localhost:8080/api/admin/promotion/${promotionId}`,
+        `${baseUrl}/api/admin/promotion/${promotionId}`,
         {
           ...promoData,
           percentage: pct,
@@ -144,7 +145,7 @@ const EditPromotion = ({ promotionId, onCancel, triggerRefresh }) => {
     try {
       const token = localStorage.getItem("token");
       await axios.delete(
-        `http://localhost:8080/api/admin/promotion/${promotionId}`,
+        `${baseUrl}/api/admin/promotion/${promotionId}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       Swal.fire("Đã xóa", "Promotion đã bị xóa.", "success");

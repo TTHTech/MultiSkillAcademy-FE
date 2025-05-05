@@ -9,6 +9,8 @@ import {
   StarIcon,
   UserGroupIcon,
 } from "@heroicons/react/24/outline";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
+
 const ProfileEdit = () => {
   const token = localStorage.getItem("token");
   const userId = Number(localStorage.getItem("userId"));
@@ -47,19 +49,19 @@ const ProfileEdit = () => {
         const [courseResponse, salesResponse, reviewResponse, studentResponse] =
           await Promise.all([
             axios.get(
-              `http://localhost:8080/api/instructor/dashboard/courses/${userId}`,
+              `${baseUrl}/api/instructor/dashboard/courses/${userId}`,
               config
             ),
             axios.get(
-              `http://localhost:8080/api/instructor/dashboard/sales/${userId}`,
+              `${baseUrl}/api/instructor/dashboard/sales/${userId}`,
               config
             ),
             axios.get(
-              `http://localhost:8080/api/instructor/dashboard/reviews/${userId}`,
+              `${baseUrl}/api/instructor/dashboard/reviews/${userId}`,
               config
             ),
             axios.get(
-              `http://localhost:8080/api/instructor/dashboard/students/${userId}`,
+              `${baseUrl}/api/instructor/dashboard/students/${userId}`,
               config
             ),
           ]);
@@ -75,7 +77,7 @@ const ProfileEdit = () => {
       try {
         // Gọi API lấy thông tin giảng viên
         const instructorResponse = await axios.get(
-          `http://localhost:8080/api/instructor/user/${userId}`,
+          `${baseUrl}/api/instructor/user/${userId}`,
           {
             headers: {
               Authorization: `Bearer ${tokenLocal}`,
@@ -114,7 +116,7 @@ const ProfileEdit = () => {
     formData.append("file", file);
     try {
       const response = await fetch(
-        "http://localhost:8080/api/cloudinary/upload/image",
+        `${baseUrl}/api/cloudinary/upload/image`,
         {
           method: "POST",
           headers: {
@@ -169,7 +171,7 @@ const ProfileEdit = () => {
 
     try {
       const response = await axios.put(
-        `http://localhost:8080/api/instructor/edit-user/${userId}`,
+        `${baseUrl}/api/instructor/edit-user/${userId}`,
         updatedData,
         {
           headers: {

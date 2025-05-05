@@ -9,6 +9,7 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import { FaUserCircle, FaBook, FaTools, FaClipboardList, FaChevronLeft, FaChevronRight, FaArrowLeft, FaCheck, FaTimes } from "react-icons/fa";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 // Add CSS animations with more subtle transitions
 const animationStyles = `
@@ -514,7 +515,7 @@ const CoursesTable = () => {
     setLoading(true);
     try {
       const response = await fetch(
-        "http://localhost:8080/api/admin/courses/pending",
+        `${baseUrl}/api/admin/courses/pending`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -565,7 +566,7 @@ const CoursesTable = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:8080/api/admin/courses/${courseId}/status`,
+        `${baseUrl}/api/admin/courses/${courseId}/status`,
         {
           method: "PUT",
           headers: {
