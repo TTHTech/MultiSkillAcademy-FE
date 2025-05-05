@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { FaGithub, FaEye, FaEyeSlash } from "react-icons/fa";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 const COVER_IMAGE =
   "https://thumbs.dreamstime.com/z/online-courses-e-learning-vector-background-text-mobile-phone-s-screen-school-elements-internet-devices-home-181482059.jpg";
 const BACKGROUND_IMAGE =
@@ -17,14 +17,13 @@ const LoginForm = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/auth/login",
+        `${baseUrl}/api/auth/login`,
         {
           username,
           password,
