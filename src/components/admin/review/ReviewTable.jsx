@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Search } from "lucide-react";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const SalesTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -32,7 +33,7 @@ const SalesTable = () => {
           throw new Error("No token found, please login again.");
         }
 
-        const response = await fetch("http://localhost:8080/api/admin/sales", {
+        const response = await fetch(`${baseUrl}/api/admin/sales`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

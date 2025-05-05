@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import Swal from "sweetalert2";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const QuestionsAndAnswers = ({ courseId }) => {
   const [questions, setQuestions] = useState([]);
@@ -12,7 +13,7 @@ const QuestionsAndAnswers = ({ courseId }) => {
     const fetchQuestions = async () => {
       try {
         const response = await fetch(
-          `http://localhost:8080/api/student/questions/${courseId}`,
+          `${baseUrl}/api/student/questions/${courseId}`,
           {
             method: "GET",
             headers: {
@@ -48,7 +49,7 @@ const QuestionsAndAnswers = ({ courseId }) => {
 
     try {
       const response = await fetch(
-        `http://localhost:8080/api/student/add-answer`,
+        `${baseUrl}/api/student/add-answer`,
         {
           method: "POST",
           headers: {
@@ -84,7 +85,7 @@ const QuestionsAndAnswers = ({ courseId }) => {
 
     try {
       const response = await fetch(
-        "http://localhost:8080/api/student/add-question",
+        `${baseUrl}/api/student/add-question`,
         {
           method: "POST",
           headers: {
@@ -121,7 +122,7 @@ const QuestionsAndAnswers = ({ courseId }) => {
 
     try {
       await fetch(
-        `http://localhost:8080/api/student/delete-questions/${questionId}`,
+        `${baseUrl}/api/student/delete-questions/${questionId}`,
         {
           method: "DELETE",
           headers: {
@@ -154,7 +155,7 @@ const QuestionsAndAnswers = ({ courseId }) => {
 
     try {
       await fetch(
-        `http://localhost:8080/api/student/delete-answers/${answerId}`,
+        `${baseUrl}/api/student/delete-answers/${answerId}`,
         {
           method: "DELETE",
           headers: {

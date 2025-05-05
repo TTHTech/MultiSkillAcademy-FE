@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { FaEnvelope } from "react-icons/fa";
 import "react-toastify/dist/ReactToastify.css";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const BACKGROUND_IMAGE = "https://toigingiuvedep.vn/wp-content/uploads/2021/02/background-may-dep-cho-khai-giang.jpg";
 
@@ -20,7 +21,7 @@ const ForgotPassForm = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/auth/forgot-password", 
+        `${baseUrl}/api/auth/forgot-password`, 
         { email }
       );
 

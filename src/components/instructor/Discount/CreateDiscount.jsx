@@ -2,6 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import TableCategoryAndCourses from "./tableCategoryAndCoursesCreate";
 import Swal from "sweetalert2";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const CreateDiscount = () => {
   const [discountData, setDiscountData] = useState({
@@ -134,7 +135,7 @@ const CreateDiscount = () => {
 
     try {
       await axios.post(
-        "http://localhost:8080/api/instructor/discounts",
+        `${baseUrl}/api/instructor/discounts`,
         payload,
         {
           headers: {

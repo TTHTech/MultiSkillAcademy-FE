@@ -19,6 +19,7 @@ import {
 } from "react-icons/fa";
 import SupplementaryLectures from "./SupplementaryLectures";
 import { decodeId } from '../../../utils/hash';
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const CustomVideoPlayer = ({
   videoRef,
@@ -261,7 +262,7 @@ const MainContent = ({
 
           const userId = localStorage.getItem("userId");
           const response = await fetch(
-            `http://localhost:8080/api/student/lecture-progress/${id}/${selectedLecture.lecture_id}`,
+            `${baseUrl}/api/student/lecture-progress/${id}/${selectedLecture.lecture_id}`,
             {
               method: "GET",
               headers: {
@@ -337,7 +338,7 @@ const MainContent = ({
   // Gửi API để cập nhật tiến độ
   const updateProgressAPI = async (newProgress, currentTime) => {
     try {
-      await fetch("http://localhost:8080/api/student/update-progress", {
+      await fetch(`${baseUrl}/api/student/update-progress`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

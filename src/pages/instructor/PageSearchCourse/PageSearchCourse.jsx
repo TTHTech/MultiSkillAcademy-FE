@@ -3,6 +3,7 @@ import Sidebar from "../../../components/instructor/Sidebar/Sidebar";
 import TableCourse from "../../../components/instructor/SearchCourse/TableCourse";
 import FilterCourse from "../../../components/instructor/SearchCourse/FilterCourse";
 import axios from "axios";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const PageSearchCourse = () => {
   const [open, setOpen] = useState(true);
@@ -18,7 +19,7 @@ const PageSearchCourse = () => {
     const fetchCourses = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8080/api/instructor/course-table/${userId}`,
+          `${baseUrl}/api/instructor/course-table/${userId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

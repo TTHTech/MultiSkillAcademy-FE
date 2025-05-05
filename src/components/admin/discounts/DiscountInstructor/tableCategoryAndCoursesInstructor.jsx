@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const TableCategoryAndCourses = ({
   applicableCategories,
@@ -23,7 +24,7 @@ const TableCategoryAndCourses = ({
     const token = localStorage.getItem("token");
     setLoading(true);
     axios
-      .get("http://localhost:8080/api/admin/discounts/categories", {
+      .get(`${baseUrl}/api/admin/discounts/categories`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
@@ -40,7 +41,7 @@ const TableCategoryAndCourses = ({
     const token = localStorage.getItem("token");
     setLoading(true);
     axios
-      .get("http://localhost:8080/api/admin/discounts/courses", {
+      .get(`${baseUrl}/api/admin/discounts/courses`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {

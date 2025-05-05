@@ -2,8 +2,9 @@ import React, { useEffect, useState, useMemo } from "react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { motion, AnimatePresence } from "framer-motion";
 import { Calendar, TrendingUp, DollarSign, LineChart as ChartIcon, ChevronDown, AlertCircle } from 'lucide-react';
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
-const API_URL = "http://localhost:8080/api/admin/stats";
+const API_URL = `${baseUrl}/api/admin/stats`;
 
 const MONTHS = [
   "Jan", "Feb", "Mar", "Apr", "May", "Jun",

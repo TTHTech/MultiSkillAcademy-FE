@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import EditDiscount from "./editDiscountAdmin";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const DiscountsTable = () => {
   const [discounts, setDiscounts] = useState([]);
@@ -46,7 +47,7 @@ const DiscountsTable = () => {
     const fetchDiscounts = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:8080/api/admin/discounts",
+          `${baseUrl}/api/admin/discounts`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }

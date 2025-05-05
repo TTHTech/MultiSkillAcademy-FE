@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Send, Paperclip, Image, FileText, Video, X, Smile } from 'lucide-react';
 import { toast } from 'react-toastify';
 import EmojiPicker from 'emoji-picker-react';
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const InstructorChatInput = ({ chatId, addMessage, setIsTyping, disabled }) => {
   const [message, setMessage] = useState('');
@@ -127,7 +128,7 @@ const InstructorChatInput = ({ chatId, addMessage, setIsTyping, disabled }) => {
       formData.append('file', file);
       formData.append('type', fileType);
       
-      console.log("Uploading file to endpoint:", `http://localhost:8080/api/instructor/chat/${chatId}/upload`);
+      console.log("Uploading file to endpoint:", `${baseUrl}/api/instructor/chat/${chatId}/upload`);
       console.log("File type:", fileType);
       console.log("File size:", file.size);
       
@@ -164,7 +165,7 @@ const InstructorChatInput = ({ chatId, addMessage, setIsTyping, disabled }) => {
         });
         
         // Use instructor API
-        xhr.open('POST', `http://localhost:8080/api/instructor/chat/${chatId}/upload`);
+        xhr.open('POST', `${baseUrl}/api/instructor/chat/${chatId}/upload`);
         xhr.setRequestHeader('Authorization', `Bearer ${token}`);
         xhr.send(formData);
       });

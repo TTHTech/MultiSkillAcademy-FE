@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Search, MoreHorizontal, Edit, Filter, UserPlus } from "lucide-react";
 import { toast } from "react-toastify";
 import axios from "axios";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const ChatSidebar = ({ onUserSelect }) => {
   const [chatUsers, setChatUsers] = useState([]);
@@ -25,7 +26,7 @@ const ChatSidebar = ({ onUserSelect }) => {
         throw new Error("Vui lòng đăng nhập lại");
       }
 
-      const response = await fetch(`http://localhost:8080/api/student/chat/users/${userId}/avatar`, {
+      const response = await fetch(`${baseUrl}/api/student/chat/users/${userId}/avatar`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -74,7 +75,7 @@ const ChatSidebar = ({ onUserSelect }) => {
         throw new Error("Vui lòng đăng nhập lại");
       }
 
-      const response = await fetch("http://localhost:8080/api/student/chat/users", {
+      const response = await fetch(`${baseUrl}/api/student/chat/users`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -108,7 +109,7 @@ const ChatSidebar = ({ onUserSelect }) => {
       }
 
       // Chuẩn bị URL với các tham số tìm kiếm
-      const url = new URL("http://localhost:8080/api/student/chat/search-users");
+      const url = new URL(`${baseUrl}/api/student/chat/search-users`);
       if (keyword) url.searchParams.append("keyword", keyword);
       if (role && role !== "ALL") url.searchParams.append("role", role);
 
@@ -146,7 +147,7 @@ const ChatSidebar = ({ onUserSelect }) => {
       // Cố gắng tìm cuộc trò chuyện hiện có trước
       try {
         const response = await fetch(
-          `http://localhost:8080/api/student/chat/one-to-one/${user.userId}`,
+          `${baseUrl}/api/student/chat/one-to-one/${user.userId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -197,7 +198,7 @@ const ChatSidebar = ({ onUserSelect }) => {
       };
       
       const response = await axios.post(
-        "http://localhost:8080/api/student/chat", 
+        `${baseUrl}/api/student/chat`,
         chatRequest,
         {
           headers: {
@@ -230,7 +231,7 @@ const ChatSidebar = ({ onUserSelect }) => {
         if (!user) {
           try {
             const userResponse = await axios.get(
-              `http://localhost:8080/api/student/chat/users/${recipientId}`,
+              `${baseUrl}/api/student/chat/users/${recipientId}`,
               {
                 headers: {
                   Authorization: `Bearer ${token}`

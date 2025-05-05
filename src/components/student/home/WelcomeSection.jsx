@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { UserCircle } from 'lucide-react';
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const DEFAULT_PROFILE_IMAGE = "https://lh3.googleusercontent.com/IUCQIQksFr7qJDlXK43uhIUwvDt_tpLSNiumv8bFESGLs6wekNyBDdNMyzeFwqgTe-l5vG6RSMvnUek=w544-h544-l90-rj";
 
@@ -22,7 +23,7 @@ const WelcomeSection = () => {
         }
 
         const response = await fetch(
-          `http://localhost:8080/api/student/profile/${userId}`,
+          `${baseUrl}/api/student/profile/${userId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

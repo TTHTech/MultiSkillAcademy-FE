@@ -3,6 +3,7 @@ import axios from "axios";
 import Sidebar from "../../../components/instructor/Sidebar/Sidebar";
 import { FileText, Star } from "lucide-react";
 import Swal from "sweetalert2";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const InstructorReviews = () => {
   const [reviews, setReviews] = useState([]);
@@ -24,7 +25,7 @@ const InstructorReviews = () => {
     const fetchReviews = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8080/api/instructor/reviews/${userId}`,
+          `${baseUrl}/api/instructor/reviews/${userId}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setReviews(response.data);
@@ -38,7 +39,7 @@ const InstructorReviews = () => {
     const fetchCourse = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8080/api/instructor/${userId}`,
+          `${baseUrl}/api/instructor/${userId}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setCourses(response.data);
@@ -149,7 +150,7 @@ const InstructorReviews = () => {
 
     try {
       await axios.post(
-        `http://localhost:8080/api/instructor/reviews/${userId}/report`,
+        `${baseUrl}/api/instructor/reviews/${userId}/report`,
         {
           idUserReport: userId,
           review_id: review.id ?? review.reviewId ?? review.review_id,

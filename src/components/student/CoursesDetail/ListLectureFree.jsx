@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import { X, Play, Video, AlertCircle, Loader } from 'lucide-react';
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const LoadingScreen = () => (
   <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex justify-center items-center z-50">
@@ -99,7 +100,7 @@ const ListLectureFree = ({ onClose }) => {
         if (!courseId) throw new Error("Không tìm thấy mã khóa học.");
 
         const response = await axios.get(
-          `http://localhost:8080/api/student/lectures/${courseId}`
+          `${baseUrl}/api/student/lectures/${courseId}`
         );
 
         if (Array.isArray(response.data) && response.data.length > 0) {

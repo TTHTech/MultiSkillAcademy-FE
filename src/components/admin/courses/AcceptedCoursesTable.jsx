@@ -12,6 +12,7 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import { FaUserCircle, FaBook, FaTools, FaClipboardList, FaChevronLeft, FaChevronRight, FaArrowLeft } from "react-icons/fa";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 // Add CSS animations with more subtle transitions
 const animationStyles = `
@@ -482,7 +483,7 @@ const AcceptedCoursesTable = () => {
     setLoading(true);
     try {
       const response = await fetch(
-        "http://localhost:8080/api/admin/courses/active",
+        `${baseUrl}/api/admin/courses/active`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -546,7 +547,7 @@ const AcceptedCoursesTable = () => {
 
     try {
       const response = await fetch(
-        "http://localhost:8080/api/admin/emails/send",
+        `${baseUrl}/api/admin/emails/send`,
         {
           method: "POST",
           headers: {
@@ -581,7 +582,7 @@ const AcceptedCoursesTable = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:8080/api/admin/courses/${courseId}/status`,
+        `${baseUrl}/api/admin/courses/${courseId}/status`,
         {
           method: "PUT",
           headers: {

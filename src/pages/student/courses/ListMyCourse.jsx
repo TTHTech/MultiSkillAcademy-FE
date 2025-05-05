@@ -3,6 +3,8 @@ import axios from "axios";
 import CoursesList from "../../../components/student/Enrollment/StudentCourseList";
 import NavBar from "../../../components/student/common/NavBar";
 import Footer from "../../../components/student/common/Footer";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
+
 const userId = Number(localStorage.getItem("userId"));
 const CoursesPage = () => {
   const [courses, setCourses] = useState([]);
@@ -17,7 +19,7 @@ const CoursesPage = () => {
     const fetchCourses = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8080/api/student/enrollments/${userId}`
+          `${baseUrl}/api/student/enrollments/${userId}`
         );
         setCourses(response.data);
         setFilteredCourses(response.data);

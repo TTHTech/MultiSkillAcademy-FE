@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { encodeId } from '../../../utils/hash';
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const TopPythonCoursesSection = () => {
   const [courses, setCourses] = useState([]);
@@ -26,7 +27,7 @@ const TopPythonCoursesSection = () => {
       try {
         setLoading(true);
         const response = await axios.get(
-          "http://localhost:8080/api/student/courses/python"
+          `${baseUrl}/api/student/courses/python`
         );
         const shuffledCourses = response.data.sort(() => 0.5 - Math.random());
         const updatedCourses = shuffledCourses.map((course) => {

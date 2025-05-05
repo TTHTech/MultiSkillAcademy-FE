@@ -6,6 +6,7 @@ import CourseSearchList from '../../../components/student/search/CourseSearchLis
 import CourseFilter from '../../../components/student/category/CourseFilter';
 import axios from 'axios';
 import debounce from 'lodash.debounce';
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const SearchCoursePage = () => {
   const location = useLocation(); // Lấy query từ URL
@@ -28,7 +29,7 @@ const SearchCoursePage = () => {
   
       try {
         setLoading(true);
-        const response = await axios.get('http://localhost:8080/api/student/courses/search', {
+        const response = await axios.get(`${baseUrl}/api/student/courses/search`, {
           params: { query },
         });
   

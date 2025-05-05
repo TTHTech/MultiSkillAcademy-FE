@@ -7,6 +7,7 @@ import {
   X
 } from 'lucide-react';
 import { toast } from 'react-toastify';
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const AddNotification = () => {
   const [formData, setFormData] = useState({
@@ -24,7 +25,7 @@ const AddNotification = () => {
         throw new Error("No token found, please login first.");
       }
 
-      const response = await fetch("http://localhost:8080/api/admin/notifications", {
+      const response = await fetch(`${baseUrl}/api/admin/notifications`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 import { FiEdit, FiTrash2 } from "react-icons/fi";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const SupplementaryLectures = ({ courseId }) => {
   const [lectures, setLectures] = useState([]);
@@ -59,7 +60,7 @@ const SupplementaryLectures = ({ courseId }) => {
     formData.append("file", file);
     try {
       const response = await fetch(
-        "http://localhost:8080/api/cloudinary/upload/video",
+        `${baseUrl}/api/cloudinary/upload/video`,
         {
           method: "POST",
           headers: {
@@ -82,7 +83,7 @@ const SupplementaryLectures = ({ courseId }) => {
     formData.append("file", file);
     try {
       const response = await fetch(
-        "http://localhost:8080/api/cloudinary/upload/pdf",
+        `${baseUrl}/api/cloudinary/upload/pdf`,
         {
           method: "POST",
           headers: {
@@ -113,7 +114,7 @@ const SupplementaryLectures = ({ courseId }) => {
     formData.append("file", file);
     try {
       const response = await fetch(
-        "http://localhost:8080/api/cloudinary/upload/raw",
+        `${baseUrl}/api/cloudinary/upload/raw`,
         {
           method: "POST",
           headers: {
@@ -180,7 +181,7 @@ const SupplementaryLectures = ({ courseId }) => {
       };
 
       await axios.post(
-        `http://localhost:8080/api/instructor/supplementary/courses/${courseId}/lectures`,
+        `${baseUrl}/api/instructor/supplementary/courses/${courseId}/lectures`,
         newLectureData,
         {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
@@ -272,7 +273,7 @@ const SupplementaryLectures = ({ courseId }) => {
       };
 
       await axios.put(
-        `http://localhost:8080/api/instructor/supplementary/lectures/${lectureToEdit.lecture_id}`,
+        `${baseUrl}/api/instructor/supplementary/lectures/${lectureToEdit.lecture_id}`,
         updatedLectureData,
         {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
@@ -317,7 +318,7 @@ const SupplementaryLectures = ({ courseId }) => {
       });
       if (confirm.isConfirmed) {
         await axios.delete(
-          `http://localhost:8080/api/instructor/supplementary/lectures/${lecture_id}`,
+          `${baseUrl}/api/instructor/supplementary/lectures/${lecture_id}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -345,7 +346,7 @@ const SupplementaryLectures = ({ courseId }) => {
     try {
       setIsLoading(true);
       const response = await axios.get(
-        `http://localhost:8080/api/instructor/supplementary/courses/${courseId}/lectures`,
+        `${baseUrl}/api/instructor/supplementary/courses/${courseId}/lectures`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setLectures(response.data);

@@ -2,6 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import TableCategoryAndCourses from "./tableCategoryAndCourses";
 import Swal from "sweetalert2";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const CreatePromotion = () => {
   const [promoData, setPromoData] = useState({
@@ -100,7 +101,7 @@ const CreatePromotion = () => {
     };
 
     try {
-      await axios.post("http://localhost:8080/api/admin/promotion", payload, {
+      await axios.post(`${baseUrl}/api/admin/promotion`, payload, {
         headers: { Authorization: `Bearer ${token}` },
       });
       Swal.fire("Thành công", "Promotion đã được tạo!", "success");

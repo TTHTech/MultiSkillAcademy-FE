@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { X } from "lucide-react";
 import InstructorRevenueList from "./InstructorRevenueList";
 import InstructorRevenueDetail from "./InstructorRevenueDetail";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 // Error boundary component
 class ErrorBoundary extends React.Component {
@@ -102,7 +103,7 @@ const AdminInstructorRevenueContainer = () => {
       const apiPage = Math.max(0, page - 1);
       
       const response = await fetch(
-        `http://localhost:8080/api/admin/instructor-revenues?page=${apiPage}&size=${itemsPerPage}`,
+        `${baseUrl}/api/admin/instructor-revenues?page=${apiPage}&size=${itemsPerPage}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -168,7 +169,7 @@ const AdminInstructorRevenueContainer = () => {
       const currentMonth = currentDate.getMonth() + 1; // JavaScript months are 0-indexed
       
       const response = await fetch(
-        `http://localhost:8080/api/admin/instructor-revenues/calculate?month=${currentMonth}&year=${selectedYear}`,
+        `${baseUrl}/api/admin/instructor-revenues/calculate?month=${currentMonth}&year=${selectedYear}`,
         {
           method: "POST",
           headers: {
@@ -216,7 +217,7 @@ const AdminInstructorRevenueContainer = () => {
       }
       
       const response = await fetch(
-        `http://localhost:8080/api/admin/instructor-revenues/${instructorId}`,
+        `${baseUrl}/api/admin/instructor-revenues/${instructorId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -263,7 +264,7 @@ const AdminInstructorRevenueContainer = () => {
       }
       
       const response = await fetch(
-        `http://localhost:8080/api/admin/instructor-revenues/${instructorId}/monthly?year=${selectedYear}`,
+        `${baseUrl}/api/admin/instructor-revenues/${instructorId}/monthly?year=${selectedYear}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

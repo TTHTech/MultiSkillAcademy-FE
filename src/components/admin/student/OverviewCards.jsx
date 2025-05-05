@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios"; // Import axios
 import { UserCheck, UserPlus, UsersIcon, UserX } from "lucide-react";
 import { motion } from "framer-motion";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const StatCard = ({ name, icon: Icon, value, color }) => {
   return (
@@ -47,7 +48,7 @@ const OverviewCards = () => {
     }
 
     axios
-      .get("http://localhost:8080/api/admin/students/stats", {
+      .get(`${baseUrl}/api/admin/students/stats`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

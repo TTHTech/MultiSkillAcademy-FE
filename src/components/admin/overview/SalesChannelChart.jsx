@@ -12,9 +12,10 @@ import {
 } from "recharts";
 import { useState, useEffect, useMemo } from "react";
 import { Loader2, RefreshCcw, TrendingUp, AlertCircle, BarChart3 } from "lucide-react";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 // Constants
-const API_URL = "http://localhost:8080/api/admin/stats";
+const API_URL = `${baseUrl}/api/admin/stats`;
 
 // Enhanced professional color palette
 const COLORS = {

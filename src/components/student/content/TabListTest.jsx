@@ -4,6 +4,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Loader2, Clock, FileText, ChevronLeft } from "lucide-react";
 import StudentScores from "./ViewListTestScores";
 import { decodeId } from '../../../utils/hash';
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const TabListTest = () => {
   const [tests, setTests] = useState([]);
@@ -18,7 +19,7 @@ const TabListTest = () => {
     const fetchTests = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8080/api/student/course/tests/${id}`
+          `${baseUrl}/api/student/course/tests/${id}`
         );
         setTests(response.data);
       } catch (err) {

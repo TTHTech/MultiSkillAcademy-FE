@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Eye, EyeOff, Lock, Key, RefreshCw } from "lucide-react";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const Alert = ({ variant = "default", children }) => (
   <div className={`p-4 rounded-lg mb-4 ${
@@ -82,7 +83,7 @@ const ChangePassword = () => {
       }
 
       const response = await fetch(
-        `http://localhost:8080/api/auth/change-password/${userId}`,
+        `${baseUrl}/api/auth/change-password/${userId}`,
         {
           method: "POST",
           headers: {

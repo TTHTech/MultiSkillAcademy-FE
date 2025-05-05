@@ -25,6 +25,7 @@ import {
   Users
 } from "lucide-react";
 import { toast } from 'react-toastify';
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 // ============= NotificationHeader Component =============
 const NotificationHeader = ({ notificationCount, showFilters, setShowFilters, searchTerm, setSearchTerm, onRefresh }) => {
@@ -561,7 +562,7 @@ const NotificationList = () => {
         throw new Error("Không tìm thấy token đăng nhập");
       }
 
-      const response = await fetch("http://localhost:8080/api/admin/notifications", {
+      const response = await fetch(`${baseUrl}/api/admin/notifications`, {
         headers: {
           "Authorization": `Bearer ${token}`,
           "Content-Type": "application/json"

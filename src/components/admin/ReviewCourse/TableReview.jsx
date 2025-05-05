@@ -4,6 +4,7 @@ import {
   Trash2, Star, StarHalf, User, Book, MessageSquare, Calendar, 
   Search, Filter, ChevronDown, ChevronUp, AlertTriangle
 } from "lucide-react";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const TableReview = ({ reviews, onDeleteReview, triggerRefresh }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -45,7 +46,7 @@ const TableReview = ({ reviews, onDeleteReview, triggerRefresh }) => {
         setIsLoading(true);
         
         const response = await fetch(
-          `http://localhost:8080/api/admin/reviews/${review.reviewId}`,
+          `${baseUrl}/api/admin/reviews/${review.reviewId}`,
           {
             method: "DELETE",
             headers: {

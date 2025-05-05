@@ -11,6 +11,7 @@ import {
 } from "react-icons/fa";
 import axios from "axios";
 import Swal from "sweetalert2";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const CourseCard = ({
   courseId,
@@ -92,7 +93,7 @@ const CourseCard = ({
         if (!token) throw new Error("No token found, please login first.");
 
         const response = await fetch(
-          `http://localhost:8080/api/instructor/user/${userId}`,
+          `${baseUrl}/api/instructor/user/${userId}`,
           {
             method: "GET",
             headers: {
@@ -158,7 +159,7 @@ const CourseCard = ({
     }
     try {
       const response = await axios.put(
-        `http://localhost:8080/api/instructor/changeStatus/${courseId}`,
+        `${baseUrl}/api/instructor/changeStatus/${courseId}`,
         {},
         {
           headers: {
@@ -200,7 +201,7 @@ const CourseCard = ({
     const coursesId = courseId;
     try {
       const response = await fetch(
-        `http://localhost:8080/api/instructor/delete-course/${coursesId}`,
+        `${baseUrl}/api/instructor/delete-course/${coursesId}`,
         {
           method: "DELETE",
           headers: {

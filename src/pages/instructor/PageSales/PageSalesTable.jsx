@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const PageSalesTable = () => {
   // Lấy token và userId từ localStorage
@@ -14,7 +15,7 @@ const PageSalesTable = () => {
       try {
         // Gọi API với endpoint cụ thể cho dữ liệu bảng bán hàng
         const response = await axios.get(
-          `http://localhost:8080/api/instructor/dashboard/total-sales/${userId}`,
+          `${baseUrl}/api/instructor/dashboard/total-sales/${userId}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }

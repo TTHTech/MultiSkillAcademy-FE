@@ -4,6 +4,7 @@ import UpdateStudyReminder from "./UpdateStudyReminder";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import { decodeId } from '../../../utils/hash';
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const StudyReminderList = () => {
   const [reminders, setReminders] = useState([]);
@@ -22,7 +23,7 @@ const StudyReminderList = () => {
   useEffect(() => {
     if (userId) {
       fetch(
-        `http://localhost:8080/api/student/reminders/user/${userId}/course/${id}`
+        `${baseUrl}/api/student/reminders/user/${userId}/course/${id}`
       )
         .then((response) => response.json())
         .then((data) => {
@@ -48,7 +49,7 @@ const StudyReminderList = () => {
     if (window.confirm("Bạn có chắc chắn muốn xóa nhắc nhở này?")) {
       try {
         await axios.delete(
-          `http://localhost:8080/api/student/reminders/${reminderId}`
+          `${baseUrl}/api/student/reminders/${reminderId}`
         );
         setReminders(
           reminders.filter((reminder) => reminder.id !== reminderId)
@@ -97,7 +98,7 @@ const StudyReminderList = () => {
   const changeActive = async (reminderId) => {
     try {
       const response = await axios.patch(
-        `http://localhost:8080/api/student/reminders/${reminderId}/status`
+        `${baseUrl}/api/student/reminders/${reminderId}/status`
       );
 
       console.log(response.data);

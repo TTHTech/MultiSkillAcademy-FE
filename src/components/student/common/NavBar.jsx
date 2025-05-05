@@ -7,6 +7,8 @@ import ProfileMenu from "../../../components/student/profile/ProfileMenu";
 import NotificationList from "../../../components/student/notification/NotificationList";
 // Import Logo component
 import Logo from "../../../components/student/common/Logo";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
+
 const Navbar = () => {
   const [isMenuOpen, setMenuOpen] = useState(false);
   const [categories, setCategories] = useState([]);
@@ -25,7 +27,7 @@ const Navbar = () => {
     const fetchCategories = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:8080/api/student/categories"
+          `${baseUrl}/api/student/categories`
         );
         setCategories(response.data);
       } catch (error) {
@@ -42,7 +44,7 @@ const Navbar = () => {
         if (!token) return;
 
         const response = await axios.get(
-          "http://localhost:8080/api/student/cart/count",
+          `${baseUrl}/api/student/cart/count`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -90,7 +92,7 @@ const Navbar = () => {
     try {
       setLoadingSuggestions(true);
       const response = await axios.get(
-        "http://localhost:8080/api/student/courses/suggestions",
+        `${baseUrl}/api/student/courses/suggestions`,
         {
           params: { query },
         }

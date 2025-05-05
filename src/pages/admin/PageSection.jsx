@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import TableSection from "../../components/admin/Section/TableSection";
 import FilterSection from "../../components/admin/Section/FilterSection";
 import Header from "../../components/admin/common/Header";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const PageSection = () => {
   const [sections, setSections] = useState([]);
@@ -17,7 +18,7 @@ const PageSection = () => {
       setLoading(true);
       try {
         const response = await fetch(
-          "http://localhost:8080/api/admin/section",
+          `${baseUrl}/api/admin/section`,
           {
             headers: {
               "Content-Type": "application/json",

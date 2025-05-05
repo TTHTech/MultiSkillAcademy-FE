@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { BookOpen, Users, Tag, DollarSign, TrendingUp, TrendingDown, AlertCircle, RefreshCcw } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 // Enhanced loading skeleton with more professional appearance
 const LoadingSkeleton = () => {
@@ -131,7 +132,7 @@ const OverviewCards = () => {
         throw new Error("Authentication token not found. Please login again.");
       }
 
-      const response = await axios.get("http://localhost:8080/api/admin/stats", {
+      const response = await axios.get(`${baseUrl}/api/admin/stats`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const TargetAudience = () => {
   const { id } = useParams();
@@ -16,7 +17,7 @@ const TargetAudience = () => {
     const fetchCourse = async () => {
       try {
         const response = await fetch(
-          `http://localhost:8080/api/instructor/courses/${id}`,
+          `${baseUrl}/api/instructor/courses/${id}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -62,7 +63,7 @@ const TargetAudience = () => {
 
     try {
       await axios.put(
-        `http://localhost:8080/api/instructor/update-course-detail/${course.courseId}`,
+        `${baseUrl}/api/instructor/update-course-detail/${course.courseId}`,
         instructorCoursesDetailDTO,
         {
           headers: {

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import Swal from "sweetalert2";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const ManageFreeLectures = () => {
   const { id: courseId } = useParams();
@@ -22,7 +23,7 @@ const ManageFreeLectures = () => {
       try {
         setIsLoading(true);
         const response = await axios.get(
-          `http://localhost:8080/api/instructor/lectures-free/${courseId}`,
+          `${baseUrl}/api/instructor/lectures-free/${courseId}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setLectures(response.data);
@@ -39,7 +40,7 @@ const ManageFreeLectures = () => {
     formData.append("file", file);
     try {
       const response = await fetch(
-        "http://localhost:8080/api/cloudinary/upload/video",
+        `${baseUrl}/api/cloudinary/upload/video`,
         {
           method: "POST",
           headers: {
@@ -80,7 +81,7 @@ const ManageFreeLectures = () => {
       setIsLoading(true);
       const uploadedUrl = await handleUpload(newLectureFile);
       const response = await axios.post(
-        `http://localhost:8080/api/instructor/lectures-free`,
+        `${baseUrl}/api/instructor/lectures-free`,
         { ...newLecture, videoUrl: uploadedUrl, courseId },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -129,7 +130,7 @@ const ManageFreeLectures = () => {
         updatedVideoUrl = await handleUpload(editLectureFile);
       }
       const response = await axios.put(
-        `http://localhost:8080/api/instructor/lectures-free`,
+        `${baseUrl}/api/instructor/lectures-free`,
         { id, title: editLectureData.title, videoUrl: updatedVideoUrl },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -169,7 +170,7 @@ const ManageFreeLectures = () => {
     try {
       setIsLoading(true);
       await axios.delete(
-        `http://localhost:8080/api/instructor/lectures-free/${id}`,
+        `${baseUrl}/api/instructor/lectures-free/${id}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setLectures(lectures.filter((lecture) => lecture.id !== id));

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const CartSummary = () => {
   const [totalAmount, setTotalAmount] = useState(null);
@@ -13,7 +14,7 @@ const CartSummary = () => {
   const fetchTotalAmount = async (appliedCoupon = "") => {
     try {
       const token = localStorage.getItem("token");
-      let url = "http://localhost:8080/api/student/cart/total";
+      let url = `${baseUrl}/api/student/cart/total`;
       if (appliedCoupon) {
         url += `?couponCode=${appliedCoupon}`;
       }
@@ -34,7 +35,7 @@ const CartSummary = () => {
       const token = localStorage.getItem("token");
       const userId = localStorage.getItem("userId");
       const response = await axios.get(
-        `http://localhost:8080/api/student/cart/course-apply-promotion/${userId}`,
+        `${baseUrl}/api/student/cart/course-apply-promotion/${userId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -52,7 +53,7 @@ const CartSummary = () => {
       const token = localStorage.getItem("token");
       const userId = localStorage.getItem("userId");
       await axios.post(
-        `http://localhost:8080/api/student/discount-usage/applyDiscount?userId=${userId}&codeDiscount=${coupon}`,
+        `${baseUrl}/api/student/discount-usage/applyDiscount?userId=${userId}&codeDiscount=${coupon}`,
         null,
         {
           headers: {
@@ -77,7 +78,7 @@ const CartSummary = () => {
     try {
       const requests = validCourses.map(item => {
         return axios.post(
-          'http://localhost:8080/api/student/promotion/applyPromotion',
+          `${baseUrl}/api/student/promotion/applyPromotion`,
           null,
           {
             params: {
@@ -106,7 +107,7 @@ const CartSummary = () => {
       const token = localStorage.getItem("token");
       const userId = localStorage.getItem("userId");
       const response = await axios.post(
-        `http://localhost:8080/api/student/discount-usage/check/${coupon}/${userId}`,
+        `${baseUrl}/api/student/discount-usage/check/${coupon}/${userId}`,
         null,
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -171,7 +172,7 @@ const CartSummary = () => {
       handleApplyPromotionUsage();
 
       const response = await axios.get(
-        `http://localhost:8080/api/student/vn-pay?totalAmount=${totalAmount}&couponCode=${coupon}`,
+        `${baseUrl}/api/student/vn-pay?totalAmount=${totalAmount}&couponCode=${coupon}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }

@@ -3,6 +3,7 @@ import axios from "axios";
 import Sidebar from "../../../components/instructor/Sidebar/Sidebar";
 import TestDetailsModal from "./TestDetailsModal";
 import AddTestForm from "./AddTestForm";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const TestList = () => {
   const [courses, setCourses] = useState([]);
@@ -17,7 +18,7 @@ const TestList = () => {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:8080/api/instructor/${userId}`, {
+      .get(`${baseUrl}/api/instructor/${userId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -28,7 +29,7 @@ const TestList = () => {
         const courseIds = response.data.map((course) => course.courseId);
         const testPromises = courseIds.map((courseId) =>
           axios.get(
-            `http://localhost:8080/api/instructor/course/test/${courseId}`,
+            `${baseUrl}/api/instructor/course/test/${courseId}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -79,7 +80,7 @@ const TestList = () => {
 
   const handleViewTestDetails = (testId) => {
     axios
-      .get(`http://localhost:8080/api/instructor/test/${testId}`, {
+      .get(`${baseUrl}/api/instructor/test/${testId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

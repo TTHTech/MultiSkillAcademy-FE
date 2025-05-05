@@ -5,6 +5,7 @@ import {
   LineChart, Line, BarChart, Bar, PieChart, Pie, XAxis, YAxis, CartesianGrid, 
   Tooltip as RechartsTooltip, Legend, ResponsiveContainer, Cell 
 } from 'recharts';
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 // Error boundary component
 class ErrorBoundary extends React.Component {
@@ -93,7 +94,7 @@ const AdminRevenueDashboard = () => {
       }
 
       const response = await fetch(
-        "http://localhost:8080/api/admin/revenue-reports/dashboard",
+        `${baseUrl}/api/admin/revenue-reports/dashboard`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -137,7 +138,7 @@ const AdminRevenueDashboard = () => {
       }
       
       const response = await fetch(
-        `http://localhost:8080/api/admin/revenue-reports/monthly?year=${selectedYear}`,
+        `${baseUrl}/api/admin/revenue-reports/monthly?year=${selectedYear}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

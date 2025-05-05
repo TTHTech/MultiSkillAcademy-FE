@@ -4,6 +4,7 @@ import {
   Play, FileText, Eye, CheckCircle, XCircle, 
   Lock, Unlock, X, Film, Book, Layers, Bookmark 
 } from "lucide-react";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const TableLecture = ({ lectures, triggerRefresh }) => {
   const [loading, setLoading] = useState(false);
@@ -34,7 +35,7 @@ const TableLecture = ({ lectures, triggerRefresh }) => {
       try {
         setLoading(true);
         const response = await fetch(
-          `http://localhost:8080/api/admin/lectures/${lecture.lectureId}/toggle-status`,
+          `${baseUrl}/api/admin/lectures/${lecture.lectureId}/toggle-status`,
           {
             method: "PATCH",
             headers: {

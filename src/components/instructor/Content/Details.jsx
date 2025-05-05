@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import Swal from "sweetalert2";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const Details = ({ course, categories, languages, onEditingChange, triggerRefresh }) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -65,7 +66,7 @@ const Details = ({ course, categories, languages, onEditingChange, triggerRefres
 
     try {
       const response = await fetch(
-        `http://localhost:8080/api/instructor/update-course/${course.courseId}`,
+        `${baseUrl}/api/instructor/update-course/${course.courseId}`,
         {
           method: "PUT",
           headers: {

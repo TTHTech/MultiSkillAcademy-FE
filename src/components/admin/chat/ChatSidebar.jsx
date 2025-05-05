@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Search, MoreHorizontal, Edit, Filter, UserPlus } from "lucide-react";
 import { toast } from "react-toastify";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const ChatSidebar = ({ onUserSelect }) => {
   const [chatUsers, setChatUsers] = useState([]);
@@ -24,7 +25,7 @@ const ChatSidebar = ({ onUserSelect }) => {
         throw new Error("Vui lòng đăng nhập lại");
       }
 
-      const response = await fetch(`http://localhost:8080/api/admin/chat/users/${userId}/avatar`, {
+      const response = await fetch(`${baseUrl}/api/admin/chat/users/${userId}/avatar`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -73,7 +74,7 @@ const ChatSidebar = ({ onUserSelect }) => {
         throw new Error("Vui lòng đăng nhập lại");
       }
 
-      const response = await fetch("http://localhost:8080/api/admin/chat/users", {
+      const response = await fetch(`${baseUrl}/api/admin/chat/users`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -107,7 +108,7 @@ const ChatSidebar = ({ onUserSelect }) => {
       }
 
       // Chuẩn bị URL với các tham số tìm kiếm
-      const url = new URL("http://localhost:8080/api/admin/chat/search-users");
+      const url = new URL(`${baseUrl}/api/admin/chat/search-users`);
       if (keyword) url.searchParams.append("keyword", keyword);
       if (role && role !== "ALL") url.searchParams.append("role", role);
 
@@ -141,7 +142,7 @@ const ChatSidebar = ({ onUserSelect }) => {
       if (!token) throw new Error("Vui lòng đăng nhập lại");
 
       const response = await fetch(
-        `http://localhost:8080/api/admin/chat/one-to-one/${user.userId}`,
+        `${baseUrl}/api/admin/chat/one-to-one/${user.userId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -180,7 +181,7 @@ const ChatSidebar = ({ onUserSelect }) => {
         initialMessage: "Xin chào! Tôi là Admin."
       };
       
-      const response = await fetch("http://localhost:8080/api/admin/chat", {
+      const response = await fetch(`${baseUrl}/api/admin/chat`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

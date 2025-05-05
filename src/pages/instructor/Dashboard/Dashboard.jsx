@@ -9,6 +9,7 @@ import { ImBook } from "react-icons/im";
 import { FaDollarSign } from "react-icons/fa";
 import { FaStar } from "react-icons/fa";
 import { PiStudentFill } from "react-icons/pi";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const Dashboard = () => {
   const [courseData, setCourseData] = useState({});
@@ -34,19 +35,19 @@ const Dashboard = () => {
         const [courseResponse, salesResponse, reviewResponse, studentResponse] =
           await Promise.all([
             axios.get(
-              "http://localhost:8080/api/instructor/dashboard/courses/2",
+              `${baseUrl}/api/instructor/dashboard/courses/2`,
               config
             ),
             axios.get(
-              "http://localhost:8080/api/instructor/dashboard/sales/2",
+              `${baseUrl}/api/instructor/dashboard/sales/2`,
               config
             ),
             axios.get(
-              "http://localhost:8080/api/instructor/dashboard/reviews/2",
+              `${baseUrl}/api/instructor/dashboard/reviews/2`,
               config
             ),
             axios.get(
-              "http://localhost:8080/api/instructor/dashboard/students/2",
+              `${baseUrl}/api/instructor/dashboard/students/2`,
               config
             ),
           ]);

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import FilterReport from "../../components/admin/ReportReviewCourse/FilterReport";
 import TableReport from "../../components/admin/ReportReviewCourse/TableReport";
 import Header from "../../components/admin/common/Header";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 export default function ReportPage() {
   const [reports, setReports] = useState([]);
@@ -17,7 +18,7 @@ export default function ReportPage() {
       const token = localStorage.getItem("token");
       try {
         const res = await fetch(
-          "http://localhost:8080/api/admin/reviews/reports",
+          `${baseUrl}/api/admin/reviews/reports`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         const data = await res.json();

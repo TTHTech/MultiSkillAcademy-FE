@@ -20,6 +20,7 @@ import { saveAs } from "file-saver";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import { AiFillFileExcel, AiFillFilePdf } from "react-icons/ai";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 ChartJS.register(
   CategoryScale,
@@ -47,7 +48,7 @@ const InstructorDashboard = () => {
     const fetchSalesData = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8080/api/instructor/dashboard/total-sales/${userId}`,
+          `${baseUrl}/api/instructor/dashboard/total-sales/${userId}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }

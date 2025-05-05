@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { BookOpen, Hourglass, CheckCircle, XCircle, AlertCircle } from "lucide-react";
 import { useState, useEffect } from "react";
 import axios from "axios";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 // Animated skeleton loader for cards
 const SkeletonCard = () => (
@@ -92,7 +93,7 @@ const OverviewCards = () => {
       
       try {
         const response = await axios.get(
-          "http://localhost:8080/api/admin/courses/stats", 
+          `${baseUrl}/api/admin/courses/stats`, 
           {
             headers: {
               Authorization: `Bearer ${token}`,

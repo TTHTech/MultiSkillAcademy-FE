@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import html2canvas from "html2canvas";
 import certificateBg from "../../../images/certificate/certificate.jpg";
 import axios from "axios";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const CertificateGenerator = () => {
   const location = useLocation();
@@ -18,7 +19,7 @@ const CertificateGenerator = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8080/api/student/profile/${userId}`,
+          `${baseUrl}/api/student/profile/${userId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`, // Pass token vào header Authorization

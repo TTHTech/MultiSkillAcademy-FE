@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { encodeId } from '../../../utils/hash';
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const CoursesInstructor = ({ id }) => {
   const [courses, setCourses] = useState([]);
@@ -15,7 +16,7 @@ const CoursesInstructor = ({ id }) => {
     const fetchCourses = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`http://localhost:8080/api/student/courses/instructor/${id}`);
+        const response = await axios.get(`${baseUrl}/api/student/courses/instructor/${id}`);
         const shuffledCourses = response.data.sort(() => 0.5 - Math.random());
         const updatedCourses = shuffledCourses.map(course => {
           const originalPrice = Math.floor(course.price);

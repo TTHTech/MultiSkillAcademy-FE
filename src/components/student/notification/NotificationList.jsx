@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const NotificationList = ({ isOpen }) => {
   const [notifications, setNotifications] = useState([]);
@@ -23,7 +24,7 @@ const NotificationList = ({ isOpen }) => {
         }
 
         const response = await axios.get(
-          "http://localhost:8080/api/student/notifications",
+          `${baseUrl}/api/student/notifications`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -52,7 +53,7 @@ const NotificationList = ({ isOpen }) => {
       const token = localStorage.getItem("token");
       
       await axios.post(
-        `http://localhost:8080/api/student/notifications/${id}/read`,
+        `${baseUrl}/api/student/notifications/${id}/read`,
         {},
         {
           headers: {
@@ -86,7 +87,7 @@ const NotificationList = ({ isOpen }) => {
       await Promise.all(
         unreadNotifications.map(notification => 
           axios.post(
-            `http://localhost:8080/api/student/notifications/${notification.id}/read`,
+            `${baseUrl}/api/student/notifications/${notification.id}/read`,
             {},
             {
               headers: {

@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Phone, Video, MoreVertical, Trash2, FileUp, Send, X } from 'lucide-react';
 import { toast } from 'react-toastify';
 import ChatInput from './ChatInput';
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const ChatWindow = ({ selectedUser, chatId, chatData }) => {
   const [isTyping, setIsTyping] = useState(false);
@@ -68,26 +69,26 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
     console.log("Processing file URL:", fileUrl);
     if (fileUrl && fileUrl.includes('%20')) {
       // URL đã được encode - cần giữ nguyên format
-      return fileUrl.startsWith('http') ? fileUrl : `http://localhost:8080${fileUrl.startsWith('/') ? '' : '/api/student/chat/files/'}${fileUrl}`;
+      return fileUrl.startsWith('http') ? fileUrl : `${baseUrl}${fileUrl.startsWith('/') ? '' : '/api/student/chat/files/'}${fileUrl}`;
     }
     
     // Chuyển hướng từ API instructor sang API student
     // if (fileUrl && fileUrl.includes('/api/instructor/chat/files/')) {
     //   const fileName = fileUrl.split('/').pop();
-    //   return `http://localhost:8080/api/student/chat/files/${fileName}`;
+    //   return `${baseUrl}/api/student/chat/files/${fileName}`;
     // }
     
     // Chuyển hướng từ API admin sang API student
     if (fileUrl && fileUrl.includes('/api/student/chat/files/')) {
       const fileName = fileUrl.split('/').pop();
-      return `http://localhost:8080/api/admin/chat/files/${fileName}`;
+      return `${baseUrl}/api/admin/chat/files/${fileName}`;
     }
     
     // Chuyển hướng tương tự cho các URL ngắn (image_XXXX)
     // Sửa tại ChatWindow.jsx
     if (fileUrl && fileUrl.includes('image_')) {
       const imageId = fileUrl.includes('/') ? fileUrl.split('/').pop() : fileUrl;
-      return `http://localhost:8080/api/admin/chat/files/${imageId}`;
+      return `${baseUrl}/api/admin/chat/files/${imageId}`;
     }
     
     // Các trường hợp khác giữ nguyên
@@ -96,15 +97,15 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
     }
     
     if (fileUrl.startsWith('/api/')) {
-      return `http://localhost:8080${fileUrl}`;
+      return `${baseUrl}${fileUrl}`;
     }
 
     if (fileUrl.includes('/uploads/')) {
-      return `http://localhost:8080${fileUrl.startsWith('/') ? '' : '/'}${fileUrl}`;
+      return `${baseUrl}${fileUrl.startsWith('/') ? '' : '/'}${fileUrl}`;
     }
     
     if (!fileUrl.includes('/') && !fileUrl.includes(':\\')) {
-      return `http://localhost:8080/uploads/${fileUrl}`;
+      return `${baseUrl}/uploads/${fileUrl}`;
     }
     
     return fileUrl;
@@ -118,7 +119,7 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
       const token = localStorage.getItem("token");
       if (!token) return;
 
-      const response = await fetch(`http://localhost:8080/api/student/chat/users/${userId}/avatar`, {
+      const response = await fetch(`${baseUrl}/api/student/chat/users/${userId}/avatar`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -147,7 +148,7 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
       if (!token) throw new Error("Vui lòng đăng nhập lại");
 
       // Sử dụng API student để lấy tin nhắn
-      const response = await fetch(`http://localhost:8080/api/student/chat/${chatId}/messages`, {
+      const response = await fetch(`${baseUrl}/api/student/chat/${chatId}/messages`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -233,7 +234,7 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
       if (!token) throw new Error("Vui lòng đăng nhập lại");
 
       const response = await fetch(
-        `http://localhost:8080/api/student/chat/${chatData.chatId}/messages/${selectedMessageId}`, 
+        `${baseUrl}/api/student/chat/${chatData.chatId}/messages/${selectedMessageId}`, 
         {
           method: 'DELETE',
           headers: {
@@ -321,7 +322,7 @@ const ChatWindow = ({ selectedUser, chatId, chatData }) => {
       console.log("Sending message data:", messageRequest);
 
       // Send to server
-      const response = await fetch(`http://localhost:8080/api/student/chat/${chatData.chatId}/messages`, {
+      const response = await fetch(`${baseUrl}/api/student/chat/${chatData.chatId}/messages`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

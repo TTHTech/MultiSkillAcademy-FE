@@ -13,6 +13,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { encodeId } from '../../../utils/hash';
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const CartItems = () => {
   const [cartItems, setCartItems] = useState([]);
@@ -26,7 +27,7 @@ const CartItems = () => {
       try {
         const token = localStorage.getItem("token");
         const response = await axios.get(
-          "http://localhost:8080/api/student/cart",
+          `${baseUrl}/api/student/cart`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -56,7 +57,7 @@ const CartItems = () => {
     try {
       const token = localStorage.getItem("token");
       await axios.delete(
-        `http://localhost:8080/api/student/cart/remove/${courseId}`,
+        `${baseUrl}/api/student/cart/remove/${courseId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -82,7 +83,7 @@ const CartItems = () => {
       const userId = localStorage.getItem("userId");
 
       const response = await axios.post(
-        `http://localhost:8080/api/student/cart/move-wishlist/${courseId}/${userId}`,
+        `${baseUrl}/api/student/cart/move-wishlist/${courseId}/${userId}`,
         {},
         {
           headers: {

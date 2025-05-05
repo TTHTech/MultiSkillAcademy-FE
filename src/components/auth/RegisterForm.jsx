@@ -3,6 +3,7 @@ import axios from "axios";
 import { FaGoogle, FaGithub, FaEye, FaEyeSlash } from "react-icons/fa";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const COVER_IMAGE =
   "https://thumbs.dreamstime.com/z/word-training-courses-written-notebook-business-office-desktop-253334437.jpg";
@@ -42,7 +43,7 @@ const RegisterForm = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/auth/register",
+        `${baseUrl}/api/auth/register`,
         formData
       );
 

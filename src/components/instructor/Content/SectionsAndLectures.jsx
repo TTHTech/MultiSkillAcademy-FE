@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Sections from "./Sections";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const SectionsAndLectures = () => {
   const { id } = useParams();
@@ -12,7 +13,7 @@ const SectionsAndLectures = () => {
     const fetchCourse = async () => {
       try {
         const response = await fetch(
-          `http://localhost:8080/api/instructor/courses/${id}`,
+          `${baseUrl}/api/instructor/courses/${id}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
