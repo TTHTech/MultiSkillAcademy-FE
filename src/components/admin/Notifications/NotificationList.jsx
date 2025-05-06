@@ -582,6 +582,7 @@ const NotificationList = () => {
       }));
       
       setNotifications(enhancedData);
+      console.log(enhancedData)
       setLoading(false);
     } catch (err) {
       setError(err.message);
@@ -630,17 +631,42 @@ const NotificationList = () => {
     // deleteNotification(id);
   };
 
-  const formatTime = (dateString) => {
-    const date = new Date(dateString);
+  const formatTime = (dateInput) => {
+    let date;
+    if (Array.isArray(dateInput)) {
+      const [
+        year = 1970,
+        month = 1,
+        day = 1,
+        hour = 0,
+        minute = 0,
+        second = 0,
+        nanoseconds = 0,
+      ] = dateInput;
+        const ms = Math.floor(nanoseconds / 1e6);
+        date = new Date(year, month - 1, day, hour, minute, second, ms);
+    } else {
+      date = new Date(dateInput);
+    }
+  
+    if (isNaN(date)) {
+      return "—";
+    }
+  
     const now = new Date();
-    const diffInMinutes = Math.floor((now - date) / (1000 * 60));
-
-    if (diffInMinutes < 60) {
+    const diffMs = now - date;
+    const diffInMinutes = Math.floor(diffMs / (1000 * 60));
+  
+    if (diffInMinutes < 1) {
+      return "vừa xong";
+    } else if (diffInMinutes < 60) {
       return `${diffInMinutes} phút trước`;
     } else if (diffInMinutes < 1440) {
-      return `${Math.floor(diffInMinutes / 60)} giờ trước`;
+      const h = Math.floor(diffInMinutes / 60);
+      return `${h} giờ trước`;
     } else {
-      return `${Math.floor(diffInMinutes / 1440)} ngày trước`;
+      const d = Math.floor(diffInMinutes / 1440);
+      return `${d} ngày trước`;
     }
   };
 

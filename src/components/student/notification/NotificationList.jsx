@@ -109,23 +109,43 @@ const NotificationList = ({ isOpen }) => {
   };
 
   // Định dạng thời gian
-  const formatTime = (dateTimeString) => {
-    if (!dateTimeString) return "";
-    
-    const date = new Date(dateTimeString);
+  const formatTime = (dateInput) => {
+    let date;
+    if (Array.isArray(dateInput)) {
+      const [
+        year = 1970,
+        month = 1,
+        day = 1,
+        hour = 0,
+        minute = 0,
+        second = 0,
+        nanoseconds = 0,
+      ] = dateInput;
+        const ms = Math.floor(nanoseconds / 1e6);
+        date = new Date(year, month - 1, day, hour, minute, second, ms);
+    } else {
+      date = new Date(dateInput);
+    }
+  
+    if (isNaN(date)) {
+      return "—";
+    }
+  
     const now = new Date();
-    
     const diffMs = now - date;
-    const diffMins = Math.floor(diffMs / 60000);
-    const diffHours = Math.floor(diffMins / 60);
-    const diffDays = Math.floor(diffHours / 24);
-    
-    if (diffMins < 1) return "Vừa xong";
-    if (diffMins < 60) return `${diffMins} phút trước`;
-    if (diffHours < 24) return `${diffHours} giờ trước`;
-    if (diffDays < 7) return `${diffDays} ngày trước`;
-    
-    return date.toLocaleDateString('vi-VN');
+    const diffInMinutes = Math.floor(diffMs / (1000 * 60));
+  
+    if (diffInMinutes < 1) {
+      return "vừa xong";
+    } else if (diffInMinutes < 60) {
+      return `${diffInMinutes} phút trước`;
+    } else if (diffInMinutes < 1440) {
+      const h = Math.floor(diffInMinutes / 60);
+      return `${h} giờ trước`;
+    } else {
+      const d = Math.floor(diffInMinutes / 1440);
+      return `${d} ngày trước`;
+    }
   };
 
   if (!isOpen) return null;
