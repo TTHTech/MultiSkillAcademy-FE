@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 import InstructorChatInput from './ChatInput';
 const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
-const InstructorChatWindow = ({ selectedUser, chatId, chatData }) => {
+const ChatWindow = ({ selectedUser, chatId, chatData }) => {
   const [isTyping, setIsTyping] = useState(false);
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -698,4 +698,4 @@ const getFullFileUrl = (fileUrl) => {
   );
 };
 
-export default InstructorChatWindow;
+export default ChatWindow;

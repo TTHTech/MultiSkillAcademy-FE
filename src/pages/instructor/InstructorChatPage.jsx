@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import ChatHeader from '../../components/admin/chat/ChatHeader';
-import InstructorChatSidebar from '../../components/instructor/chat/ChatSidebar.jsx';
-import InstructorChatWindow from '../../components/instructor/chat/InstructorChatWindow.jsx';
+import ChatSidebar from '../../components/instructor/chat/ChatSidebar.jsx';
+import ChatWindow from '../../components/instructor/chat/ChatWindow.jsx';
 import Sidebar from "../../components/instructor/Sidebar/Sidebar";
 
 const InstructorChatPage = () => {
@@ -25,11 +25,11 @@ const InstructorChatPage = () => {
       >
         <div className="flex h-full bg-gray-100 relative">
           <div className="flex-none relative z-30">
-            <InstructorChatSidebar onUserSelect={handleUserSelect} />
+            <ChatSidebar onUserSelect={handleUserSelect} />
           </div>
           <div className="flex-1 flex flex-col bg-gray-900">
             <div className="flex-1 overflow-hidden">
-              <InstructorChatWindow 
+              <ChatWindow 
                 selectedUser={selectedUser}
                 chatId={chatData?.chatId}
                 chatData={chatData}

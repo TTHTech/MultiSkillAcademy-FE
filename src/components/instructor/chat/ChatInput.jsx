@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 import EmojiPicker from 'emoji-picker-react';
 const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
-const InstructorChatInput = ({ chatId, addMessage, setIsTyping, disabled }) => {
+const ChatInput = ({ chatId, addMessage, setIsTyping, disabled }) => {
   const [message, setMessage] = useState('');
   const [showAttachmentOptions, setShowAttachmentOptions] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -427,4 +427,4 @@ const InstructorChatInput = ({ chatId, addMessage, setIsTyping, disabled }) => {
   );
 };
 
-export default InstructorChatInput;
+export default ChatInput;
