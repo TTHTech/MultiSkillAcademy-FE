@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Phone, Video, MoreVertical, Trash2, FileUp, Send, X } from 'lucide-react';
 import { toast } from 'react-toastify';
-import InstructorChatInput from './InstructorChatInput';
+import InstructorChatInput from './ChatInput';
 const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const InstructorChatWindow = ({ selectedUser, chatId, chatData }) => {
