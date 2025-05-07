@@ -221,7 +221,7 @@ const CoursesInstructor = ({ id }) => {
               <div className="px-4 py-3 bg-gray-50 border-t border-gray-100 flex justify-between items-center">
                 <span className="text-sm text-gray-600 flex items-center">
                   <i className="fas fa-users mr-2 text-gray-500"></i>
-                  {course.enrolledCount || 0} học viên
+                  {course.studentsCount || 0} học viên
                 </span>
                 <span className="text-blue-600 text-sm font-medium group-hover:translate-x-1 transition-transform inline-flex items-center">
                   Xem chi tiết
