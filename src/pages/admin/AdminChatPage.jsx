@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import ChatHeader from '../../components/admin/chat/ChatHeader';
-import ChatSidebar from '../../components/admin/chat/ChatSideBar';
+import ChatSidebar from '../../components/admin/chat/ChatSidebar';
 import ChatWindow from '../../components/admin/chat/ChatWindow';
 
 const AdminChatPage = () => {
