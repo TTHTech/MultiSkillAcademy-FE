@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import ChatHeader from '../../components/admin/chat/ChatHeader';
-import InstructorChatSidebar from '../../components/instructor/chat/InstructorChatSideBar';
+import InstructorChatSidebar from '../../components/instructor/chat/InstructorChatSidebar';
 import InstructorChatWindow from '../../components/instructor/chat/InstructorChatWindow';
 import Sidebar from "../../components/instructor/Sidebar/Sidebar";
 

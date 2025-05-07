@@ -3,7 +3,7 @@ import { Search, MoreHorizontal, Edit, Filter, UserPlus } from "lucide-react";
 import { toast } from "react-toastify";
 const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
-const InstructorChatSideBar= ({ onUserSelect }) => {
+const InstructorChatSidebar= ({ onUserSelect }) => {
   const [chatUsers, setChatUsers] = useState([]);
   const [searchUsers, setSearchUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -595,4 +595,4 @@ const InstructorChatSideBar= ({ onUserSelect }) => {
   );
 };
 
-export default InstructorChatSideBar;
+export default InstructorChatSidebar;
