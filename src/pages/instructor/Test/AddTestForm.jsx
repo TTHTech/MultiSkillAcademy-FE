@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const AddTestForm = ({ onClose, onTestAdded, courses }) => {
     const [formData, setFormData] = useState({
@@ -62,7 +63,7 @@ const AddTestForm = ({ onClose, onTestAdded, courses }) => {
             return;
           }
         try {
-          const response = await axios.post("http://localhost:8080/api/instructor/addTest", formData, {
+          const response = await axios.post(`${baseUrl}/api/instructor/addTest`, formData, {
             headers: {
               Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",

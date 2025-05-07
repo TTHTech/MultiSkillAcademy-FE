@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Camera } from "lucide-react";
 import Swal from "sweetalert2";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const InstructorProfile = () => {
   const [instructor, setInstructor] = useState(null);
@@ -12,7 +13,7 @@ const InstructorProfile = () => {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
-  const updateUrl = `http://localhost:8080/api/instructor/edit-user/${userId}`;
+  const updateUrl = `${baseUrl}/api/instructor/edit-user/${userId}`;
 
   // Lấy dữ liệu giảng viên từ API
   useEffect(() => {
@@ -22,7 +23,7 @@ const InstructorProfile = () => {
         if (!token) throw new Error("No token found, please login first.");
 
         const response = await fetch(
-          `http://localhost:8080/api/instructor/user/${userId}`,
+          `${baseUrl}/api/instructor/user/${userId}`,
           {
             method: "GET",
             headers: {
@@ -126,7 +127,7 @@ const InstructorProfile = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `http://localhost:8080/api/auth/change-password/${userId}`,
+        `${baseUrl}/api/auth/change-password/${userId}`,
         {
           method: "POST",
           headers: {

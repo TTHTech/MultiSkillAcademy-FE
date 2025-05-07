@@ -26,6 +26,7 @@ import {
   Trophy,
 } from "lucide-react";
 import { decodeId } from '../../../utils/hash';
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const getResourceIcon = (description) => {
   const lowerDesc = description.toLowerCase();
@@ -129,17 +130,17 @@ const CourseMedia = ({
           activeCourse,
         ] = await Promise.all([
           axios.get(
-            `http://localhost:8080/api/student/cart/check/${userId}/${courseId}`
+            `${baseUrl}/api/student/cart/check/${userId}/${courseId}`
           ),
           axios.get(
-            `http://localhost:8080/api/student/wishlist/check/${userId}/${courseId}`
+            `${baseUrl}/api/student/wishlist/check/${userId}/${courseId}`
           ),
           axios.get(
-            `http://localhost:8080/api/student/enrollments/check/${userId}/${courseId}`
+            `${baseUrl}/api/student/enrollments/check/${userId}/${courseId}`
           ),
-          axios.get(`http://localhost:8080/api/student/lectures/${courseId}`),
+          axios.get(`${baseUrl}/api/student/lectures/${courseId}`),
           axios.get(
-            `http://localhost:8080/api/student/courses/${courseId}/status`
+            `${baseUrl}/api/student/courses/${courseId}/status`
           ),
         ]);
         setCheckCart(cartResponse.data);
@@ -171,7 +172,7 @@ const CourseMedia = ({
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/student/add-wishlist",
+        `${baseUrl}/api/student/add-wishlist`,
         requestData
       );
 

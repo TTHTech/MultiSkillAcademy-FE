@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import CoursesInstructor from "./CoursesInstructor";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const InstructorProfile = ({ id }) => {
   const [profile, setProfile] = useState(null);
@@ -9,7 +10,7 @@ const InstructorProfile = ({ id }) => {
   useEffect(() => {
     setIsLoading(true);
     axios
-      .get(`http://localhost:8080/api/student/profile-instructor/${id}`)
+      .get(`${baseUrl}/api/student/profile-instructor/${id}`)
       .then((response) => {
         setProfile(response.data);
         setIsLoading(false);

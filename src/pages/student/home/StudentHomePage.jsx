@@ -15,6 +15,9 @@ import Footer from "../../../components/student/common/Footer";
 import TopDesignCoursesSection from "../../../components/student/home/TopDesignCoursesSection";
 import TopTechnologyCoursesSection from "../../../components/student/home/TopTechnologyCoursesSection";
 import RecommendedCoursesComponent from "../../../components/student/home/RecommendedCoursesComponent"; // Import mới
+import TopDevelopmentCoursesSection from "../../../components/student/home/TopDevelopmentCoursesSection"; // Import mới
+import TopBusinessCoursesSection from "../../../components/student/home/TopBusinessCoursesSection"; // Import mới
+import TopFinanceCoursesSection from "../../../components/student/home/TopFinanceCoursesSection"; // Import mới
 const StudentHomePage = () => {
   return (
     <div className="w-full h-full min-h-screen bg-[#F5F6F8] overflow-y-auto">
@@ -25,13 +28,17 @@ const StudentHomePage = () => {
       
       <RecommendedCoursesComponent />
       <SuggestedCoursesSection />
-      <RecommendedCoursesSection />
-      <TopPythonCoursesSection /> {/* Thêm component TopWebCoursesSection mới */}
+     
+      <TopDevelopmentCoursesSection/>
+      <TopBusinessCoursesSection/>
+      {/* Thêm component TopWebCoursesSection mới */}
       <TopMusicCoursesSection/>
       <TopMarketingCoursesSection />
       <TopDesignCoursesSection/>
-      <TopTechnologyCoursesSection/>
      < RecommendedTopics/>
+      <TopTechnologyCoursesSection/>
+     <TopPythonCoursesSection /> 
+     <TopFinanceCoursesSection/>
       <Footer />
     </div>
   );

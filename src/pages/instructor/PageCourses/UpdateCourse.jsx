@@ -12,6 +12,8 @@ import SupplementaryLectures from "../../../components/instructor/Content/Supple
 
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
+
 const UpdateCourse = () => {
   const [selectedComponent, setSelectedComponent] = useState("CourseDetails");
   const [error, setError] = useState(null);
@@ -25,7 +27,7 @@ const UpdateCourse = () => {
     const fetchCourse = async () => {
       try {
         const ownershipResponse = await fetch(
-          `http://localhost:8080/api/instructor/courses/${id}/check-ownership?userId=${userId}`,
+          `${baseUrl}/api/instructor/courses/${id}/check-ownership?userId=${userId}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -38,7 +40,7 @@ const UpdateCourse = () => {
           return;
         }
         const response = await fetch(
-          `http://localhost:8080/api/instructor/courses/${id}`,
+          `${baseUrl}/api/instructor/courses/${id}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,

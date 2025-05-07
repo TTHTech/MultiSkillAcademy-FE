@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { encodeId } from '../../../utils/hash';
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const CoursesInstructor = ({ id }) => {
   const [courses, setCourses] = useState([]);
@@ -15,7 +16,7 @@ const CoursesInstructor = ({ id }) => {
     const fetchCourses = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`http://localhost:8080/api/student/courses/instructor/${id}`);
+        const response = await axios.get(`${baseUrl}/api/student/courses/instructor/${id}`);
         const shuffledCourses = response.data.sort(() => 0.5 - Math.random());
         const updatedCourses = shuffledCourses.map(course => {
           const originalPrice = Math.floor(course.price);
@@ -220,7 +221,7 @@ const CoursesInstructor = ({ id }) => {
               <div className="px-4 py-3 bg-gray-50 border-t border-gray-100 flex justify-between items-center">
                 <span className="text-sm text-gray-600 flex items-center">
                   <i className="fas fa-users mr-2 text-gray-500"></i>
-                  {course.enrolledCount || 0} học viên
+                  {course.studentsCount || 0} học viên
                 </span>
                 <span className="text-blue-600 text-sm font-medium group-hover:translate-x-1 transition-transform inline-flex items-center">
                   Xem chi tiết

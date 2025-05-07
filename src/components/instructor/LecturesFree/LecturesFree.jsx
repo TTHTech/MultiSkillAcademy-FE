@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const LecturesFreeComponent = ({ courseId }) => {
   const [lectures, setLectures] = useState([]);
@@ -14,7 +15,7 @@ const LecturesFreeComponent = ({ courseId }) => {
     const fetchLectures = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8080/api/instructor/lectures-free/${courseId}`,
+          `${baseUrl}/api/instructor/lectures-free/${courseId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -68,7 +69,7 @@ const LecturesFreeComponent = ({ courseId }) => {
     }
     try {
       const response = await axios.post(
-        `http://localhost:8080/api/instructor/lectures-free`,
+        `${baseUrl}/api/instructor/lectures-free`,
         {
           ...newLecture,
           courseId,
@@ -112,7 +113,7 @@ const LecturesFreeComponent = ({ courseId }) => {
     }
     try {
       const response = await axios.put(
-        `http://localhost:8080/api/instructor/lectures-free`,
+        `${baseUrl}/api/instructor/lectures-free`,
         editLecture,
         {
           headers: {
@@ -152,7 +153,7 @@ const LecturesFreeComponent = ({ courseId }) => {
     }
     try {
       await axios.delete(
-        `http://localhost:8080/api/instructor/lectures-free/${id}`,
+        `${baseUrl}/api/instructor/lectures-free/${id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

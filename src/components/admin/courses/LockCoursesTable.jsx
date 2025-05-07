@@ -9,6 +9,7 @@ import { Navigation, Pagination as SwiperPagination } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 // Lucide icons
 import { 
@@ -33,7 +34,7 @@ import {
 
 // Constants
 const ITEMS_PER_PAGE = 10;
-const API_BASE_URL = "http://localhost:8080/api";
+const API_BASE_URL = `${baseUrl}/api`;
 
 // Add CSS animations
 const animationStyles = `

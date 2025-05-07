@@ -5,6 +5,7 @@ import NavBar from "../../../components/student/common/NavBar";
 import Footer from "../../../components/student/common/Footer";
 import StudentCoursesList from "../../../components/student/Enrollment/StudentCourseList";
 import { Search, Calendar, Filter, BookOpen, GraduationCap, AlertCircle } from "lucide-react";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const MyCoursesPage = () => {
   const [courses, setCourses] = useState([]);
@@ -35,7 +36,7 @@ const MyCoursesPage = () => {
         setIsLoading(true);
         setError(null);
         const response = await axios.get(
-          `http://localhost:8080/api/student/enrollments/${userId}`
+          `${baseUrl}/api/student/enrollments/${userId}`
         );
         setCourses(response.data || []);
         setFilteredCourses(response.data || []);
@@ -204,7 +205,7 @@ const MyCoursesPage = () => {
     setIsLoading(true);
     
     // Fetch courses with the current userId
-    axios.get(`http://localhost:8080/api/student/enrollments/${currentUserId}`)
+    axios.get(`${baseUrl}/api/student/enrollments/${currentUserId}`)
       .then(response => {
         setCourses(response.data || []);
         setFilteredCourses(response.data || []);

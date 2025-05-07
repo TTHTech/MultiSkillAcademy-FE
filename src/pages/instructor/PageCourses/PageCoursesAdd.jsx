@@ -11,6 +11,7 @@ import Sidebar from "../../../components/instructor/Sidebar/Sidebar";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Swal from "sweetalert2";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const userId = Number(localStorage.getItem("userId"));
 const App = () => {
@@ -38,7 +39,7 @@ const App = () => {
         }
 
         const response = await fetch(
-          "http://localhost:8080/api/instructor/categories",
+          `${baseUrl}/api/instructor/categories`,
           {
             method: "GET",
             headers: {
@@ -141,7 +142,7 @@ const App = () => {
 
       console.log("Course Data:", addCourse);
       const response = await fetch(
-        "http://localhost:8080/api/instructor/add-course",
+        `${baseUrl}/api/instructor/add-course`,
         {
           method: "POST",
           headers: {
@@ -209,7 +210,7 @@ const App = () => {
         };
 
         const response = await fetch(
-          `http://localhost:8080/api/instructor/addImage`,
+          `${baseUrl}/api/instructor/addImage`,
           {
             method: "POST",
             headers: {
@@ -264,7 +265,7 @@ const App = () => {
         };
 
         const response = await fetch(
-          `http://localhost:8080/api/instructor/updateImage`,
+          `${baseUrl}/api/instructor/updateImage`,
           {
             method: "PUT",
             headers: {
@@ -306,7 +307,7 @@ const App = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:8080/api/instructor/deleteImage`,
+        `${baseUrl}/api/instructor/deleteImage`,
         {
           method: "DELETE",
           headers: {

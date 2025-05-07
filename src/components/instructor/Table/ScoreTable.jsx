@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const ScoreTable = () => {
   const [scores, setScores] = useState([]);
@@ -20,7 +21,7 @@ const ScoreTable = () => {
     const fetchCoursesAndScores = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8080/api/instructor/${userId}`,
+          `${baseUrl}/api/instructor/${userId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -33,7 +34,7 @@ const ScoreTable = () => {
         const courseIds = fetchedCourses.map((course) => course.courseId);
         const testPromises = courseIds.map((courseId) =>
           fetch(
-            `http://localhost:8080/api/student/scores/details/course/${courseId}`
+            `${baseUrl}/api/student/scores/details/course/${courseId}`
           ).then((response) => response.json())
         );
         const scoresData = await Promise.all(testPromises);

@@ -2,6 +2,9 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 import { Flag } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
+
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const TabComment = ({ courseId }) => {
   const [reviews, setReviews] = useState([]);
@@ -16,14 +19,16 @@ const TabComment = ({ courseId }) => {
   const [newComment, setNewComment] = useState(""); // Text of the new comment
   const [submitLoading, setSubmitLoading] = useState(false);
   const userId = Number(localStorage.getItem("userId"));
-  const [showAddReview, setShowAddReview] = useState(true);
+
+  const [showAddReview, setShowAddReview] = useState(false);
+  const [reviewMessage, setReviewMessage] = useState("");
 
   // Fetch reviews when the component is mounted
   useEffect(() => {
     const fetchReviews = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8080/api/student/reviews/${courseId}`
+          `${baseUrl}/api/student/reviews/${courseId}`
         );
         setReviews(response.data); // Set the reviews data
         console.log(response.data);
@@ -33,9 +38,27 @@ const TabComment = ({ courseId }) => {
         setLoading(false);
       }
     };
-
+    const checkReview = async () => {
+      try {
+        const response = await axios.get(
+          `${baseUrl}/api/student/check/${userId}/${courseId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+        // response.data = { canReview: boolean, message: string }
+        const { canReview, message } = response.data;
+        setShowAddReview(canReview);
+        setReviewMessage(message);
+      } catch (error) {
+        console.error("Error fetching eligibility:", error);
+      }
+    };
+    checkReview();
     fetchReviews();
-  }, [courseId]); // Run when courseId changes
+  }, [courseId, userId]); // Run when courseId changes
 
   // Filter reviews by rating
   const filteredReviews = reviews.filter((review) => {
@@ -82,14 +105,11 @@ const TabComment = ({ courseId }) => {
       };
 
       // Make the API call to submit the new review
-      await axios.post(
-        "http://localhost:8080/api/student/add-review",
-        newReview
-      );
+      await axios.post(`${baseUrl}/api/student/add-review`, newReview);
 
       // Re-fetch the reviews after submission
       const response = await axios.get(
-        `http://localhost:8080/api/student/reviews/${courseId}`
+        `${baseUrl}/api/student/reviews/${courseId}`
       );
       setShowAddReview(false);
       setReviews(response.data); // Update reviews list
@@ -128,7 +148,7 @@ const TabComment = ({ courseId }) => {
 
     try {
       await axios.post(
-        "http://localhost:8080/api/student/reviews/report",
+        `${baseUrl}/api/student/reviews/report`,
         {
           idUserReport: userId,
           review_id: review.review_id,
@@ -145,45 +165,76 @@ const TabComment = ({ courseId }) => {
   return (
     <div className="bg-white p-6 rounded-lg shadow-lg mt-4">
       {/* Add Review Form */}
-      {showAddReview && (
-        <div className="mt-6">
-          <h3 className="text-xl font-semibold text-gray-900 mb-4">
+      {/* Add Review Form or Message */}
+      {showAddReview ? (
+        <div className="mt-6 p-6 bg-white border border-gray-200 rounded-2xl shadow-md">
+          <h3 className="text-2xl font-bold text-gray-800 mb-6">
             Thêm đánh giá của bạn
           </h3>
-          <div className="flex items-center mb-4">
-            <span className="mr-2">Đánh giá:</span>
-            {[1, 2, 3, 4, 5].map((star) => (
-              <button
-                key={star}
-                onClick={() => setNewRating(star)}
-                className={`text-xl ${
-                  newRating >= star ? "text-yellow-500" : "text-gray-400"
-                }`}
-              >
-                ★
-              </button>
-            ))}
+
+          {/* Star Rating */}
+          <div className="flex items-center mb-6">
+            <span className="mr-4 font-medium text-gray-700">Đánh giá:</span>
+            <div className="flex space-x-2">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <button
+                  key={star}
+                  onClick={() => setNewRating(star)}
+                  className={`
+              text-2xl transition-transform transform hover:scale-110
+              ${newRating >= star ? "text-yellow-500" : "text-gray-300"}
+            `}
+                  aria-label={`${star} sao`}
+                >
+                  ★
+                </button>
+              ))}
+            </div>
           </div>
 
+          {/* Comment textarea */}
           <textarea
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
             placeholder="Chia sẻ cảm nhận của bạn về khóa học..."
-            className="p-4 border rounded-md w-full"
-            rows="4"
-          ></textarea>
+            rows="5"
+            className="
+        w-full p-4 mb-6
+        border border-gray-300 rounded-lg
+        focus:outline-none focus:ring-2 focus:ring-blue-400
+        resize-none
+      "
+          />
 
-          <div className="flex justify-end mt-4">
+          {/* Submit Button */}
+          <div className="flex justify-end">
             <button
               onClick={handleSubmitReview}
               disabled={submitLoading}
-              className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition duration-200 ease-in-out"
+              className={`
+          px-6 py-3 font-semibold rounded-lg transition
+          ${
+            submitLoading
+              ? "bg-blue-300 cursor-not-allowed"
+              : "bg-blue-600 hover:bg-blue-700"
+          }
+          text-white
+        `}
             >
               {submitLoading ? "Đang gửi..." : "Gửi đánh giá"}
             </button>
           </div>
         </div>
+      ) : (
+        <div className="mt-6 flex items-start p-4 bg-red-50 border-l-4 border-red-500 rounded-lg">
+          <AlertTriangle
+            size={24}
+            className="flex-shrink-0 text-red-500 mr-3"
+          />
+          <p className="text-red-700 font-medium">{reviewMessage}</p>
+        </div>
       )}
+
       {/* Filter, Sort, and Search Section */}
       <div className="flex justify-between mt-4 mb-4">
         <div className="flex space-x-4">
@@ -241,12 +292,21 @@ const TabComment = ({ courseId }) => {
                   <img
                     src={review.profileImage}
                     alt={`${review.studentFirstName} ${review.studentLastName}`}
-                    className="w-10 h-10 rounded-full mr-4 object-cover"
+                    className="w-12 h-12 rounded-full object-cover mr-4"
                   />
-                  <span className="font-semibold mr-2 text-gray-900">
-                    {review.studentFirstName} {review.studentLastName}
-                  </span>
-                  <span className="text-yellow-500">{review.rating} ★</span>
+                  <div className="flex flex-col">
+                    <span className="text-base font-semibold text-gray-900">
+                      {review.studentFirstName} {review.studentLastName}
+                    </span>
+                    <div className="flex items-center space-x-3 text-sm text-gray-600 mt-1">
+                      <span className="text-yellow-500 font-medium">
+                        {review.rating} ★
+                      </span>
+                      <span className="text-blue-600">
+                        Tiến độ lúc đánh giá: {review.progress}%
+                      </span>
+                    </div>
+                  </div>
                 </div>
 
                 <button

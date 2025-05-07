@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import FilterReview from "../../components/admin/ReviewCourse/FilterReview";
 import TableReview from "../../components/admin/ReviewCourse/TableReview";
 import Header from "../../components/admin/common/Header";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const PageReview = () => {
   const [reviews, setReviews] = useState([]);
@@ -25,7 +26,7 @@ const PageReview = () => {
       try {
         const token = localStorage.getItem("token");
         const response = await fetch(
-          "http://localhost:8080/api/admin/reviews/table",
+          `${baseUrl}/api/admin/reviews/table`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

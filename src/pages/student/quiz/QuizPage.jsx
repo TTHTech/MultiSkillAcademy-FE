@@ -6,6 +6,7 @@ import QuizSidebar from "../../../components/student/Quiz/QuizSidebar";
 import QuizQuestionSection from "../../../components/student/Quiz/QuizQuestionSection";
 import QuizNavigation from "../../../components/student/Quiz/QuizNavigation";
 import { useParams, useNavigate } from "react-router-dom";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const QuizPage = () => {
   const [quizData, setQuizData] = useState(null);
@@ -24,7 +25,7 @@ const QuizPage = () => {
     const fetchQuizData = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8080/api/student/course/test/${id}`
+          `${baseUrl}/api/student/course/test/${id}`
         );
         const data = response.data;
 
@@ -96,7 +97,7 @@ const QuizPage = () => {
     };
 
     try {
-      await axios.post("http://localhost:8080/api/student/scores", payload);
+      await axios.post(`${baseUrl}/api/student/scores`, payload);
       setIsScoreSaved(true);
       alert("Lưu điểm thành công!");
     } catch (err) {

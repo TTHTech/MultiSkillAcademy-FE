@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import Lectures from "./Lectures";
 import Swal from "sweetalert2";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const Sections = () => {
   const { id } = useParams();
@@ -38,7 +39,7 @@ const Sections = () => {
     const fetchCourse = async () => {
       try {
         const response = await fetch(
-          `http://localhost:8080/api/instructor/courses/${id}`,
+          `${baseUrl}/api/instructor/courses/${id}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -65,7 +66,7 @@ const Sections = () => {
         if (!token) throw new Error("No token found, please login first.");
 
         const response = await fetch(
-          `http://localhost:8080/api/instructor/user/${userId}`,
+          `${baseUrl}/api/instructor/user/${userId}`,
           {
             method: "GET",
             headers: {
@@ -91,7 +92,7 @@ const Sections = () => {
     const section = sections[index];
     try {
       await axios.put(
-        `http://localhost:8080/api/instructor/update-section/${section.section_id}`,
+        `${baseUrl}/api/instructor/update-section/${section.section_id}`,
         {
           sectionId: section.section_id,
           title: section.title,
@@ -118,7 +119,7 @@ const Sections = () => {
       await Promise.all(
         sectionsToSave.map((section) =>
           axios.put(
-            `http://localhost:8080/api/instructor/update-section/${section.section_id}`,
+            `${baseUrl}/api/instructor/update-section/${section.section_id}`,
             {
               sectionId: section.section_id,
               title: section.title,
@@ -163,7 +164,7 @@ const Sections = () => {
     const section = sections[index];
     try {
       await axios.delete(
-        `http://localhost:8080/api/instructor/delete-section/${section.section_id}`,
+        `${baseUrl}/api/instructor/delete-section/${section.section_id}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -231,7 +232,7 @@ const Sections = () => {
     };
     try {
       await axios.post(
-        `http://localhost:8080/api/instructor/add-section`,
+        `${baseUrl}/api/instructor/add-section`,
         newSectionObj,
         {
           headers: {

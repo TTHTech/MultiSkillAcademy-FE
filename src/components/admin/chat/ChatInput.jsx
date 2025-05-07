@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Send, Paperclip, Image, FileText, Video, X, Smile } from 'lucide-react';
 import { toast } from 'react-toastify';
 import EmojiPicker from 'emoji-picker-react';
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const ChatInput = ({ addMessage, setIsTyping, disabled }) => {
   const [message, setMessage] = useState('');
@@ -148,7 +149,7 @@ const ChatInput = ({ addMessage, setIsTyping, disabled }) => {
           reject(new Error('Network error during upload'));
         });
         
-        xhr.open('POST', 'http://localhost:8080/api/admin/chat/upload');
+        xhr.open('POST', `${baseUrl}/api/admin/chat/upload`);
         xhr.setRequestHeader('Authorization', `Bearer ${token}`);
         xhr.send(formData);
       });

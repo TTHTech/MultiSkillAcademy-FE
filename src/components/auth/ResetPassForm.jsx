@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { FaEnvelope, FaKey, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
 import 'react-toastify/dist/ReactToastify.css';
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const BACKGROUND_IMAGE = "https://toigingiuvedep.vn/wp-content/uploads/2021/02/background-may-dep-cho-khai-giang.jpg";
 
@@ -38,7 +39,7 @@ const ResetPassForm = () => {
     setError(null);
 
     try {
-      await axios.post('http://localhost:8080/api/auth/verify-otp', formData);
+      await axios.post(`${baseUrl}/api/auth/verify-otp`, formData);
       toast.success('Password reset successful!');
       navigate('/login');
     } catch (err) {

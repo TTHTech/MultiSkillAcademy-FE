@@ -1,4 +1,5 @@
 import Swal from "sweetalert2";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const TableSection = ({ sections, triggerRefresh }) => {
   const handleToggleStatus = async (section) => {
@@ -15,7 +16,7 @@ const TableSection = ({ sections, triggerRefresh }) => {
     if (result.isConfirmed) {
       try {
         const response = await fetch(
-          `http://localhost:8080/api/admin/section/${section.sectionId}/toggle-status`,
+          `${baseUrl}/api/admin/section/${section.sectionId}/toggle-status`,
           {
             method: "PATCH",
             headers: {

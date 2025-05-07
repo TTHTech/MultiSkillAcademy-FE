@@ -14,6 +14,7 @@ import {
   Settings, 
   LogOut 
 } from 'lucide-react';
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const DEFAULT_PROFILE_IMAGE = "https://lh3.googleusercontent.com/IUCQIQksFr7qJDlXK43uhIUwvDt_tpLSNiumv8bFESGLs6wekNyBDdNMyzeFwqgTe-l5vG6RSMvnUek=w544-h544-l90-rj";
 
@@ -56,7 +57,7 @@ const ProfileMenu = () => {
       // Gọi API logout (tùy chọn)
       if (token) {
         try {
-          await axios.post('http://localhost:8080/api/auth/logout', {}, {
+          await axios.post(`${baseUrl}/api/auth/logout`, {}, {
             headers: {
               'Authorization': `Bearer ${token}`
             }
@@ -107,7 +108,7 @@ const ProfileMenu = () => {
         }
 
         const response = await axios.get(
-          `http://localhost:8080/api/student/profile/${userId}`,
+          `${baseUrl}/api/student/profile/${userId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

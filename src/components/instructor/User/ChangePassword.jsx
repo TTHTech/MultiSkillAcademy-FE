@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Swal from "sweetalert2";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const ChangePassword = ({ onClose }) => {
   const userId = Number(localStorage.getItem("userId"));
@@ -36,7 +37,7 @@ const ChangePassword = ({ onClose }) => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `http://localhost:8080/api/auth/change-password/${userId}`,
+        `${baseUrl}/api/auth/change-password/${userId}`,
         {
           method: "POST",
           headers: {

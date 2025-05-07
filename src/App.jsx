@@ -79,7 +79,7 @@ import PageReportReviewCourse from "./pages/admin/PageReportReviewCourse.jsx";
 import PageCreatePromotion from "./pages/admin/PageCreatePromotion.jsx";
 import PagePromotion from "./pages/admin/PagePromotion.jsx"
 import PagePromotionUsage from "./pages/admin/PagePromotionUsage.jsx"
-
+import TopicCoursesPage from "./pages/student/topic/TopicCoursesPage.jsx";
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [role, setRole] = useState("");
@@ -226,6 +226,7 @@ function App() {
                 <Route path="/student/result" element={<ResultPage />} />
                 <Route path="/student/profile-instructor/:id" element={<PageProfileInstructor />} />
                 <Route path="/student/reminder" element={<ReminderPage />} />
+                <Route path="/topic/:topicPath" element={<TopicCoursesPage />} />
               </>
             )}
             

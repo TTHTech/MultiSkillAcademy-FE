@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import DiscountUsageSummaryList from "./DiscountUsageInstructorSummaryList";
 import DiscountUsageDetail from "./DiscountUsageInstructorDetail";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const DiscountUsageDashboard = () => {
   const [discountUsages, setDiscountUsages] = useState([]);
@@ -20,7 +21,7 @@ const DiscountUsageDashboard = () => {
     const fetchDiscountUsage = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:8080/api/admin/discount-usage/instructor",
+          `${baseUrl}/api/admin/discount-usage/instructor`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setDiscountUsages(response.data);

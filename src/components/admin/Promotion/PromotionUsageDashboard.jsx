@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import PromotionUsageSummaryList from "./PromotionUsageSummaryList";
 import PromotionUsageDetail from "./PromotionUsageDetail";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const PromotionUsageDashboard = () => {
   const [usages, setUsages] = useState([]);
@@ -22,7 +23,7 @@ const PromotionUsageDashboard = () => {
     const fetch = async () => {
       try {
         const res = await axios.get(
-          "http://localhost:8080/api/admin/promotion-usage",
+          `${baseUrl}/api/admin/promotion-usage`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setUsages(res.data);

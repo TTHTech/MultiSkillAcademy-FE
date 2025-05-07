@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Camera, Loader, CheckCircle, AlertTriangle, User, Mail, Lock, Phone, MapPin, FileText, Calendar, Users } from "lucide-react";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 // Animation styles
 const animationStyles = `
@@ -123,7 +124,7 @@ const CreateUserForm = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:8080/api/admin/users?role=" + userData.role, {
+      const response = await fetch(`${baseUrl}/api/admin/users?role=` + userData.role, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,

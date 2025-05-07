@@ -2,6 +2,7 @@ import { useState } from "react";
 import Swal from "sweetalert2";
 import { Star, StarHalf } from "lucide-react";
 import { Eye, CheckCircle, XCircle } from "lucide-react";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 export default function TableReport({
   reports,
@@ -43,7 +44,7 @@ export default function TableReport({
     try {
       setIsLoading(true);
       const res = await fetch(
-        `http://localhost:8080/api/admin/reviews/${report.review_id}/reports/approve`,
+        `${baseUrl}/api/admin/reviews/${report.review_id}/reports/approve`,
         {
           method: "POST",
           headers: { Authorization: `Bearer ${token}` },
@@ -81,7 +82,7 @@ export default function TableReport({
     try {
       setIsLoading(true);
       const res = await fetch(
-        `http://localhost:8080/api/admin/reviews/reports/${report.reportId}/reject`,
+        `${baseUrl}/api/admin/reviews/reports/${report.reportId}/reject`,
         {
           method: "DELETE",
           headers: { Authorization: `Bearer ${token}` },
@@ -138,7 +139,7 @@ export default function TableReport({
 
     try {
       const res = await fetch(
-        `http://localhost:8080/api/admin/reviews/detail/reports/${report.reportId}`,
+        `${baseUrl}/api/admin/reviews/detail/reports/${report.reportId}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       if (!res.ok) throw new Error("Lấy dữ liệu thất bại");

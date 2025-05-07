@@ -13,6 +13,7 @@ import {
   Users,
   BarChart2
 } from "lucide-react";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 // Error boundary component
 class ErrorBoundary extends React.Component {
@@ -133,7 +134,7 @@ const AdminInstructorSales = () => {
       }
       
       const response = await fetch(
-        "http://localhost:8080/api/admin/instructor-sales",
+        `${baseUrl}/api/admin/instructor-sales`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

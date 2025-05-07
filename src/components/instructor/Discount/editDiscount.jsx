@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import TableCategoryAndCourses from "./tableCategoryAndCourses";
 import Swal from "sweetalert2";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const EditDiscount = ({ discountId, onCancel, triggerRefresh }) => {
   const [refresh, setRefresh] = useState(0);
@@ -27,7 +28,7 @@ const EditDiscount = ({ discountId, onCancel, triggerRefresh }) => {
     const fetchDiscountData = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8080/api/instructor/discounts/user/${userId}/discount/${discountId}`,
+          `${baseUrl}/api/instructor/discounts/user/${userId}/discount/${discountId}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -79,7 +80,7 @@ const EditDiscount = ({ discountId, onCancel, triggerRefresh }) => {
     if (result.isConfirmed) {
       try {
         const response = await axios.put(
-          `http://localhost:8080/api/instructor/discounts/${discountId}/status/${userId}`,
+          `${baseUrl}/api/instructor/discounts/${discountId}/status/${userId}`,
           {},
           {
             headers: {
@@ -133,7 +134,7 @@ const EditDiscount = ({ discountId, onCancel, triggerRefresh }) => {
       if (confirmResult.isConfirmed) {
         await axios
           .delete(
-            `http://localhost:8080/api/instructor/discounts/user/${userId}/discount/${discountId}`,
+            `${baseUrl}/api/instructor/discounts/user/${userId}/discount/${discountId}`,
             {
               headers: { Authorization: `Bearer ${token}` },
             }
@@ -258,7 +259,7 @@ const EditDiscount = ({ discountId, onCancel, triggerRefresh }) => {
 
     try {
       await axios.put(
-        `http://localhost:8080/api/instructor/discounts/user/${userId}/discount/${discountId}`,
+        `${baseUrl}/api/instructor/discounts/user/${userId}/discount/${discountId}`,
         payload,
         {
           headers: {

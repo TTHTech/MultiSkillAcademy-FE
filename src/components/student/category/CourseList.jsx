@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 import CourseCard from './CourseCard';
 import { encodeId } from '../../../utils/hash';
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const CourseList = ({ categoryId, filter }) => {
   const [courses, setCourses] = useState([]);
@@ -15,7 +16,7 @@ const CourseList = ({ categoryId, filter }) => {
     const fetchCourses = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`http://localhost:8080/api/student/categories/${categoryId}/courses`);
+        const response = await axios.get(`${baseUrl}/api/student/categories/${categoryId}/courses`);
         setCourses(response.data);
         setNoCourses(response.data.length === 0);
       } catch (error) {

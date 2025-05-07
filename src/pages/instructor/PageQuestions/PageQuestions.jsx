@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Sidebar from "../../../components/instructor/Sidebar/Sidebar";
 import Question from "../../../components/instructor/QuestionsAndAnswers/Questions";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const CourseQuestionsTable = () => {
   const [courses, setCourses] = useState([]);
@@ -21,7 +22,7 @@ const CourseQuestionsTable = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8080/api/instructor/course-questions/${userId}`,
+          `${baseUrl}/api/instructor/course-questions/${userId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import StudyReminderList from "./StudyReminderList";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const Reminder = () => {
   const userId = Number(localStorage.getItem("userId"));
@@ -18,7 +19,7 @@ const Reminder = () => {
     const fetchReminders = async () => {
       try {
         const response = await fetch(
-          `http://localhost:8080/api/student/reminders/user/${userId}`
+          `${baseUrl}/api/student/reminders/user/${userId}`
         );
         if (!response.ok) {
           throw new Error("Failed to fetch data");

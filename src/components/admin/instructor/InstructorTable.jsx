@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Search, Camera, Edit, Trash2, ChevronLeft, ChevronRight, Loader, AlertTriangle, X } from "lucide-react";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 // Animation styles
 const animationStyles = `
@@ -152,7 +153,7 @@ const InstructorsTable = () => {
         }
 
         const response = await fetch(
-          "http://localhost:8080/api/admin/instructors",
+          `${baseUrl}/api/admin/instructors`,
           {
             method: "GET",
             headers: {
@@ -223,7 +224,7 @@ const InstructorsTable = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `http://localhost:8080/api/admin/instructors/${instructorToDelete.id}`,
+        `${baseUrl}/api/admin/instructors/${instructorToDelete.id}`,
         {
           method: "DELETE",
           headers: {
@@ -277,7 +278,7 @@ const InstructorsTable = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `http://localhost:8080/api/admin/instructors/${editingInstructor.id}`,
+        `${baseUrl}/api/admin/instructors/${editingInstructor.id}`,
         {
           method: "PUT",
           headers: {

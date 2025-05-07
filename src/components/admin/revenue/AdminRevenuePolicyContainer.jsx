@@ -5,6 +5,7 @@ import { Search, Plus, X } from "lucide-react";
 // Import các component đã tách
 import PolicyTable from "./PolicyTable";
 import PolicyFormModal from "./PolicyFormModal";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 // Error boundary component
 class ErrorBoundary extends React.Component {
@@ -185,7 +186,7 @@ const AdminRevenuePolicyTable = () => {
       
       // Gọi API lấy phần tử theo trang
       const response = await fetch(
-        `http://localhost:8080/api/admin/revenue-policies?page=${apiPage}&size=${policiesPerPage}`,
+        `${baseUrl}/api/admin/revenue-policies?page=${apiPage}&size=${policiesPerPage}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -297,7 +298,7 @@ const AdminRevenuePolicyTable = () => {
       }
 
       const response = await fetch(
-        "http://localhost:8080/api/admin/revenue-policies/presets",
+        `${baseUrl}/api/admin/revenue-policies/presets`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -341,7 +342,7 @@ const AdminRevenuePolicyTable = () => {
       }
 
       const response = await fetch(
-        `http://localhost:8080/api/admin/revenue-policies/${id}`,
+        `${baseUrl}/api/admin/revenue-policies/${id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -492,8 +493,8 @@ const AdminRevenuePolicyTable = () => {
       }
 
       const url = formMode === "create" 
-        ? "http://localhost:8080/api/admin/revenue-policies"
-        : `http://localhost:8080/api/admin/revenue-policies/${formPolicy.id}`;
+        ? `${baseUrl}/api/admin/revenue-policies`
+        : `${baseUrl}/api/admin/revenue-policies/${formPolicy.id}`;
       
       const method = formMode === "create" ? "POST" : "PUT";
       
@@ -558,7 +559,7 @@ const AdminRevenuePolicyTable = () => {
       }
 
       const response = await fetch(
-        `http://localhost:8080/api/admin/revenue-policies/${policyToDelete.id}`,
+        `${baseUrl}/api/admin/revenue-policies/${policyToDelete.id}`,
         {
           method: "DELETE",
           headers: {

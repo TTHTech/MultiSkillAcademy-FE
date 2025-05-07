@@ -3,8 +3,9 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
-const BACKEND_URL = "http://localhost:8080";
+const BACKEND_URL = `${baseUrl}`;
 
 const GitHubCallbackPage = () => {
   const navigate = useNavigate();

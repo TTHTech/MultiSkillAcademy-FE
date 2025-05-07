@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import axios from "axios";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const ChangeStatus = ({ title, courseId, status, triggerRefresh }) => {
   const { id } = useParams();
@@ -35,7 +36,7 @@ const ChangeStatus = ({ title, courseId, status, triggerRefresh }) => {
         if (!token) throw new Error("No token found, please login first.");
 
         const response = await fetch(
-          `http://localhost:8080/api/instructor/user/${userId}`,
+          `${baseUrl}/api/instructor/user/${userId}`,
           {
             method: "GET",
             headers: {
@@ -131,7 +132,7 @@ const ChangeStatus = ({ title, courseId, status, triggerRefresh }) => {
     }
     try {
       const response = await axios.put(
-        `http://localhost:8080/api/instructor/changeStatus/${courseId}`,
+        `${baseUrl}/api/instructor/changeStatus/${courseId}`,
         {},
         {
           headers: {

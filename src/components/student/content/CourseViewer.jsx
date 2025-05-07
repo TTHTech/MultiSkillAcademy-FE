@@ -5,6 +5,7 @@ import Sidebar from "../../student/content/CourseSidebar.jsx";
 import MainContent from "../../student/content/MainContent.jsx";
 import { decodeId } from '../../../utils/hash';
 import { encodeId } from '../../../utils/hash';
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const CourseViewer = () => {
   const [course, setCourse] = useState(null); // Dữ liệu khóa học
@@ -27,7 +28,7 @@ const CourseViewer = () => {
       console.log(progress)
       try {
         const response = await fetch(
-          `http://localhost:8080/api/student/study-courses/${id}/${userId}`,
+          `${baseUrl}/api/student/study-courses/${id}/${userId}`,
           {
             method: "GET",
             headers: {
@@ -115,7 +116,7 @@ const CourseViewer = () => {
   // Cập nhật tiến độ qua API
   const updateProgress = async (lectureId, progress) => {
     try {
-      const response = await fetch("http://localhost:8080/api/student/update-progress", {
+      const response = await fetch(`${baseUrl}/api/student/update-progress`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

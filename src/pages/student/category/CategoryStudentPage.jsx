@@ -5,6 +5,7 @@ import Footer from '../../../components/student/common/Footer'; // Import Footer
 import CourseList from '../../../components/student/category/CourseList';
 import CourseFilter from '../../../components/student/category/CourseFilter';
 import axios from 'axios';
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const CategoryStudentPage = () => {
   const { categoryId } = useParams(); // Extract categoryId from URL params
@@ -20,7 +21,7 @@ const CategoryStudentPage = () => {
   useEffect(() => {
     const fetchCategoryData = async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/api/student/categories/${categoryId}`);
+        const response = await axios.get(`${baseUrl}/api/student/categories/${categoryId}`);
         setCategoryName(response.data.name); // Assuming response contains category name
       } catch (error) {
         console.error('Failed to fetch category data:', error);

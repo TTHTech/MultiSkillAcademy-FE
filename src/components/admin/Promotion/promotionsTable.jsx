@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import EditPromotion from "./updatePromotion";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const PromotionsTable = () => {
   const [promotions, setPromotions] = useState([]);
@@ -36,7 +37,7 @@ const PromotionsTable = () => {
     const fetchPromotions = async () => {
       try {
         const res = await axios.get(
-          "http://localhost:8080/api/admin/promotion",
+          `${baseUrl}/api/admin/promotion`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setPromotions(res.data);

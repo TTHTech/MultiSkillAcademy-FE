@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Search, MoreHorizontal, Edit, Filter, UserPlus } from "lucide-react";
 import { toast } from "react-toastify";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
-const InstructorChatSidebar = ({ onUserSelect }) => {
+const InstructorChatSideBar= ({ onUserSelect }) => {
   const [chatUsers, setChatUsers] = useState([]);
   const [searchUsers, setSearchUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -24,7 +25,7 @@ const InstructorChatSidebar = ({ onUserSelect }) => {
         throw new Error("Vui lòng đăng nhập lại");
       }
 
-      const response = await fetch(`http://localhost:8080/api/instructor/chat/users/${userId}/avatar`, {
+      const response = await fetch(`${baseUrl}/api/instructor/chat/users/${userId}/avatar`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -73,7 +74,7 @@ const InstructorChatSidebar = ({ onUserSelect }) => {
         throw new Error("Vui lòng đăng nhập lại");
       }
 
-      const response = await fetch("http://localhost:8080/api/instructor/chat/users", {
+      const response = await fetch(`${baseUrl}/api/instructor/chat/users`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -107,7 +108,7 @@ const InstructorChatSidebar = ({ onUserSelect }) => {
       }
 
       // Prepare URL with search parameters
-      const url = new URL("http://localhost:8080/api/instructor/chat/search-users");
+      const url = new URL(`${baseUrl}/api/instructor/chat/search-users`);
       if (keyword) url.searchParams.append("keyword", keyword);
       if (role && role !== "ALL") url.searchParams.append("role", role);
 
@@ -153,7 +154,7 @@ const InstructorChatSidebar = ({ onUserSelect }) => {
 
       try {
         const response = await fetch(
-          `http://localhost:8080/api/instructor/chat/one-to-one/${user.userId}`,
+          `${baseUrl}/api/instructor/chat/one-to-one/${user.userId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -214,7 +215,7 @@ const InstructorChatSidebar = ({ onUserSelect }) => {
       
       console.log("Chat request payload:", chatRequest);
       
-      const response = await fetch("http://localhost:8080/api/instructor/chat", {
+      const response = await fetch(`${baseUrl}/api/instructor/chat`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -271,7 +272,7 @@ const InstructorChatSidebar = ({ onUserSelect }) => {
       if (!token) throw new Error("Vui lòng đăng nhập lại");
       
       // Try to fetch the chat by user ID directly
-      const response = await fetch(`http://localhost:8080/api/instructor/chat/users/${recipientId}/chat`, {
+      const response = await fetch(`${baseUrl}/api/instructor/chat/users/${recipientId}/chat`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -594,4 +595,4 @@ const InstructorChatSidebar = ({ onUserSelect }) => {
   );
 };
 
-export default InstructorChatSidebar;
+export default InstructorChatSideBar;

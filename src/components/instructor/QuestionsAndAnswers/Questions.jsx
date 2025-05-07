@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const DetailQuestions = ({ courseId }) => {
   const [questions, setQuestions] = useState([]);
@@ -14,7 +15,7 @@ const DetailQuestions = ({ courseId }) => {
     const fetchQuestions = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8080/api/instructor/detail-questions/${courseId}`,
+          `${baseUrl}/api/instructor/detail-questions/${courseId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -46,7 +47,7 @@ const DetailQuestions = ({ courseId }) => {
     }
     try {
       await fetch(
-        `http://localhost:8080/api/instructor/deleteQuestion/${questionsId}`,
+        `${baseUrl}/api/instructor/deleteQuestion/${questionsId}`,
         {
           method: "DELETE",
           headers: {
@@ -81,7 +82,7 @@ const DetailQuestions = ({ courseId }) => {
     console.log("Câu trả lời vừa nhập:", newAnswer);
 
     try {
-      await fetch("http://localhost:8080/api/instructor/addAnswer", {
+      await fetch(`${baseUrl}/api/instructor/addAnswer`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -115,7 +116,7 @@ const DetailQuestions = ({ courseId }) => {
     }
     try {
       await fetch(
-        `http://localhost:8080/api/instructor/deleteAnswer/${answersId}`,
+        `${baseUrl}/api/instructor/deleteAnswer/${answersId}`,
         {
           method: "DELETE",
           headers: {
@@ -155,7 +156,7 @@ const DetailQuestions = ({ courseId }) => {
     if (swalResult.isDismissed) {
       return;
     }
-    fetch(`http://localhost:8080/api/instructor/evaluateAnswer/${answersId}`, {
+    fetch(`${baseUrl}/api/instructor/evaluateAnswer/${answersId}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const CreateStudyReminder = ({ Data, closeModal, triggerRefresh, courseId }) => {
   const [step, setStep] = useState(1);
@@ -61,7 +62,7 @@ const CreateStudyReminder = ({ Data, closeModal, triggerRefresh, courseId }) => 
       };
       console.log(localStorage.getItem("userId"));
       const response = await axios.put(
-        `http://localhost:8080/api/student/reminders/${Data.id}`,
+        `${baseUrl}/api/student/reminders/${Data.id}`,
         payload
       );
 

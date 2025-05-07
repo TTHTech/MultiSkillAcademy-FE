@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useState, useEffect } from "react";
 import Swal from "sweetalert2";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const TestDetailsModal = ({ test, onClose, open }) => {
   const [testData, setTestData] = useState(test);
@@ -31,7 +32,7 @@ const TestDetailsModal = ({ test, onClose, open }) => {
     }
     try {
       const response = await axios.post(
-        `http://localhost:8080/api/instructor/addQuestion`,
+        `${baseUrl}/api/instructor/addQuestion`,
         {
           text: newQuestionText,
           testId: testData.id,
@@ -77,7 +78,7 @@ const TestDetailsModal = ({ test, onClose, open }) => {
 
     try {
       const response = await axios.post(
-        `http://localhost:8080/api/instructor/addAnswers`,
+        `${baseUrl}/api/instructor/addAnswers`,
         {
           text: newAnswerText,
           questionId: questionId,
@@ -147,7 +148,7 @@ const TestDetailsModal = ({ test, onClose, open }) => {
     }
     try {
       const response = await axios.put(
-        `http://localhost:8080/api/instructor/updateTest/${testData.id}`,
+        `${baseUrl}/api/instructor/updateTest/${testData.id}`,
         {
           title: testData.title,
           description: testData.description,
@@ -221,7 +222,7 @@ const TestDetailsModal = ({ test, onClose, open }) => {
 
     try {
       await axios.delete(
-        `http://localhost:8080/api/instructor/deleteTest/${test.id}`,
+        `${baseUrl}/api/instructor/deleteTest/${test.id}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -262,7 +263,7 @@ const TestDetailsModal = ({ test, onClose, open }) => {
 
     try {
       await axios.delete(
-        `http://localhost:8080/api/instructor/deleteTestQuestion/${questionId}`,
+        `${baseUrl}/api/instructor/deleteTestQuestion/${questionId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -310,7 +311,7 @@ const TestDetailsModal = ({ test, onClose, open }) => {
 
     try {
       await axios.delete(
-        `http://localhost:8080/api/instructor/deleteTestAnswers/${answerId}`,
+        `${baseUrl}/api/instructor/deleteTestAnswers/${answerId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }

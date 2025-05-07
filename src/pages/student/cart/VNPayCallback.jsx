@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom"; // Dùng useNavigate cho React Router v6
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const VNPayCallback = () => {
   const navigate = useNavigate();
@@ -20,7 +21,7 @@ const VNPayCallback = () => {
       // Gọi API xác nhận thanh toán
       const confirmPayment = async () => {
         try {
-          const response = await fetch("http://localhost:8080/api/student/payment/vn-pay-callback", {
+          const response = await fetch(`${baseUrl}/api/student/payment/vn-pay-callback`, {
             method: "GET",
             headers: {
               "Authorization": `Bearer ${token}`,  // Đảm bảo token hợp lệ nếu cần

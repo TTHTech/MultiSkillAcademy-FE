@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Clock, Star, Trash2, AlertTriangle, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { encodeId } from '../../../utils/hash';
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const WishlistCard = ({ course, onDelete }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -21,7 +22,7 @@ const WishlistCard = ({ course, onDelete }) => {
     setError(null);
     
     try {
-      const response = await fetch('http://localhost:8080/api/student/delete-course', {
+      const response = await fetch(`${baseUrl}/api/student/delete-course`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',

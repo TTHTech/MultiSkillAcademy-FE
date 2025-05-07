@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import TableLecture from "../../components/admin/Lectures/TableLecture";
 import FilterLecture from "../../components/admin/Lectures/FilterLecture";
 import Header from "../../components/admin/common/Header";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const PageLecture = () => {
   const [lectures, setLectures] = useState([]);
@@ -18,7 +19,7 @@ const PageLecture = () => {
       setLoading(true);
       try {
         const response = await fetch(
-          "http://localhost:8080/api/admin/lectures",
+          `${baseUrl}/api/admin/lectures`,
           {
             headers: {
               "Content-Type": "application/json",

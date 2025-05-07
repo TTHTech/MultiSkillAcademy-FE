@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const ITEMS_PER_PAGE = 9;
 
@@ -13,7 +14,7 @@ const StudentLectures = ({ courseId }) => {
     const fetchLectures = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8080/api/student/supplementary/courses/${courseId}/lectures`,
+          `${baseUrl}/api/student/supplementary/courses/${courseId}/lectures`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

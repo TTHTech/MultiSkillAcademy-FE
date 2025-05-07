@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const GoogleCallback = () => {
   const navigate = useNavigate();
@@ -23,7 +24,7 @@ const GoogleCallback = () => {
     const exchangeCodeForToken = async () => {
       try {
         // Gửi code đến backend để đổi lấy token JWT
-        const response = await axios.post('http://localhost:8080/api/auth/google/callback', { code });
+        const response = await axios.post(`${baseUrl}/api/auth/google/callback`, { code });
         
         if (response.data && response.data.token) {
           // Lưu thông tin đăng nhập

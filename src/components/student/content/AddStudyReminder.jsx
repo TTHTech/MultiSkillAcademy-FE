@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import { decodeId } from '../../../utils/hash';
+const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const CreateStudyReminder = ({ closeModal, triggerRefresh }) => {
   const [step, setStep] = useState(1);
@@ -72,7 +73,7 @@ const CreateStudyReminder = ({ closeModal, triggerRefresh }) => {
       };
       console.log(localStorage.getItem("userId"));
       const response = await axios.post(
-        "http://localhost:8080/api/student/reminders",
+        `${baseUrl}/api/student/reminders`,
         payload
       );
 
