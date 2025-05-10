@@ -285,7 +285,10 @@ const InstructorReviews = () => {
           </div>
 
           {loading ? (
-            <div className="text-center text-gray-500">Đang tải dữ liệu...</div>
+            <div className="absolute inset-0 bg-white bg-opacity-75 flex flex-col items-center justify-center rounded-lg">
+              <div className="animate-spin rounded-full h-20 w-20 border-t-4 border-blue-500"></div>
+              <p className="mt-4 text-blue-500 text-xl font-bold">Loading...</p>
+            </div>
           ) : error ? (
             <div className="text-center text-red-500">{error}</div>
           ) : (

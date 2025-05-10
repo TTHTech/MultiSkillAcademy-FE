@@ -80,6 +80,8 @@ import PageCreatePromotion from "./pages/admin/PageCreatePromotion.jsx";
 import PagePromotion from "./pages/admin/PagePromotion.jsx"
 import PagePromotionUsage from "./pages/admin/PagePromotionUsage.jsx"
 import TopicCoursesPage from "./pages/student/topic/TopicCoursesPage.jsx";
+import PageAdminProfile from "./pages/admin/PageAdminProfile.jsx"
+
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [role, setRole] = useState("");
@@ -207,6 +209,7 @@ function App() {
                 <Route path="/admin/promotions/add" element={<PageCreatePromotion />} />
                 <Route path="/admin/promotions" element={<PagePromotion />} />
                 <Route path="/admin/promotions-usage" element={<PagePromotionUsage />} />
+                <Route path="/admin/profile-admin" element={<PageAdminProfile />} />
               </>
             )}
             

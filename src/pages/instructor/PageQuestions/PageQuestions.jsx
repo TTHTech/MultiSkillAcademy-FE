@@ -14,12 +14,14 @@ const CourseQuestionsTable = () => {
   const itemsPerPage = 12;
   const userId = Number(localStorage.getItem("userId"));
   const token = localStorage.getItem("token");
+  const [loading, setLoading] = useState(true);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       try {
         const response = await axios.get(
           `${baseUrl}/api/instructor/course-questions/${userId}`,
@@ -33,6 +35,8 @@ const CourseQuestionsTable = () => {
         setFilteredCourses(response.data);
       } catch (error) {
         console.error("Error fetching data", error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchData();
@@ -88,7 +92,12 @@ const CourseQuestionsTable = () => {
         <h1 className="text-3xl font-bold mb-6 text-blue-700">
           Course Questions
         </h1>
-
+        {loading && (
+          <div className="absolute inset-0 bg-white bg-opacity-75 flex flex-col items-center justify-center rounded-lg">
+            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
+            <p className="mt-3 text-blue-600 font-semibold">Đang tải...</p>
+          </div>
+        )}
         <div className="flex items-center justify-between mb-6">
           <input
             type="text"
