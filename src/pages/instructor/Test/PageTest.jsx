@@ -12,11 +12,13 @@ const TestList = () => {
   const [selectedTest, setSelectedTest] = useState(null);
   const [open, setOpen] = useState(true);
   const [showAddTestForm, setShowAddTestForm] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const userId = localStorage.getItem("userId");
   const token = localStorage.getItem("token");
 
   useEffect(() => {
+    setLoading(true);
     axios
       .get(`${baseUrl}/api/instructor/${userId}`, {
         headers: {
@@ -28,14 +30,11 @@ const TestList = () => {
 
         const courseIds = response.data.map((course) => course.courseId);
         const testPromises = courseIds.map((courseId) =>
-          axios.get(
-            `${baseUrl}/api/instructor/course/test/${courseId}`,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          )
+          axios.get(`${baseUrl}/api/instructor/course/test/${courseId}`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          })
         );
 
         Promise.all(testPromises)
@@ -48,6 +47,7 @@ const TestList = () => {
             );
             setTests(allTests);
             setFilteredTests(allTests);
+            setLoading(false);
           })
           .catch((error) => console.error("Error fetching tests:", error));
       })
@@ -104,6 +104,12 @@ const TestList = () => {
     >
       <Sidebar open={open} setOpen={setOpen} />
       <div className="p-8">
+        {loading && (
+          <div className="absolute inset-0 bg-white bg-opacity-75 flex flex-col items-center justify-center rounded-xl">
+            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
+            <p className="mt-3 text-blue-600 font-semibold">Đang tải...</p>
+          </div>
+        )}
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-extrabold text-blue-700">
             Danh sách bài kiểm tra

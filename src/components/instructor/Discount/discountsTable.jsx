@@ -118,7 +118,10 @@ const DiscountsTable = () => {
           </div>
 
           {loading ? (
-            <p className="text-gray-800 text-sm">Đang tải dữ liệu...</p>
+            <div className="absolute inset-0 bg-white bg-opacity-75 flex flex-col items-center justify-center rounded-lg">
+              <div className="animate-spin rounded-full h-20 w-20 border-t-4 border-blue-500"></div>
+              <p className="mt-4 text-blue-500 text-xl font-bold">Loading...</p>
+            </div>
           ) : error ? (
             <p className="text-red-600 text-sm">{error}</p>
           ) : (

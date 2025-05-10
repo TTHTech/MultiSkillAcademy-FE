@@ -47,16 +47,12 @@ const StudentList = () => {
     }
 
     try {
-      await axios.post(
-        `${baseUrl}/api/instructor/send-email`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
+      await axios.post(`${baseUrl}/api/instructor/send-email`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
       alert("Email sent successfully!");
     } catch (error) {
       console.error("Error sending email:", error);
@@ -67,6 +63,7 @@ const StudentList = () => {
   };
 
   useEffect(() => {
+    setIsLoading(true);
     axios
       .get(`${baseUrl}/api/instructor/students/${userId}`, {
         headers: {
@@ -74,10 +71,12 @@ const StudentList = () => {
         },
       })
       .then((response) => {
+        setIsLoading(false);
         setStudents(response.data);
         setFilteredStudents(response.data);
       })
       .catch((error) => {
+        setIsLoading(false);
         console.error("Error fetching data:", error);
       });
   }, []);
@@ -133,6 +132,12 @@ const StudentList = () => {
       <Sidebar open={open} setOpen={setOpen} />
 
       <div className="container mx-auto p-6">
+        {isLoading && (
+          <div className="absolute inset-0 bg-white bg-opacity-75 flex flex-col items-center justify-center rounded-xl">
+            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
+            <p className="mt-3 text-blue-600 font-semibold">Đang tải...</p>
+          </div>
+        )}
         <h1 className="text-3xl font-bold mb-6 text-gray-800">Student List</h1>
 
         <CourseFilter students={students} onFilterChange={handleFilterChange} />
@@ -282,10 +287,13 @@ const StudentList = () => {
             </div>
           </div>
           {isLoading && (
-            <div className="absolute inset-0 bg-gray-300 bg-opacity-75 flex items-center justify-center z-60">
-              <p className="text-xl font-bold text-gray-700 animate-pulse">
-                Sending email, please wait...
-              </p>
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-white bg-opacity-90">
+              <div className="flex flex-col items-center">
+                <div className="animate-spin rounded-full h-20 w-20 border-t-4 border-blue-500"></div>
+                <p className="mt-4 text-blue-500 text-xl font-bold">
+                  Sending email, please wait...
+                </p>
+              </div>
             </div>
           )}
         </div>

@@ -27,14 +27,11 @@ const PageCourses = () => {
       setLoading(true);
       setError(null);
       try {
-        const resp = await fetch(
-          `${baseUrl}/api/instructor/${userId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
-        );
+        const resp = await fetch(`${baseUrl}/api/instructor/${userId}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
         if (!resp.ok) throw new Error(`Status ${resp.status}`);
         const data = await resp.json();
         setCourses(data);
@@ -74,11 +71,36 @@ const PageCourses = () => {
 
   // Tabs config
   const tabs = [
-    { key: "pending", label: "Chưa Duyệt", page: pendingPage, setPage: setPendingPage },
-    { key: "approved", label: "Đã Duyệt", page: approvedPage, setPage: setApprovedPage },
-    { key: "inactive", label: "Bị Khóa", page: inactivePage, setPage: setInactivePage },
-    { key: "unsent", label: "Chưa Gửi", page: unsentPage, setPage: setUnsentPage },
-    { key: "declined", label: "Bị Từ Chối", page: declinedPage, setPage: setDeclinedPage },
+    {
+      key: "pending",
+      label: "Chưa Duyệt",
+      page: pendingPage,
+      setPage: setPendingPage,
+    },
+    {
+      key: "approved",
+      label: "Đã Duyệt",
+      page: approvedPage,
+      setPage: setApprovedPage,
+    },
+    {
+      key: "inactive",
+      label: "Bị Khóa",
+      page: inactivePage,
+      setPage: setInactivePage,
+    },
+    {
+      key: "unsent",
+      label: "Chưa Gửi",
+      page: unsentPage,
+      setPage: setUnsentPage,
+    },
+    {
+      key: "declined",
+      label: "Bị Từ Chối",
+      page: declinedPage,
+      setPage: setDeclinedPage,
+    },
   ];
 
   // Precompute lists
@@ -87,8 +109,7 @@ const PageCourses = () => {
   );
 
   // Generate pagination numbers
-  const pagesCount = (key) =>
-    Math.ceil(lists[key].length / coursesPerPage);
+  const pagesCount = (key) => Math.ceil(lists[key].length / coursesPerPage);
 
   return (
     <section
@@ -123,15 +144,18 @@ const PageCourses = () => {
         {/* Content */}
         <div className="mt-6">
           {loading ? (
-            <p className="text-center text-blue-600 animate-pulse">
-              Đang tải khóa học...
-            </p>
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-white bg-opacity-90">
+              <div className="flex flex-col items-center">
+                <div className="animate-spin rounded-full h-20 w-20 border-t-4 border-blue-500"></div>
+                <p className="mt-4 text-blue-500 text-xl font-bold">
+                  Loading...
+                </p>
+              </div>
+            </div>
           ) : error ? (
             <p className="text-center text-red-500">Lỗi: {error}</p>
           ) : lists[activeTab].length === 0 ? (
-            <p className="text-center text-gray-500">
-              Không có khóa học
-            </p>
+            <p className="text-center text-gray-500">Không có khóa học</p>
           ) : (
             <div className="bg-white p-6 rounded-lg shadow-md space-y-4">
               <ListCard
@@ -142,13 +166,14 @@ const PageCourses = () => {
               />
               {/* Pagination */}
               <div className="flex justify-center space-x-2 mt-6">
-                {Array.from({ length: pagesCount(activeTab) }, (_, i) => i + 1).map((pg) => (
+                {Array.from(
+                  { length: pagesCount(activeTab) },
+                  (_, i) => i + 1
+                ).map((pg) => (
                   <button
                     key={pg}
                     onClick={() =>
-                      tabs
-                        .find((t) => t.key === activeTab)
-                        .setPage(pg)
+                      tabs.find((t) => t.key === activeTab).setPage(pg)
                     }
                     className={`px-4 py-2 rounded-full text-lg font-semibold transition-all duration-300 ${
                       tabs.find((t) => t.key === activeTab).page === pg
