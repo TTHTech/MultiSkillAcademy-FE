@@ -235,7 +235,6 @@ const InstructorDashboard = () => {
     });
     doc.save("Course_Revenue_Report.pdf");
   };
-
   return (
     <section
       className={`m-3 text-xl text-gray-900 font-semibold duration-300 flex-1 bg-gradient-to-b from-gray-100 to-gray-100 min-h-screen ${
@@ -273,8 +272,13 @@ const InstructorDashboard = () => {
                 </button>
               </div>
               {loading ? (
-                <div className="flex justify-center items-center">
-                  <div className="animate-spin h-12 w-12 border-4 border-blue-500 border-t-transparent rounded-full"></div>
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-white bg-opacity-90">
+                  <div className="flex flex-col items-center">
+                    <div className="animate-spin rounded-full h-20 w-20 border-t-4 border-blue-500"></div>
+                    <p className="mt-4 text-blue-500 text-xl font-bold">
+                      Loading...
+                    </p>
+                  </div>
                 </div>
               ) : error ? (
                 <div className="text-center text-red-500">{error}</div>

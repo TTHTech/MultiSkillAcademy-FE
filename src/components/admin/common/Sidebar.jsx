@@ -45,6 +45,7 @@ import {
   LineChart,
   BadgePercent,
   DollarSign,
+  UserCircle2,
 } from "lucide-react";
 import { ChalkboardTeacher } from "phosphor-react";
 
@@ -351,6 +352,12 @@ const MENU_GROUPS = [
             color: "#ec4899",
           },
           {
+            name: "Profile Admin",
+            icon: UserCircle2,
+            href: "/admin/profile-admin",
+            color: "#ec4899",
+          },
+          {
             name: "Add User",
             icon: Plus,
             href: "/admin/add-user",
@@ -422,7 +429,7 @@ const MENU_GROUPS = [
   },
 ];
 
-const UserProfile = ({ isOpen }) => (
+const UserProfile = ({ isOpen, formData }) => (
   <motion.div
     className="flex items-center p-4 mb-4 bg-slate-700/40 hover:bg-slate-700/60 rounded-lg transition-colors border border-slate-600/30 shadow-sm"
     initial={false}
@@ -432,9 +439,17 @@ const UserProfile = ({ isOpen }) => (
     }}
   >
     <div className="flex-shrink-0">
-      <div className="w-10 h-10 rounded-full bg-gradient-to-r from-indigo-600 to-blue-500 animate-gradient flex items-center justify-center shadow-md">
-        <User size={20} className="text-white" />
-      </div>
+      {formData.profileImagePreview ? (
+        <img
+          src={formData.profileImagePreview}
+          alt="Profile Preview"
+          className="w-10 h-10 rounded-full object-cover shadow-md"
+        />
+      ) : (
+        <div className="w-10 h-10 rounded-full bg-gradient-to-r from-indigo-600 to-blue-500 animate-gradient flex items-center justify-center shadow-md">
+          <User size={20} className="text-white" />
+        </div>
+      )}
     </div>
     <AnimatePresence>
       {isOpen && (
@@ -444,8 +459,8 @@ const UserProfile = ({ isOpen }) => (
           animate={{ opacity: 1, width: "auto" }}
           exit={{ opacity: 0, width: 0 }}
         >
-          <p className="text-sm font-medium text-white">Admin User</p>
-          <p className="text-xs text-slate-300">admin@example.com</p>
+          <p className="text-sm font-medium text-white">{formData.firstName} {formData.lastName}</p>
+          <p className="text-xs text-slate-300">{formData.email}</p>
         </motion.div>
       )}
     </AnimatePresence>
@@ -596,11 +611,40 @@ const Sidebar = () => {
   const [mounted, setMounted] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-
+  const userId = Number(localStorage.getItem("userId"));
+  const token = localStorage.getItem("token");
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phoneNumber: "",
+    address: "",
+    dateOfBirth: "",
+    profileImageFile: null,
+    profileImagePreview: ""
+  });
   useEffect(() => {
+    fetch(`${import.meta.env.VITE_REACT_APP_BASE_URL}/api/admin/profile/${userId}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+      .then(res => res.json())
+      .then(data => {
+        setFormData(prev => ({
+          ...prev,
+          firstName: data.firstName || "",
+          lastName: data.lastName || "",
+          email: data.email || "",
+          phoneNumber: data.phoneNumber || "",
+          address: data.address || "",
+          dateOfBirth: data.dateOfBirth
+            ? `${data.dateOfBirth[0]}-${String(data.dateOfBirth[1]).padStart(2, '0')}-${String(data.dateOfBirth[2]).padStart(2, '0')}`
+            : "",
+          profileImagePreview: data.profileImageUrl || ""
+        }));
+      })
     setMounted(true);
     return () => setMounted(false);
-  }, []);
+  }, [token, userId]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -651,7 +695,7 @@ const Sidebar = () => {
           </div>
 
           {/* User Profile - Fixed */}
-          <UserProfile isOpen={isSidebarOpen} />
+          <UserProfile isOpen={isSidebarOpen} formData={formData}/>
         </div>
 
         {/* Navigation - Scrollable */}
