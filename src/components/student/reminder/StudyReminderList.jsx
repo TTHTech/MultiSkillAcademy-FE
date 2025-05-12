@@ -44,9 +44,7 @@ const StudyReminderList = ({ courseId, nameCourse }) => {
   const handleDelete = async (reminderId) => {
     if (window.confirm("Bạn có chắc chắn muốn xóa nhắc nhở này?")) {
       try {
-        await axios.delete(
-          `${baseUrl}/api/student/reminders/${reminderId}`
-        );
+        await axios.delete(`${baseUrl}/api/student/reminders/${reminderId}`);
         setReminders(
           reminders.filter((reminder) => reminder.id !== reminderId)
         );
@@ -175,10 +173,40 @@ const StudyReminderList = ({ courseId, nameCourse }) => {
       <div className="space-y-8">
         {currentReminders.length === 0 ? (
           <div className="flex flex-col items-center justify-center p-6 border border-gray-300 rounded-lg bg-gray-100 shadow-md">
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-32 h-32 text-gray-600" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" >
-              <circle cx="50" cy="50" r="45" stroke="black" strokeWidth="3" fill="white" />
-              <line x1="50" y1="50" x2="50" y2="25" stroke="red" strokeWidth="3" />
-              <line x1="50" y1="50" x2="70" y2="50" stroke="blue" strokeWidth="2" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="w-32 h-32 text-gray-600"
+              viewBox="0 0 100 100"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <circle
+                cx="50"
+                cy="50"
+                r="45"
+                stroke="black"
+                strokeWidth="3"
+                fill="white"
+              />
+              <line
+                x1="50"
+                y1="50"
+                x2="50"
+                y2="25"
+                stroke="red"
+                strokeWidth="3"
+              />
+              <line
+                x1="50"
+                y1="50"
+                x2="70"
+                y2="50"
+                stroke="blue"
+                strokeWidth="2"
+              />
               <circle cx="50" cy="50" r="3" fill="black" />
             </svg>
             <p className="text-lg font-semibold text-gray-700">
