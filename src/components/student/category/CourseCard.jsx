@@ -155,9 +155,9 @@ const CourseCard = ({ course = defaultCourse, onEnroll }) => {
     price,
     discount,
     description,
-    studentsCount = 0,
-    lessonsCount = 0,
-    reviewsCount = 0,
+    studentsCount,
+    lessonsCount,
+    numberReview,
   } = { ...defaultCourse, ...course };
 
   const discountPercent = discount;
@@ -229,7 +229,7 @@ const CourseCard = ({ course = defaultCourse, onEnroll }) => {
                 {instructorFirstName} {instructorLastName}
               </span>
             </p>
-            <RatingStars rating={rating} reviewsCount={reviewsCount} />
+            <RatingStars rating={rating} reviewsCount={numberReview} />
             <p className="text-gray-600 line-clamp-2 leading-relaxed">
               {description}
             </p>
