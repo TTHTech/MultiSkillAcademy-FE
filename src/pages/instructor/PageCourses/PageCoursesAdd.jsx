@@ -370,7 +370,7 @@ const App = () => {
       <div className="container mx-auto p-4">
         <div className="bg-white shadow-md rounded-lg p-6 mb-8">
           <h1 className="text-3xl font-bold text-gray-800 mb-6">
-            Add New Course
+            Thêm khóa học mới
           </h1>
           <div className="relative mb-6">
             {images.length >= 0 && (
@@ -429,7 +429,7 @@ const App = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               <div>
                 <label className="block text-gray-700 mb-2" htmlFor="title">
-                  Title
+                  Tiêu đề
                 </label>
                 <input
                   id="title"
@@ -442,7 +442,7 @@ const App = () => {
               </div>
               <div>
                 <label className="block text-gray-700 mb-2" htmlFor="price">
-                  Price (VND)
+                  Giá (VND)
                 </label>
                 <input
                   id="price"
@@ -457,7 +457,7 @@ const App = () => {
 
             <div className="mb-6">
               <label className="block text-gray-700 mb-2" htmlFor="description">
-                Description
+                Mô tả
               </label>
               <textarea
                 id="description"
@@ -472,7 +472,7 @@ const App = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               <div>
                 <label className="block text-gray-700 mb-2" htmlFor="level">
-                  Level
+                  Cấp độ
                 </label>
                 <select
                   id="level"
@@ -481,14 +481,14 @@ const App = () => {
                   onChange={handleChange}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                  <option value="Beginner">Beginner</option>
-                  <option value="Intermediate">Intermediate</option>
-                  <option value="Advanced">Advanced</option>
+                  <option value="Beginner">Cơ bản</option>
+                  <option value="Intermediate">Trung cấp</option>
+                  <option value="Advanced">Nâng cao</option>
                 </select>
               </div>
               <div>
                 <label className="block text-gray-700 mb-2" htmlFor="language">
-                  Language
+                  Ngôn ngữ
                 </label>
                 <select
                   id="language"
@@ -498,7 +498,7 @@ const App = () => {
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="" disabled>
-                    Select a language
+                    Chọn ngôn ngữ
                   </option>
                   {languages.map((language) => (
                     <option key={language} value={language}>
@@ -514,7 +514,7 @@ const App = () => {
                 className="block text-gray-700 mb-2"
                 htmlFor="categoryName"
               >
-                Category Name
+                Danh mục
               </label>
               <select
                 id="categoryName"
@@ -524,7 +524,7 @@ const App = () => {
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="" disabled>
-                  Select a category
+                  Chọn một danh mục
                 </option>
                 {categories.map((category) => (
                   <option key={category} value={category}>
@@ -535,7 +535,7 @@ const App = () => {
             </div>
             <div className="mb-6">
               <label className="block text-gray-700 mb-2" htmlFor="duration">
-                Duration
+                Thời gian
               </label>
               <input
                 id="duration"
@@ -552,13 +552,7 @@ const App = () => {
                 onClick={handleSaveCourse}
                 className="bg-blue-500 text-white px-6 py-3 rounded-lg flex items-center shadow-md hover:bg-blue-600 transition-colors"
               >
-                <FaSave className="mr-2" /> Save Course
-              </button>
-              <button
-                onClick={() => navigate(-1)}
-                className="bg-gray-500 text-white px-6 py-3 rounded-lg flex items-center shadow-md hover:bg-gray-600 transition-colors"
-              >
-                <FaTimes className="mr-2" /> Cancel
+                <FaSave className="mr-2" /> Lưu khóa học
               </button>
             </div>
           </div>

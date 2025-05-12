@@ -226,7 +226,7 @@ const Images = ({ images = [], courseId, triggerRefresh}) => {
               onClick={handlePrev}
               className="bg-gray-800 text-white px-3 py-2 rounded-md hover:bg-gray-700 focus:outline-none"
             >
-              Prev
+              Trước
             </button>
             <p className="text-gray-600 text-sm italic text-center">
               Đang xem ảnh thứ {currentIndex + 1} / {images.length}
@@ -235,7 +235,7 @@ const Images = ({ images = [], courseId, triggerRefresh}) => {
               onClick={handleNext}
               className="bg-gray-800 text-white px-3 py-2 rounded-md hover:bg-gray-700 focus:outline-none"
             >
-              Next
+              Sau
             </button>
           </div>
         </div>

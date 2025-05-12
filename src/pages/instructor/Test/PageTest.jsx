@@ -105,9 +105,15 @@ const TestList = () => {
       <Sidebar open={open} setOpen={setOpen} />
       <div className="p-8">
         {loading && (
-          <div className="absolute inset-0 bg-white bg-opacity-75 flex flex-col items-center justify-center rounded-xl">
-            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
-            <p className="mt-3 text-blue-600 font-semibold">Đang tải...</p>
+          <div className="flex flex-col justify-center items-center h-screen">
+            <div className="flex flex-col items-center">
+              <div className="relative flex flex-col items-center bg-white bg-opacity-90 p-6 rounded-2xl shadow-xl">
+                <div className="w-14 h-14 border-4 border-blue-200 border-t-blue-500 rounded-full animate-spin"></div>
+                <p className="mt-4 text-blue-600 font-semibold text-lg animate-pulse">
+                  Đang tải dữ liệu...
+                </p>
+              </div>
+            </div>
           </div>
         )}
         <div className="flex justify-between items-center mb-6">

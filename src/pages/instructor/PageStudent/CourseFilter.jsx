@@ -31,20 +31,20 @@ const CourseFilter = ({ students, onFilterChange }) => {
   return (
     <div className="mb-4 flex flex-wrap gap-4">
       <select className="py-2 px-3 border rounded-md" onChange={(e) => setFilters({ ...filters, course: e.target.value })}>
-        <option value="">All Courses</option>
+        <option value="">Tất cả khóa học</option>
         {courseOptions.map((course) => (
           <option key={course} value={course}>{course}</option>
         ))}
       </select>
 
-      <input type="text" placeholder="Search by name" className="py-2 px-3 border rounded-md" onChange={(e) => setFilters({ ...filters, name: e.target.value })} />
+      <input type="text" placeholder="Tìm theo tên" className="py-2 px-3 border rounded-md" onChange={(e) => setFilters({ ...filters, name: e.target.value })} />
 
-      <input type="text" placeholder="Search by email" className="py-2 px-3 border rounded-md" onChange={(e) => setFilters({ ...filters, email: e.target.value })} />
+      <input type="text" placeholder="Tìm theo email" className="py-2 px-3 border rounded-md" onChange={(e) => setFilters({ ...filters, email: e.target.value })} />
 
-      <input type="text" placeholder="Search by phone" className="py-2 px-3 border rounded-md" onChange={(e) => setFilters({ ...filters, phone: e.target.value })} />
+      <input type="text" placeholder="Tìm theo SĐT" className="py-2 px-3 border rounded-md" onChange={(e) => setFilters({ ...filters, phone: e.target.value })} />
 
       <select className="py-2 px-3 border rounded-md" onChange={(e) => setFilters({ ...filters, progress: e.target.value })}>
-        <option value="">All Progress</option>
+        <option value="">Tất cả tiến độ</option>
         <option value="1-40">1% - 40%</option>
         <option value="40-70">41% - 70%</option>
         <option value="70-100">71% - 100%</option>

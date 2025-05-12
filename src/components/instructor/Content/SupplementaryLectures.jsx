@@ -701,7 +701,7 @@ const SupplementaryLectures = ({ courseId }) => {
   return (
     <div className="min-h-screen p-8 bg-white">
       <div className="flex items-center justify-between mb-1">
-        <h1 className="text-2xl font-bold">Supplementary Lectures</h1>
+        <h1 className="text-2xl font-bold">Tài liệu học tập</h1>
       </div>
       <p className="text-gray-500 text-sm italic mb-4">
         Chú ý các tài liệu bạn đăng phài phù hợp với mội dung khóa học
