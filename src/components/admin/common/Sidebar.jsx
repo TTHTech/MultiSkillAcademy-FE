@@ -84,27 +84,27 @@ const animationStyles = `
 
 const MENU_GROUPS = [
   {
-    label: "MAIN MENU",
+    label: "Menu Chính",
     items: [
       {
-        name: "Overview",
+        name: "Tổng Quan",
         icon: BarChart2,
         color: "#4f46e5",
         subItems: [
           {
-            name: "Dashboard",
+            name: "Bảng Thống Kê",
             icon: LayoutDashboard,
             href: "/admin",
             color: "#4f46e5",
           },
           {
-            name: "Quick Stats",
+            name: "Thống Kê Nhanh",
             icon: LineChart,
             href: "/admin/quick-stats",
             color: "#818cf8",
           },
           {
-            name: "Recent Activity",
+            name: "Hoạt Động Gần Đây",
             icon: Clock,
             href: "/admin/recent-activity",
             color: "#4f46e5",
@@ -112,31 +112,31 @@ const MENU_GROUPS = [
         ],
       },
       {
-        name: "Statistics",
+        name: "Thống Kê",
         icon: TrendingUp,
         color: "#10b981",
         subItems: [
           {
-            name: "Sales Table",
+            name: "Bảng Doanh Số",
             icon: BarChart,
             href: "/admin/statistics",
             color: "#10b981",
           },
           {
-            name: "Sale By Instructors",
+            name: "Doanh Số Theo Giảng Viên",
             icon: Users,
             href: "/admin/sale-by-instructor",
             color: "#34d399",
           },
 
           {
-            name: "Statistics Reviews",
+            name: "Thống Kê Đánh Giá",
             icon: Activity,
             href: "/admin/statistics/performance",
             color: "#10b981",
           },
           {
-            name: "Reports",
+            name: "Báo Cáo",
             icon: FileText,
             href: "/admin/statistics/reports",
             color: "#059669",
@@ -144,42 +144,42 @@ const MENU_GROUPS = [
         ],
       },
       {
-        name: "Revenue Management",
+        name: "Quản Lý Doanh Thu",
         icon: BarChart2,
         color: "#3b82f6",
         subItems: [
           {
-            name: "Revenue Overview",
+            name: "Tổng Quan Doanh Thu",
             icon: LineChart,
             href: "/admin/revenue",
             color: "#3b82f6",
           },
           {
-            name: "Admin Revenue Dashboard",
+            name: "Bảng Doanh Thu Admin",
             icon: Users,
             href: "/admin/revenue-dashboard",
             color: "#3b82f6",
           },
           {
-            name: "Instructor Revenue",
+            name: "Doanh Thu Giảng Viên",
             icon: DollarSign,
             href: "/admin/instructor-revenue",
             color: "#2563eb",
           },
           {
-            name: "Instructor Sales",
+            name: "Báo Cáo Doanh Số Giảng Viên",
             icon: TrendingUp,
             href: "/admin/instructor-sales",
             color: "#1d4ed8",
           },
           {
-            name: "Sharing Policies",
+            name: "Chính Sách Doanh Thu",
             icon: FileText,
             href: "/admin/revenue-policy",
             color: "#2563eb",
           },
           {
-            name: "Payout Reports",
+            name: "Báo Cáo Thanh Toán",
             icon: Archive,
             href: "/admin/revenue/payouts",
             color: "#1d4ed8",
@@ -188,18 +188,18 @@ const MENU_GROUPS = [
       },
 
       {
-        name: "Notifications",
+        name: "Thông Báo",
         icon: Bell,
         color: "#f59e0b",
         subItems: [
           {
-            name: "All Notifications",
+            name: "Tất Cả Thông Báo",
             icon: Inbox,
             href: "/admin/notification",
             color: "#f59e0b",
           },
           {
-            name: "Create Notification",
+            name: "Tạo Thông Báo",
             icon: Mail,
             href: "/admin/add-notification",
             color: "#ef4444",
@@ -209,33 +209,33 @@ const MENU_GROUPS = [
     ],
   },
   {
-    label: "COURSE MANAGEMENT",
+    label: "Quản Lý Khóa Học",
     items: [
       {
-        name: "Courses",
+        name: "Khóa Học",
         icon: BookOpen,
         color: "#8b5cf6",
         subItems: [
           {
-            name: "All Courses",
+            name: "Tất Cả Khóa Học",
             icon: ListFilter,
             href: "/admin/courses",
             color: "#8b5cf6",
           },
           {
-            name: "Course Reviews",
+            name: "Đánh Giá Khóa Học",
             icon: MessageSquare,
             href: "/admin/courses/reviews",
             color: "#ec4899",
           },
           {
-            name: "Sections",
+            name: "Chương",
             icon: FolderTree,
             href: "/admin/courses/sections",
             color: "#4f46e5",
           },
           {
-            name: "Lectures",
+            name: "Bài Giảng",
             icon: Video,
             href: "/admin/courses/lectures",
             color: "#8b5cf6",
@@ -243,18 +243,18 @@ const MENU_GROUPS = [
         ],
       },
       {
-        name: "Categories",
+        name: "Danh Mục",
         icon: Layers,
         color: "#f97316",
         subItems: [
           {
-            name: "All Categories",
+            name: "Tất Cả Danh Mục",
             icon: ListFilter,
             href: "/admin/category",
             color: "#f97316",
           },
           {
-            name: "Add Category",
+            name: "Thêm Danh Mục",
             icon: FolderPlus,
             href: "/admin/category/add",
             color: "#10b981",
@@ -262,48 +262,48 @@ const MENU_GROUPS = [
         ],
       },
       {
-        name: "Promotions",
+        name: "Mã Giảm Giá / Khuyến Mãi",
         icon: Tag,
         color: "#ec4899",
         subItems: [
           {
-            name: "Discount Usage",
+            name: "Sử Dụng Mã Giảm Giá",
             icon: Ticket,
             href: "/admin/discount-usage",
             color: "#f59e0b",
           },
           {
-            name: "Discounts",
+            name: "Danh Sách Mã Giảm Giá",
             icon: Percent,
             href: "/admin/discounts",
             color: "#ec4899",
           },
           {
-            name: "Browse Discounts",
+            name: "Duyệt Mã Giảm Giá",
             icon: BadgePercent,
             href: "/admin/browsed-discounts",
             color: "#ec4899",
           },
           {
-            name: "Add Discount",
+            name: "Thêm Mã Giảm Giá",
             icon: PlusCircle,
             href: "/admin/discount/add",
             color: "#10b981",
           },
           {
-            name: "Promotion Usage",
+            name: "Sử Dụng Khuyến Mãi",
             icon: Ticket,
             href: "/admin/promotions-usage",
             color: "#f59e0b",
           },
           {
-            name: "Promotions",
+            name: "Danh Sách Khuyến Mãi",
             icon: Percent,
             href: "/admin/promotions",
             color: "#ec4899",
           },
           {
-            name: "Add Promotion",
+            name: "Thêm Khuyến Mãi",
             icon: PlusCircle,
             href: "/admin/promotions/add",
             color: "#10b981",
@@ -311,48 +311,48 @@ const MENU_GROUPS = [
         ],
       },
       {
-        name: "Reports",
+        name: "Báo Cáo",
         icon: AlertTriangle,
         color: "#f97316",
         subItems: [
           {
-            name: "Report Review Course",
+            name: "Báo Cáo Đánh Giá Khóa Học",
             icon: MessageCircle,
             href: "/admin/report/review-course",
             color: "#f97316",
           },
-          {
-            name: "Report Course",
-            icon: Ticket,
-            href: "/admin/report/course",
-            color: "#10b981",
-          },
+          // {
+          //   name: "Báo Cáo Khóa Học",
+          //   icon: Ticket,
+          //   href: "/admin/report/course",
+          //   color: "#10b981",
+          // },
         ],
       },
     ],
   },
   {
-    label: "USER MANAGEMENT",
+    label: "Quản Lý Người Dùng",
     items: [
       {
-        name: "Users",
+        name: "Người Dùng",
         icon: Users,
         color: "#ec4899",
         subItems: [
           {
-            name: "Students",
+            name: "Danh Sách Học Viên",
             icon: GraduationCap,
             href: "/admin/student",
             color: "#ec4899",
           },
           {
-            name: "Instructors",
+            name: "Danh Sách Giảng Viên",
             icon: ChalkboardTeacher,
             href: "/admin/instructor",
             color: "#ec4899",
           },
           {
-            name: "Add User",
+            name: "Thêm Người Dùng",
             icon: Plus,
             href: "/admin/add-user",
             color: "#10b981",
@@ -362,27 +362,27 @@ const MENU_GROUPS = [
     ],
   },
   {
-    label: "COMMUNICATION",
+    label: "Truyền Thông",
     items: [
       {
-        name: "Messages",
+        name: "Tin Nhắn",
         icon: MessageCircle,
         color: "#10b981",
         subItems: [
           {
-            name: "Chat",
+            name: "Trò Chuyện",
             icon: MessagesSquare,
             href: "/admin/chat",
             color: "#10b981",
           },
           {
-            name: "Announcements",
+            name: "Thông Báo Nội Bộ",
             icon: Megaphone,
             href: "/admin/announcements",
             color: "#f59e0b",
           },
           {
-            name: "Support",
+            name: "Hỗ Trợ",
             icon: HeadphonesIcon,
             href: "/admin/support",
             color: "#ec4899",
@@ -392,33 +392,33 @@ const MENU_GROUPS = [
     ],
   },
   {
-    label: "ADMINISTRATION",
+    label: "Quản Trị",
     items: [
       {
-        name: "Settings",
+        name: "Cài Đặt",
         icon: Settings,
         color: "#64748b",
         subItems: [
           {
-            name: "Profile Admin",
+            name: "Hồ Sơ Quản Trị Viên",
             icon: UserCircle2,
             href: "/admin/profile-admin",
             color: "#64748b",
           },
           {
-            name: "General",
+            name: "Chung",
             icon: Sliders,
             href: "/admin/settings/general",
             color: "#64748b",
           },
           {
-            name: "Appearance",
+            name: "Giao Diện",
             icon: Palette,
             href: "/admin/settings/appearance",
             color: "#8b5cf6",
           },
           {
-            name: "Security",
+            name: "Bảo Mật",
             icon: Shield,
             href: "/admin/settings/security",
             color: "#10b981",

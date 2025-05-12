@@ -1,7 +1,12 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import { useEffect, useState, useMemo } from "react";
-import { Loader2, RefreshCcw, PieChart as PieChartIcon, AlertCircle } from "lucide-react";
+import {
+  Loader2,
+  RefreshCcw,
+  PieChart as PieChartIcon,
+  AlertCircle,
+} from "lucide-react";
 const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const API_URL = `${baseUrl}/api/admin/stats`;
@@ -11,7 +16,7 @@ const DISTINCT_COLORS = [
   "#ff7e1d", // Vibrant Orange
   "#4169ff", // Royal Blue
   "#9c19bc", // Purple
-  "#08c79c", // Turquoise 
+  "#08c79c", // Turquoise
   "#fb3e7a", // Hot Pink
   "#ffb700", // Golden Yellow
   "#0fb7ef", // Cyan
@@ -26,7 +31,7 @@ const DISTINCT_COLORS = [
   "#009688", // Green
   "#cddc39", // Lime
   "#ff5722", // Deep Orange
-  "#607d8b"  // Blue Gray
+  "#607d8b", // Blue Gray
 ];
 
 // Animations configuration
@@ -34,13 +39,13 @@ const ANIMATIONS = {
   container: {
     initial: { opacity: 0, y: 20 },
     animate: { opacity: 1, y: 0 },
-    transition: { duration: 0.4, ease: "easeOut" }
+    transition: { duration: 0.4, ease: "easeOut" },
   },
   chart: {
     initial: { opacity: 0, scale: 0.95, rotate: -5 },
     animate: { opacity: 1, scale: 1, rotate: 0 },
-    transition: { delay: 0.2, duration: 0.7, ease: "easeOut" }
-  }
+    transition: { delay: 0.2, duration: 0.7, ease: "easeOut" },
+  },
 };
 
 // Loading Spinner Component with enhanced styling
@@ -76,17 +81,19 @@ const CustomTooltip = ({ active, payload }) => {
 
   const data = payload[0];
   const percentage = ((data.value / data.payload.totalValue) * 100).toFixed(1);
-  
+
   return (
     <div className="bg-slate-800 p-4 rounded-lg shadow-xl border border-blue-900/30 backdrop-blur-md max-w-xs">
       <div className="flex items-start gap-2 mb-2">
-        <div 
-          className="w-3 h-3 rounded-full mt-1" 
+        <div
+          className="w-3 h-3 rounded-full mt-1"
           style={{ backgroundColor: data.fill }}
         />
-        <h3 className="text-slate-200 font-semibold text-sm break-words">{data.name}</h3>
+        <h3 className="text-slate-200 font-semibold text-sm break-words">
+          {data.name}
+        </h3>
       </div>
-      
+
       <div className="space-y-1 mt-3">
         <div className="flex justify-between items-center">
           <span className="text-slate-400 text-xs">Count:</span>
@@ -94,15 +101,17 @@ const CustomTooltip = ({ active, payload }) => {
         </div>
         <div className="flex justify-between items-center">
           <span className="text-slate-400 text-xs">Percentage:</span>
-          <span className="text-white font-mono font-medium">{percentage}%</span>
+          <span className="text-white font-mono font-medium">
+            {percentage}%
+          </span>
         </div>
         <div className="mt-2 pt-2 border-t border-slate-700">
           <div className="w-full bg-slate-700 rounded-full h-1.5">
-            <div 
-              className="h-1.5 rounded-full" 
-              style={{ 
+            <div
+              className="h-1.5 rounded-full"
+              style={{
                 width: `${percentage}%`,
-                backgroundColor: data.fill
+                backgroundColor: data.fill,
               }}
             />
           </div>
@@ -121,18 +130,22 @@ const SideLegend = ({ data, selectedCategory, setSelectedCategory }) => {
       </h3>
       <div className="space-y-2">
         {data.map((item, index) => (
-          <div 
-            key={`legend-${index}`} 
+          <div
+            key={`legend-${index}`}
             className={`flex items-center gap-2 p-1.5 rounded-md transition-colors cursor-pointer
-                      ${selectedCategory === item.name 
-                        ? 'bg-slate-700/70 shadow-sm' 
-                        : 'hover:bg-slate-700/40'}`}
-            onClick={() => setSelectedCategory(
-              selectedCategory === item.name ? null : item.name
-            )}
+                      ${
+                        selectedCategory === item.name
+                          ? "bg-slate-700/70 shadow-sm"
+                          : "hover:bg-slate-700/40"
+                      }`}
+            onClick={() =>
+              setSelectedCategory(
+                selectedCategory === item.name ? null : item.name
+              )
+            }
           >
-            <div 
-              className="min-w-3 h-3 rounded-full" 
+            <div
+              className="min-w-3 h-3 rounded-full"
               style={{ backgroundColor: item.color }}
             />
             <span className="text-xs text-slate-300 truncate max-w-[55%]">
@@ -154,8 +167,12 @@ const EmptyState = ({ onRefresh }) => (
     <div className="p-4 bg-slate-800/50 rounded-full mb-4 border border-slate-700">
       <PieChartIcon className="w-10 h-10 text-slate-500" />
     </div>
-    <p className="text-slate-300 font-medium mb-1">No category data available</p>
-    <p className="text-slate-500 text-sm mb-4">Category distribution data not found</p>
+    <p className="text-slate-300 font-medium mb-1">
+      No category data available
+    </p>
+    <p className="text-slate-500 text-sm mb-4">
+      Category distribution data not found
+    </p>
     <button
       onClick={onRefresh}
       className="px-4 py-2 bg-blue-600/20 text-blue-300 border border-blue-500/30 rounded-lg hover:bg-blue-600/30 transition-colors text-sm flex items-center gap-2"
@@ -178,14 +195,14 @@ const CategoryDistributionChart = () => {
     setError(null);
     setLoading(true); // Set loading state to true when refreshing
     setCategoryData([]); // Clear existing data before fetching
-    
+
     try {
       const response = await fetch(API_URL, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
         // Add cache busting parameter
-        cache: 'no-cache'
+        cache: "no-cache",
       });
 
       if (!response.ok) {
@@ -193,15 +210,18 @@ const CategoryDistributionChart = () => {
       }
 
       const data = await response.json();
-      
+
       // Transform and calculate total
-      const total = Object.values(data.categoryDistribution).reduce((a, b) => a + b, 0);
+      const total = Object.values(data.categoryDistribution).reduce(
+        (a, b) => a + b,
+        0
+      );
       const transformedData = Object.entries(data.categoryDistribution)
         .map(([name, value], index) => ({
           name,
           value,
           totalValue: total,
-          color: DISTINCT_COLORS[index % DISTINCT_COLORS.length]
+          color: DISTINCT_COLORS[index % DISTINCT_COLORS.length],
         }))
         .sort((a, b) => b.value - a.value);
 
@@ -226,23 +246,26 @@ const CategoryDistributionChart = () => {
   // Filters data based on selection
   const filteredData = useMemo(() => {
     if (!selectedCategory) return categoryData;
-    return categoryData.filter(item => item.name === selectedCategory);
+    return categoryData.filter((item) => item.name === selectedCategory);
   }, [categoryData, selectedCategory]);
 
   // Memoize the chart configuration
-  const chartConfig = useMemo(() => ({
-    label: (entry) => {
-      const percentage = ((entry.value / entry.totalValue) * 100).toFixed(1);
-      // Always show the percentage
-      return `${percentage}%`;
-    },
-    onMouseEnter: (_, index) => {
-      setSelectedCategory(categoryData[index].name);
-    },
-    onMouseLeave: () => {
-      setSelectedCategory(null);
-    }
-  }), [categoryData]);
+  const chartConfig = useMemo(
+    () => ({
+      label: (entry) => {
+        const percentage = ((entry.value / entry.totalValue) * 100).toFixed(1);
+        // Always show the percentage
+        return `${percentage}%`;
+      },
+      onMouseEnter: (_, index) => {
+        setSelectedCategory(categoryData[index].name);
+      },
+      onMouseLeave: () => {
+        setSelectedCategory(null);
+      },
+    }),
+    [categoryData]
+  );
 
   return (
     <motion.div
@@ -256,28 +279,32 @@ const CategoryDistributionChart = () => {
           </div>
           <div>
             <h2 className="text-xl font-bold text-white tracking-tight">
-              Category Distribution
+              Phân Phối Danh Mục
             </h2>
             <p className="text-slate-400 text-xs">
-              Distribution of courses across categories
+              Phân phối các khóa học theo từng danh mục
             </p>
           </div>
         </div>
-        
+
         {!loading && !error && (
           <button
             onClick={() => fetchCategoryData(true)}
             disabled={refreshing}
             className="flex items-center gap-2 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors border border-slate-700 shadow-sm relative overflow-hidden group"
           >
-            <RefreshCcw 
-              size={14} 
-              className={`text-blue-400 ${refreshing ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-500'}`}
+            <RefreshCcw
+              size={14}
+              className={`text-blue-400 ${
+                refreshing
+                  ? "animate-spin"
+                  : "group-hover:rotate-180 transition-transform duration-500"
+              }`}
             />
             <span className="text-slate-200 text-xs font-medium">
-              {refreshing ? 'Refreshing...' : 'Refresh'}
+              {refreshing ? "Refreshing..." : "Refresh"}
             </span>
-            
+
             {/* Button highlight effect */}
             <span className="absolute inset-0 w-full h-full bg-blue-500/10 scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
           </button>
@@ -286,8 +313,13 @@ const CategoryDistributionChart = () => {
 
       <div className="bg-slate-800/50 rounded-xl border border-blue-900/20 p-3">
         {loading && <LoadingSpinner />}
-        {error && <ErrorDisplay message={error} onRetry={() => fetchCategoryData(true)} />}
-        
+        {error && (
+          <ErrorDisplay
+            message={error}
+            onRetry={() => fetchCategoryData(true)}
+          />
+        )}
+
         {!loading && !error && categoryData.length > 0 && (
           <motion.div
             className="grid grid-cols-1 lg:grid-cols-5 gap-4 h-72"
@@ -296,14 +328,18 @@ const CategoryDistributionChart = () => {
             {/* Chart on the left (3/5 of width) */}
             <div className="lg:col-span-3 h-full flex items-center justify-center">
               <div className="w-full h-full max-w-md mx-auto">
-                <ResponsiveContainer width="100%" height="100%" className="text-xs font-medium">
+                <ResponsiveContainer
+                  width="100%"
+                  height="100%"
+                  className="text-xs font-medium"
+                >
                   <PieChart>
                     <Pie
                       data={filteredData}
                       cx="50%"
                       cy="50%"
                       labelLine={true}
-                      labelLine={{ stroke: '#475569', strokeWidth: 1 }}
+                      labelLine={{ stroke: "#475569", strokeWidth: 1 }}
                       outerRadius={85}
                       innerRadius={40}
                       paddingAngle={3}
@@ -312,22 +348,39 @@ const CategoryDistributionChart = () => {
                       minAngle={7}
                       onMouseEnter={chartConfig.onMouseEnter}
                       onMouseLeave={chartConfig.onMouseLeave}
-                      activeIndex={selectedCategory ? filteredData.findIndex(item => item.name === selectedCategory) : undefined}
+                      activeIndex={
+                        selectedCategory
+                          ? filteredData.findIndex(
+                              (item) => item.name === selectedCategory
+                            )
+                          : undefined
+                      }
                       activeShape={(props) => {
                         const RADIAN = Math.PI / 180;
-                        const { cx, cy, midAngle, outerRadius, fill, value, name, totalValue } = props;
+                        const {
+                          cx,
+                          cy,
+                          midAngle,
+                          outerRadius,
+                          fill,
+                          value,
+                          name,
+                          totalValue,
+                        } = props;
                         const sin = Math.sin(-RADIAN * midAngle);
                         const cos = Math.cos(-RADIAN * midAngle);
                         const sx = cx + (outerRadius + 10) * cos;
                         const sy = cy + (outerRadius + 10) * sin;
                         const mx = cx + (outerRadius + 40) * cos;
                         const my = cy + (outerRadius + 40) * sin;
-                        const percentage = ((value / totalValue) * 100).toFixed(1);
-                        
+                        const percentage = ((value / totalValue) * 100).toFixed(
+                          1
+                        );
+
                         // Position floating tooltip away from the chart more
                         const tooltipX = cos >= 0 ? cx + 160 : cx - 160;
                         const tooltipY = cy - 50;
-                        
+
                         return (
                           <g>
                             {/* Active sector with enhanced style */}
@@ -342,7 +395,7 @@ const CategoryDistributionChart = () => {
                               filter="url(#glow)"
                               opacity={0.9}
                             />
-                            
+
                             {/* Floating tooltip box with dark background */}
                             <rect
                               x={tooltipX - 100}
@@ -355,12 +408,12 @@ const CategoryDistributionChart = () => {
                               strokeWidth={1}
                               filter="drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3))"
                             />
-                            
+
                             {/* Category name */}
-                            <text 
-                              x={tooltipX} 
-                              y={tooltipY - 15} 
-                              fill="#fff" 
+                            <text
+                              x={tooltipX}
+                              y={tooltipY - 15}
+                              fill="#fff"
                               textAnchor="middle"
                               dominantBaseline="central"
                               fontSize={13}
@@ -368,24 +421,24 @@ const CategoryDistributionChart = () => {
                             >
                               {name}
                             </text>
-                            
+
                             {/* Count label */}
-                            <text 
-                              x={tooltipX} 
-                              y={tooltipY + 10} 
-                              fill="#94a3b8" 
+                            <text
+                              x={tooltipX}
+                              y={tooltipY + 10}
+                              fill="#94a3b8"
                               textAnchor="middle"
                               dominantBaseline="central"
                               fontSize={11}
                             >
                               Count: {value.toFixed(0)}
                             </text>
-                            
+
                             {/* Percentage */}
-                            <text 
-                              x={tooltipX} 
-                              y={tooltipY + 30} 
-                              fill="#fff" 
+                            <text
+                              x={tooltipX}
+                              y={tooltipY + 30}
+                              fill="#fff"
                               textAnchor="middle"
                               dominantBaseline="central"
                               fontSize={14}
@@ -394,11 +447,13 @@ const CategoryDistributionChart = () => {
                             >
                               {percentage}%
                             </text>
-                            
+
                             {/* Connecting line */}
-                            <path 
-                              d={`M${cx},${cy}L${sx},${sy}L${mx},${my}L${tooltipX - 50},${tooltipY}`} 
-                              stroke="#fff" 
+                            <path
+                              d={`M${cx},${cy}L${sx},${sy}L${mx},${my}L${
+                                tooltipX - 50
+                              },${tooltipY}`}
+                              stroke="#fff"
                               fill="none"
                               strokeWidth={1.5}
                               strokeDasharray="2 2"
@@ -408,15 +463,25 @@ const CategoryDistributionChart = () => {
                       }}
                     >
                       <defs>
-                        <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                        <filter
+                          id="glow"
+                          x="-20%"
+                          y="-20%"
+                          width="140%"
+                          height="140%"
+                        >
                           <feGaussianBlur stdDeviation="2" result="blur" />
-                          <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                          <feComposite
+                            in="SourceGraphic"
+                            in2="blur"
+                            operator="over"
+                          />
                         </filter>
                       </defs>
-                      
+
                       <AnimatePresence>
                         {filteredData.map((entry, index) => (
-                          <Cell 
+                          <Cell
                             key={`cell-${index}`}
                             fill={entry.color}
                             stroke="#0f172a"
@@ -431,11 +496,11 @@ const CategoryDistributionChart = () => {
                 </ResponsiveContainer>
               </div>
             </div>
-            
+
             {/* Legend on the right (2/5 of width) */}
             <div className="lg:col-span-2 h-full bg-slate-800/70 rounded-lg p-3 border border-slate-700/50">
-              <SideLegend 
-                data={categoryData} 
+              <SideLegend
+                data={categoryData}
                 selectedCategory={selectedCategory}
                 setSelectedCategory={setSelectedCategory}
               />
