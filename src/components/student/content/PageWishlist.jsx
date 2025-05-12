@@ -1,8 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { Search, SlidersHorizontal, Loader2, RefreshCw, Heart, X, AlertTriangle } from "lucide-react";
+import {
+  Search,
+  SlidersHorizontal,
+  Loader2,
+  RefreshCw,
+  Heart,
+  X,
+  AlertTriangle,
+} from "lucide-react";
 import WishlistList from "../../instructor/Card/WishlistListCard";
 const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
-
+import { ChevronRight } from "lucide-react";
 const ITEMS_PER_PAGE = 4;
 
 const PageWishlist = () => {
@@ -10,29 +18,27 @@ const PageWishlist = () => {
   const [wishlist, setWishlist] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
+
   // Search and Filter states
   const [searchQuery, setSearchQuery] = useState("");
   const [priceFilter, setPriceFilter] = useState("all");
   const [ratingFilter, setRatingFilter] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
-  
+
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
 
   const fetchWishlist = async () => {
     setLoading(true);
     setError(null);
-    
+
     try {
-      const response = await fetch(
-        `${baseUrl}/api/student/wishlist/${userId}`
-      );
-      
+      const response = await fetch(`${baseUrl}/api/student/wishlist/${userId}`);
+
       if (!response.ok) {
         throw new Error("Failed to fetch wishlist");
       }
-      
+
       const text = await response.text();
       const data = text ? JSON.parse(text) : [];
       setWishlist(data);
@@ -61,17 +67,17 @@ const PageWishlist = () => {
         .toLowerCase()
         .includes(searchQuery.toLowerCase());
 
-      const matchesPrice = priceFilter === "all" 
-        ? true
-        : priceFilter === "free" 
+      const matchesPrice =
+        priceFilter === "all"
+          ? true
+          : priceFilter === "free"
           ? course.price === 0
-          : priceFilter === "paid" 
-            ? course.price > 0
-            : true;
+          : priceFilter === "paid"
+          ? course.price > 0
+          : true;
 
-      const matchesRating = ratingFilter === "all"
-        ? true
-        : course.rating >= Number(ratingFilter);
+      const matchesRating =
+        ratingFilter === "all" ? true : course.rating >= Number(ratingFilter);
 
       return matchesSearch && matchesPrice && matchesRating;
     });
@@ -87,8 +93,8 @@ const PageWishlist = () => {
       case "rating":
         return [...courses].sort((a, b) => b.rating - a.rating);
       case "newest":
-        return [...courses].sort((a, b) => 
-          new Date(b.createdAt) - new Date(a.createdAt)
+        return [...courses].sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
         );
       default:
         return courses;
@@ -104,7 +110,9 @@ const PageWishlist = () => {
 
   // Calculate pagination
   const filteredAndSortedCourses = sortCourses(filterCourses(wishlist));
-  const totalPages = Math.ceil(filteredAndSortedCourses.length / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(
+    filteredAndSortedCourses.length / ITEMS_PER_PAGE
+  );
   const paginatedCourses = filteredAndSortedCourses.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE
@@ -113,16 +121,28 @@ const PageWishlist = () => {
   return (
     <div className="bg-gray-100 min-h-screen mt-[50px] mb-[90px]">
       <div className="max-w-[1350px] mx-auto px-4 pt-24 pb-12">
+        <div className="flex items-center space-x-2 text-sm text-gray-500 mb-8">
+          <a
+            href="/student/home"
+            className="hover:text-blue-600 transition-colors duration-200 mt-[50px]"
+          >
+            Trang chủ
+          </a>
+          <ChevronRight className="w-4 h-4 mt-[50px]" />
+          <span className="text-gray-700 font-medium mt-[50px]">
+            Khóa học yêu thích
+          </span>
+        </div>
         {/* Header Section */}
         <div className="flex items-center justify-between mb-8 border-b border-gray-200 pb-6">
           <div className="flex items-center gap-3">
             <Heart className="w-8 h-8 text-red-500" />
             <h1 className="text-3xl font-bold text-gray-800">
-              My Wishlist
+              Danh sách khóa học yêu thích
             </h1>
           </div>
           <div className="text-sm text-gray-500">
-            {filteredAndSortedCourses.length} courses saved
+            {filteredAndSortedCourses.length} khóa học đã lưu
           </div>
         </div>
 
@@ -148,9 +168,9 @@ const PageWishlist = () => {
                 onChange={(e) => setPriceFilter(e.target.value)}
                 className="px-4 py-3 border border-gray-200 rounded-lg bg-white hover:border-gray-300 transition-all cursor-pointer"
               >
-                <option value="all">All Prices</option>
-                <option value="free">Free</option>
-                <option value="paid">Paid</option>
+                <option value="all">Tất cả giá</option>
+                <option value="free">Miễn phí</option>
+                <option value="paid">Trả phí</option>
               </select>
 
               <select
@@ -158,10 +178,10 @@ const PageWishlist = () => {
                 onChange={(e) => setRatingFilter(e.target.value)}
                 className="px-4 py-3 border border-gray-200 rounded-lg bg-white hover:border-gray-300 transition-all cursor-pointer"
               >
-                <option value="all">All Ratings</option>
-                <option value="4">4+ Stars</option>
-                <option value="3">3+ Stars</option>
-                <option value="2">2+ Stars</option>
+                <option value="all">Tất cả xếp hạng</option>
+                <option value="4">4+ Sao</option>
+                <option value="3">3+ Sao</option>
+                <option value="2">2+ Sao</option>
               </select>
 
               <select
@@ -169,10 +189,10 @@ const PageWishlist = () => {
                 onChange={(e) => setSortBy(e.target.value)}
                 className="px-4 py-3 border border-gray-200 rounded-lg bg-white hover:border-gray-300 transition-all cursor-pointer"
               >
-                <option value="newest">Newest First</option>
-                <option value="rating">Highest Rated</option>
-                <option value="price-low">Price: Low to High</option>
-                <option value="price-high">Price: High to Low</option>
+                <option value="newest">Mới nhất</option>
+                <option value="rating">Đánh giá cao nhất</option>
+                <option value="price-low">Giá: Thấp đến cao</option>
+                <option value="price-high">Giá: Cao đến thấp</option>
               </select>
             </div>
           </div>
@@ -183,24 +203,34 @@ const PageWishlist = () => {
               <div className="flex flex-wrap gap-2">
                 {searchQuery && (
                   <span className="bg-blue-50 text-blue-700 px-3 py-1.5 rounded-full text-sm font-medium flex items-center gap-1">
-                    Search: {searchQuery}
-                    <button onClick={() => setSearchQuery("")} className="hover:text-blue-900">
+                    Tìm kiếm: {searchQuery}
+                    <button
+                      onClick={() => setSearchQuery("")}
+                      className="hover:text-blue-900"
+                    >
                       <X className="w-4 h-4" />
                     </button>
                   </span>
                 )}
                 {priceFilter !== "all" && (
                   <span className="bg-green-50 text-green-700 px-3 py-1.5 rounded-full text-sm font-medium flex items-center gap-1">
-                    Price: {priceFilter.charAt(0).toUpperCase() + priceFilter.slice(1)}
-                    <button onClick={() => setPriceFilter("all")} className="hover:text-green-900">
+                    Giá:{" "}
+                    {priceFilter.charAt(0).toUpperCase() + priceFilter.slice(1)}
+                    <button
+                      onClick={() => setPriceFilter("all")}
+                      className="hover:text-green-900"
+                    >
                       <X className="w-4 h-4" />
                     </button>
                   </span>
                 )}
                 {ratingFilter !== "all" && (
                   <span className="bg-yellow-50 text-yellow-700 px-3 py-1.5 rounded-full text-sm font-medium flex items-center gap-1">
-                    Rating: {ratingFilter}+ Stars
-                    <button onClick={() => setRatingFilter("all")} className="hover:text-yellow-900">
+                    Đánh giá: {ratingFilter}+ Sao
+                    <button
+                      onClick={() => setRatingFilter("all")}
+                      className="hover:text-yellow-900"
+                    >
                       <X className="w-4 h-4" />
                     </button>
                   </span>
@@ -210,7 +240,7 @@ const PageWishlist = () => {
                 onClick={clearFilters}
                 className="text-sm text-gray-500 hover:text-gray-700"
               >
-                Clear all
+                Xóa tất cả
               </button>
             </div>
           )}
@@ -227,7 +257,7 @@ const PageWishlist = () => {
               onClick={fetchWishlist}
               className="flex items-center gap-2 text-sm font-medium hover:text-red-800 transition-colors"
             >
-              <RefreshCw className="w-4 h-4" /> Try Again
+              <RefreshCw className="w-4 h-4" /> Thử lại
             </button>
           </div>
         )}
@@ -237,7 +267,9 @@ const PageWishlist = () => {
           {loading ? (
             <div className="flex flex-col items-center justify-center py-12">
               <Loader2 className="w-8 h-8 text-blue-500 animate-spin mb-4" />
-              <p className="text-gray-500">Loading your wishlist...</p>
+              <p className="text-gray-500">
+                Đang tải danh sách yêu thích khóa học của bạn...
+              </p>
             </div>
           ) : paginatedCourses.length > 0 ? (
             <>
@@ -245,38 +277,44 @@ const PageWishlist = () => {
                 wishlist={paginatedCourses}
                 onDelete={handleDeleteCourse}
               />
-              
+
               {/* Pagination */}
               {totalPages > 1 && (
                 <div className="flex justify-center mt-8 gap-2">
                   <button
-                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.max(prev - 1, 1))
+                    }
                     disabled={currentPage === 1}
                     className="px-4 py-2 border border-gray-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
                   >
-                    Previous
+                    Trước
                   </button>
-                  
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                    <button
-                      key={page}
-                      onClick={() => setCurrentPage(page)}
-                      className={`px-4 py-2 border rounded-lg transition-colors ${
-                        currentPage === page
-                          ? "bg-blue-500 text-white border-blue-500"
-                          : "border-gray-200 hover:bg-gray-50"
-                      }`}
-                    >
-                      {page}
-                    </button>
-                  ))}
-                  
+
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                    (page) => (
+                      <button
+                        key={page}
+                        onClick={() => setCurrentPage(page)}
+                        className={`px-4 py-2 border rounded-lg transition-colors ${
+                          currentPage === page
+                            ? "bg-blue-500 text-white border-blue-500"
+                            : "border-gray-200 hover:bg-gray-50"
+                        }`}
+                      >
+                        {page}
+                      </button>
+                    )
+                  )}
+
                   <button
-                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                    }
                     disabled={currentPage === totalPages}
                     className="px-4 py-2 border border-gray-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
                   >
-                    Next
+                    Kế tiếp
                   </button>
                 </div>
               )}
@@ -284,7 +322,9 @@ const PageWishlist = () => {
           ) : (
             <div className="text-center py-12">
               <SlidersHorizontal className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-              <p className="text-xl text-gray-600 mb-2 font-medium">No courses found</p>
+              <p className="text-xl text-gray-600 mb-2 font-medium">
+                Không tìm thấy khóa học nào
+              </p>
               <p className="text-gray-500">
                 {searchQuery || priceFilter !== "all" || ratingFilter !== "all"
                   ? "Try adjusting your filters or search terms"

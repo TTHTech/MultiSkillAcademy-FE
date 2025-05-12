@@ -26,9 +26,7 @@ const Navbar = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get(
-          `${baseUrl}/api/student/categories`
-        );
+        const response = await axios.get(`${baseUrl}/api/student/categories`);
         setCategories(response.data);
       } catch (error) {
         console.error("Error loading categories:", error);
@@ -43,14 +41,11 @@ const Navbar = () => {
         const token = localStorage.getItem("token");
         if (!token) return;
 
-        const response = await axios.get(
-          `${baseUrl}/api/student/cart/count`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await axios.get(`${baseUrl}/api/student/cart/count`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         setCartItemCount(response.data);
       } catch (error) {
         console.error("Error fetching cart item count:", error);
@@ -138,9 +133,9 @@ const Navbar = () => {
           onMouseEnter={handleMouseOver}
           onMouseLeave={handleMouseOut}
         >
-        <Link to="/student/home" className="flex-shrink-0">
-        <Logo className="w-40 h-auto" />
-      </Link>
+          <Link to="/student/home" className="flex-shrink-0">
+            <Logo className="w-40 h-auto" />
+          </Link>
           <button className="text-gray-700 text-lg font-medium hover:text-blue-600 transition-colors duration-300 flex items-center gap-2">
             <span>Thể loại</span>
             <i className="fas fa-chevron-down text-sm transition-transform duration-300"></i>
@@ -160,11 +155,15 @@ const Navbar = () => {
                       to={`/category/${category.categoryId}`}
                       className="text-gray-600 hover:text-blue-600 hover:bg-blue-50 py-2 px-6 transition-all duration-200 flex items-center gap-2 group"
                     >
-                      <span className="group-hover:translate-x-1 transition-transform duration-200">{category.name}</span>
+                      <span className="group-hover:translate-x-1 transition-transform duration-200">
+                        {category.name}
+                      </span>
                     </Link>
                   ))
                 ) : (
-                  <div className="text-gray-500 px-6 py-2">Không có danh mục</div>
+                  <div className="text-gray-500 px-6 py-2">
+                    Không có danh mục
+                  </div>
                 )}
               </div>
             </div>
@@ -260,7 +259,7 @@ const Navbar = () => {
           </Link>
 
           {/* Notifications Section */}
-          <div 
+          <div
             className="relative"
             onMouseEnter={handleNotificationMouseOver}
             onMouseLeave={handleNotificationMouseOut}
@@ -271,7 +270,7 @@ const Navbar = () => {
             >
               <i className="fas fa-bell text-xl group-hover:scale-110 transition-transform duration-300"></i>
               {notificationCount > 0 && (
-                <span className="absolute -top-2 -right-2 bg-gradient-to-r from-yellow-500 to-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-lg transform transition-transform duration-300 group-hover:scale-110">
+                <span className="absolute -top-4 -right-2 bg-gradient-to-r from-yellow-500 to-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-lg transform transition-transform duration-300 group-hover:scale-110">
                   {notificationCount}
                 </span>
               )}

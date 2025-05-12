@@ -202,7 +202,7 @@ const ManageFreeLectures = () => {
   }
   return (
     <div className="min-h-screen bg-white p-8">
-      <h1 className="text-2xl font-bold mb-6">Manage Free Lectures</h1>
+      <h1 className="text-2xl font-bold mb-6">Quản lý bài học miễn phí</h1>
       <p className="text-black-500 mb-6">
         Để thu hút học viên và giúp họ có cái nhìn tổng quan về khóa học, hãy
         thực hiện các bài học với các video miễn phí đê học viên có thể xem

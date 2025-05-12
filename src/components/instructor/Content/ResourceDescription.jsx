@@ -133,7 +133,7 @@ const ResourceDescription = () => {
 
   return (
     <div className="min-h-screen bg-white-100 p-6">
-      <h1 className="text-2xl font-bold mb-4">Resource Description</h1>
+      <h1 className="text-2xl font-bold mb-4">Mô tả tài nguyên khóa học</h1>
       <p className="text-black-500">
         Các mô tả sau sẽ hiển thị công khai trên Trang tổng quan khóa học của
         bạn và sẽ tác động trực tiếp đến thành tích khóa học, đồng thời giúp học

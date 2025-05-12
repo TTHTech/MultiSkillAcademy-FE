@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import StudyReminderList from "./StudyReminderList";
 const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
+import { ChevronRight } from "lucide-react";
 
 const Reminder = () => {
   const userId = Number(localStorage.getItem("userId"));
@@ -63,114 +64,128 @@ const Reminder = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg mt-10 relative">
-      <h1 className="text-2xl font-bold text-gray-800 mb-4">
-        Reminder Notifications
-      </h1>
-      <input
-        type="text"
-        placeholder="Search by course name..."
-        className="w-full p-2 mb-4 border rounded"
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-      />
-      <div className="mb-4">
-        <button
-          onClick={() => setSortBy("active")}
-          className="mr-2 p-2 bg-blue-500 text-white rounded"
+    <>
+      <div className="flex items-center space-x-2 text-sm text-gray-500 mb-8">
+        <a
+          href="/student/home"
+          className="hover:text-blue-600 transition-colors duration-200 mt-[50px]"
         >
-          Sort by Active
-        </button>
-        <button
-          onClick={() => setSortBy("inactive")}
-          className="p-2 bg-red-500 text-white rounded"
-        >
-          Sort by Inactive
-        </button>
-      </div>
-      {loading ? (
-        <p className="text-gray-600">Loading...</p>
-      ) : error ? (
-        <p className="text-red-500">{error}</p>
-      ) : displayedReminders.length === 0 ? (
-        <p className="text-gray-600">No reminders found.</p>
-      ) : (
-        <div className="space-y-4">
-          {displayedReminders.map((reminder) => (
-            <div
-              key={reminder.courseId}
-              className="p-4 border shadow-md flex justify-between items-center bg-gray-50 cursor-pointer"
-              onClick={() => handleSelectCourse(reminder)}
-            >
-              <div>
-                <h2 className="text-lg font-semibold text-gray-800">
-                  {reminder.nameCourse}
-                </h2>
-              </div>
-              <div className="flex space-x-4">
-                <div className="text-green-600 font-semibold">
-                  Active: {reminder.active}
-                </div>
-                <div className="text-red-600 font-semibold">
-                  Inactive: {reminder.inactive}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-      <div className="flex items-center justify-center gap-4 mt-6">
-        <button
-          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-          disabled={currentPage === 1}
-          className="px-4 py-2 bg-gray-500 text-white rounded-lg shadow-md transition disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-600 active:bg-gray-700"
-        >
-          Previous
-        </button>
-
-        <span className="text-lg font-medium text-gray-700">
-          Page <span className="font-bold">{currentPage}</span> of{" "}
-          <span className="font-bold">{totalPages}</span>
+          Trang chủ
+        </a>
+        <ChevronRight className="w-4 h-4 mt-[50px]" />
+        <span className="text-gray-700 font-medium mt-[50px]">
+          Nhắc nhở học tập
         </span>
-
-        <button
-          onClick={() =>
-            setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-          }
-          disabled={currentPage === totalPages}
-          className="px-4 py-2 bg-gray-500 text-white rounded-lg shadow-md transition disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-600 active:bg-gray-700"
-        >
-          Next
-        </button>
       </div>
-
-      {selectedCourse && (
-        <div
-          id="overlay"
-          className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4"
-          onClick={handleClose}
-        >
-          <div
-            className="bg-white p-6 max-h-[calc(100vh-230px)] overflow-auto w-full max-w-4xl rounded-lg shadow-lg absolute left-1/2 transform -translate-x-1/2"
-            style={{ top: "120px", bottom: "2px" }}
-            onClick={(e) => e.stopPropagation()}
+      <div className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg mt-10 relative">
+        <h1 className="text-2xl font-bold text-gray-800 mb-4">
+          Thông báo nhắc nhở{" "}
+        </h1>
+        <input
+          type="text"
+          placeholder="Search by course name..."
+          className="w-full p-2 mb-4 border rounded"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+        <div className="mb-4">
+          <button
+            onClick={() => setSortBy("active")}
+            className="mr-2 p-2 bg-blue-500 text-white rounded"
           >
-            <StudyReminderList
-              courseId={selectedCourse.courseId}
-              nameCourse={selectedCourse.nameCourse}
-            />
-            <div className="flex justify-end">
-              <button
-                onClick={() => setSelectedCourse(null)}
-                className="mt-4 p-2 bg-gray-500 text-white rounded"
+            Nhắc nhở đang hoạt động
+          </button>
+          <button
+            onClick={() => setSortBy("inactive")}
+            className="p-2 bg-red-500 text-white rounded"
+          >
+            Nhắc nhở không hoạt động
+          </button>
+        </div>
+        {loading ? (
+          <p className="text-gray-600">Đang tải...</p>
+        ) : error ? (
+          <p className="text-red-500">{error}</p>
+        ) : displayedReminders.length === 0 ? (
+          <p className="text-gray-600">Không tìm thấy lời nhắc nào.</p>
+        ) : (
+          <div className="space-y-4">
+            {displayedReminders.map((reminder) => (
+              <div
+                key={reminder.courseId}
+                className="p-4 border shadow-md flex justify-between items-center bg-gray-50 cursor-pointer"
+                onClick={() => handleSelectCourse(reminder)}
               >
-                Close
-              </button>
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-800">
+                    {reminder.nameCourse}
+                  </h2>
+                </div>
+                <div className="flex space-x-4">
+                  <div className="text-green-600 font-semibold">
+                    Hoạt động: {reminder.active}
+                  </div>
+                  <div className="text-red-600 font-semibold">
+                    Không hoạt động: {reminder.inactive}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+        <div className="flex items-center justify-center gap-4 mt-6">
+          <button
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            className="px-4 py-2 bg-gray-500 text-white rounded-lg shadow-md transition disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-600 active:bg-gray-700"
+          >
+            Trước
+          </button>
+
+          <span className="text-lg font-medium text-gray-700">
+            Trang <span className="font-bold">{currentPage}</span> trên{" "}
+            <span className="font-bold">{totalPages}</span>
+          </span>
+
+          <button
+            onClick={() =>
+              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+            }
+            disabled={currentPage === totalPages}
+            className="px-4 py-2 bg-gray-500 text-white rounded-lg shadow-md transition disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-600 active:bg-gray-700"
+          >
+            Sau
+          </button>
+        </div>
+
+        {selectedCourse && (
+          <div
+            id="overlay"
+            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4"
+            onClick={handleClose}
+          >
+            <div
+              className="bg-white p-6 max-h-[calc(100vh-230px)] overflow-auto w-full max-w-4xl rounded-lg shadow-lg absolute left-1/2 transform -translate-x-1/2"
+              style={{ top: "120px", bottom: "2px" }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <StudyReminderList
+                courseId={selectedCourse.courseId}
+                nameCourse={selectedCourse.nameCourse}
+              />
+              <div className="flex justify-end">
+                <button
+                  onClick={() => setSelectedCourse(null)}
+                  className="mt-4 p-2 bg-gray-500 text-white rounded"
+                >
+                  Đóng
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </>
   );
 };
 

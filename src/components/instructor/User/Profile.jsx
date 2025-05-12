@@ -115,16 +115,13 @@ const ProfileEdit = () => {
     const formData = new FormData();
     formData.append("file", file);
     try {
-      const response = await fetch(
-        `${baseUrl}/api/cloudinary/upload/image`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          body: formData,
-        }
-      );
+      const response = await fetch(`${baseUrl}/api/cloudinary/upload/image`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
       if (!response.ok) {
         throw new Error("Lỗi khi upload image");
       }
@@ -201,27 +198,32 @@ const ProfileEdit = () => {
   };
   if (isLoading) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-white bg-opacity-90">
+      <div className="flex flex-col justify-center items-center h-screen">
         <div className="flex flex-col items-center">
-          <div className="animate-spin rounded-full h-20 w-20 border-t-4 border-blue-500"></div>
-          <p className="mt-4 text-blue-500 text-xl font-bold">Loading...</p>
+          <div className="relative flex flex-col items-center bg-white bg-opacity-90 p-6 rounded-2xl shadow-xl">
+            <div className="w-14 h-14 border-4 border-blue-200 border-t-blue-500 rounded-full animate-spin"></div>
+            <p className="mt-4 text-blue-600 font-semibold text-lg animate-pulse">
+              Đang tải dữ liệu...
+            </p>
+          </div>
         </div>
       </div>
     );
   }
+
   return (
     <div className="w-full p-4 mx-4 bg-white shadow-md rounded-md mt-5">
       <h2 className="text-3xl font-bold mb-6 flex items-center gap-3">
-        Instructor Profile Details
+        Thông Tin Cá Nhân Giảng Viên
         {instructor.active ? (
           <span className="inline-flex items-center px-3 py-1 rounded-full bg-green-50 text-green-600 text-sm font-semibold">
             <CheckCircleIcon className="w-4 h-4 mr-1" />
-            Active
+            Đang hoạt động
           </span>
         ) : (
           <span className="inline-flex items-center px-3 py-1 rounded-full bg-red-50 text-red-600 text-sm font-semibold">
             <XCircleIcon className="w-4 h-4 mr-1" />
-            Inactive
+            Không hoạt động
           </span>
         )}
       </h2>
@@ -285,7 +287,7 @@ const ProfileEdit = () => {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
             {/* Courses */}
             <div>
-              <p className="text-gray-600 font-bold">Courses</p>
+              <p className="text-gray-600 font-bold">Khóa Học</p>
               <div className="bg-gradient-to-br from-blue-50 to-blue-100 shadow-lg rounded-lg p-4 flex flex-col items-center">
                 <AcademicCapIcon className="w-8 h-8 text-blue-800 mb-2" />
                 <h3 className="text-xl font-bold text-gray-800">
@@ -296,7 +298,7 @@ const ProfileEdit = () => {
 
             {/* Sales */}
             <div>
-              <p className="text-gray-600 font-bold">Sales (VND)</p>
+              <p className="text-gray-600 font-bold">Doanh Thu (VND)</p>
               <div className="bg-gradient-to-br from-green-50 to-green-100 shadow-lg rounded-lg p-4 flex flex-col items-center">
                 <CurrencyDollarIcon className="w-8 h-8 text-green-800 mb-2" />
                 <h3 className="text-xl font-bold text-gray-800">
@@ -313,7 +315,7 @@ const ProfileEdit = () => {
 
             {/* Reviews */}
             <div>
-              <p className="text-gray-600 font-bold">Reviews</p>
+              <p className="text-gray-600 font-bold">Đánh Giá</p>
               <div className="bg-gradient-to-br from-purple-50 to-purple-100 shadow-lg rounded-lg p-4 flex flex-col items-center">
                 <StarIcon className="w-8 h-8 text-purple-800 mb-2" />
                 <h3 className="text-xl font-bold text-gray-800">
@@ -324,7 +326,7 @@ const ProfileEdit = () => {
 
             {/* Students */}
             <div>
-              <p className="text-gray-600 font-bold">Students</p>
+              <p className="text-gray-600 font-bold">Học Viên</p>
               <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 shadow-lg rounded-lg p-4 flex flex-col items-center">
                 <UserGroupIcon className="w-8 h-8 text-yellow-800 mb-2" />
                 <h3 className="text-xl font-bold text-gray-800">

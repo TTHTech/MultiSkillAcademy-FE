@@ -32,7 +32,10 @@ const DetailQuestions = ({ courseId }) => {
     fetchQuestions();
   }, [courseId, token, refresh]);
   const triggerRefresh = () => setRefresh((prev) => !prev);
-
+  const EVALUATE_LABELS = {
+    Correct: "Đúng",
+    Incorrect: "Sai",
+  };
   const handleDeleteQuestion = async (questionsId) => {
     const swalResult = await Swal.fire({
       title: "Confirmation",
@@ -46,15 +49,12 @@ const DetailQuestions = ({ courseId }) => {
       return;
     }
     try {
-      await fetch(
-        `${baseUrl}/api/instructor/deleteQuestion/${questionsId}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
+      await fetch(`${baseUrl}/api/instructor/deleteQuestion/${questionsId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
       triggerRefresh();
       await Swal.fire({
         title: "Confirmation",
@@ -115,15 +115,12 @@ const DetailQuestions = ({ courseId }) => {
       return;
     }
     try {
-      await fetch(
-        `${baseUrl}/api/instructor/deleteAnswer/${answersId}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
+      await fetch(`${baseUrl}/api/instructor/deleteAnswer/${answersId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
       triggerRefresh();
       await Swal.fire({
         title: "Confirmation",
@@ -142,16 +139,15 @@ const DetailQuestions = ({ courseId }) => {
     );
   };
   const handleEvaluateChange = async (questionsId, answersId, newEvaluate) => {
+    const newEvaluateLabel = EVALUATE_LABELS[newEvaluate] || newEvaluate;
+
     const swalResult = await Swal.fire({
-      title: "Confirmation",
-      text:
-        `Bạn có chắc chắn muốn chuyển đổi trạng thái của câu trả lời này thành ` +
-        `${newEvaluate}` +
-        ` hay không ?`,
+      title: "Xác nhận",
+      text: `Bạn có chắc chắn muốn chuyển trạng thái của câu trả lời này thành “${newEvaluateLabel}” không?`,
       icon: "question",
       showCancelButton: true,
-      confirmButtonText: "Yes",
-      cancelButtonText: "No",
+      confirmButtonText: "Có",
+      cancelButtonText: "Không",
     });
     if (swalResult.isDismissed) {
       return;
@@ -217,7 +213,7 @@ const DetailQuestions = ({ courseId }) => {
                   onClick={() => handleDeleteQuestion(question.questionsId)}
                   className="text-red-500 hover:text-red-700 transition-all duration-200 text-sm font-medium"
                 >
-                  Delete
+                  Xóa
                 </button>
               </div>
               <p className="text-gray-700 mt-2 leading-relaxed">
@@ -231,7 +227,7 @@ const DetailQuestions = ({ courseId }) => {
                   className="text-blue-500 hover:text-blue-700 font-medium transition-all duration-200 ml-2"
                   onClick={() => toggleAnswersVisibility(question.questionsId)}
                 >
-                  {question.totalAnswers} answers
+                  {question.totalAnswers} Câu trả lời
                 </button>
               </div>
             </div>
@@ -276,7 +272,7 @@ const DetailQuestions = ({ courseId }) => {
                             : "text-red-500 hover:text-red-700"
                         }`}
                       >
-                        {answer.evaluate}
+                        {answer.evaluate === "Correct" ? "Đúng" : "Sai"}
                       </span>
                     </div>
                   </div>
@@ -286,7 +282,7 @@ const DetailQuestions = ({ courseId }) => {
                     }
                     className="text-red-500 text-sm hover:text-red-700 transition-all"
                   >
-                    Delete
+                    Xóa
                   </button>
                 </div>
               ))}

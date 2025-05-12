@@ -120,74 +120,98 @@ const PageCourses = () => {
       <Sidebar open={open} setOpen={setOpen} />
 
       <div className="p-4 space-y-6">
-        {/* Tabs */}
-        <div className="flex justify-center space-x-4 py-4">
-          {tabs.map(({ key, label }) => (
-            <button
-              key={key}
-              onClick={() => {
-                setActiveTab(key);
-                // reset pages
-                tabs.forEach(({ setPage }) => setPage(1));
-              }}
-              className={`px-6 py-2 rounded-full font-medium text-lg transition-all duration-300 ${
-                activeTab === key
-                  ? "bg-blue-600 text-white shadow-lg"
-                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-
-        {/* Content */}
-        <div className="mt-6">
-          {loading ? (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-white bg-opacity-90">
-              <div className="flex flex-col items-center">
-                <div className="animate-spin rounded-full h-20 w-20 border-t-4 border-blue-500"></div>
-                <p className="mt-4 text-blue-500 text-xl font-bold">
-                  Loading...
+        {loading ? (
+          <div className="flex flex-col justify-center items-center h-screen">
+            <div className="flex flex-col items-center">
+              <div className="relative flex flex-col items-center bg-white bg-opacity-90 p-6 rounded-2xl shadow-xl">
+                <div className="w-14 h-14 border-4 border-blue-200 border-t-blue-500 rounded-full animate-spin"></div>
+                <p className="mt-4 text-blue-600 font-semibold text-lg animate-pulse">
+                  Đang tải dữ liệu...
                 </p>
               </div>
             </div>
-          ) : error ? (
-            <p className="text-center text-red-500">Lỗi: {error}</p>
-          ) : lists[activeTab].length === 0 ? (
+          </div>
+        ) : error ? (
+          <p className="text-center text-red-500">Lỗi: {error}</p>
+        ) : lists[activeTab].length === 0 ? (
+          <>
+            <div className="flex justify-center space-x-4 py-4">
+              {tabs.map(({ key, label }) => (
+                <button
+                  key={key}
+                  onClick={() => {
+                    setActiveTab(key);
+                    // reset pages
+                    tabs.forEach(({ setPage }) => setPage(1));
+                  }}
+                  className={`px-6 py-2 rounded-full font-medium text-lg transition-all duration-300 ${
+                    activeTab === key
+                      ? "bg-blue-600 text-white shadow-lg"
+                      : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
             <p className="text-center text-gray-500">Không có khóa học</p>
-          ) : (
-            <div className="bg-white p-6 rounded-lg shadow-md space-y-4">
-              <ListCard
-                courses={paginate(
-                  lists[activeTab],
-                  tabs.find((t) => t.key === activeTab).page
-                )}
-              />
-              {/* Pagination */}
-              <div className="flex justify-center space-x-2 mt-6">
-                {Array.from(
-                  { length: pagesCount(activeTab) },
-                  (_, i) => i + 1
-                ).map((pg) => (
-                  <button
-                    key={pg}
-                    onClick={() =>
-                      tabs.find((t) => t.key === activeTab).setPage(pg)
-                    }
-                    className={`px-4 py-2 rounded-full text-lg font-semibold transition-all duration-300 ${
-                      tabs.find((t) => t.key === activeTab).page === pg
-                        ? "bg-blue-600 text-white"
-                        : "bg-gray-200 text-gray-700 hover:bg-blue-300"
-                    }`}
-                  >
-                    {pg}
-                  </button>
-                ))}
+          </>
+        ) : (
+          <>
+            {/* Tabs */}
+            <div className="flex justify-center space-x-4 py-4">
+              {tabs.map(({ key, label }) => (
+                <button
+                  key={key}
+                  onClick={() => {
+                    setActiveTab(key);
+                    // reset pages
+                    tabs.forEach(({ setPage }) => setPage(1));
+                  }}
+                  className={`px-6 py-2 rounded-full font-medium text-lg transition-all duration-300 ${
+                    activeTab === key
+                      ? "bg-blue-600 text-white shadow-lg"
+                      : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+            {/* Content */}
+            <div className="mt-6">
+              <div className="bg-white p-6 rounded-lg shadow-md space-y-4">
+                <ListCard
+                  courses={paginate(
+                    lists[activeTab],
+                    tabs.find((t) => t.key === activeTab).page
+                  )}
+                />
+                {/* Pagination */}
+                <div className="flex justify-center space-x-2 mt-6">
+                  {Array.from(
+                    { length: pagesCount(activeTab) },
+                    (_, i) => i + 1
+                  ).map((pg) => (
+                    <button
+                      key={pg}
+                      onClick={() =>
+                        tabs.find((t) => t.key === activeTab).setPage(pg)
+                      }
+                      className={`px-4 py-2 rounded-full text-lg font-semibold transition-all duration-300 ${
+                        tabs.find((t) => t.key === activeTab).page === pg
+                          ? "bg-blue-600 text-white"
+                          : "bg-gray-200 text-gray-700 hover:bg-blue-300"
+                      }`}
+                    >
+                      {pg}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
-          )}
-        </div>
+          </>
+        )}
       </div>
     </section>
   );
