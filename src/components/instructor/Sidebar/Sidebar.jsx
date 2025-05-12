@@ -18,20 +18,20 @@ import { FaTags } from 'react-icons/fa';
 const Sidebar = ({ open, setOpen }) => {
   const location = useLocation();
   const menus = [
-    { name: "Profile", link: "/instructor/user", icon: AiOutlineUser },
-    { name: "Sales", link: "/instructor/sales", icon: FaCircleDollarToSlot },
+    { name: "Thông Tin Các Nhân", link: "/instructor/user", icon: AiOutlineUser },
+    { name: "Doanh Thu", link: "/instructor/sales", icon: FaCircleDollarToSlot },
     // { name: "Dashboard", link: "/instructor/dashboard", icon: MdOutlineDashboard },
-    { name: "Courses", link: "/instructor/courses", icon: ImBook },
-    { name: "Search Course", link: "/instructor/search", icon: GiBookshelf },
-    { name: "Discount", link: "/instructor/discount", icon: FaTags },
-    { name: "Add New Courses", link: "/instructor/addCourses", icon: BiBookAdd },
-    { name: "Review", link: "/instructor/review", icon: MdOutlineReviews },
-    { name: "Test", link: "/instructor/tests", icon: LuFileSignature },
-    { name: "Scores", link: "/instructor/scores", icon: GrScorecard },
-    { name: "Questions", link: "/instructor/questions", icon: BsFillQuestionSquareFill },
-    { name: "Students", link: "/instructor/students", icon: PiStudentFill },
-    { name: "Chat", link: "/instructor/chat", icon: BsChatDots },
-    { name: "Sign Out", link: "/login", icon: FaSignOutAlt },
+    { name: "Danh Sách Khóa Học", link: "/instructor/courses", icon: ImBook },
+    { name: "Tìm Kiếm Khóa Học", link: "/instructor/search", icon: GiBookshelf },
+    { name: "Mã Giảm Giá", link: "/instructor/discount", icon: FaTags },
+    { name: "Thêm Mới Khóa Học", link: "/instructor/addCourses", icon: BiBookAdd },
+    { name: "Đánh Giá Khóa Học", link: "/instructor/review", icon: MdOutlineReviews },
+    { name: "Bài Kiểm Tra", link: "/instructor/tests", icon: LuFileSignature },
+    { name: "Điểm Số Học Viên", link: "/instructor/scores", icon: GrScorecard },
+    { name: "Hỏi Đáp Của Khóa Học", link: "/instructor/questions", icon: BsFillQuestionSquareFill },
+    { name: "Học Viên", link: "/instructor/students", icon: PiStudentFill },
+    { name: "Nhắn Tin", link: "/instructor/chat", icon: BsChatDots },
+    { name: "Đăng Xuất", link: "/login", icon: FaSignOutAlt },
   ];
 
   return (

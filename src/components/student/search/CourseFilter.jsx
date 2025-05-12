@@ -1,15 +1,23 @@
-import React, { useState } from 'react';
-import { FaStar, FaRegStar, FaCheck, FaRegCheckCircle } from 'react-icons/fa';
+import React, { useState } from "react";
+import { FaStar, FaRegStar, FaCheck, FaRegCheckCircle } from "react-icons/fa";
 
 const CourseFilter = ({ onFilter }) => {
-  const [level, setLevel] = useState('');
-  const [priceRange, setPriceRange] = useState('');
-  const [rating, setRating] = useState('');
-
+  const [level, setLevel] = useState("");
+  const [priceRange, setPriceRange] = useState("");
+  const [rating, setRating] = useState("");
+  const LEVEL_LABELS = {
+    Beginner: "Cơ bản",
+    Intermediate: "Trung cấp",
+    Advanced: "Nâng cao",
+  };
   // Function to handle level change
   const handleLevelClick = (selectedLevel) => {
-    setLevel(level === selectedLevel ? '' : selectedLevel); // Toggle the selected level
-    onFilter({ level: level === selectedLevel ? '' : selectedLevel, priceRange, rating });
+    setLevel(level === selectedLevel ? "" : selectedLevel); // Toggle the selected level
+    onFilter({
+      level: level === selectedLevel ? "" : selectedLevel,
+      priceRange,
+      rating,
+    });
   };
 
   // Function to render the stars based on rating
@@ -18,9 +26,17 @@ const CourseFilter = ({ onFilter }) => {
     for (let i = 1; i <= 5; i++) {
       stars.push(
         i <= minRating ? (
-          <FaStar key={i} className="text-yellow-400" style={{ fontSize: '20px' }} />
+          <FaStar
+            key={i}
+            className="text-yellow-400"
+            style={{ fontSize: "20px" }}
+          />
         ) : (
-          <FaRegStar key={i} className="text-yellow-400" style={{ fontSize: '20px' }} />
+          <FaRegStar
+            key={i}
+            className="text-yellow-400"
+            style={{ fontSize: "20px" }}
+          />
         )
       );
     }
@@ -29,14 +45,15 @@ const CourseFilter = ({ onFilter }) => {
 
   // Toggle the selected price range
   const handlePriceRangeClick = (range) => {
-    const newPriceRange = priceRange === range ? '' : range;
+    const newPriceRange = priceRange === range ? "" : range;
     setPriceRange(newPriceRange);
     onFilter({ level, priceRange: newPriceRange, rating });
   };
 
   // Toggle the selected rating
   const handleRatingClick = (minRating) => {
-    const newRating = rating === minRating.toString() ? '' : minRating.toString();
+    const newRating =
+      rating === minRating.toString() ? "" : minRating.toString();
     setRating(newRating);
     onFilter({ level, priceRange, rating: newRating });
   };
@@ -47,15 +64,27 @@ const CourseFilter = ({ onFilter }) => {
       <div className="flex flex-col items-center space-y-2 w-full max-w-xs">
         <label className="text-gray-700">Mức độ</label>
         <div className="flex flex-col space-y-2 w-full">
-          {['Beginner', 'Intermediate', 'Advanced'].map((levelOption) => (
+          {["Beginner", "Intermediate", "Advanced"].map((levelOption) => (
             <div
               key={levelOption}
               onClick={() => handleLevelClick(levelOption)}
-              className={`flex items-center cursor-pointer px-4 py-2 rounded-md ${level === levelOption ? 'bg-blue-600 text-white' : 'bg-transparent text-blue-600 border-2 border-blue-600'}`}
+              className={`flex items-center cursor-pointer px-4 py-2 rounded-md ${
+                level === levelOption
+                  ? "bg-blue-600 text-white"
+                  : "bg-transparent text-blue-600 border-2 border-blue-600"
+              }`}
             >
-              {level === levelOption ? <FaCheck className="mr-2" /> : <FaRegCheckCircle className="mr-2" />}
-              <span className={level === levelOption ? 'text-white' : 'text-blue-600'}>
-                {levelOption}
+              {level === levelOption ? (
+                <FaCheck className="mr-2" />
+              ) : (
+                <FaRegCheckCircle className="mr-2" />
+              )}
+              <span
+                className={
+                  level === levelOption ? "text-white" : "text-blue-600"
+                }
+              >
+                {LEVEL_LABELS[levelOption]}
               </span>
             </div>
           ))}
@@ -66,15 +95,33 @@ const CourseFilter = ({ onFilter }) => {
       <div className="flex flex-col items-center space-y-2 w-full max-w-xs">
         <label className="text-gray-700">Khoảng giá</label>
         <div className="flex flex-col space-y-2 w-full">
-          {['100000-200000', '200000-300000', '300000-400000', '400000-500000', '500000-600000'].map((range) => (
+          {[
+            "100000-200000",
+            "200000-300000",
+            "300000-400000",
+            "400000-500000",
+            "500000-600000",
+          ].map((range) => (
             <div
               key={range}
               onClick={() => handlePriceRangeClick(range)}
-              className={`flex items-center cursor-pointer px-4 py-2 rounded-md ${priceRange === range ? 'bg-blue-600 text-white' : 'bg-transparent text-blue-600 border-2 border-blue-600'}`}
+              className={`flex items-center cursor-pointer px-4 py-2 rounded-md ${
+                priceRange === range
+                  ? "bg-blue-600 text-white"
+                  : "bg-transparent text-blue-600 border-2 border-blue-600"
+              }`}
             >
-              {priceRange === range ? <FaCheck className="mr-2" /> : <FaRegCheckCircle className="mr-2" />}
-              <span className={priceRange === range ? 'text-white' : 'text-blue-600'}>
-                {range.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.')}
+              {priceRange === range ? (
+                <FaCheck className="mr-2" />
+              ) : (
+                <FaRegCheckCircle className="mr-2" />
+              )}
+              <span
+                className={
+                  priceRange === range ? "text-white" : "text-blue-600"
+                }
+              >
+                {range.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.")}
               </span>
             </div>
           ))}
@@ -89,12 +136,27 @@ const CourseFilter = ({ onFilter }) => {
             <div
               key={minRating}
               onClick={() => handleRatingClick(minRating)}
-              className={`flex items-center cursor-pointer px-4 py-2 rounded-md ${rating === minRating.toString() ? 'bg-blue-600 text-white' : 'bg-transparent text-blue-600 border-2 border-blue-600'}`}
+              className={`flex items-center cursor-pointer px-4 py-2 rounded-md ${
+                rating === minRating.toString()
+                  ? "bg-blue-600 text-white"
+                  : "bg-transparent text-blue-600 border-2 border-blue-600"
+              }`}
             >
-              {rating === minRating.toString() ? <FaCheck className="mr-2" /> : <FaRegCheckCircle className="mr-2" />}
+              {rating === minRating.toString() ? (
+                <FaCheck className="mr-2" />
+              ) : (
+                <FaRegCheckCircle className="mr-2" />
+              )}
               <div className="flex items-center">
                 {renderStars(minRating)}
-                <span className={rating === minRating.toString() ? 'text-white' : 'text-blue-600'} className="ml-2 text-sm">
+                <span
+                  className={
+                    rating === minRating.toString()
+                      ? "text-white"
+                      : "text-blue-600"
+                  }
+                  className="ml-2 text-sm"
+                >
                   {minRating} sao trở lên
                 </span>
               </div>

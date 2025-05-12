@@ -159,7 +159,7 @@ const ChangeStatus = ({ title, courseId, status, triggerRefresh }) => {
   };
   return (
     <div className="min-h-screen bg-white-100 p-6">
-      <h1 className="text-2xl font-bold">Change Status</h1>
+      <h1 className="text-2xl font-bold">Chuyển đổi trạng thái</h1>
       <p className="text-gray-500 text-sm italic">
         Chuyển đổi trạng thái khóa học để khóa học có trạng thái hoạt động phù
         hợp với mong muốn của bạn.

@@ -90,32 +90,41 @@ const CourseQuestionsTable = () => {
 
       <div className="p-6 bg-white shadow-lg rounded-lg">
         <h1 className="text-3xl font-bold mb-6 text-blue-700">
-          Course Questions
+          Hỏi Đáp Của Khóa Học
         </h1>
         {loading && (
-          <div className="absolute inset-0 bg-white bg-opacity-75 flex flex-col items-center justify-center rounded-lg">
-            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
-            <p className="mt-3 text-blue-600 font-semibold">Đang tải...</p>
+          <div className="flex flex-col justify-center items-center h-screen">
+            <div className="flex flex-col items-center -mt-12">
+              <div className="relative flex flex-col items-center bg-white bg-opacity-90 p-6 rounded-2xl shadow-xl">
+                <div className="w-14 h-14 border-4 border-blue-200 border-t-blue-500 rounded-full animate-spin"></div>
+                <p className="mt-4 text-blue-600 font-semibold text-lg animate-pulse">
+                  Đang tải dữ liệu...
+                </p>
+              </div>
+            </div>
           </div>
         )}
+
         <div className="flex items-center justify-between mb-6">
           <input
             type="text"
-            placeholder="Search by course name..."
+            placeholder="Tìm kiếm theo tên khóa học..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="border border-gray-300 p-3 rounded-lg w-1/3 shadow-sm focus:outline-none focus:ring focus:ring-blue-300"
           />
           <div className="flex items-center space-x-2">
-            <label className="font-medium">Sort by:</label>
+            <label className="font-medium">Sắp xếp theo:</label>
             <select
               value={sortOption}
               onChange={(e) => handleSort(e.target.value)}
               className="border border-gray-300 p-3 rounded-lg shadow-sm focus:outline-none focus:ring focus:ring-blue-300"
             >
-              <option value="newQuestions">Newest Question</option>
-              <option value="questionNoAnswers">Unanswered Questions</option>
-              <option value="courseName">Course Name</option>
+              <option value="newQuestions">Câu hỏi mới nhất</option>
+              <option value="questionNoAnswers">
+                Câu hỏi chưa được trả lời
+              </option>
+              <option value="courseName">Tên khóa học</option>
             </select>
           </div>
         </div>
@@ -128,19 +137,19 @@ const CourseQuestionsTable = () => {
                   STT
                 </th>
                 <th className="border border-gray-300 px-6 py-3 text-left">
-                  Image
+                  Hình ảnh
                 </th>
                 <th className="border border-gray-300 px-6 py-3 text-left">
-                  Course Name
+                  Tên khóa học
                 </th>
                 <th className="border border-gray-300 px-6 py-3 text-center">
-                  Total Questions
+                  Tổng số câu hỏi
                 </th>
                 <th className="border border-gray-300 px-6 py-3 text-center">
-                  Unanswered Questions
+                  Số câu hỏi chưa trả lời
                 </th>
                 <th className="border border-gray-300 px-6 py-3 text-center">
-                  Newest Question Date
+                  Ngày câu hỏi mới nhất
                 </th>
               </tr>
             </thead>
@@ -190,7 +199,7 @@ const CourseQuestionsTable = () => {
               onClick={(e) => e.stopPropagation()}
             >
               <h2 className="text-2xl font-bold text-blue-700 mb-4">
-                Questions for {selectedCourse.courseName}
+                Câu hỏi của khóa học {selectedCourse.courseName}
               </h2>
               <Question courseId={selectedCourse.courseId} />
               <div className="flex justify-end mt-4">
@@ -198,7 +207,7 @@ const CourseQuestionsTable = () => {
                   onClick={closeModal}
                   className="bg-gray-500 text-white px-4 py-2 rounded-md font-medium transition-colors duration-300 hover:bg-gray-600"
                 >
-                  Close
+                  Đóng
                 </button>
               </div>
             </div>
@@ -215,10 +224,10 @@ const CourseQuestionsTable = () => {
                 : "bg-blue-500 text-white hover:bg-blue-600"
             }`}
           >
-            Previous
+            Trước
           </button>
           <span className="text-gray-700 font-medium">
-            Page {currentPage} of {totalPages}
+            Trang {currentPage} của {totalPages}
           </span>
           <button
             onClick={goToNextPage}
@@ -229,7 +238,7 @@ const CourseQuestionsTable = () => {
                 : "bg-blue-500 text-white hover:bg-blue-600"
             }`}
           >
-            Next
+            Sau
           </button>
         </div>
       </div>

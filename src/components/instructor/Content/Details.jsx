@@ -2,7 +2,13 @@ import { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
-const Details = ({ course, categories, languages, onEditingChange, triggerRefresh }) => {
+const Details = ({
+  course,
+  categories,
+  languages,
+  onEditingChange,
+  triggerRefresh,
+}) => {
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     categoryName: course.category?.name || course.category || "",
@@ -109,7 +115,7 @@ const Details = ({ course, categories, languages, onEditingChange, triggerRefres
       {isEditing ? (
         <form onSubmit={handleUpdate} className="space-y-4">
           <div className="mb-4">
-            <label className="block text-gray-700 font-bold">Title:</label>
+            <label className="block text-gray-700 font-bold">Tiêu đề:</label>
             <input
               type="text"
               name="title"
@@ -124,7 +130,7 @@ const Details = ({ course, categories, languages, onEditingChange, triggerRefres
           </div>
 
           <div>
-            <label className="block text-gray-700 font-bold">Category:</label>
+            <label className="block text-gray-700 font-bold">Danh mục:</label>
             <select
               name="categoryName"
               value={formData.categoryName}
@@ -143,9 +149,7 @@ const Details = ({ course, categories, languages, onEditingChange, triggerRefres
             </p>
           </div>
           <div>
-            <label className="block text-gray-700 font-bold">
-              Description:
-            </label>
+            <label className="block text-gray-700 font-bold">Mô tả:</label>
             <textarea
               name="description"
               value={formData.description}
@@ -159,7 +163,7 @@ const Details = ({ course, categories, languages, onEditingChange, triggerRefres
             </p>
           </div>
           <div>
-            <label className="block text-gray-700 font-bold">Price:</label>
+            <label className="block text-gray-700 font-bold">Giá:</label>
             <input
               type="number"
               name="price"
@@ -173,7 +177,7 @@ const Details = ({ course, categories, languages, onEditingChange, triggerRefres
             </p>
           </div>
           <div>
-            <label className="block text-gray-700 font-bold">Language:</label>
+            <label className="block text-gray-700 font-bold">Ngôn ngữ:</label>
             <select
               name="language"
               value={formData.language}
@@ -192,16 +196,16 @@ const Details = ({ course, categories, languages, onEditingChange, triggerRefres
             </p>
           </div>
           <div>
-            <label className="block text-gray-700 font-bold">Level:</label>
+            <label className="block text-gray-700 font-bold">Cấp độ:</label>
             <select
               name="level"
               value={formData.level}
               onChange={handleInputChange}
               className="mt-1 w-full p-2 border border-gray-300 rounded"
             >
-              <option value="Beginner">Beginner</option>
-              <option value="Intermediate">Intermediate</option>
-              <option value="Advanced">Advanced</option>
+              <option value="Beginner">Cơ bản</option>
+              <option value="Intermediate">Trung cấp</option>
+              <option value="Advanced">Nâng cao</option>
             </select>
             <p className="text-gray-500 text-sm italic">
               Chọn cấp độ phù hợp: Beginner, Intermediate, hoặc Advanced. Để học
@@ -210,7 +214,7 @@ const Details = ({ course, categories, languages, onEditingChange, triggerRefres
           </div>
 
           <div>
-            <label className="block text-gray-700 font-bold">Duration:</label>
+            <label className="block text-gray-700 font-bold">Thời gian:</label>
             <input
               type="text"
               name="duration"
@@ -228,14 +232,14 @@ const Details = ({ course, categories, languages, onEditingChange, triggerRefres
               type="submit"
               className="px-4 py-2 bg-blue-600 text-white rounded"
             >
-              Save
+              Lưu
             </button>
             <button
               type="button"
               onClick={stopEditing}
               className="px-4 py-2 bg-gray-300 text-gray-800 rounded"
             >
-              Cancel
+              Hủy
             </button>
           </div>
         </form>
@@ -243,7 +247,7 @@ const Details = ({ course, categories, languages, onEditingChange, triggerRefres
         <div className="space-y-4 text-lg">
           <div className="fade-in">
             <p>
-              <strong className="text-gray-700">Title:</strong>
+              <strong className="text-gray-700">Tiêu đề:</strong>
               <span className="ml-2">{course.title}</span>
             </p>
             <p className="text-gray-500 text-sm italic">
@@ -254,7 +258,7 @@ const Details = ({ course, categories, languages, onEditingChange, triggerRefres
 
           <div className="fade-in">
             <p>
-              <strong className="text-gray-700">Category:</strong>
+              <strong className="text-gray-700">Danh mục:</strong>
               <span className="ml-2">
                 {course.category?.name || course.category}
               </span>
@@ -267,7 +271,7 @@ const Details = ({ course, categories, languages, onEditingChange, triggerRefres
 
           <div className="fade-in">
             <p>
-              <strong className="text-gray-700">Description:</strong>
+              <strong className="text-gray-700">Mô tả:</strong>
               <span className="ml-2">{course.description}</span>
             </p>
             <p className="text-gray-500 text-sm italic">
@@ -278,7 +282,7 @@ const Details = ({ course, categories, languages, onEditingChange, triggerRefres
 
           <div className="fade-in">
             <p>
-              <strong className="text-gray-700">Price:</strong>
+              <strong className="text-gray-700">Giá:</strong>
               <span className="ml-2">{course.price.toLocaleString()} VND</span>
             </p>
             <p className="text-gray-500 text-sm italic">
@@ -289,7 +293,7 @@ const Details = ({ course, categories, languages, onEditingChange, triggerRefres
 
           <div className="fade-in">
             <p>
-              <strong className="text-gray-700">Language:</strong>
+              <strong className="text-gray-700">Ngôn ngữ:</strong>
               <span className="ml-2">{course.language}</span>
             </p>
             <p className="text-gray-500 text-sm italic">
@@ -300,18 +304,24 @@ const Details = ({ course, categories, languages, onEditingChange, triggerRefres
 
           <div className="fade-in">
             <p>
-              <strong className="text-gray-700">Level:</strong>
-              <span className="ml-2">{course.level}</span>
+              <strong className="text-gray-700">Cấp độ:</strong>
+              <span className="ml-2">
+                {course.level === "Beginner"
+                  ? "Cơ bản"
+                  : course.level === "Intermediate"
+                  ? "Trung cấp"
+                  : "Nâng cao"}
+              </span>{" "}
             </p>
             <p className="text-gray-500 text-sm italic">
-              Chọn cấp độ phù hợp: Beginner, Intermediate, hoặc Advanced. Để học
-              viên có thể xem xét chọn một cách phù hợp.
+              Chọn cấp độ phù hợp: Cơ bản, Trung cấp, hoặc Nâng cao. Để học viên
+              có thể xem xét chọn một cách phù hợp.
             </p>
           </div>
 
           <div className="fade-in">
             <p>
-              <strong className="text-gray-700">Duration:</strong>
+              <strong className="text-gray-700">Thời gian:</strong>
               <span className="ml-2">{course.duration}</span>
             </p>
             <p className="text-gray-500 text-sm italic">
@@ -325,7 +335,7 @@ const Details = ({ course, categories, languages, onEditingChange, triggerRefres
               onClick={startEditing}
               className="px-6 py-3 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 transition duration-300 ease-in-out"
             >
-              Edit Course Details
+              Chỉnh sửa thông tin khóa học
             </button>
           </div>
         </div>

@@ -352,12 +352,6 @@ const MENU_GROUPS = [
             color: "#ec4899",
           },
           {
-            name: "Profile Admin",
-            icon: UserCircle2,
-            href: "/admin/profile-admin",
-            color: "#ec4899",
-          },
-          {
             name: "Add User",
             icon: Plus,
             href: "/admin/add-user",
@@ -405,6 +399,12 @@ const MENU_GROUPS = [
         icon: Settings,
         color: "#64748b",
         subItems: [
+          {
+            name: "Profile Admin",
+            icon: UserCircle2,
+            href: "/admin/profile-admin",
+            color: "#64748b",
+          },
           {
             name: "General",
             icon: Sliders,

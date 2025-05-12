@@ -76,7 +76,20 @@ const DiscountsTable = () => {
     startIndex,
     startIndex + pageSize
   );
-
+  if (loading) {
+    return (
+      <div className="flex flex-col justify-center items-center h-screen">
+        <div className="flex flex-col items-center">
+          <div className="relative flex flex-col items-center bg-white bg-opacity-90 p-6 rounded-2xl shadow-xl">
+            <div className="w-14 h-14 border-4 border-blue-200 border-t-blue-500 rounded-full animate-spin"></div>
+            <p className="mt-4 text-blue-600 font-semibold text-lg animate-pulse">
+              Đang tải dữ liệu...
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="p-6 bg-white rounded-lg shadow-lg mt-4">
       {editingDiscountId ? (
@@ -116,122 +129,109 @@ const DiscountsTable = () => {
               <option value="DECLINED">Bị từ chối</option>
             </select>
           </div>
-
-          {loading ? (
-            <div className="absolute inset-0 bg-white bg-opacity-75 flex flex-col items-center justify-center rounded-lg">
-              <div className="animate-spin rounded-full h-20 w-20 border-t-4 border-blue-500"></div>
-              <p className="mt-4 text-blue-500 text-xl font-bold">Loading...</p>
-            </div>
-          ) : error ? (
-            <p className="text-red-600 text-sm">{error}</p>
-          ) : (
-            <>
-              <table className="w-full text-gray-800 border-collapse">
-                <thead>
-                  <tr className="bg-gray-100 border-b border-gray-300">
-                    <th className="py-3 px-4 border-r border-gray-300 text-sm">
-                      STT
-                    </th>
-                    <th className="py-3 px-4 border-r border-gray-300 text-sm">
-                      Tên
-                    </th>
-                    <th className="py-3 px-4 border-r border-gray-300 text-sm">
-                      Mã
-                    </th>
-                    <th className="py-3 px-4 border-r border-gray-300 text-sm">
-                      Giá trị
-                    </th>
-                    <th className="py-3 px-4 border-r border-gray-300 text-sm">
-                      Ngày bắt đầu
-                    </th>
-                    <th className="py-3 px-4 border-r border-gray-300 text-sm">
-                      Ngày kết thúc
-                    </th>
-                    <th className="py-3 px-4 border-r border-gray-300 text-sm">
-                      Trạng thái
-                    </th>
-                    <th className="py-3 px-4 text-sm">Hành động</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {currentDiscounts.map((discount, index) => {
-                    const serialNumber =
-                      (currentPage - 1) * pageSize + index + 1;
-                    return (
-                      <tr
-                        key={discount.discountId}
-                        className="hover:bg-gray-50 transition-colors duration-200"
-                      >
-                        <td className="py-3 px-4 border-r border-gray-300 text-center text-sm">
-                          {serialNumber}
-                        </td>
-                        <td className="py-3 px-4 border-r border-gray-300 text-sm">
-                          {discount.name}
-                        </td>
-                        <td className="py-3 px-4 border-r border-gray-300 text-sm">
-                          {discount.code}
-                        </td>
-                        <td className="py-3 px-4 border-r border-gray-300 text-center text-sm">
-                          {discount.discountType === "PERCENTAGE"
-                            ? `${discount.value}%`
-                            : `${discount.value} VND`}
-                        </td>
-                        <td className="py-3 px-4 border-r border-gray-300 text-center text-sm">
-                          {new Date(...discount.startDate).toLocaleDateString(
-                            "vi-VN"
-                          )}
-                        </td>
-                        <td className="py-3 px-4 border-r border-gray-300 text-center text-sm">
-                          {new Date(...discount.endDate).toLocaleDateString(
-                            "vi-VN"
-                          )}
-                        </td>
-                        <td className="py-3 px-4 border-r border-gray-300 text-center text-sm">
-                          <span
-                            className={`px-2 py-1 rounded text-xs font-medium ${
-                              discount.status === "ACTIVE"
-                                ? "bg-green-100 text-green-800"
-                                : "bg-red-100 text-red-800"
-                            }`}
-                          >
-                            {discount.status}
-                          </span>
-                        </td>
-                        <td className="py-3 px-4 text-center text-sm">
-                          <button
-                            onClick={() =>
-                              setEditingDiscountId(discount.discountId)
-                            }
-                            className="bg-yellow-400 text-gray-900 px-4 py-1 rounded hover:bg-yellow-500 transition-colors text-xs"
-                          >
-                            Xem chi tiết
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-              <div className="mt-4 flex justify-center items-center space-x-2">
-                {getPaginationItems().map((item, index) => (
-                  <button
-                    key={index}
-                    onClick={() =>
-                      typeof item === "number" && handlePageChange(item)
-                    }
-                    className={`px-3 py-1 rounded text-sm ${
-                      item === currentPage
-                        ? "bg-blue-600 text-white"
-                        : "bg-gray-200 text-gray-800 hover:bg-gray-300"
-                    }`}
-                    disabled={item === "..."}
+          <table className="w-full text-gray-800 border-collapse">
+            <thead>
+              <tr className="bg-gray-100 border-b border-gray-300">
+                <th className="py-3 px-4 border-r border-gray-300 text-sm">
+                  STT
+                </th>
+                <th className="py-3 px-4 border-r border-gray-300 text-sm">
+                  Tên
+                </th>
+                <th className="py-3 px-4 border-r border-gray-300 text-sm">
+                  Mã
+                </th>
+                <th className="py-3 px-4 border-r border-gray-300 text-sm">
+                  Giá trị
+                </th>
+                <th className="py-3 px-4 border-r border-gray-300 text-sm">
+                  Ngày bắt đầu
+                </th>
+                <th className="py-3 px-4 border-r border-gray-300 text-sm">
+                  Ngày kết thúc
+                </th>
+                <th className="py-3 px-4 border-r border-gray-300 text-sm">
+                  Trạng thái
+                </th>
+                <th className="py-3 px-4 text-sm">Hành động</th>
+              </tr>
+            </thead>
+            <tbody>
+              {currentDiscounts.map((discount, index) => {
+                const serialNumber = (currentPage - 1) * pageSize + index + 1;
+                return (
+                  <tr
+                    key={discount.discountId}
+                    className="hover:bg-gray-50 transition-colors duration-200"
                   >
-                    {item}
-                  </button>
-                ))}
-              </div>
-            </>
-          )}
+                    <td className="py-3 px-4 border-r border-gray-300 text-center text-sm">
+                      {serialNumber}
+                    </td>
+                    <td className="py-3 px-4 border-r border-gray-300 text-sm">
+                      {discount.name}
+                    </td>
+                    <td className="py-3 px-4 border-r border-gray-300 text-sm">
+                      {discount.code}
+                    </td>
+                    <td className="py-3 px-4 border-r border-gray-300 text-center text-sm">
+                      {discount.discountType === "PERCENTAGE"
+                        ? `${discount.value}%`
+                        : `${discount.value} VND`}
+                    </td>
+                    <td className="py-3 px-4 border-r border-gray-300 text-center text-sm">
+                      {new Date(...discount.startDate).toLocaleDateString(
+                        "vi-VN"
+                      )}
+                    </td>
+                    <td className="py-3 px-4 border-r border-gray-300 text-center text-sm">
+                      {new Date(...discount.endDate).toLocaleDateString(
+                        "vi-VN"
+                      )}
+                    </td>
+                    <td className="py-3 px-4 border-r border-gray-300 text-center text-sm">
+                      <span
+                        className={`px-2 py-1 rounded text-xs font-medium ${
+                          discount.status === "ACTIVE"
+                            ? "bg-green-100 text-green-800"
+                            : "bg-red-100 text-red-800"
+                        }`}
+                      >
+                        {discount.status}
+                      </span>
+                    </td>
+                    <td className="py-3 px-4 text-center text-sm">
+                      <button
+                        onClick={() =>
+                          setEditingDiscountId(discount.discountId)
+                        }
+                        className="bg-yellow-400 text-gray-900 px-4 py-1 rounded hover:bg-yellow-500 transition-colors text-xs"
+                      >
+                        Xem chi tiết
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+          <div className="mt-4 flex justify-center items-center space-x-2">
+            {getPaginationItems().map((item, index) => (
+              <button
+                key={index}
+                onClick={() =>
+                  typeof item === "number" && handlePageChange(item)
+                }
+                className={`px-3 py-1 rounded text-sm ${
+                  item === currentPage
+                    ? "bg-blue-600 text-white"
+                    : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+                }`}
+                disabled={item === "..."}
+              >
+                {item}
+              </button>
+            ))}
+          </div>
         </>
       )}
     </div>

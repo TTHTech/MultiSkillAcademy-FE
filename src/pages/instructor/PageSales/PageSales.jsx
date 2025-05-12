@@ -252,38 +252,40 @@ const InstructorDashboard = () => {
             />
           ) : (
             <>
-              <h1 className="text-2xl lg:text-3xl font-bold text-gray-800 mb-6">
-                Doanh Thu Các Khóa Học
-              </h1>
-              <div className="flex justify-end space-x-2 mb-2">
-                <button
-                  onClick={exportToExcel}
-                  className="p-2 bg-green-500 text-white rounded-md hover:bg-green-600 flex items-center"
-                >
-                  <AiFillFileExcel className="text-xl" />
-                  Xuất Excel
-                </button>
-                <button
-                  onClick={exportToPDF}
-                  className="p-2 bg-red-500 text-white rounded-md hover:bg-red-600 flex items-center"
-                >
-                  <AiFillFilePdf className="text-xl" />
-                  Xuất PDF
-                </button>
-              </div>
               {loading ? (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-white bg-opacity-90">
+                <div className="flex flex-col justify-center items-center h-screen">
                   <div className="flex flex-col items-center">
-                    <div className="animate-spin rounded-full h-20 w-20 border-t-4 border-blue-500"></div>
-                    <p className="mt-4 text-blue-500 text-xl font-bold">
-                      Loading...
-                    </p>
+                    <div className="relative flex flex-col items-center bg-white bg-opacity-90 p-6 rounded-2xl shadow-xl">
+                      <div className="w-14 h-14 border-4 border-blue-200 border-t-blue-500 rounded-full animate-spin"></div>
+                      <p className="mt-4 text-blue-600 font-semibold text-lg animate-pulse">
+                        Đang tải dữ liệu...
+                      </p>
+                    </div>
                   </div>
                 </div>
               ) : error ? (
                 <div className="text-center text-red-500">{error}</div>
               ) : (
                 <>
+                  <h1 className="text-2xl lg:text-3xl font-bold text-gray-800 mb-6">
+                    Doanh Thu Các Khóa Học
+                  </h1>
+                  <div className="flex justify-end space-x-2 mb-2">
+                    <button
+                      onClick={exportToExcel}
+                      className="p-2 bg-green-500 text-white rounded-md hover:bg-green-600 flex items-center"
+                    >
+                      <AiFillFileExcel className="text-xl" />
+                      Xuất Excel
+                    </button>
+                    <button
+                      onClick={exportToPDF}
+                      className="p-2 bg-red-500 text-white rounded-md hover:bg-red-600 flex items-center"
+                    >
+                      <AiFillFilePdf className="text-xl" />
+                      Xuất PDF
+                    </button>
+                  </div>
                   <div className="mb-8 h-96">
                     <Line data={chartData} options={chartOptions} />
                   </div>
