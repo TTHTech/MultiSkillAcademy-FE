@@ -81,6 +81,7 @@ import PagePromotion from "./pages/admin/PagePromotion.jsx"
 import PagePromotionUsage from "./pages/admin/PagePromotionUsage.jsx"
 import TopicCoursesPage from "./pages/student/topic/TopicCoursesPage.jsx";
 import PageAdminProfile from "./pages/admin/PageAdminProfile.jsx"
+import PgaeNotifications from "./pages/student/notifications/PgaeNotifications.jsx";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -230,6 +231,7 @@ function App() {
                 <Route path="/student/profile-instructor/:id" element={<PageProfileInstructor />} />
                 <Route path="/student/reminder" element={<ReminderPage />} />
                 <Route path="/topic/:topicPath" element={<TopicCoursesPage />} />
+                <Route path="/student/notifications" element={<PgaeNotifications />} />
               </>
             )}
             
