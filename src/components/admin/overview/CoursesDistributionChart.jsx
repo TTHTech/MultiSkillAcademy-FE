@@ -1,7 +1,12 @@
 import { motion } from "framer-motion";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import { useEffect, useState, useMemo } from "react";
-import { Loader2, RefreshCcw, PieChart as PieChartIcon, AlertCircle } from "lucide-react";
+import {
+  Loader2,
+  RefreshCcw,
+  PieChart as PieChartIcon,
+  AlertCircle,
+} from "lucide-react";
 const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const API_URL = `${baseUrl}/api/admin/stats`;
@@ -26,7 +31,7 @@ const DISTINCT_COLORS = [
   "#0284c7", // Sky Darker
   "#ea580c", // Orange Darker
   "#a21caf", // Fuchsia
-  "#15803d"  // Green Darker
+  "#15803d", // Green Darker
 ];
 
 // Animations configuration
@@ -34,13 +39,13 @@ const ANIMATIONS = {
   container: {
     initial: { opacity: 0, y: 20 },
     animate: { opacity: 1, y: 0 },
-    transition: { duration: 0.4, ease: "easeOut" }
+    transition: { duration: 0.4, ease: "easeOut" },
   },
   chart: {
     initial: { opacity: 0, scale: 0.95 },
     animate: { opacity: 1, scale: 1 },
-    transition: { delay: 0.2, duration: 0.5, ease: "easeOut" }
-  }
+    transition: { delay: 0.2, duration: 0.5, ease: "easeOut" },
+  },
 };
 
 // Loading Spinner Component with enhanced styling
@@ -77,7 +82,9 @@ const EmptyState = ({ onRefresh }) => (
       <PieChartIcon className="w-10 h-10 text-slate-500" />
     </div>
     <p className="text-slate-300 font-medium mb-1">No revenue data available</p>
-    <p className="text-slate-500 text-sm mb-4">Course revenue distribution data not found</p>
+    <p className="text-slate-500 text-sm mb-4">
+      Course revenue distribution data not found
+    </p>
     <button
       onClick={onRefresh}
       className="px-4 py-2 bg-blue-600/20 text-blue-300 border border-blue-500/30 rounded-lg hover:bg-blue-600/30 transition-colors text-sm flex items-center gap-2"
@@ -97,14 +104,13 @@ const CustomTooltip = ({ active, payload }) => {
     <div className="bg-slate-800 p-4 rounded-lg shadow-xl border border-blue-900/30 backdrop-blur-md">
       <h3 className="text-slate-200 font-semibold mb-2 text-sm">{data.name}</h3>
       <div className="flex items-center text-white font-medium space-x-2 mb-1">
-        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: data.payload.color }} />
-        <span className="font-mono text-lg">
-          {(data.value).toFixed(1)}%
-        </span>
+        <div
+          className="w-3 h-3 rounded-full"
+          style={{ backgroundColor: data.payload.color }}
+        />
+        <span className="font-mono text-lg">{data.value.toFixed(1)}%</span>
       </div>
-      <p className="text-slate-400 text-xs">
-        of total course revenue
-      </p>
+      <p className="text-slate-400 text-xs">of total course revenue</p>
     </div>
   );
 };
@@ -119,8 +125,8 @@ const SideLegend = ({ data }) => {
       <div className="space-y-2.5">
         {data.map((item, index) => (
           <div key={`legend-${index}`} className="flex items-center gap-2">
-            <div 
-              className="min-w-3 h-3 rounded-full" 
+            <div
+              className="min-w-3 h-3 rounded-full"
               style={{ backgroundColor: item.color }}
             />
             <span className="text-xs text-slate-300 truncate max-w-[65%]">
@@ -145,7 +151,7 @@ const CoursesRevenueChart = () => {
   const fetchCourseData = async (showRefreshing = false) => {
     if (showRefreshing) setRefreshing(true);
     setError(null);
-    
+
     try {
       const response = await fetch(API_URL, {
         headers: {
@@ -158,14 +164,14 @@ const CoursesRevenueChart = () => {
       }
 
       const data = await response.json();
-      
+
       // Transform data and assign distinct colors based on index
       const transformedData = Object.entries(data.courseRevenuePercentage)
         .map(([name, value], index) => ({
           name,
           value: parseFloat(value.toFixed(1)),
           // Assign color from the distinct colors array (cycle through if more courses than colors)
-          color: DISTINCT_COLORS[index % DISTINCT_COLORS.length]
+          color: DISTINCT_COLORS[index % DISTINCT_COLORS.length],
         }))
         .sort((a, b) => b.value - a.value);
 
@@ -184,12 +190,15 @@ const CoursesRevenueChart = () => {
   }, []);
 
   // Memoized chart configuration
-  const chartConfig = useMemo(() => ({
-    customLabel: ({ name, value, index }) => {
-      // Show percentages for all segments
-      return `${value}%`;
-    }
-  }), []);
+  const chartConfig = useMemo(
+    () => ({
+      customLabel: ({ name, value, index }) => {
+        // Show percentages for all segments
+        return `${value}%`;
+      },
+    }),
+    []
+  );
 
   return (
     <motion.div
@@ -203,26 +212,26 @@ const CoursesRevenueChart = () => {
           </div>
           <div>
             <h2 className="text-xl font-bold text-white tracking-tight">
-              Course Revenue Distribution
+              Phân Phối Doanh Thu Khóa Học
             </h2>
             <p className="text-slate-400 text-xs">
-              Percentage breakdown of revenue by course
+              Phân Tích Phần Trăm Doanh Thu Theo Khóa Học
             </p>
           </div>
         </div>
-        
+
         {!loading && !error && (
           <button
             onClick={() => fetchCourseData(true)}
             disabled={refreshing}
             className="flex items-center gap-2 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors border border-slate-700 shadow-sm self-end sm:self-auto"
           >
-            <RefreshCcw 
-              size={14} 
-              className={`text-blue-400 ${refreshing ? 'animate-spin' : ''}`}
+            <RefreshCcw
+              size={14}
+              className={`text-blue-400 ${refreshing ? "animate-spin" : ""}`}
             />
             <span className="text-slate-200 text-xs font-medium">
-              {refreshing ? 'Refreshing...' : 'Refresh Data'}
+              {refreshing ? "Refreshing..." : "Refresh Data"}
             </span>
           </button>
         )}
@@ -230,8 +239,10 @@ const CoursesRevenueChart = () => {
 
       <div className="bg-slate-800/50 rounded-xl border border-blue-900/20 p-3">
         {loading && <LoadingSpinner />}
-        {error && <ErrorDisplay message={error} onRetry={() => fetchCourseData(true)} />}
-        
+        {error && (
+          <ErrorDisplay message={error} onRetry={() => fetchCourseData(true)} />
+        )}
+
         {!loading && !error && courseData.length > 0 && (
           <motion.div
             className="grid grid-cols-1 lg:grid-cols-5 gap-4 h-72"
@@ -241,7 +252,7 @@ const CoursesRevenueChart = () => {
             <div className="lg:col-span-2 h-full bg-slate-800/70 rounded-lg p-3 border border-slate-700/50">
               <SideLegend data={courseData} />
             </div>
-            
+
             {/* Chart in the middle (3/5 of width) */}
             <div className="lg:col-span-3 h-full flex items-center justify-center">
               <div className="w-full h-full max-w-md mx-auto">
@@ -250,8 +261,8 @@ const CoursesRevenueChart = () => {
                     <Pie
                       data={courseData}
                       cx="50%"
-                      cy="50%" 
-                      labelLine={{ stroke: '#475569', strokeWidth: 1 }}
+                      cy="50%"
+                      labelLine={{ stroke: "#475569", strokeWidth: 1 }}
                       outerRadius={courseData.length > 10 ? 70 : 80}
                       innerRadius={40}
                       paddingAngle={3}
@@ -260,7 +271,7 @@ const CoursesRevenueChart = () => {
                       minAngle={7}
                     >
                       {courseData.map((entry, index) => (
-                        <Cell 
+                        <Cell
                           key={`cell-${index}`}
                           fill={entry.color}
                           stroke="#0f172a"

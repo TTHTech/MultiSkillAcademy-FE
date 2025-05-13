@@ -195,7 +195,7 @@ const SalesOverviewChart = () => {
           <div className="p-2 bg-blue-600/20 rounded-lg">
             <ChartIcon className="w-6 h-6 text-blue-400" />
           </div>
-          <h2 className="text-2xl font-bold text-white tracking-tight">Sales Overview</h2>
+          <h2 className="text-2xl font-bold text-white tracking-tight">Tổng Quan Doanh Thu</h2>
         </div>
         
         <div className="flex gap-3">
@@ -229,20 +229,20 @@ const SalesOverviewChart = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <StatCard 
           icon={DollarSign}
-          title="Total Sales"
+          title="Tổng Doanh Thu"
           value={`$${stats.total.toLocaleString()}`}
           trend={stats.growth}
           color="blue"
         />
         <StatCard 
           icon={TrendingUp}
-          title="Average Sales"
+          title="Doanh Thu Trung Bình"
           value={`$${stats.avg}`}
           color="purple"
         />
         <StatCard 
           icon={Calendar}
-          title="Period"
+          title="Giai Đoạn"
           value={selectedMonth ? `${selectedMonth} ${selectedYear}` : `${selectedYear}`}
           color="teal"
         />

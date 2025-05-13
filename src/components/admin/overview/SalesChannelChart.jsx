@@ -176,11 +176,11 @@ const SalesChannelChart = () => {
               <BarChart3 className="w-5 h-5 text-blue-400" />
             </div>
             <h2 className="text-2xl font-bold text-white tracking-tight">
-              Sales by Category
+              Doanh Thu Theo Doanh Mục
             </h2>
           </div>
           <p className="text-slate-400 text-sm ml-10">
-            Revenue distribution across product categories
+            Phân Phối Doanh Thu Theo Danh Mục Sản Phẩm
           </p>
         </div>
 
