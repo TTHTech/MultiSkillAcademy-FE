@@ -21,46 +21,32 @@ const InstructorReviews = () => {
   useEffect(() => {
     handleFilter();
   }, [courseNameFilter, ratingFilter]);
+  
   useEffect(() => {
-    const fetchReviews = async () => {
+    const fetchData = async () => {
+      setLoading(true);
       try {
-        const response = await axios.get(
-          `${baseUrl}/api/instructor/reviews/${userId}`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        setReviews(response.data);
-        setFilteredReviews(response.data);
-      } catch (err) {
-        setError("Không thể tải dữ liệu đánh giá. Vui lòng thử lại sau.");
-      } finally {
-        setLoading(false);
-      }
-    };
-    const fetchCourse = async () => {
-      try {
-        const response = await axios.get(
-          `${baseUrl}/api/instructor/${userId}`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        setCourses(response.data);
-      } catch (err) {
-        setError("Không thể tải dữ liệu đánh giá. Vui lòng thử lại sau.");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchCourse();
-    fetchReviews();
-  }, [token, userId]);
+        const [reviewsRes, coursesRes] = await Promise.all([
+          axios.get(`${baseUrl}/api/instructor/reviews/${userId}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          axios.get(`${baseUrl}/api/instructor/${userId}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+        ]);
 
-  const calculateAverageRating = () => {
-    if (filteredReviews.length === 0) return 0;
-    const totalRating = filteredReviews.reduce(
-      (sum, review) => sum + review.rating,
-      0
-    );
-    return (totalRating / filteredReviews.length).toFixed(1);
-  };
+        setReviews(reviewsRes.data);
+        setFilteredReviews(reviewsRes.data);
+        setCourses(coursesRes.data);
+      } catch (err) {
+        setError("Không thể tải dữ liệu. Vui lòng thử lại sau.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [token, userId]);
 
   const handleFilter = () => {
     const filtered = reviews.filter((review) => {
@@ -76,6 +62,15 @@ const InstructorReviews = () => {
     });
     setFilteredReviews(filtered);
     setCurrentPage(1);
+  };
+
+  const calculateAverageRating = () => {
+    if (filteredReviews.length === 0) return 0;
+    const totalRating = filteredReviews.reduce(
+      (sum, review) => sum + review.rating,
+      0
+    );
+    return (totalRating / filteredReviews.length).toFixed(1);
   };
 
   const indexOfLastReview = currentPage * reviewsPerPage;
@@ -186,113 +181,119 @@ const InstructorReviews = () => {
 
       <div className="flex-1 bg-gray-100 overflow-hidden">
         <div className="p-6 lg:p-8 max-w-7xl mx-auto">
-          <h1 className="text-2xl lg:text-3xl font-bold text-gray-800 mb-6">
-            Danh sách đánh giá
-          </h1>
-
-          <div className="mb-8">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div className="bg-gradient-to-br from-purple-300 to-purple-100 p-1 rounded-2xl shadow-lg">
-                <div className="bg-white rounded-xl p-5">
-                  <label
-                    htmlFor="course-select"
-                    className="block text-sm font-semibold text-gray-700 mb-2"
-                  >
-                    <span className="text-purple-600">🎓</span> Chọn khóa học
-                  </label>
-                  <select
-                    id="course-select"
-                    className="w-full border border-gray-300 rounded-md p-2.5 shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
-                    value={courseNameFilter}
-                    onChange={(e) => setCourseNameFilter(e.target.value)}
-                  >
-                    <option value="">-- Tất cả khóa học --</option>
-                    {courses.map((course) => (
-                      <option key={course.courseId} value={course.title}>
-                        {course.title}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div className="bg-gradient-to-br from-pink-300 to-pink-100 p-1 rounded-2xl shadow-lg">
-                <div className="bg-white rounded-xl p-5">
-                  <label
-                    htmlFor="rating-select"
-                    className="block text-sm font-semibold text-gray-700 mb-2"
-                  >
-                    <span className="text-yellow-500">⭐</span> Chọn mức đánh
-                    giá
-                  </label>
-                  <select
-                    id="rating-select"
-                    className="w-full border border-gray-300 rounded-md p-2.5 shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-500 transition"
-                    value={ratingFilter}
-                    onChange={(e) => setRatingFilter(e.target.value)}
-                  >
-                    <option value="">-- Tất cả mức đánh giá --</option>
-                    <option value="5">5 sao</option>
-                    <option value="4">4 sao</option>
-                    <option value="3">3 sao</option>
-                    <option value="2">2 sao</option>
-                    <option value="1">1 sao</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="mb-8">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div className="bg-gradient-to-br from-blue-300 to-blue-100 p-1 rounded-2xl shadow-lg">
-                <div className="bg-white rounded-xl p-6 flex items-center space-x-4">
-                  <div className="flex-shrink-0">
-                    <span className="inline-block p-3 bg-blue-100 rounded-full">
-                      <FileText className="w-6 h-6 text-blue-500" />
-                    </span>
-                  </div>
-                  <div className="text-center sm:text-left">
-                    <p className="text-sm text-gray-500 uppercase tracking-wide">
-                      Số đánh giá
-                    </p>
-                    <p className="mt-1 text-2xl font-bold text-blue-700">
-                      {filteredReviews.length}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-gradient-to-br from-indigo-300 to-indigo-100 p-1 rounded-2xl shadow-lg">
-                <div className="bg-white rounded-xl p-6 flex items-center space-x-4">
-                  <div className="flex-shrink-0">
-                    <span className="inline-block p-3 bg-indigo-100 rounded-full">
-                      <Star className="w-6 h-6 text-indigo-500" />
-                    </span>
-                  </div>
-                  <div className="text-center sm:text-left">
-                    <p className="text-sm text-gray-500 uppercase tracking-wide">
-                      Đánh giá trung bình
-                    </p>
-                    <p className="mt-1 text-2xl font-bold text-indigo-700 flex items-center justify-center sm:justify-start">
-                      {calculateAverageRating()}
-                      <Star className="w-5 h-5 ml-1 text-yellow-400" />
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
           {loading ? (
-            <div className="absolute inset-0 bg-white bg-opacity-75 flex flex-col items-center justify-center rounded-lg">
-              <div className="animate-spin rounded-full h-20 w-20 border-t-4 border-blue-500"></div>
-              <p className="mt-4 text-blue-500 text-xl font-bold">Loading...</p>
+            <div className="flex flex-col justify-center items-center h-screen">
+              <div className="flex flex-col items-center">
+                <div className="relative flex flex-col items-center bg-white bg-opacity-90 p-6 rounded-2xl shadow-xl">
+                  <div className="w-14 h-14 border-4 border-blue-200 border-t-blue-500 rounded-full animate-spin"></div>
+                  <p className="mt-4 text-blue-600 font-semibold text-lg animate-pulse">
+                    Đang tải dữ liệu...
+                  </p>
+                </div>
+              </div>
             </div>
           ) : error ? (
             <div className="text-center text-red-500">{error}</div>
           ) : (
             <>
+              <h1 className="text-2xl lg:text-3xl font-bold text-gray-800 mb-6">
+                Danh sách đánh giá
+              </h1>
+
+              <div className="mb-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <div className="bg-gradient-to-br from-purple-300 to-purple-100 p-1 rounded-2xl shadow-lg">
+                    <div className="bg-white rounded-xl p-5">
+                      <label
+                        htmlFor="course-select"
+                        className="block text-sm font-semibold text-gray-700 mb-2"
+                      >
+                        <span className="text-purple-600">🎓</span> Chọn khóa
+                        học
+                      </label>
+                      <select
+                        id="course-select"
+                        className="w-full border border-gray-300 rounded-md p-2.5 shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
+                        value={courseNameFilter}
+                        onChange={(e) => setCourseNameFilter(e.target.value)}
+                      >
+                        <option value="">-- Tất cả khóa học --</option>
+                        {courses.map((course) => (
+                          <option key={course.courseId} value={course.title}>
+                            {course.title}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="bg-gradient-to-br from-pink-300 to-pink-100 p-1 rounded-2xl shadow-lg">
+                    <div className="bg-white rounded-xl p-5">
+                      <label
+                        htmlFor="rating-select"
+                        className="block text-sm font-semibold text-gray-700 mb-2"
+                      >
+                        <span className="text-yellow-500">⭐</span> Chọn mức
+                        đánh giá
+                      </label>
+                      <select
+                        id="rating-select"
+                        className="w-full border border-gray-300 rounded-md p-2.5 shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-500 transition"
+                        value={ratingFilter}
+                        onChange={(e) => setRatingFilter(e.target.value)}
+                      >
+                        <option value="">-- Tất cả mức đánh giá --</option>
+                        <option value="5">5 sao</option>
+                        <option value="4">4 sao</option>
+                        <option value="3">3 sao</option>
+                        <option value="2">2 sao</option>
+                        <option value="1">1 sao</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mb-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <div className="bg-gradient-to-br from-blue-300 to-blue-100 p-1 rounded-2xl shadow-lg">
+                    <div className="bg-white rounded-xl p-6 flex items-center space-x-4">
+                      <div className="flex-shrink-0">
+                        <span className="inline-block p-3 bg-blue-100 rounded-full">
+                          <FileText className="w-6 h-6 text-blue-500" />
+                        </span>
+                      </div>
+                      <div className="text-center sm:text-left">
+                        <p className="text-sm text-gray-500 uppercase tracking-wide">
+                          Số đánh giá
+                        </p>
+                        <p className="mt-1 text-2xl font-bold text-blue-700">
+                          {filteredReviews.length}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-gradient-to-br from-indigo-300 to-indigo-100 p-1 rounded-2xl shadow-lg">
+                    <div className="bg-white rounded-xl p-6 flex items-center space-x-4">
+                      <div className="flex-shrink-0">
+                        <span className="inline-block p-3 bg-indigo-100 rounded-full">
+                          <Star className="w-6 h-6 text-indigo-500" />
+                        </span>
+                      </div>
+                      <div className="text-center sm:text-left">
+                        <p className="text-sm text-gray-500 uppercase tracking-wide">
+                          Đánh giá trung bình
+                        </p>
+                        <p className="mt-1 text-2xl font-bold text-indigo-700 flex items-center justify-center sm:justify-start">
+                          {calculateAverageRating()}
+                          <Star className="w-5 h-5 ml-1 text-yellow-400" />
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
               <div className="shadow-md rounded-md">
                 <table className="w-full table-auto border-collapse bg-white text-left text-sm lg:text-base">
                   <thead className="bg-gray-200">

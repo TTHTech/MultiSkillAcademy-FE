@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify"; // Import toast
 import "react-toastify/dist/ReactToastify.css"; // Import CSS của react-toastify
-
+import { RefreshCcw } from "lucide-react";
 import NavBar from "../../../components/student/common/NavBar";
 import Footer from "../../../components/student/common/Footer";
 import CourseHeader from "../../../components/student/CoursesDetail/CourseHeader";
@@ -13,7 +13,7 @@ import CourseContentDetails from "../../../components/student/CoursesDetail/Cour
 import CourseRequirements from "../../../components/student/CoursesDetail/CourseRequirements";
 import CourseReviews from "../../../components/student/CoursesDetail/CourseReviews";
 import CourseInstructor from "../../../components/student/CoursesDetail/CourseInstructor";
-import { decodeId } from '../../../utils/hash';
+import { decodeId } from "../../../utils/hash";
 const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const CourseDetailPage = () => {
@@ -26,7 +26,7 @@ const CourseDetailPage = () => {
   const [instructorDetail, setInstructorDetail] = useState([]);
 
   useEffect(() => {
-    console.log("CourseId" + courseId)
+    console.log("CourseId" + courseId);
     if (!courseId) {
       return;
     }
@@ -80,9 +80,41 @@ const CourseDetailPage = () => {
     }
   };
 
-  if (loading) return <p>Loading...</p>;
-  if (!courseData) return <p>Không tìm thấy khóa học.</p>;
-
+  if (loading)
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-4">
+        <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-500 rounded-full animate-spin"></div>
+        <p className="mt-4 text-blue-600 font-semibold animate-pulse">
+          Đang tải nội dung khóa học...
+        </p>
+        <div className="mt-8 w-full max-w-3xl space-y-4">
+          <div className="h-8 bg-gray-200 rounded-lg animate-pulse"></div>
+          <div className="h-4 bg-gray-200 rounded-lg animate-pulse"></div>
+          <div className="h-4 bg-gray-200 rounded-lg animate-pulse w-5/6"></div>
+          {[...Array(4)].map((_, i) => (
+            <div
+              key={i}
+              className="h-6 bg-gray-200 rounded-lg animate-pulse"
+            ></div>
+          ))}
+        </div>
+      </div>
+    );
+  if (!courseData) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64 bg-gray-50 rounded-lg shadow-md p-6">
+        <RefreshCcw className="w-12 h-12 text-gray-400 mb-4 animate-pulse" />
+        <p className="text-gray-700 mb-6">Không tìm thấy khóa học.</p>
+        <button
+          onClick={() => window.location.reload()}
+          className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+        >
+          <RefreshCcw className="w-5 h-5 mr-2" />
+          Thử lại
+        </button>
+      </div>
+    );
+  }
   return (
     <div className="w-full h-full min-h-screen bg-gray-100 overflow-y-auto mt-[30px] ">
       <NavBar />

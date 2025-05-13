@@ -177,28 +177,28 @@ const OverviewCards = () => {
 
   const cards = [
     {
-      name: "Total Courses",
+      name: "Tổng Khóa Học",
       icon: BookOpen,
       value: stats.totalCourses.toLocaleString(),
       color: "#4CAF50",
       trend: stats.trends.courses
     },
     {
-      name: "Total Users",
+      name: "Tổng Người Dùng",
       icon: Users,
       value: stats.totalUsers.toLocaleString(),
       color: "#FF6347",
       trend: stats.trends.users
     },
     {
-      name: "Total Categories",
+      name: "Tổng Doanh Mục",
       icon: Tag,
       value: stats.totalCategories.toLocaleString(),
       color: "#FFA500",
       trend: stats.trends.categories
     },
     {
-      name: "Total Sales",
+      name: "Tổng Doanh Thu",
       icon: DollarSign,
       value: new Intl.NumberFormat('vi-VN', {
         style: 'currency',

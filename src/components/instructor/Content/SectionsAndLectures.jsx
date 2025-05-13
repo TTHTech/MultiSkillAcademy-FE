@@ -52,7 +52,7 @@ const SectionsAndLectures = () => {
 
   return (
     <div className="min-h-screen bg-white-100 p-6">
-      <h1 className="text-3xl font-bold mb-2">Sections And Lectures</h1>
+      <h1 className="text-3xl font-bold mb-2">Chương và bài học</h1>
       <p className="text-gray-500 text-sm italic">
         Danh sách các chương và các bài học của từng chương. Đây là nội dung mà
         học viên sẽ được học từ khóa học của bạn. Nội dung của các bài học có
