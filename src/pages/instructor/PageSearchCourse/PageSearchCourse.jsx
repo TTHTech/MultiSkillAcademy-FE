@@ -64,19 +64,19 @@ const PageSearchCourse = () => {
         </div>
       </div>
       <div className="relative bg-gray-50 p-4 rounded-lg shadow-sm">
-        {error && (
-          <p className="text-red-500 font-semibold mb-4">{error}</p>
-        )}
+        {error && <p className="text-red-500 font-semibold mb-4">{error}</p>}
         <FilterCourse onFilter={handleFilter} />
         <div className="overflow-hidden bg-white rounded-lg shadow-md mt-5">
           <TableCourse courses={filteredCourses} />
         </div>
         {loading && (
           <div className="absolute inset-0 bg-white bg-opacity-75 flex flex-col items-center justify-center rounded-lg">
-            <div className="animate-spin rounded-full h-20 w-20 border-t-4 border-blue-500"></div>
-            <p className="mt-4 text-blue-500 text-xl font-bold">
-              Loading...
-            </p>
+            <div className="relative flex flex-col items-center bg-white bg-opacity-90 p-6 rounded-2xl shadow-xl">
+              <div className="w-14 h-14 border-4 border-blue-200 border-t-blue-500 rounded-full animate-spin"></div>
+              <p className="mt-4 text-blue-600 font-semibold text-lg animate-pulse">
+                Đang tải dữ liệu...
+              </p>
+            </div>
           </div>
         )}
       </div>

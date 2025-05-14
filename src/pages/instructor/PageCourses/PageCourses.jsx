@@ -3,16 +3,12 @@ import Sidebar from "../../../components/instructor/Sidebar/Sidebar";
 import ListCard from "../../../components/instructor/Card/ListCoursesCard";
 const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
-const userId = localStorage.getItem("userId");
-
 const PageCourses = () => {
   const [open, setOpen] = useState(true);
   const [activeTab, setActiveTab] = useState("pending");
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  // pagination state
   const [pendingPage, setPendingPage] = useState(1);
   const [approvedPage, setApprovedPage] = useState(1);
   const [unsentPage, setUnsentPage] = useState(1);
@@ -20,16 +16,17 @@ const PageCourses = () => {
   const [inactivePage, setInactivePage] = useState(1);
 
   const coursesPerPage = 8;
-
-  // Fetch data with loading & error handling
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    const userId = localStorage.getItem("userId");
+
     const fetchCourses = async () => {
       setLoading(true);
       setError(null);
       try {
         const resp = await fetch(`${baseUrl}/api/instructor/${userId}`, {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            Authorization: `Bearer ${token}`,
           },
         });
         if (!resp.ok) throw new Error(`Status ${resp.status}`);
@@ -42,15 +39,8 @@ const PageCourses = () => {
         setLoading(false);
       }
     };
-    if (userId && localStorage.getItem("token")) {
-      fetchCourses();
-    } else {
-      setLoading(false);
-      setError("Chưa có thông tin đăng nhập.");
-    }
+    fetchCourses();
   }, []);
-
-  // Filter courses by status
   const filterCourses = (status) =>
     courses.filter((course) => {
       if (status === "pending")
@@ -62,14 +52,10 @@ const PageCourses = () => {
       if (status === "inactive") return course.status === "Inactive";
       return false;
     });
-
-  // Pagination helper
   const paginate = (list, page) => {
     const start = (page - 1) * coursesPerPage;
     return list.slice(start, start + coursesPerPage);
   };
-
-  // Tabs config
   const tabs = [
     {
       key: "pending",
@@ -102,13 +88,9 @@ const PageCourses = () => {
       setPage: setDeclinedPage,
     },
   ];
-
-  // Precompute lists
   const lists = Object.fromEntries(
     tabs.map(({ key }) => [key, filterCourses(key)])
   );
-
-  // Generate pagination numbers
   const pagesCount = (key) => Math.ceil(lists[key].length / coursesPerPage);
 
   return (
@@ -158,14 +140,12 @@ const PageCourses = () => {
           </>
         ) : (
           <>
-            {/* Tabs */}
             <div className="flex justify-center space-x-4 py-4">
               {tabs.map(({ key, label }) => (
                 <button
                   key={key}
                   onClick={() => {
                     setActiveTab(key);
-                    // reset pages
                     tabs.forEach(({ setPage }) => setPage(1));
                   }}
                   className={`px-6 py-2 rounded-full font-medium text-lg transition-all duration-300 ${
@@ -178,7 +158,6 @@ const PageCourses = () => {
                 </button>
               ))}
             </div>
-            {/* Content */}
             <div className="mt-6">
               <div className="bg-white p-6 rounded-lg shadow-md space-y-4">
                 <ListCard
@@ -187,7 +166,6 @@ const PageCourses = () => {
                     tabs.find((t) => t.key === activeTab).page
                   )}
                 />
-                {/* Pagination */}
                 <div className="flex justify-center space-x-2 mt-6">
                   {Array.from(
                     { length: pagesCount(activeTab) },

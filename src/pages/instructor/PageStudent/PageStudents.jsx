@@ -1,37 +1,37 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import Sidebar from "../../../components/instructor/Sidebar/Sidebar";
 import axios from "axios";
 import moment from "moment";
 import CourseFilter from "./CourseFilter";
 const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
-const userId = Number(localStorage.getItem("userId"));
 const StudentList = () => {
   const [open, setOpen] = useState(true);
   const [students, setStudents] = useState([]);
-  const [selectedCourse, setSelectedCourse] = useState("");
-  const [filteredStudents, setFilteredStudents] = useState([]);
   const [selectedStudentEmail, setSelectedStudentEmail] = useState(null);
   const [emailContent, setEmailContent] = useState("");
   const [selectedFile, setSelectedFile] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [filteredStudents, setFilteredStudents] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const studentsPerPage = 10;
-  const indexOfLastStudent = currentPage * studentsPerPage;
-  const indexOfFirstStudent = indexOfLastStudent - studentsPerPage;
+  const userId = Number(localStorage.getItem("userId"));
+  const totalPages = useMemo(
+    () => Math.max(1, Math.ceil(filteredStudents.length / studentsPerPage)),
+    [filteredStudents]
+  );
+  const indexOfFirstStudent = (currentPage - 1) * studentsPerPage;
+  const currentStudents = useMemo(() => {
+    const start = (currentPage - 1) * studentsPerPage;
+    return filteredStudents.slice(start, start + studentsPerPage);
+  }, [filteredStudents, currentPage]);
   const handlePageChange = (newPage) => {
-    if (
-      newPage > 0 &&
-      newPage <= Math.ceil(filteredStudents.length / studentsPerPage)
-    ) {
+    if (newPage >= 1 && newPage <= totalPages) {
       setCurrentPage(newPage);
     }
   };
-  const currentStudents = filteredStudents.slice(
-    indexOfFirstStudent,
-    indexOfLastStudent
-  );
+
   const handleEmailClick = (email) => {
     setSelectedStudentEmail(email);
     setIsModalOpen(true);
@@ -74,55 +74,38 @@ const StudentList = () => {
         setIsLoading(false);
         setStudents(response.data);
         setFilteredStudents(response.data);
+        setCurrentPage(1);
       })
       .catch((error) => {
         setIsLoading(false);
         console.error("Error fetching data:", error);
       });
   }, []);
-  const handleFilterChange = (filteredData) => {
-    setFilteredStudents(filteredData);
-    setCurrentPage(1); // Reset về trang đầu khi lọc
-  };
+  const handleFilterChange = useCallback((data) => {
+    setFilteredStudents(data);
+    setCurrentPage(1);
+  }, []);
 
   const getProgressColor = (progress) => {
     if (progress <= 40) return "bg-red-500";
     if (progress <= 75) return "bg-yellow-500";
     return "bg-green-500";
   };
-  const totalPages = Math.ceil(filteredStudents.length / studentsPerPage);
 
   const getPageNumbers = () => {
     const pages = [];
     if (totalPages <= 10) {
-      for (let i = 1; i <= totalPages; i++) {
-        pages.push(i);
-      }
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
     } else {
-      if (currentPage <= 4) {
-        for (let i = 1; i <= 5; i++) {
-          pages.push(i);
-        }
-        pages.push("...");
-        pages.push(totalPages - 2, totalPages - 1, totalPages);
-      } else if (currentPage >= totalPages - 3) {
-        pages.push(1, 2, 3);
-        pages.push("...");
-        for (let i = totalPages - 4; i <= totalPages; i++) {
-          pages.push(i);
-        }
-      } else {
-        pages.push(1, 2, 3);
-        pages.push("...");
-        for (let i = currentPage - 1; i <= currentPage + 1; i++) {
-          pages.push(i);
-        }
-        pages.push("...");
-        pages.push(totalPages - 2, totalPages - 1, totalPages);
-      }
+      const left = Math.max(1, currentPage - 2);
+      const right = Math.min(totalPages, currentPage + 2);
+      if (left > 1) pages.push(1, "...");
+      for (let i = left; i <= right; i++) pages.push(i);
+      if (right < totalPages) pages.push("...", totalPages);
     }
     return pages;
   };
+
   return (
     <section
       className={`flex-1 min-h-screen bg-gradient-to-b from-green-100 to-blue-200 duration-300 ${
@@ -144,7 +127,7 @@ const StudentList = () => {
             </div>
           </div>
         )}
-        <h1 className="text-3xl font-bold mb-6 text-gray-800">Student List</h1>
+        <h1 className="text-3xl font-bold mb-6 text-gray-800">Danh Sách Học Viên</h1>
 
         <CourseFilter students={students} onFilterChange={handleFilterChange} />
 
@@ -217,14 +200,15 @@ const StudentList = () => {
             >
               Trang trước
             </button>
-            {getPageNumbers().map((page, index) =>
+
+            {getPageNumbers().map((page, idx) =>
               page === "..." ? (
-                <span key={index} className="px-4 py-2 mx-1">
-                  ...
+                <span key={idx} className="px-4 py-2 mx-1">
+                  …
                 </span>
               ) : (
                 <button
-                  key={index}
+                  key={idx}
                   onClick={() => handlePageChange(page)}
                   className={`px-4 py-2 mx-1 rounded-lg shadow-md border transition-all ${
                     currentPage === page
@@ -236,6 +220,7 @@ const StudentList = () => {
                 </button>
               )
             )}
+
             <button
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
