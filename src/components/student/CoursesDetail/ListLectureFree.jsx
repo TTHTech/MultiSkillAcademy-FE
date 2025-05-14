@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import { X, Play, Video, AlertCircle, Loader } from 'lucide-react';
 const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
+import { decodeId } from '../../../utils/hash';
 
 const LoadingScreen = () => (
   <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex justify-center items-center z-50">
@@ -88,7 +89,8 @@ const LectureItem = ({ lecture, isSelected, onSelect }) => (
 );
 
 const ListLectureFree = ({ onClose }) => {
-  const { courseId } = useParams();
+  const { courseHash } = useParams();
+  const courseId = decodeId(courseHash);
   const [lectures, setLectures] = useState([]);
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [loading, setLoading] = useState(true);
