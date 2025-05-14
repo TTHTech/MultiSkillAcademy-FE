@@ -12,7 +12,7 @@ import {
   Trash2,
   ChevronRight,
 } from "lucide-react";
-import { encodeId } from '../../../utils/hash';
+import { encodeId } from "../../../utils/hash";
 const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const CartItems = () => {
@@ -26,14 +26,11 @@ const CartItems = () => {
     const fetchCartItems = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await axios.get(
-          `${baseUrl}/api/student/cart`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await axios.get(`${baseUrl}/api/student/cart`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
         if (Array.isArray(response.data)) {
           setCartItems(response.data);
@@ -56,14 +53,11 @@ const CartItems = () => {
   const deleteCourseFromCart = async (courseId) => {
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(
-        `${baseUrl}/api/student/cart/remove/${courseId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      await axios.delete(`${baseUrl}/api/student/cart/remove/${courseId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       setCartItems(cartItems.filter((item) => item.courseId !== courseId));
       toast.success("Khóa học đã được xóa khỏi giỏ hàng!");
@@ -256,14 +250,20 @@ const CartItems = () => {
                   <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
                     <div className="flex gap-4">
                       <button
-                        onClick={() => moveCourseToWishlist(item.courseId)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          moveCourseToWishlist(item.courseId);
+                        }}
                         className="flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-50 text-purple-600 hover:bg-purple-100 transition-colors duration-200"
                       >
                         <Heart className="w-4 h-4" />
                         <span>Yêu thích</span>
                       </button>
                       <button
-                        onClick={() => deleteCourseFromCart(item.courseId)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          deleteCourseFromCart(item.courseId);
+                        }}
                         className="flex items-center gap-2 px-4 py-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors duration-200"
                       >
                         <Trash2 className="w-4 h-4" />
