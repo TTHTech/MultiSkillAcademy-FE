@@ -11,9 +11,11 @@ import {
   BookOpen,
   GraduationCap,
   AlertCircle,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
-import { ChevronRight } from "lucide-react";
+import { ChevronRight as ChevronRightIcon } from "lucide-react";
 
 const MyCoursesPage = () => {
   const [courses, setCourses] = useState([]);
@@ -28,6 +30,10 @@ const MyCoursesPage = () => {
   const [error, setError] = useState(null);
   // Get user ID from localStorage every time the component renders
   const [userId, setUserId] = useState(null);
+  
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const coursesPerPage = 4;
 
   // Set userId when component mounts and whenever localStorage changes
   useEffect(() => {
@@ -135,6 +141,8 @@ const MyCoursesPage = () => {
       }
 
       setFilteredCourses(filtered);
+      // Reset to first page when filters change
+      setCurrentPage(1);
     };
 
     applyFilters();
@@ -159,6 +167,27 @@ const MyCoursesPage = () => {
   };
 
   const stats = getCompletionStats();
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredCourses.length / coursesPerPage);
+  
+  // Get current courses to display
+  const indexOfLastCourse = currentPage * coursesPerPage;
+  const indexOfFirstCourse = indexOfLastCourse - coursesPerPage;
+  const currentCourses = filteredCourses.slice(indexOfFirstCourse, indexOfLastCourse);
+  
+  // Change page
+  const goToPage = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+  
+  const goToPreviousPage = () => {
+    setCurrentPage((prev) => Math.max(prev - 1, 1));
+  };
+  
+  const goToNextPage = () => {
+    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+  };
 
   // EmptyState component for no courses
   const EmptyState = ({ filterActive }) => (
@@ -236,6 +265,103 @@ const MyCoursesPage = () => {
       });
   };
 
+  // Pagination component
+  const Pagination = () => {
+    if (totalPages <= 1) return null;
+    
+    // Generate array of page numbers to display
+    const pageNumbers = [];
+    const maxPageDisplay = 5;
+    
+    let startPage = Math.max(1, currentPage - Math.floor(maxPageDisplay / 2));
+    let endPage = Math.min(totalPages, startPage + maxPageDisplay - 1);
+    
+    if (endPage - startPage + 1 < maxPageDisplay) {
+      startPage = Math.max(1, endPage - maxPageDisplay + 1);
+    }
+    
+    for (let i = startPage; i <= endPage; i++) {
+      pageNumbers.push(i);
+    }
+    
+    return (
+      <div className="flex justify-center items-center mt-8 mb-4">
+        <nav className="flex items-center gap-1">
+          <button
+            onClick={goToPreviousPage}
+            disabled={currentPage === 1}
+            className={`p-2 rounded-lg ${
+              currentPage === 1
+                ? "text-gray-400 cursor-not-allowed"
+                : "text-gray-700 hover:bg-gray-100"
+            }`}
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+
+          {startPage > 1 && (
+            <>
+              <button
+                onClick={() => goToPage(1)}
+                className={`w-10 h-10 flex items-center justify-center rounded-lg 
+                  ${currentPage === 1 
+                    ? "bg-blue-500 text-white" 
+                    : "text-gray-700 hover:bg-gray-100"}`}
+              >
+                1
+              </button>
+              {startPage > 2 && (
+                <span className="mx-1 text-gray-500">...</span>
+              )}
+            </>
+          )}
+          
+          {pageNumbers.map((number) => (
+            <button
+              key={number}
+              onClick={() => goToPage(number)}
+              className={`w-10 h-10 flex items-center justify-center rounded-lg 
+                ${currentPage === number 
+                  ? "bg-blue-500 text-white" 
+                  : "text-gray-700 hover:bg-gray-100"}`}
+            >
+              {number}
+            </button>
+          ))}
+          
+          {endPage < totalPages && (
+            <>
+              {endPage < totalPages - 1 && (
+                <span className="mx-1 text-gray-500">...</span>
+              )}
+              <button
+                onClick={() => goToPage(totalPages)}
+                className={`w-10 h-10 flex items-center justify-center rounded-lg 
+                  ${currentPage === totalPages 
+                    ? "bg-blue-500 text-white" 
+                    : "text-gray-700 hover:bg-gray-100"}`}
+              >
+                {totalPages}
+              </button>
+            </>
+          )}
+
+          <button
+            onClick={goToNextPage}
+            disabled={currentPage === totalPages}
+            className={`p-2 rounded-lg ${
+              currentPage === totalPages
+                ? "text-gray-400 cursor-not-allowed"
+                : "text-gray-700 hover:bg-gray-100"
+            }`}
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
+        </nav>
+      </div>
+    );
+  };
+
   return (
     <div className="w-full min-h-screen bg-gray-50 overflow-y-auto mt-[90px]">
       <NavBar />
@@ -249,7 +375,7 @@ const MyCoursesPage = () => {
             >
               Trang chủ
             </a>
-            <ChevronRight className="w-4 h-4 mt-[50px]" />
+            <ChevronRightIcon className="w-4 h-4 mt-[50px]" />
             <span className="text-gray-700 font-medium mt-[50px]">
               Danh sách khóa học
             </span>
@@ -435,7 +561,14 @@ const MyCoursesPage = () => {
         ) : filteredCourses.length === 0 ? (
           <EmptyState filterActive={true} />
         ) : (
-          <StudentCoursesList filteredCourses={filteredCourses} />
+          <>
+            <StudentCoursesList filteredCourses={currentCourses} />
+            <Pagination />
+            {/* Results count */}
+            <div className="text-center text-sm text-gray-500 mt-2">
+              Hiển thị {indexOfFirstCourse + 1}-{Math.min(indexOfLastCourse, filteredCourses.length)} của {filteredCourses.length} khóa học
+            </div>
+          </>
         )}
       </div>
       <Footer />
