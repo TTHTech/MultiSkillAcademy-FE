@@ -14,22 +14,24 @@ import { GrScorecard } from "react-icons/gr";
 import { BiBookAdd } from "react-icons/bi";
 import { GiBookshelf } from "react-icons/gi";
 import { FaTags } from 'react-icons/fa';
+import { FaBell } from "react-icons/fa";
 
 const Sidebar = ({ open, setOpen }) => {
   const location = useLocation();
   const menus = [
-    { name: "Thông Tin Các Nhân", link: "/instructor/user", icon: AiOutlineUser },
+    { name: "Thông Tin Cá Nhân", link: "/instructor/user", icon: AiOutlineUser },
     { name: "Doanh Thu", link: "/instructor/sales", icon: FaCircleDollarToSlot },
     // { name: "Dashboard", link: "/instructor/dashboard", icon: MdOutlineDashboard },
     { name: "Danh Sách Khóa Học", link: "/instructor/courses", icon: ImBook },
     { name: "Tìm Kiếm Khóa Học", link: "/instructor/search", icon: GiBookshelf },
     { name: "Mã Giảm Giá", link: "/instructor/discount", icon: FaTags },
-    { name: "Thêm Mới Khóa Học", link: "/instructor/addCourses", icon: BiBookAdd },
+    { name: "Thêm Khóa Học Mới", link: "/instructor/addCourses", icon: BiBookAdd },
     { name: "Đánh Giá Khóa Học", link: "/instructor/review", icon: MdOutlineReviews },
     { name: "Bài Kiểm Tra", link: "/instructor/tests", icon: LuFileSignature },
     { name: "Điểm Số Học Viên", link: "/instructor/scores", icon: GrScorecard },
     { name: "Hỏi Đáp Của Khóa Học", link: "/instructor/questions", icon: BsFillQuestionSquareFill },
     { name: "Học Viên", link: "/instructor/students", icon: PiStudentFill },
+    { name: "Thông Báo", link: "/instructor/notifications", icon: FaBell },
     { name: "Nhắn Tin", link: "/instructor/chat", icon: BsChatDots },
     { name: "Đăng Xuất", link: "/login", icon: FaSignOutAlt },
   ];
