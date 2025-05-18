@@ -82,7 +82,7 @@ import PagePromotionUsage from "./pages/admin/PagePromotionUsage.jsx"
 import TopicCoursesPage from "./pages/student/topic/TopicCoursesPage.jsx";
 import PageAdminProfile from "./pages/admin/PageAdminProfile.jsx"
 import PgaeNotifications from "./pages/student/notifications/PgaeNotifications.jsx";
-
+import PageNotification from "./pages/instructor/Notification/PageNotification.jsx";
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [role, setRole] = useState("");
@@ -253,6 +253,7 @@ function App() {
                 <Route path="/instructor/chat" element={<InstructorChatPage />} />
                 <Route path="/instructor/user" element={<PageProfile />} />
                 <Route path="/instructor/discount" element={<PageDiscountInstructor />} />
+                <Route path="/instructor/notifications" element={<PageNotification />} />
               </>
             )}
           </Routes>
