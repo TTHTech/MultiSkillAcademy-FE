@@ -46,6 +46,12 @@ import {
   BadgePercent,
   DollarSign,
   UserCircle2,
+  Tag as TagIcon,
+  Gift as GiftIcon,
+  Ticket as TicketIcon,
+  Percent as PercentIcon,
+  BadgePercent as BadgePercentIcon,
+  PlusCircle as PlusCircleIcon,
 } from "lucide-react";
 import { ChalkboardTeacher } from "phosphor-react";
 
@@ -262,49 +268,56 @@ const MENU_GROUPS = [
         ],
       },
       {
-        name: "Mã Giảm Giá / Khuyến Mãi",
-        icon: Tag,
+        name: "Mã Giảm Giá",
+        icon: TagIcon,
         color: "#ec4899",
         subItems: [
           {
             name: "Sử Dụng Mã Giảm Giá",
-            icon: Ticket,
+            icon: TicketIcon,
             href: "/admin/discount-usage",
             color: "#f59e0b",
           },
           {
             name: "Danh Sách Mã Giảm Giá",
-            icon: Percent,
+            icon: PercentIcon,
             href: "/admin/discounts",
             color: "#ec4899",
           },
           {
             name: "Duyệt Mã Giảm Giá",
-            icon: BadgePercent,
+            icon: BadgePercentIcon,
             href: "/admin/browsed-discounts",
-            color: "#ec4899",
+            color: "#6366f1",
           },
           {
             name: "Thêm Mã Giảm Giá",
-            icon: PlusCircle,
+            icon: PlusCircleIcon,
             href: "/admin/discount/add",
             color: "#10b981",
           },
+        ],
+      },
+      {
+        name: "Khuyến Mãi",
+        icon: GiftIcon,
+        color: "#3b82f6",
+        subItems: [
           {
             name: "Sử Dụng Khuyến Mãi",
-            icon: Ticket,
+            icon: TicketIcon,
             href: "/admin/promotions-usage",
             color: "#f59e0b",
           },
           {
             name: "Danh Sách Khuyến Mãi",
-            icon: Percent,
+            icon: PercentIcon,
             href: "/admin/promotions",
-            color: "#ec4899",
+            color: "#3b82f6",
           },
           {
             name: "Thêm Khuyến Mãi",
-            icon: PlusCircle,
+            icon: PlusCircleIcon,
             href: "/admin/promotions/add",
             color: "#10b981",
           },
@@ -459,7 +472,9 @@ const UserProfile = ({ isOpen, formData }) => (
           animate={{ opacity: 1, width: "auto" }}
           exit={{ opacity: 0, width: 0 }}
         >
-          <p className="text-sm font-medium text-white">{formData.firstName} {formData.lastName}</p>
+          <p className="text-sm font-medium text-white">
+            {formData.firstName} {formData.lastName}
+          </p>
           <p className="text-xs text-slate-300">{formData.email}</p>
         </motion.div>
       )}
@@ -621,15 +636,18 @@ const Sidebar = () => {
     address: "",
     dateOfBirth: "",
     profileImageFile: null,
-    profileImagePreview: ""
+    profileImagePreview: "",
   });
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_REACT_APP_BASE_URL}/api/admin/profile/${userId}`, {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-      .then(res => res.json())
-      .then(data => {
-        setFormData(prev => ({
+    fetch(
+      `${import.meta.env.VITE_REACT_APP_BASE_URL}/api/admin/profile/${userId}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        setFormData((prev) => ({
           ...prev,
           firstName: data.firstName || "",
           lastName: data.lastName || "",
@@ -637,11 +655,14 @@ const Sidebar = () => {
           phoneNumber: data.phoneNumber || "",
           address: data.address || "",
           dateOfBirth: data.dateOfBirth
-            ? `${data.dateOfBirth[0]}-${String(data.dateOfBirth[1]).padStart(2, '0')}-${String(data.dateOfBirth[2]).padStart(2, '0')}`
+            ? `${data.dateOfBirth[0]}-${String(data.dateOfBirth[1]).padStart(
+                2,
+                "0"
+              )}-${String(data.dateOfBirth[2]).padStart(2, "0")}`
             : "",
-          profileImagePreview: data.profileImageUrl || ""
+          profileImagePreview: data.profileImageUrl || "",
         }));
-      })
+      });
     setMounted(true);
     return () => setMounted(false);
   }, [token, userId]);
@@ -695,7 +716,7 @@ const Sidebar = () => {
           </div>
 
           {/* User Profile - Fixed */}
-          <UserProfile isOpen={isSidebarOpen} formData={formData}/>
+          <UserProfile isOpen={isSidebarOpen} formData={formData} />
         </div>
 
         {/* Navigation - Scrollable */}
