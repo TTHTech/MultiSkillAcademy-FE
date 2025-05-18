@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import Sidebar from "../../../components/instructor/Sidebar/Sidebar";
 import ListCard from "../../../components/instructor/Card/ListCoursesCard";
+
 const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const PageCourses = () => {
@@ -9,13 +10,17 @@ const PageCourses = () => {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [pendingPage, setPendingPage] = useState(1);
-  const [approvedPage, setApprovedPage] = useState(1);
-  const [unsentPage, setUnsentPage] = useState(1);
-  const [declinedPage, setDeclinedPage] = useState(1);
-  const [inactivePage, setInactivePage] = useState(1);
 
+  // Unified pagination state
+  const [pageNumbers, setPageNumbers] = useState({
+    pending: 1,
+    approved: 1,
+    unsent: 1,
+    declined: 1,
+    inactive: 1,
+  });
   const coursesPerPage = 8;
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     const userId = localStorage.getItem("userId");
@@ -25,9 +30,7 @@ const PageCourses = () => {
       setError(null);
       try {
         const resp = await fetch(`${baseUrl}/api/instructor/${userId}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
         if (!resp.ok) throw new Error(`Status ${resp.status}`);
         const data = await resp.json();
@@ -39,59 +42,56 @@ const PageCourses = () => {
         setLoading(false);
       }
     };
+
     fetchCourses();
   }, []);
-  const filterCourses = (status) =>
-    courses.filter((course) => {
-      if (status === "pending")
-        return !course.status || course.status === "Pending";
-      if (status === "approved")
-        return ["Active", "Processing"].includes(course.status);
-      if (status === "unsent") return course.status === "Unsent";
-      if (status === "declined") return course.status === "Declined";
-      if (status === "inactive") return course.status === "Inactive";
-      return false;
-    });
+
+  const filterCourses = (status) => {
+    switch (status) {
+      case "pending":
+        return courses.filter(
+          (c) => !c.status || c.status === "Pending"
+        );
+      case "approved":
+        return courses.filter(
+          (c) => ["Active", "Processing"].includes(c.status)
+        );
+      case "unsent":
+        return courses.filter((c) => c.status === "Unsent");
+      case "declined":
+        return courses.filter((c) => c.status === "Declined");
+      case "inactive":
+        return courses.filter((c) => c.status === "Inactive");
+      default:
+        return [];
+    }
+  };
+
   const paginate = (list, page) => {
     const start = (page - 1) * coursesPerPage;
     return list.slice(start, start + coursesPerPage);
   };
+
   const tabs = [
-    {
-      key: "pending",
-      label: "Chưa Duyệt",
-      page: pendingPage,
-      setPage: setPendingPage,
-    },
-    {
-      key: "approved",
-      label: "Đã Duyệt",
-      page: approvedPage,
-      setPage: setApprovedPage,
-    },
-    {
-      key: "inactive",
-      label: "Bị Khóa",
-      page: inactivePage,
-      setPage: setInactivePage,
-    },
-    {
-      key: "unsent",
-      label: "Chưa Gửi",
-      page: unsentPage,
-      setPage: setUnsentPage,
-    },
-    {
-      key: "declined",
-      label: "Bị Từ Chối",
-      page: declinedPage,
-      setPage: setDeclinedPage,
-    },
+    { key: "pending", label: "Chưa Duyệt" },
+    { key: "approved", label: "Đã Duyệt" },
+    { key: "inactive", label: "Bị Khóa" },
+    { key: "unsent", label: "Chưa Gửi" },
+    { key: "declined", label: "Bị Từ Chối" },
   ];
+
   const lists = Object.fromEntries(
     tabs.map(({ key }) => [key, filterCourses(key)])
   );
-  const pagesCount = (key) => Math.ceil(lists[key].length / coursesPerPage);
+
+  const handleTabClick = (key) => {
+    setActiveTab(key);
+    setPageNumbers((prev) => ({ ...prev, [key]: 1 }));
+  };
+
+  const currentList = lists[activeTab];
+  const currentPage = pageNumbers[activeTab];
+  const totalPages = Math.ceil(currentList.length / coursesPerPage);
 
   return (
     <section
@@ -104,50 +104,22 @@ const PageCourses = () => {
       <div className="p-4 space-y-6">
         {loading ? (
           <div className="flex flex-col justify-center items-center h-screen">
-            <div className="flex flex-col items-center">
-              <div className="relative flex flex-col items-center bg-white bg-opacity-90 p-6 rounded-2xl shadow-xl">
-                <div className="w-14 h-14 border-4 border-blue-200 border-t-blue-500 rounded-full animate-spin"></div>
-                <p className="mt-4 text-blue-600 font-semibold text-lg animate-pulse">
-                  Đang tải dữ liệu...
-                </p>
-              </div>
+            <div className="relative flex flex-col items-center bg-white bg-opacity-90 p-6 rounded-2xl shadow-xl">
+              <div className="w-14 h-14 border-4 border-blue-200 border-t-blue-500 rounded-full animate-spin"></div>
+              <p className="mt-4 text-blue-600 font-semibold text-lg animate-pulse">
+                Đang tải dữ liệu...
+              </p>
             </div>
           </div>
         ) : error ? (
           <p className="text-center text-red-500">Lỗi: {error}</p>
-        ) : lists[activeTab].length === 0 ? (
-          <>
-            <div className="flex justify-center space-x-4 py-4">
-              {tabs.map(({ key, label }) => (
-                <button
-                  key={key}
-                  onClick={() => {
-                    setActiveTab(key);
-                    // reset pages
-                    tabs.forEach(({ setPage }) => setPage(1));
-                  }}
-                  className={`px-6 py-2 rounded-full font-medium text-lg transition-all duration-300 ${
-                    activeTab === key
-                      ? "bg-blue-600 text-white shadow-lg"
-                      : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                  }`}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-            <p className="text-center text-gray-500">Không có khóa học</p>
-          </>
         ) : (
           <>
             <div className="flex justify-center space-x-4 py-4">
               {tabs.map(({ key, label }) => (
                 <button
                   key={key}
-                  onClick={() => {
-                    setActiveTab(key);
-                    tabs.forEach(({ setPage }) => setPage(1));
-                  }}
+                  onClick={() => handleTabClick(key)}
                   className={`px-6 py-2 rounded-full font-medium text-lg transition-all duration-300 ${
                     activeTab === key
                       ? "bg-blue-600 text-white shadow-lg"
@@ -158,36 +130,34 @@ const PageCourses = () => {
                 </button>
               ))}
             </div>
-            <div className="mt-6">
-              <div className="bg-white p-6 rounded-lg shadow-md space-y-4">
-                <ListCard
-                  courses={paginate(
-                    lists[activeTab],
-                    tabs.find((t) => t.key === activeTab).page
-                  )}
-                />
+
+            {currentList.length === 0 ? (
+              <p className="text-center text-gray-500">Không có khóa học</p>
+            ) : (
+              <div className="mt-6 bg-white p-6 rounded-lg shadow-md space-y-4" key={activeTab}>
+                {/* Key on container to force remount and clear stale state */}
+                <ListCard courses={paginate(currentList, currentPage)} />
                 <div className="flex justify-center space-x-2 mt-6">
-                  {Array.from(
-                    { length: pagesCount(activeTab) },
-                    (_, i) => i + 1
-                  ).map((pg) => (
-                    <button
-                      key={pg}
-                      onClick={() =>
-                        tabs.find((t) => t.key === activeTab).setPage(pg)
-                      }
-                      className={`px-4 py-2 rounded-full text-lg font-semibold transition-all duration-300 ${
-                        tabs.find((t) => t.key === activeTab).page === pg
-                          ? "bg-blue-600 text-white"
-                          : "bg-gray-200 text-gray-700 hover:bg-blue-300"
-                      }`}
-                    >
-                      {pg}
-                    </button>
-                  ))}
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                    (pg) => (
+                      <button
+                        key={pg}
+                        onClick={() =>
+                          setPageNumbers((prev) => ({ ...prev, [activeTab]: pg }))
+                        }
+                        className={`px-4 py-2 rounded-full text-lg font-semibold transition-all duration-300 ${
+                          currentPage === pg
+                            ? "bg-blue-600 text-white"
+                            : "bg-gray-200 text-gray-700 hover:bg-blue-300"
+                        }`}
+                      >
+                        {pg}
+                      </button>
+                    )
+                  )}
                 </div>
               </div>
-            </div>
+            )}
           </>
         )}
       </div>
