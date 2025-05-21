@@ -21,7 +21,7 @@ import TopFinanceCoursesSection from "../../../components/student/home/TopFinanc
 const StudentHomePage = () => {
   return (
     <div className="w-full h-full min-h-screen bg-[#F5F6F8] overflow-y-auto">
-      <TopBanner />
+
       <NavBar />
       <WelcomeSection />
       <HeroSection />
