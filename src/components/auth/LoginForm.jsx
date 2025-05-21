@@ -22,13 +22,10 @@ const LoginForm = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post(
-        `${baseUrl}/api/auth/login`,
-        {
-          username,
-          password,
-        }
-      );
+      const response = await axios.post(`${baseUrl}/api/auth/login`, {
+        username,
+        password,
+      });
 
       const { token, userId, email: userEmail, role } = response.data;
 
@@ -67,16 +64,19 @@ const LoginForm = () => {
   // Google login handler
   const handleGoogleLogin = () => {
     // Use your Google Client ID
-    const googleClientId = '979797905767-l9rt1m82le6jfmmr9v0mbpqnsh8va1es.apps.googleusercontent.com';
-    
+    const googleClientId =
+      "979797905767-l9rt1m82le6jfmmr9v0mbpqnsh8va1es.apps.googleusercontent.com";
+
     // Create redirect URL for Google authentication
-    const redirectUri = encodeURIComponent(`${window.location.origin}/auth/callback`);
-    const scope = encodeURIComponent('email profile');
-    const responseType = 'code';
-    
+    const redirectUri = encodeURIComponent(
+      `${window.location.origin}/auth/callback`
+    );
+    const scope = encodeURIComponent("email profile");
+    const responseType = "code";
+
     // Create full URL
     const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${googleClientId}&redirect_uri=${redirectUri}&response_type=${responseType}&scope=${scope}`;
-    
+
     // Redirect to Google login page
     window.location.href = googleAuthUrl;
   };
@@ -84,15 +84,17 @@ const LoginForm = () => {
   // GitHub login handler
   const handleGitHubLogin = () => {
     // Use configured GitHub Client ID
-    const githubClientId = 'Ov23liczIPidk9u5hA1o';
-    
+    const githubClientId = "Ov23liczIPidk9u5hA1o";
+
     // Create redirect URL for GitHub authentication
-    const redirectUri = encodeURIComponent(`${window.location.origin}/auth/github/callback`);
-    const scope = encodeURIComponent('user:email');
-    
+    const redirectUri = encodeURIComponent(
+      `${window.location.origin}/auth/github/callback`
+    );
+    const scope = encodeURIComponent("user:email");
+
     // Create full URL for GitHub login
     const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${githubClientId}&redirect_uri=${redirectUri}&scope=${scope}`;
-    
+
     // Redirect to GitHub login page
     window.location.href = githubAuthUrl;
   };
@@ -106,46 +108,84 @@ const LoginForm = () => {
         {/* Left side - Cover Image with hover effect */}
         <div className="w-1/2 hidden lg:block relative group">
           {/* Base image */}
-          <div 
+          <div
             className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
             style={{ backgroundImage: `url(${COVER_IMAGE})` }}
           ></div>
-          
+
           {/* Light overlay always visible */}
           <div className="absolute inset-0 bg-gradient-to-br from-indigo-600/20 to-purple-600/20"></div>
-          
+
           {/* Dark overlay on hover */}
           <div className="absolute inset-0 bg-gradient-to-br from-indigo-600/90 to-purple-600/90 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
             <div className="h-full flex items-center justify-center">
               <div className="text-center px-8 translate-y-8 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-500 delay-100">
-                <h2 className="text-3xl font-bold text-white mb-4">Welcome Back!</h2>
+                <h2 className="text-3xl font-bold text-white mb-4">
+                  Chào mừng trở lại!
+                </h2>
                 <p className="text-white text-lg opacity-90 mb-6">
-                  Continue your learning journey with us
+                  Tiếp tục hành trình học tập cùng chúng tôi
                 </p>
                 <div className="space-y-4">
                   <div className="flex items-center space-x-3 transform -translate-x-8 group-hover:translate-x-0 opacity-0 group-hover:opacity-100 transition-all duration-500 delay-200">
                     <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      <svg
+                        className="w-6 h-6 text-white"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
                       </svg>
                     </div>
-                    <p className="text-white text-sm">Access to 1000+ courses</p>
+                    <p className="text-white text-sm">
+                      Truy cập hơn 1000+ khóa học
+                    </p>
                   </div>
                   <div className="flex items-center space-x-3 transform translate-x-8 group-hover:translate-x-0 opacity-0 group-hover:opacity-100 transition-all duration-500 delay-300">
                     <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      <svg
+                        className="w-6 h-6 text-white"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
                       </svg>
                     </div>
-                    <p className="text-white text-sm">Learn at your own pace</p>
+                    <p className="text-white text-sm">
+                      Học theo tốc độ của riêng bạn
+                    </p>
                   </div>
                   <div className="flex items-center space-x-3 transform -translate-x-8 group-hover:translate-x-0 opacity-0 group-hover:opacity-100 transition-all duration-500 delay-400">
                     <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                      <svg
+                        className="w-6 h-6 text-white"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+                        />
                       </svg>
                     </div>
-                    <p className="text-white text-sm">Join our community</p>
+                    <p className="text-white text-sm">
+                      Tham gia cộng đồng của chúng tôi
+                    </p>
                   </div>
                 </div>
               </div>
@@ -173,7 +213,10 @@ const LoginForm = () => {
 
             <div className="space-y-5">
               <div className="relative group">
-                <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1 transition-colors group-hover:text-indigo-600">
+                <label
+                  htmlFor="username"
+                  className="block text-sm font-medium text-gray-700 mb-1 transition-colors group-hover:text-indigo-600"
+                >
                   Username
                 </label>
                 <input
@@ -188,7 +231,10 @@ const LoginForm = () => {
               </div>
 
               <div className="relative group">
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1 transition-colors group-hover:text-indigo-600">
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium text-gray-700 mb-1 transition-colors group-hover:text-indigo-600"
+                >
                   Password
                 </label>
                 <div className="relative">
@@ -206,7 +252,11 @@ const LoginForm = () => {
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none transition-colors duration-200"
                   >
-                    {showPassword ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
+                    {showPassword ? (
+                      <FaEyeSlash size={16} />
+                    ) : (
+                      <FaEye size={16} />
+                    )}
                   </button>
                 </div>
               </div>
@@ -227,7 +277,7 @@ const LoginForm = () => {
                 onClick={() => navigate("/forgot-password")}
                 className="text-sm font-medium text-indigo-600 hover:text-indigo-700 transition-colors duration-200 hover:underline"
               >
-                Forgot Password?
+                Quên mật khẩu
               </button>
             </div>
 
@@ -235,18 +285,40 @@ const LoginForm = () => {
               type="submit"
               disabled={loading}
               className={`w-full py-3 rounded-lg shadow-lg text-sm font-medium text-white 
-                ${loading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 transform hover:scale-[1.02]'} 
+                ${
+                  loading
+                    ? "bg-indigo-400 cursor-not-allowed"
+                    : "bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 transform hover:scale-[1.02]"
+                } 
                 transition-all duration-200 flex items-center justify-center`}
             >
               {loading ? (
                 <>
-                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  <svg
+                    className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
                   </svg>
                   Signing in...
                 </>
-              ) : 'Sign In'}
+              ) : (
+                "Đăng nhập"
+              )}
             </button>
 
             <div className="relative my-6">
@@ -254,7 +326,9 @@ const LoginForm = () => {
                 <div className="w-full border-t border-gray-300"></div>
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="px-4 bg-white text-gray-500">Or continue with</span>
+                <span className="px-4 bg-white text-gray-500">
+                  Or continue with
+                </span>
               </div>
             </div>
 
@@ -264,13 +338,32 @@ const LoginForm = () => {
                 onClick={handleGoogleLogin}
                 className="w-full px-4 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-white hover:bg-gray-50 flex items-center justify-center space-x-2 transition-all duration-200 hover:shadow-md hover:border-indigo-200"
               >
-                <svg width="18" height="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                  <path fill="#EA4335" d="M5.26620003,9.76452941 C6.19878754,6.93863203 8.85444915,4.90909091 12,4.90909091 C13.6909091,4.90909091 15.2181818,5.50909091 16.4181818,6.49090909 L19.9090909,3 C17.7818182,1.14545455 15.0545455,0 12,0 C7.27006974,0 3.1977497,2.69829785 1.23999023,6.65002441 L5.26620003,9.76452941 Z"/>
-                  <path fill="#34A853" d="M16.0407269,18.0125889 C14.9509167,18.7163016 13.5660892,19.0909091 12,19.0909091 C8.86648613,19.0909091 6.21911939,17.076871 5.27698177,14.2678769 L1.23746264,17.3349879 C3.19279051,21.2936293 7.26500293,24 12,24 C14.9328362,24 17.7353462,22.9573905 19.834192,20.9995801 L16.0407269,18.0125889 Z"/>
-                  <path fill="#4A90E2" d="M19.834192,20.9995801 C22.0291676,18.9520994 23.4545455,15.903663 23.4545455,12 C23.4545455,11.2909091 23.3454545,10.5272727 23.1818182,9.81818182 L12,9.81818182 L12,14.4545455 L18.4363636,14.4545455 C18.1187732,16.013626 17.2662994,17.2212117 16.0407269,18.0125889 L19.834192,20.9995801 Z"/>
-                  <path fill="#FBBC05" d="M5.27698177,14.2678769 C5.03832634,13.556323 4.90909091,12.7937589 4.90909091,12 C4.90909091,11.2182781 5.03443647,10.4668121 5.26620003,9.76452941 L1.23999023,6.65002441 C0.43658717,8.26043162 0,10.0753848 0,12 C0,13.9195484 0.444780743,15.7301709 1.23746264,17.3349879 L5.27698177,14.2678769 Z"/>
+                <svg
+                  width="18"
+                  height="18"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    fill="#EA4335"
+                    d="M5.26620003,9.76452941 C6.19878754,6.93863203 8.85444915,4.90909091 12,4.90909091 C13.6909091,4.90909091 15.2181818,5.50909091 16.4181818,6.49090909 L19.9090909,3 C17.7818182,1.14545455 15.0545455,0 12,0 C7.27006974,0 3.1977497,2.69829785 1.23999023,6.65002441 L5.26620003,9.76452941 Z"
+                  />
+                  <path
+                    fill="#34A853"
+                    d="M16.0407269,18.0125889 C14.9509167,18.7163016 13.5660892,19.0909091 12,19.0909091 C8.86648613,19.0909091 6.21911939,17.076871 5.27698177,14.2678769 L1.23746264,17.3349879 C3.19279051,21.2936293 7.26500293,24 12,24 C14.9328362,24 17.7353462,22.9573905 19.834192,20.9995801 L16.0407269,18.0125889 Z"
+                  />
+                  <path
+                    fill="#4A90E2"
+                    d="M19.834192,20.9995801 C22.0291676,18.9520994 23.4545455,15.903663 23.4545455,12 C23.4545455,11.2909091 23.3454545,10.5272727 23.1818182,9.81818182 L12,9.81818182 L12,14.4545455 L18.4363636,14.4545455 C18.1187732,16.013626 17.2662994,17.2212117 16.0407269,18.0125889 L19.834192,20.9995801 Z"
+                  />
+                  <path
+                    fill="#FBBC05"
+                    d="M5.27698177,14.2678769 C5.03832634,13.556323 4.90909091,12.7937589 4.90909091,12 C4.90909091,11.2182781 5.03443647,10.4668121 5.26620003,9.76452941 L1.23999023,6.65002441 C0.43658717,8.26043162 0,10.0753848 0,12 C0,13.9195484 0.444780743,15.7301709 1.23746264,17.3349879 L5.27698177,14.2678769 Z"
+                  />
                 </svg>
-                <span className="text-sm font-medium text-gray-700">Sign in with Google</span>
+                <span className="text-sm font-medium text-gray-700">
+                  Đăng nhập với Google
+                </span>
               </button>
 
               <button
@@ -279,18 +372,20 @@ const LoginForm = () => {
                 className="w-full px-4 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-white hover:bg-gray-50 flex items-center justify-center space-x-2 transition-all duration-200 hover:shadow-md hover:border-indigo-200"
               >
                 <FaGithub className="text-gray-800" />
-                <span className="text-sm font-medium text-gray-700">Sign in with GitHub</span>
+                <span className="text-sm font-medium text-gray-700">
+                  Đăng nhập với GitHub
+                </span>
               </button>
             </div>
 
             <p className="text-center text-sm text-gray-600 mt-6">
-              Don't have an account?{' '}
+              Bạn chưa có tài khoản?{" "}
               <button
                 type="button"
                 onClick={() => navigate("/register")}
                 className="font-medium text-indigo-600 hover:text-indigo-700 transition-colors duration-200 hover:underline"
               >
-                Sign up for free
+                Đăng ký miễn phí
               </button>
             </p>
           </form>

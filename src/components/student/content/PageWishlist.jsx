@@ -119,7 +119,7 @@ const PageWishlist = () => {
   );
 
   return (
-    <div className="bg-gray-100 min-h-screen mt-[50px] mb-[90px]">
+    <div className="bg-gray-100 min-h-screen mb-[180px]">
       <div className="max-w-[1350px] mx-auto px-4 pt-24 pb-12">
         <div className="flex items-center space-x-2 text-sm text-gray-500 mb-8">
           <a

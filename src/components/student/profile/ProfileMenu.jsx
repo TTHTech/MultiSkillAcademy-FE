@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
-const DEFAULT_PROFILE_IMAGE = "https://lh3.googleusercontent.com/IUCQIQksFr7qJDlXK43uhIUwvDt_tpLSNiumv8bFESGLs6wekNyBDdNMyzeFwqgTe-l5vG6RSMvnUek=w544-h544-l90-rj";
+const DEFAULT_PROFILE_IMAGE = "https://static.vecteezy.com/system/resources/previews/007/319/936/large_2x/user-profile-icon-vector.jpg";
 
 const MenuItem = ({ to, icon: Icon, label, badge, onClick, className = "" }) => (
   <Link
