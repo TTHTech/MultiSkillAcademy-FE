@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { UserCircle } from 'lucide-react';
 const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
-const DEFAULT_PROFILE_IMAGE = "https://lh3.googleusercontent.com/IUCQIQksFr7qJDlXK43uhIUwvDt_tpLSNiumv8bFESGLs6wekNyBDdNMyzeFwqgTe-l5vG6RSMvnUek=w544-h544-l90-rj";
+const DEFAULT_PROFILE_IMAGE = "https://static.vecteezy.com/system/resources/previews/007/319/936/large_2x/user-profile-icon-vector.jpg";
 
 const WelcomeSection = () => {
   const [profileData, setProfileData] = useState({
@@ -78,7 +78,7 @@ const WelcomeSection = () => {
   }
 
   return (
-    <div className="flex justify-center mt-[50px]">
+    <div className="flex justify-center mt-[100px]">
       <div className="flex items-center space-x-6 p-6 bg-gradient-to-r from-yellow-50 to-purple-100 shadow-lg rounded-lg my-6 max-w-[1500px] w-full">
         {/* Avatar with Link */}
         <a 

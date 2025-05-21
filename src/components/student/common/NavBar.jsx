@@ -19,7 +19,7 @@ const Navbar = () => {
   const timeoutRef = useRef(null);
   const notificationTimeoutRef = useRef(null);
   const [cartItemCount, setCartItemCount] = useState(0);
-  const [notificationCount, setNotificationCount] = useState(5);
+  const [notificationCount, setNotificationCount] = useState();
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -32,6 +32,22 @@ const Navbar = () => {
         console.error("Error loading categories:", error);
       }
     };
+    const fetchNotifications = async () => {
+      const token = localStorage.getItem("token");
+      try {
+        const { data } = await axios.get(
+          `${baseUrl}/api/student/notifications`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        const unreadCount = data.filter((n) => !n.read).length;
+        setNotificationCount(unreadCount);
+      } catch (error) {
+        console.error("Lỗi khi tải thông báo:", error);
+      }
+    };
+    fetchNotifications();
     fetchCategories();
   }, []);
 
@@ -265,7 +281,7 @@ const Navbar = () => {
             onMouseLeave={handleNotificationMouseOut}
           >
             <Link
-              to="/student/notification"
+              to="/student/notifications"
               className="relative text-gray-600 hover:text-blue-600 transition-all duration-300 group"
             >
               <i className="fas fa-bell text-xl group-hover:scale-110 transition-transform duration-300"></i>

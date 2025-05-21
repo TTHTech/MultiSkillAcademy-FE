@@ -1,14 +1,40 @@
 import React, { useEffect, useState, useMemo } from "react";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
+} from "recharts";
 import { motion, AnimatePresence } from "framer-motion";
-import { Calendar, TrendingUp, DollarSign, LineChart as ChartIcon, ChevronDown, AlertCircle } from 'lucide-react';
+import {
+  Calendar,
+  TrendingUp,
+  DollarSign,
+  LineChart as ChartIcon,
+  ChevronDown,
+  AlertCircle,
+} from "lucide-react";
 const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const API_URL = `${baseUrl}/api/admin/stats`;
 
 const MONTHS = [
-  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
 ];
 
 const YEARS = (() => {
@@ -38,31 +64,37 @@ const StatCard = ({ icon: Icon, title, value, trend, color = "blue" }) => {
       bg: "bg-blue-600/20",
       border: "border-blue-600/30",
       icon: "text-blue-400",
-      trend: "text-emerald-400"
+      trend: "text-emerald-400",
     },
     purple: {
       bg: "bg-indigo-600/20",
       border: "border-indigo-600/30",
       icon: "text-indigo-400",
-      trend: "text-emerald-400"
+      trend: "text-emerald-400",
     },
     teal: {
       bg: "bg-teal-600/20",
       border: "border-teal-600/30",
       icon: "text-teal-400",
-      trend: "text-emerald-400"
-    }
+      trend: "text-emerald-400",
+    },
   };
 
   const classes = colorClasses[color];
 
   return (
-    <div className={`${classes.bg} rounded-xl p-6 border ${classes.border} shadow-lg backdrop-blur-sm`}>
+    <div
+      className={`${classes.bg} rounded-xl p-6 border ${classes.border} shadow-lg backdrop-blur-sm`}
+    >
       <div className="flex items-center justify-between mb-3">
-        <span className="text-slate-300 text-sm font-medium tracking-wide">{title}</span>
+        <span className="text-slate-300 text-sm font-medium tracking-wide">
+          {title}
+        </span>
         <Icon className={`w-5 h-5 ${classes.icon}`} />
       </div>
-      <div className="text-3xl font-bold text-white mb-3 tracking-tight">{value}</div>
+      <div className="text-3xl font-bold text-white mb-3 tracking-tight">
+        {value}
+      </div>
       {trend && (
         <div className="flex items-center text-sm">
           <TrendingUp className="w-4 h-4 mr-1 text-emerald-400" />
@@ -92,13 +124,13 @@ const SalesOverviewChart = () => {
       const response = await fetch(API_URL, {
         headers: {
           Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to fetch sales data');
+        throw new Error(errorData.message || "Failed to fetch sales data");
       }
 
       const data = await response.json();
@@ -116,43 +148,60 @@ const SalesOverviewChart = () => {
 
   const processedData = useMemo(() => {
     if (!salesData || Object.keys(salesData).length === 0) {
-      return MONTHS.map(month => ({ name: month, sales: 0 }));
+      return MONTHS.map((month) => ({ name: month, sales: 0 }));
     }
 
     return Object.entries(salesData)
       .filter(([date]) => {
         const dateObj = new Date(date);
-        const monthName = dateObj.toLocaleDateString('default', { month: 'short' });
+        const monthName = dateObj.toLocaleDateString("default", {
+          month: "short",
+        });
         const year = dateObj.getFullYear();
-        return (selectedMonth ? monthName === selectedMonth : true) && 
-               year === selectedYear;
+        return (
+          (selectedMonth ? monthName === selectedMonth : true) &&
+          year === selectedYear
+        );
       })
       .map(([date, sales]) => ({
-        name: selectedMonth 
-          ? new Date(date).toLocaleDateString('default', { day: '2-digit' })
-          : new Date(date).toLocaleDateString('default', { month: 'short' }),
+        name: selectedMonth
+          ? new Date(date).toLocaleDateString("default", { day: "2-digit" })
+          : new Date(date).toLocaleDateString("default", { month: "short" }),
         sales: Number(sales),
         fullDate: date,
       }))
       .sort((a, b) => new Date(a.fullDate) - new Date(b.fullDate));
   }, [salesData, selectedMonth, selectedYear]);
-
+  const formatVND = (n) => {
+    const num = typeof n === "string" ? parseFloat(n) : n;
+    return num.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  };
   const stats = useMemo(() => {
     const total = processedData.reduce((sum, item) => sum + item.sales, 0);
     const avg = processedData.length ? total / processedData.length : 0;
     const prevPeriodData = processedData.slice(0, -1);
     const prevTotal = prevPeriodData.reduce((sum, item) => sum + item.sales, 0);
-    const growth = prevTotal ? ((total - prevTotal) / prevTotal * 100).toFixed(1) : 0;
+    const growth = prevTotal
+      ? (((total - prevTotal) / prevTotal) * 100).toFixed(1)
+      : 0;
 
     return {
       total,
-      avg: avg.toFixed(2),
-      growth: `${growth}% vs prev. period`
+      avg: formatVND(avg.toFixed(0)),
+      growth: `${growth}% vs prev. period`,
     };
   }, [processedData]);
 
   // Dropdown component with better styling
-  const Dropdown = ({ isOpen, onToggle, value, options, onSelect, icon: Icon, placeholder }) => (
+  const Dropdown = ({
+    isOpen,
+    onToggle,
+    value,
+    options,
+    onSelect,
+    icon: Icon,
+    placeholder,
+  }) => (
     <div className="relative">
       <button
         className="flex items-center px-4 py-2.5 text-white bg-slate-800/80 border border-blue-500/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50 shadow-md hover:bg-slate-700/80 transition-colors"
@@ -195,9 +244,11 @@ const SalesOverviewChart = () => {
           <div className="p-2 bg-blue-600/20 rounded-lg">
             <ChartIcon className="w-6 h-6 text-blue-400" />
           </div>
-          <h2 className="text-2xl font-bold text-white tracking-tight">Tổng Quan Doanh Thu</h2>
+          <h2 className="text-2xl font-bold text-white tracking-tight">
+            Tổng Quan Doanh Thu
+          </h2>
         </div>
-        
+
         <div className="flex gap-3">
           <Dropdown
             isOpen={isYearSelectOpen}
@@ -206,7 +257,7 @@ const SalesOverviewChart = () => {
               setIsMonthSelectOpen(false);
             }}
             value={selectedYear.toString()}
-            options={YEARS.map(year => year.toString())}
+            options={YEARS.map((year) => year.toString())}
             onSelect={(year) => setSelectedYear(parseInt(year))}
             placeholder="Select Year"
           />
@@ -219,7 +270,9 @@ const SalesOverviewChart = () => {
             }}
             value={selectedMonth || "All Months"}
             options={["All Months", ...MONTHS]}
-            onSelect={(month) => setSelectedMonth(month === "All Months" ? "" : month)}
+            onSelect={(month) =>
+              setSelectedMonth(month === "All Months" ? "" : month)
+            }
             icon={Calendar}
             placeholder="Select Month"
           />
@@ -227,23 +280,27 @@ const SalesOverviewChart = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <StatCard 
+        <StatCard
           icon={DollarSign}
           title="Tổng Doanh Thu"
-          value={`$${stats.total.toLocaleString()}`}
+          value={`${stats.total.toLocaleString()} VND`}
           trend={stats.growth}
           color="blue"
         />
-        <StatCard 
+        <StatCard
           icon={TrendingUp}
           title="Doanh Thu Trung Bình"
-          value={`$${stats.avg}`}
+          value={`${stats.avg} VND`}
           color="purple"
         />
-        <StatCard 
+        <StatCard
           icon={Calendar}
           title="Giai Đoạn"
-          value={selectedMonth ? `${selectedMonth} ${selectedYear}` : `${selectedYear}`}
+          value={
+            selectedMonth
+              ? `${selectedMonth} ${selectedYear}`
+              : `${selectedYear}`
+          }
           color="teal"
         />
       </div>
@@ -267,8 +324,12 @@ const SalesOverviewChart = () => {
             className="text-center py-16 text-slate-400 border border-dashed border-slate-700 rounded-lg bg-slate-800/50"
           >
             <Calendar className="w-12 h-12 mx-auto mb-4 text-slate-500 opacity-50" />
-            <p className="text-lg font-medium">No data available for the selected period</p>
-            <p className="text-sm text-slate-500 mt-2">Try selecting a different time frame</p>
+            <p className="text-lg font-medium">
+              No data available for the selected period
+            </p>
+            <p className="text-sm text-slate-500 mt-2">
+              Try selecting a different time frame
+            </p>
           </motion.div>
         ) : (
           <motion.div
@@ -278,25 +339,28 @@ const SalesOverviewChart = () => {
             exit={{ opacity: 0 }}
           >
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={processedData} margin={{ top: 10, right: 30, left: 10, bottom: 10 }}>
-                <CartesianGrid 
-                  strokeDasharray="3 3" 
-                  stroke="#334155" 
+              <LineChart
+                data={processedData}
+                margin={{ top: 10, right: 30, left: 10, bottom: 10 }}
+              >
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke="#334155"
                   vertical={false}
                 />
-                <XAxis 
-                  dataKey="name" 
+                <XAxis
+                  dataKey="name"
                   stroke="#94a3b8"
-                  tick={{ fill: '#94a3b8', fontSize: 12 }}
-                  tickLine={{ stroke: '#334155' }}
-                  axisLine={{ stroke: '#334155' }}
+                  tick={{ fill: "#94a3b8", fontSize: 12 }}
+                  tickLine={{ stroke: "#334155" }}
+                  axisLine={{ stroke: "#334155" }}
                   padding={{ left: 10, right: 10 }}
                 />
-                <YAxis 
+                <YAxis
                   stroke="#94a3b8"
-                  tick={{ fill: '#94a3b8', fontSize: 12 }}
-                  tickLine={{ stroke: '#334155' }}
-                  axisLine={{ stroke: '#334155' }}
+                  tick={{ fill: "#94a3b8", fontSize: 12 }}
+                  tickLine={{ stroke: "#334155" }}
+                  axisLine={{ stroke: "#334155" }}
                   tickFormatter={(value) => `$${value}`}
                   width={60}
                 />
@@ -307,16 +371,22 @@ const SalesOverviewChart = () => {
                     borderRadius: "0.5rem",
                     padding: "0.75rem",
                     boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
-                    fontFamily: "system-ui, sans-serif"
+                    fontFamily: "system-ui, sans-serif",
                   }}
                   itemStyle={{ color: "#f1f5f9", fontWeight: 500 }}
-                  formatter={(value) => [`$${value.toLocaleString()}`, 'Sales']}
-                  labelStyle={{ color: "#94a3b8", marginBottom: "0.5rem", fontWeight: 400 }}
+                  formatter={(value) => [`$${value.toLocaleString()}`, "Sales"]}
+                  labelStyle={{
+                    color: "#94a3b8",
+                    marginBottom: "0.5rem",
+                    fontWeight: 400,
+                  }}
                 />
-                <Legend 
-                  wrapperStyle={{ paddingTop: 15 }} 
+                <Legend
+                  wrapperStyle={{ paddingTop: 15 }}
                   formatter={() => (
-                    <span style={{ color: "#f1f5f9", fontWeight: 500 }}>Revenue</span>
+                    <span style={{ color: "#f1f5f9", fontWeight: 500 }}>
+                      Revenue
+                    </span>
                   )}
                 />
                 <Line
@@ -324,17 +394,17 @@ const SalesOverviewChart = () => {
                   dataKey="sales"
                   stroke="#3b82f6"
                   strokeWidth={3}
-                  dot={{ 
-                    fill: "#1e40af", 
-                    strokeWidth: 2, 
+                  dot={{
+                    fill: "#1e40af",
+                    strokeWidth: 2,
                     stroke: "#3b82f6",
                     r: 5,
                   }}
-                  activeDot={{ 
-                    r: 8, 
+                  activeDot={{
+                    r: 8,
                     strokeWidth: 2,
                     stroke: "#60a5fa",
-                    fill: "#2563eb"
+                    fill: "#2563eb",
                   }}
                 />
               </LineChart>
