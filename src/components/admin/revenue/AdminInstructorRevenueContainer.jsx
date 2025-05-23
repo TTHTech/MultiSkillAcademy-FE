@@ -100,7 +100,7 @@ const AdminInstructorRevenueContainer = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [itemCount, setItemCount] = useState(0);
-  const itemsPerPage = 10;
+  const itemsPerPage = 100;
 
   // States for filtering
   const [searchTerm, setSearchTerm] = useState("");

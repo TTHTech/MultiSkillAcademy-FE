@@ -52,6 +52,8 @@ import {
   Percent as PercentIcon,
   BadgePercent as BadgePercentIcon,
   PlusCircle as PlusCircleIcon,
+  CheckCircle,
+  Lock,
 } from "lucide-react";
 import { ChalkboardTeacher } from "phosphor-react";
 
@@ -103,7 +105,7 @@ const MENU_GROUPS = [
             href: "/admin",
             color: "#4f46e5",
           },
-          {
+          /**{
             name: "Thống Kê Nhanh",
             icon: LineChart,
             href: "/admin/quick-stats",
@@ -114,7 +116,7 @@ const MENU_GROUPS = [
             icon: Clock,
             href: "/admin/recent-activity",
             color: "#4f46e5",
-          },
+          },**/
         ],
       },
       {
@@ -122,12 +124,12 @@ const MENU_GROUPS = [
         icon: TrendingUp,
         color: "#10b981",
         subItems: [
-          {
+          /**{
             name: "Bảng Doanh Số",
             icon: BarChart,
             href: "/admin/statistics",
             color: "#10b981",
-          },
+          },**/
           {
             name: "Doanh Số Theo Giảng Viên",
             icon: Users,
@@ -138,13 +140,13 @@ const MENU_GROUPS = [
           {
             name: "Thống Kê Đánh Giá",
             icon: Activity,
-            href: "/admin/statistics/performance",
+            href: "/admin/statistics-review",
             color: "#10b981",
           },
           {
-            name: "Báo Cáo",
+            name: "Thống kê khóa học",
             icon: FileText,
-            href: "/admin/statistics/reports",
+            href: "/admin/statistics-courses",
             color: "#059669",
           },
         ],
@@ -229,6 +231,24 @@ const MENU_GROUPS = [
             color: "#8b5cf6",
           },
           {
+            name: "Khóa Học Đã Duyệt",
+            icon: CheckCircle,
+            href: "/admin/courses/approved",
+            color: "#22c55e", // xanh lá
+          },
+          {
+            name: "Khóa Học Chờ Duyệt",
+            icon: Clock,
+            href: "/admin/courses/pending",
+            color: "#eab308", // vàng
+          },
+          {
+            name: "Khóa Học Bị Khóa",
+            icon: Lock,
+            href: "/admin/courses/locked",
+            color: "#ef4444", // đỏ
+          },
+          {
             name: "Đánh Giá Khóa Học",
             icon: MessageSquare,
             href: "/admin/courses/reviews",
@@ -258,12 +278,6 @@ const MENU_GROUPS = [
             icon: ListFilter,
             href: "/admin/category",
             color: "#f97316",
-          },
-          {
-            name: "Thêm Danh Mục",
-            icon: FolderPlus,
-            href: "/admin/category/add",
-            color: "#10b981",
           },
         ],
       },
@@ -388,7 +402,7 @@ const MENU_GROUPS = [
             href: "/admin/chat",
             color: "#10b981",
           },
-          {
+          /**{
             name: "Thông Báo Nội Bộ",
             icon: Megaphone,
             href: "/admin/announcements",
@@ -399,7 +413,7 @@ const MENU_GROUPS = [
             icon: HeadphonesIcon,
             href: "/admin/support",
             color: "#ec4899",
-          },
+          },**/
         ],
       },
     ],
@@ -418,7 +432,7 @@ const MENU_GROUPS = [
             href: "/admin/profile-admin",
             color: "#64748b",
           },
-          {
+          /**{
             name: "Chung",
             icon: Sliders,
             href: "/admin/settings/general",
@@ -435,7 +449,7 @@ const MENU_GROUPS = [
             icon: Shield,
             href: "/admin/settings/security",
             color: "#10b981",
-          },
+          },**/
         ],
       },
     ],
@@ -793,7 +807,7 @@ const Sidebar = () => {
                   animate={{ opacity: 1, width: "auto" }}
                   exit={{ opacity: 0, width: 0 }}
                 >
-                  Logout
+                  Đăng Xuất
                 </motion.span>
               )}
             </AnimatePresence>

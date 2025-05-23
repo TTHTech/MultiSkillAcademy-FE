@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Table, User, Star } from "lucide-react";
 import OverviewCards from "../../components/admin/overview/OverviewCards";
-import SalesTable from "../../components/admin/sales/SalesTable";
+import SalesTable from "../../components/admin/sales/CoursesTable";
 import SalesInstructorTable from "../../components/admin/sales/SalesInstructorTable";
 import ReviewTable from "../../components/admin/sales/ReviewTable"; // Import the ReviewTable component
 
