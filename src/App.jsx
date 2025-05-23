@@ -83,6 +83,8 @@ import TopicCoursesPage from "./pages/student/topic/TopicCoursesPage.jsx";
 import PageAdminProfile from "./pages/admin/PageAdminProfile.jsx"
 import PgaeNotifications from "./pages/student/notifications/PgaeNotifications.jsx";
 import PageNotification from "./pages/instructor/Notification/PageNotification.jsx";
+import ReviewStatisticsPage from "./pages/admin/ReviewStatisticsPage.jsx";
+import CoursesStatisticsPage from "./pages/admin/CoursesStatisticsPage.jsx";
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [role, setRole] = useState("");
@@ -194,6 +196,8 @@ function App() {
                 <Route path="/admin/add-notification" element={<AddNotificationPage />} />
                 <Route path="/admin/chat" element={<AdminChatPage />} />
                 <Route path="/admin/sale-by-instructor" element={<SaleByInstructorPage />} />
+                <Route path="/admin/statistics-review" element={<ReviewStatisticsPage />} />
+                <Route path="/admin/statistics-courses" element={<CoursesStatisticsPage />} />
                 <Route path="/admin/courses/reviews" element={<PageReviewCourse />} />
                 <Route path="/admin/courses/sections" element={<PageSection />} />
                 <Route path="/admin/courses/lectures" element={<PageLecture />} />
