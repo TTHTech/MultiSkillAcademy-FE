@@ -1,5 +1,6 @@
+// src/components/admin/revenue/AdminInstructorSales.jsx
 import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { 
   Search, 
   X, 
@@ -7,63 +8,19 @@ import {
   ChevronUp, 
   Filter, 
   Download, 
-  Calendar, 
   RefreshCw, 
   DollarSign,
   Users,
-  BarChart2
+  BarChart2,
+  TrendingUp,
+  BookOpen,
+  Star,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
+import Toast from "./Toast";
+import ErrorBoundary from "./ErrorBoundary";
 const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
-
-// Error boundary component
-class ErrorBoundary extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { hasError: false, error: null };
-  }
-
-  static getDerivedStateFromError(error) {
-    return { hasError: true, error };
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return (
-        <div className="bg-red-900 bg-opacity-20 border-l-4 border-red-500 text-red-400 p-4 rounded-lg my-4 shadow-md">
-          <div className="flex items-center">
-            <div className="flex-shrink-0">
-              <svg className="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-              </svg>
-            </div>
-            <div className="ml-3">
-              <h2 className="text-lg font-semibold text-red-400">Đã xảy ra lỗi</h2>
-              <p className="text-sm mt-1 font-medium text-red-300">{this.state.error?.message || 'Không thể hiển thị component này'}</p>
-              <button 
-                className="mt-3 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md transition duration-200 ease-in-out shadow-sm font-medium text-sm flex items-center"
-                onClick={() => window.location.reload()}
-              >
-                <RefreshCw size={16} className="mr-2" />
-                Tải lại trang
-              </button>
-            </div>
-          </div>
-        </div>
-      );
-    }
-
-    return this.props.children;
-  }
-}
-
-// Main component wrapper with error boundary
-const AdminInstructorSalesWithErrorBoundary = () => {
-  return (
-    <ErrorBoundary>
-      <AdminInstructorSales />
-    </ErrorBoundary>
-  );
-};
 
 // Main component
 const AdminInstructorSales = () => {
@@ -75,7 +32,9 @@ const AdminInstructorSales = () => {
 
   // States for pagination
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
+  const [itemCount, setItemCount] = useState(0);
+  const [itemsPerPage] = useState(15);
 
   // States for filtering
   const [searchTerm, setSearchTerm] = useState("");
@@ -83,31 +42,18 @@ const AdminInstructorSales = () => {
   const [sortDirection, setSortDirection] = useState("desc");
   const [filterType, setFilterType] = useState("all");
   
-  // New filter states
+  // Advanced filter states
   const [showFilters, setShowFilters] = useState(false);
-  const [dateRange, setDateRange] = useState({
-    from: '',
-    to: ''
-  });
-  const [revenueRange, setRevenueRange] = useState({
-    min: '',
-    max: ''
-  });
-  const [studentCountRange, setStudentCountRange] = useState({
-    min: '',
-    max: ''
-  });
-  const [courseCountRange, setCourseCountRange] = useState({
-    min: '',
-    max: ''
-  });
+  const [revenueRange, setRevenueRange] = useState({ min: '', max: '' });
+  const [studentCountRange, setStudentCountRange] = useState({ min: '', max: '' });
+  const [courseCountRange, setCourseCountRange] = useState({ min: '', max: '' });
 
   // Toast notification helper
   const showToast = (type, message) => {
     setToast({ type, message });
     setTimeout(() => {
       setToast(null);
-    }, 3000);
+    }, 4000);
   };
 
   // Initial data load
@@ -159,6 +105,8 @@ const AdminInstructorSales = () => {
       // Sort by default - highest revenue first
       const sortedData = [...data].sort((a, b) => b.totalRevenue - a.totalRevenue);
       setInstructorSales(sortedData);
+      setItemCount(sortedData.length);
+      setTotalPages(Math.ceil(sortedData.length / itemsPerPage));
       setCurrentPage(1);
     } catch (error) {
       console.error("Error fetching instructor sales:", error);
@@ -238,7 +186,6 @@ const AdminInstructorSales = () => {
   const resetAllFilters = () => {
     setSearchTerm("");
     setFilterType("all");
-    setDateRange({ from: '', to: '' });
     setRevenueRange({ min: '', max: '' });
     setStudentCountRange({ min: '', max: '' });
     setCourseCountRange({ min: '', max: '' });
@@ -289,6 +236,8 @@ const AdminInstructorSales = () => {
     }
     
     setInstructorSales(filtered);
+    setItemCount(filtered.length);
+    setTotalPages(Math.ceil(filtered.length / itemsPerPage));
     setCurrentPage(1);
     setShowFilters(false);
     
@@ -309,7 +258,7 @@ const AdminInstructorSales = () => {
     let csvContent = "data:text/csv;charset=utf-8,";
     
     // Add headers
-    csvContent += "Giảng viên,Số học viên,Số khóa học,Tổng doanh thu,Doanh thu/khóa học\n";
+    csvContent += "Giảng viên,Số học viên,Số khóa học,Tổng doanh thu,Doanh thu/khóa học,Đánh giá TB\n";
     
     // Add data rows
     filteredSales.forEach(instructor => {
@@ -317,7 +266,8 @@ const AdminInstructorSales = () => {
       csvContent += `${instructor.studentCount},`;
       csvContent += `${instructor.courseCount},`;
       csvContent += `${instructor.totalRevenue},`;
-      csvContent += `${instructor.revenuePerCourse}\n`;
+      csvContent += `${instructor.revenuePerCourse},`;
+      csvContent += `${instructor.averageRating || 0}\n`;
     });
     
     // Create download link
@@ -348,18 +298,29 @@ const AdminInstructorSales = () => {
     setCurrentPage(page);
   };
 
+  // Get performance badge
+  const getPerformanceBadge = (instructor) => {
+    const avgRevenuePerCourse = instructor.revenuePerCourse || 0;
+    if (avgRevenuePerCourse > 50000000) { // > 50M
+      return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-900/50 text-green-300 border border-green-500/30">Xuất sắc</span>;
+    } else if (avgRevenuePerCourse > 20000000) { // > 20M
+      return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-900/50 text-blue-300 border border-blue-500/30">Tốt</span>;
+    } else if (avgRevenuePerCourse > 5000000) { // > 5M
+      return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-900/50 text-yellow-300 border border-yellow-500/30">Trung bình</span>;
+    } else {
+      return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-900/50 text-red-300 border border-red-500/30">Cần cải thiện</span>;
+    }
+  };
+
   // Loading state with animation
   if (loading && instructorSales.length === 0) {
     return (
       <div className="flex justify-center items-center h-64">
         <div className="animate-pulse flex flex-col items-center">
           <div className="rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 h-12 w-12 mb-4 flex items-center justify-center">
-            <svg className="animate-spin h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
+            <BarChart2 className="animate-bounce h-6 w-6 text-white" />
           </div>
-          <div className="text-purple-400 text-lg font-medium">Đang tải dữ liệu...</div>
+          <div className="text-purple-400 text-lg font-medium">Đang tải dữ liệu bán hàng...</div>
         </div>
       </div>
     );
@@ -372,12 +333,10 @@ const AdminInstructorSales = () => {
         <div className="p-6">
           <div className="flex items-center">
             <div className="bg-red-600 rounded-full p-2 text-white mr-4">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-              </svg>
+              <BarChart2 className="h-6 w-6" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-red-400">Lỗi khi tải dữ liệu</h3>
+              <h3 className="text-lg font-bold text-red-400">Lỗi khi tải dữ liệu bán hàng</h3>
               <p className="text-red-300 mt-1">{error}</p>
             </div>
           </div>
@@ -398,7 +357,7 @@ const AdminInstructorSales = () => {
 
   // Get filtered and paginated data
   const filteredSales = getFilteredSales();
-  const totalPages = Math.ceil(filteredSales.length / itemsPerPage);
+  const totalFilteredPages = Math.ceil(filteredSales.length / itemsPerPage);
   
   // Get current page data
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -407,29 +366,32 @@ const AdminInstructorSales = () => {
 
   return (
     <motion.div
-      className="bg-gray-900 shadow-xl rounded-xl overflow-hidden border border-gray-800"
+      className="bg-gradient-to-br from-gray-900/80 to-gray-800/80 backdrop-blur-xl shadow-2xl rounded-2xl overflow-hidden border border-gray-700/50"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.2 }}
     >
       {/* Header section with gradient background */}
-      <div className="bg-gradient-to-r from-indigo-900 to-purple-900 px-6 py-4">
-        <div className="flex justify-between items-center">
+      <div className="bg-gradient-to-r from-indigo-900/80 to-purple-900/80 backdrop-blur-sm px-6 py-6">
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
           <div>
-            <h2 className="text-xl font-bold text-white">Báo Cáo Doanh Số Giảng Viên</h2>
-            <p className="text-indigo-200 text-sm mt-1">Quản lý và phân tích hiệu suất của giảng viên</p>
+            <h2 className="text-2xl font-bold text-white flex items-center">
+              <TrendingUp className="mr-3 h-7 w-7 text-indigo-400" />
+              Báo Cáo Doanh Số Giảng Viên
+            </h2>
+            <p className="text-indigo-200 text-sm mt-1">Quản lý và phân tích hiệu suất bán hàng của giảng viên</p>
           </div>
-          <div className="flex space-x-2">
+          <div className="flex space-x-3">
             <button 
               onClick={exportToCSV}
-              className="bg-gray-800 text-purple-300 hover:bg-gray-700 px-3 py-2 rounded-lg shadow-md flex items-center transition duration-200 text-sm font-medium border border-gray-700"
+              className="bg-gray-800/80 text-purple-300 hover:bg-gray-700/80 px-4 py-2 rounded-lg shadow-md flex items-center transition duration-200 text-sm font-medium border border-gray-600/50 backdrop-blur-sm"
             >
               <Download size={16} className="mr-2" />
               Xuất CSV
             </button>
             <button 
               onClick={() => setShowFilters(!showFilters)}
-              className={`${showFilters ? 'bg-purple-700 text-white' : 'bg-gray-800 text-purple-300 hover:bg-gray-700'} px-3 py-2 rounded-lg shadow-md flex items-center transition duration-200 text-sm font-medium border border-gray-700`}
+              className={`${showFilters ? 'bg-purple-700 text-white' : 'bg-gray-800/80 text-purple-300 hover:bg-gray-700/80'} px-4 py-2 rounded-lg shadow-md flex items-center transition duration-200 text-sm font-medium border border-gray-600/50 backdrop-blur-sm`}
             >
               <Filter size={16} className="mr-2" />
               Bộ lọc nâng cao
@@ -439,142 +401,146 @@ const AdminInstructorSales = () => {
       </div>
 
       {/* Advanced filters panel */}
-      {showFilters && (
-        <motion.div 
-          className="bg-gray-800 border-b border-gray-700 p-4"
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: 'auto' }}
-          exit={{ opacity: 0, height: 0 }}
-        >
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">Doanh thu</label>
-              <div className="flex items-center space-x-2">
-                <div className="relative rounded-md shadow-sm flex-1">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <DollarSign className="h-4 w-4 text-gray-500" />
+      <AnimatePresence>
+        {showFilters && (
+          <motion.div 
+            className="bg-gray-800/60 backdrop-blur-sm border-b border-gray-700/50 p-6"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Doanh thu (VNĐ)</label>
+                <div className="flex items-center space-x-3">
+                  <div className="relative rounded-md shadow-sm flex-1">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <DollarSign className="h-4 w-4 text-gray-500" />
+                    </div>
+                    <input
+                      type="number"
+                      placeholder="Tối thiểu"
+                      className="focus:ring-purple-500 focus:border-purple-500 block w-full pl-10 pr-3 py-2.5 sm:text-sm bg-gray-700/80 border-gray-600/50 placeholder-gray-400 text-white rounded-lg backdrop-blur-sm"
+                      value={revenueRange.min}
+                      onChange={(e) => setRevenueRange({...revenueRange, min: e.target.value})}
+                    />
                   </div>
-                  <input
-                    type="number"
-                    placeholder="Tối thiểu"
-                    className="focus:ring-purple-500 focus:border-purple-500 block w-full pl-10 pr-3 py-2 sm:text-sm bg-gray-700 border-gray-600 placeholder-gray-400 text-white rounded-md"
-                    value={revenueRange.min}
-                    onChange={(e) => setRevenueRange({...revenueRange, min: e.target.value})}
-                  />
+                  <span className="text-gray-400 font-medium">-</span>
+                  <div className="relative rounded-md shadow-sm flex-1">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <DollarSign className="h-4 w-4 text-gray-500" />
+                    </div>
+                    <input
+                      type="number"
+                      placeholder="Tối đa"
+                      className="focus:ring-purple-500 focus:border-purple-500 block w-full pl-10 pr-3 py-2.5 sm:text-sm bg-gray-700/80 border-gray-600/50 placeholder-gray-400 text-white rounded-lg backdrop-blur-sm"
+                      value={revenueRange.max}
+                      onChange={(e) => setRevenueRange({...revenueRange, max: e.target.value})}
+                    />
+                  </div>
                 </div>
-                <span className="text-gray-400">-</span>
-                <div className="relative rounded-md shadow-sm flex-1">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <DollarSign className="h-4 w-4 text-gray-500" />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Số học viên</label>
+                <div className="flex items-center space-x-3">
+                  <div className="relative rounded-md shadow-sm flex-1">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Users className="h-4 w-4 text-gray-500" />
+                    </div>
+                    <input
+                      type="number"
+                      placeholder="Tối thiểu"
+                      className="focus:ring-purple-500 focus:border-purple-500 block w-full pl-10 pr-3 py-2.5 sm:text-sm bg-gray-700/80 border-gray-600/50 placeholder-gray-400 text-white rounded-lg backdrop-blur-sm"
+                      value={studentCountRange.min}
+                      onChange={(e) => setStudentCountRange({...studentCountRange, min: e.target.value})}
+                    />
                   </div>
-                  <input
-                    type="number"
-                    placeholder="Tối đa"
-                    className="focus:ring-purple-500 focus:border-purple-500 block w-full pl-10 pr-3 py-2 sm:text-sm bg-gray-700 border-gray-600 placeholder-gray-400 text-white rounded-md"
-                    value={revenueRange.max}
-                    onChange={(e) => setRevenueRange({...revenueRange, max: e.target.value})}
-                  />
+                  <span className="text-gray-400 font-medium">-</span>
+                  <div className="relative rounded-md shadow-sm flex-1">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Users className="h-4 w-4 text-gray-500" />
+                    </div>
+                    <input
+                      type="number"
+                      placeholder="Tối đa"
+                      className="focus:ring-purple-500 focus:border-purple-500 block w-full pl-10 pr-3 py-2.5 sm:text-sm bg-gray-700/80 border-gray-600/50 placeholder-gray-400 text-white rounded-lg backdrop-blur-sm"
+                      value={studentCountRange.max}
+                      onChange={(e) => setStudentCountRange({...studentCountRange, max: e.target.value})}
+                    />
+                  </div>
+                </div>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Số khóa học</label>
+                <div className="flex items-center space-x-3">
+                  <div className="relative rounded-md shadow-sm flex-1">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <BookOpen className="h-4 w-4 text-gray-500" />
+                    </div>
+                    <input
+                      type="number"
+                      placeholder="Tối thiểu"
+                      className="focus:ring-purple-500 focus:border-purple-500 block w-full pl-10 pr-3 py-2.5 sm:text-sm bg-gray-700/80 border-gray-600/50 placeholder-gray-400 text-white rounded-lg backdrop-blur-sm"
+                      value={courseCountRange.min}
+                      onChange={(e) => setCourseCountRange({...courseCountRange, min: e.target.value})}
+                    />
+                  </div>
+                  <span className="text-gray-400 font-medium">-</span>
+                  <div className="relative rounded-md shadow-sm flex-1">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <BookOpen className="h-4 w-4 text-gray-500" />
+                    </div>
+                    <input
+                      type="number"
+                      placeholder="Tối đa"
+                      className="focus:ring-purple-500 focus:border-purple-500 block w-full pl-10 pr-3 py-2.5 sm:text-sm bg-gray-700/80 border-gray-600/50 placeholder-gray-400 text-white rounded-lg backdrop-blur-sm"
+                      value={courseCountRange.max}
+                      onChange={(e) => setCourseCountRange({...courseCountRange, max: e.target.value})}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
             
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">Số học viên</label>
-              <div className="flex items-center space-x-2">
-                <div className="relative rounded-md shadow-sm flex-1">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Users className="h-4 w-4 text-gray-500" />
-                  </div>
-                  <input
-                    type="number"
-                    placeholder="Tối thiểu"
-                    className="focus:ring-purple-500 focus:border-purple-500 block w-full pl-10 pr-3 py-2 sm:text-sm bg-gray-700 border-gray-600 placeholder-gray-400 text-white rounded-md"
-                    value={studentCountRange.min}
-                    onChange={(e) => setStudentCountRange({...studentCountRange, min: e.target.value})}
-                  />
-                </div>
-                <span className="text-gray-400">-</span>
-                <div className="relative rounded-md shadow-sm flex-1">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Users className="h-4 w-4 text-gray-500" />
-                  </div>
-                  <input
-                    type="number"
-                    placeholder="Tối đa"
-                    className="focus:ring-purple-500 focus:border-purple-500 block w-full pl-10 pr-3 py-2 sm:text-sm bg-gray-700 border-gray-600 placeholder-gray-400 text-white rounded-md"
-                    value={studentCountRange.max}
-                    onChange={(e) => setStudentCountRange({...studentCountRange, max: e.target.value})}
-                  />
-                </div>
-              </div>
+            <div className="mt-6 flex justify-end space-x-3">
+              <button 
+                onClick={resetAllFilters}
+                className="px-4 py-2 border border-gray-600/50 rounded-lg text-sm font-medium text-gray-300 bg-gray-800/80 hover:bg-gray-700/80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-purple-500 transition duration-200 backdrop-blur-sm"
+              >
+                Đặt lại
+              </button>
+              <button 
+                onClick={applyAdvancedFilters}
+                className="px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-purple-500 transition duration-200"
+              >
+                Áp dụng bộ lọc
+              </button>
             </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">Số khóa học</label>
-              <div className="flex items-center space-x-2">
-                <div className="relative rounded-md shadow-sm flex-1">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <BarChart2 className="h-4 w-4 text-gray-500" />
-                  </div>
-                  <input
-                    type="number"
-                    placeholder="Tối thiểu"
-                    className="focus:ring-purple-500 focus:border-purple-500 block w-full pl-10 pr-3 py-2 sm:text-sm bg-gray-700 border-gray-600 placeholder-gray-400 text-white rounded-md"
-                    value={courseCountRange.min}
-                    onChange={(e) => setCourseCountRange({...courseCountRange, min: e.target.value})}
-                  />
-                </div>
-                <span className="text-gray-400">-</span>
-                <div className="relative rounded-md shadow-sm flex-1">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <BarChart2 className="h-4 w-4 text-gray-500" />
-                  </div>
-                  <input
-                    type="number"
-                    placeholder="Tối đa"
-                    className="focus:ring-purple-500 focus:border-purple-500 block w-full pl-10 pr-3 py-2 sm:text-sm bg-gray-700 border-gray-600 placeholder-gray-400 text-white rounded-md"
-                    value={courseCountRange.max}
-                    onChange={(e) => setCourseCountRange({...courseCountRange, max: e.target.value})}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <div className="mt-4 flex justify-end space-x-3">
-            <button 
-              onClick={resetAllFilters}
-              className="px-4 py-2 border border-gray-600 rounded-md text-sm font-medium text-gray-300 bg-gray-800 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-purple-500 transition duration-200"
-            >
-              Đặt lại
-            </button>
-            <button 
-              onClick={applyAdvancedFilters}
-              className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-700 hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-purple-500 transition duration-200"
-            >
-              Áp dụng bộ lọc
-            </button>
-          </div>
-        </motion.div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      <div className="p-6 bg-gray-800">
-        <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+      <div className="p-6">
+        {/* Search and filter controls */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
           <div className="w-full md:w-1/2">
             <div className="relative">
               <input
                 type="text"
                 placeholder="Tìm kiếm theo tên giảng viên..."
-                className="block w-full pl-10 pr-4 py-2.5 text-gray-200 bg-gray-700 border border-gray-600 rounded-lg focus:ring-purple-500 focus:border-purple-500 placeholder-gray-400"
+                className="block w-full pl-12 pr-4 py-3 text-gray-200 bg-gray-800/80 border border-gray-600/50 rounded-xl focus:ring-purple-500 focus:border-purple-500 placeholder-gray-400 backdrop-blur-sm transition-all"
                 value={searchTerm}
                 onChange={handleSearch}
               />
-              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                <Search className="text-gray-400" size={18} />
+              <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
+                <Search className="text-gray-400" size={20} />
               </div>
               {searchTerm && (
                 <button 
-                  className="absolute inset-y-0 right-0 flex items-center pr-3"
+                  className="absolute inset-y-0 right-0 flex items-center pr-4"
                   onClick={() => setSearchTerm("")}
                 >
                   <X className="text-gray-400 hover:text-gray-200" size={18} />
@@ -587,108 +553,79 @@ const AdminInstructorSales = () => {
             <select 
               value={filterType} 
               onChange={handleFilterTypeChange}
-              className="block w-full py-2.5 px-4 text-gray-200 bg-gray-700 border border-gray-600 rounded-lg focus:ring-purple-500 focus:border-purple-500"
+              className="block w-full py-3 px-4 text-gray-200 bg-gray-800/80 border border-gray-600/50 rounded-xl focus:ring-purple-500 focus:border-purple-500 backdrop-blur-sm"
             >
               <option value="all">Tất cả giảng viên</option>
               <option value="topSales">Doanh thu cao nhất</option>
               <option value="topStudents">Học viên nhiều nhất</option>
               <option value="topCourses">Khóa học nhiều nhất</option>
-              <option value="lowPerformance">Doanh thu thấp nhất</option>
+              <option value="lowPerformance">Cần cải thiện</option>
             </select>
           </div>
         </div>
         
-        {/* Active filters display */}
-        {(searchTerm || filterType !== "all" || revenueRange.min || revenueRange.max || studentCountRange.min || studentCountRange.max || courseCountRange.min || courseCountRange.max) && (
-          <div className="mb-4 flex flex-wrap gap-2">
-            {searchTerm && (
-              <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-indigo-900 text-indigo-200 border border-indigo-700">
-                Tìm kiếm: {searchTerm}
-                <button 
-                  className="ml-1 text-indigo-300 hover:text-indigo-100"
-                  onClick={() => setSearchTerm("")}
-                >
-                  <X size={14} />
-                </button>
+        {/* Stats summary */}
+        {filteredSales.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <div className="bg-gradient-to-br from-blue-600/20 to-indigo-600/20 border border-blue-500/30 p-4 rounded-xl backdrop-blur-sm">
+              <div className="flex items-center">
+                <Users className="h-8 w-8 text-blue-400 mr-3" />
+                <div>
+                  <p className="text-blue-300 text-sm font-medium">Tổng giảng viên</p>
+                  <p className="text-blue-400 font-bold text-xl">{filteredSales.length}</p>
+                </div>
               </div>
-            )}
-            
-            {filterType !== "all" && (
-              <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-900 text-blue-200 border border-blue-700">
-                {filterType === "topSales" && "Doanh thu cao nhất"}
-                {filterType === "topStudents" && "Học viên nhiều nhất"}
-                {filterType === "topCourses" && "Khóa học nhiều nhất"}
-                {filterType === "lowPerformance" && "Doanh thu thấp nhất"}
-                <button 
-                  className="ml-1 text-blue-300 hover:text-blue-100"
-                  onClick={() => setFilterType("all")}
-                >
-                  <X size={14} />
-                </button>
+            </div>
+            <div className="bg-gradient-to-br from-emerald-600/20 to-green-600/20 border border-emerald-500/30 p-4 rounded-xl backdrop-blur-sm">
+              <div className="flex items-center">
+                <DollarSign className="h-8 w-8 text-emerald-400 mr-3" />
+                <div>
+                  <p className="text-emerald-300 text-sm font-medium">Tổng doanh thu</p>
+                  <p className="text-emerald-400 font-bold text-xl">
+                    {formatCurrency(filteredSales.reduce((sum, instructor) => sum + (instructor.totalRevenue || 0), 0))}
+                  </p>
+                </div>
               </div>
-            )}
-            
-            {(revenueRange.min || revenueRange.max) && (
-              <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-emerald-900 text-emerald-200 border border-emerald-700">
-                Doanh thu: {revenueRange.min ? formatCurrency(revenueRange.min) : "0đ"} - {revenueRange.max ? formatCurrency(revenueRange.max) : "không giới hạn"}
-                <button 
-                  className="ml-1 text-emerald-300 hover:text-emerald-100"
-                  onClick={() => setRevenueRange({min: '', max: ''})}
-                >
-                  <X size={14} />
-                </button>
+            </div>
+            <div className="bg-gradient-to-br from-purple-600/20 to-violet-600/20 border border-purple-500/30 p-4 rounded-xl backdrop-blur-sm">
+              <div className="flex items-center">
+                <BookOpen className="h-8 w-8 text-purple-400 mr-3" />
+                <div>
+                  <p className="text-purple-300 text-sm font-medium">Tổng khóa học</p>
+                  <p className="text-purple-400 font-bold text-xl">
+                    {filteredSales.reduce((sum, instructor) => sum + (instructor.courseCount || 0), 0)}
+                  </p>
+                </div>
               </div>
-            )}
-            
-            {(studentCountRange.min || studentCountRange.max) && (
-              <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-amber-900 text-amber-200 border border-amber-700">
-                Học viên: {studentCountRange.min || "0"} - {studentCountRange.max || "không giới hạn"}
-                <button 
-                  className="ml-1 text-amber-300 hover:text-amber-100"
-                  onClick={() => setStudentCountRange({min: '', max: ''})}
-                >
-                  <X size={14} />
-                </button>
+            </div>
+            <div className="bg-gradient-to-br from-yellow-600/20 to-orange-600/20 border border-yellow-500/30 p-4 rounded-xl backdrop-blur-sm">
+              <div className="flex items-center">
+                <Star className="h-8 w-8 text-yellow-400 mr-3" />
+                <div>
+                  <p className="text-yellow-300 text-sm font-medium">TB/khóa học</p>
+                  <p className="text-yellow-400 font-bold text-xl">
+                    {formatCurrency(filteredSales.reduce((sum, instructor) => sum + (instructor.revenuePerCourse || 0), 0) / Math.max(filteredSales.length, 1))}
+                  </p>
+                </div>
               </div>
-            )}
-            
-            {(courseCountRange.min || courseCountRange.max) && (
-              <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-900 text-purple-200 border border-purple-700">
-                Khóa học: {courseCountRange.min || "0"} - {courseCountRange.max || "không giới hạn"}
-                <button 
-                  className="ml-1 text-purple-300 hover:text-purple-100"
-                  onClick={() => setCourseCountRange({min: '', max: ''})}
-                >
-                  <X size={14} />
-                </button>
-              </div>
-            )}
-            
-            {(searchTerm || filterType !== "all" || revenueRange.min || revenueRange.max || studentCountRange.min || studentCountRange.max || courseCountRange.min || courseCountRange.max) && (
-              <button 
-                onClick={resetAllFilters}
-                className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-900 text-red-200 hover:bg-red-800 transition duration-200 border border-red-700"
-              >
-                Xóa tất cả bộ lọc
-                <X size={14} className="ml-1" />
-              </button>
-            )}
+            </div>
           </div>
         )}
         
         {/* Table */}
-        <div className="overflow-x-auto bg-gray-800 rounded-lg border border-gray-700 shadow-md">
-          <table className="min-w-full divide-y divide-gray-700">
+        <div className="overflow-x-auto bg-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-700/50 shadow-lg">
+          <table className="min-w-full divide-y divide-gray-700/50">
             <thead>
-              <tr className="bg-gray-900 bg-opacity-60">
+              <tr className="bg-gray-900/60 backdrop-blur-sm">
                 <th 
                   scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer group"
+                  className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer group hover:bg-gray-700/30 transition-colors"
                   onClick={() => handleSort("lastName")}
                 >
                   <div className="flex items-center">
+                    <Users className="h-4 w-4 mr-2" />
                     <span>Giảng viên</span>
-                    <div className="ml-1">
+                    <div className="ml-2">
                       {sortField === "lastName" ? (
                         sortDirection === "asc" 
                           ? <ChevronUp size={14} className="text-purple-400" /> 
@@ -701,12 +638,13 @@ const AdminInstructorSales = () => {
                 </th>
                 <th 
                   scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer group"
+                  className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer group hover:bg-gray-700/30 transition-colors"
                   onClick={() => handleSort("studentCount")}
                 >
                   <div className="flex items-center">
-                    <span>Số học viên</span>
-                    <div className="ml-1">
+                    <Users className="h-4 w-4 mr-2" />
+                    <span>Học viên</span>
+                    <div className="ml-2">
                       {sortField === "studentCount" ? (
                         sortDirection === "asc" 
                           ? <ChevronUp size={14} className="text-purple-400" /> 
@@ -719,12 +657,13 @@ const AdminInstructorSales = () => {
                 </th>
                 <th 
                   scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer group"
+                  className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer group hover:bg-gray-700/30 transition-colors"
                   onClick={() => handleSort("courseCount")}
                 >
                   <div className="flex items-center">
-                    <span>Số khóa học</span>
-                    <div className="ml-1">
+                    <BookOpen className="h-4 w-4 mr-2" />
+                    <span>Khóa học</span>
+                    <div className="ml-2">
                       {sortField === "courseCount" ? (
                         sortDirection === "asc" 
                           ? <ChevronUp size={14} className="text-purple-400" /> 
@@ -737,12 +676,13 @@ const AdminInstructorSales = () => {
                 </th>
                 <th 
                   scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer group"
+                  className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer group hover:bg-gray-700/30 transition-colors"
                   onClick={() => handleSort("totalRevenue")}
                 >
                   <div className="flex items-center">
-                    <span>Tổng doanh thu</span>
-                    <div className="ml-1">
+                    <DollarSign className="h-4 w-4 mr-2" />
+                    <span>Doanh thu</span>
+                    <div className="ml-2">
                       {sortField === "totalRevenue" ? (
                         sortDirection === "asc" 
                           ? <ChevronUp size={14} className="text-purple-400" /> 
@@ -755,12 +695,13 @@ const AdminInstructorSales = () => {
                 </th>
                 <th 
                   scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer group"
+                  className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer group hover:bg-gray-700/30 transition-colors"
                   onClick={() => handleSort("revenuePerCourse")}
                 >
                   <div className="flex items-center">
-                    <span>Doanh thu/khóa học</span>
-                    <div className="ml-1">
+                    <BarChart2 className="h-4 w-4 mr-2" />
+                    <span>TB/khóa học</span>
+                    <div className="ml-2">
                       {sortField === "revenuePerCourse" ? (
                         sortDirection === "asc" 
                           ? <ChevronUp size={14} className="text-purple-400" /> 
@@ -771,52 +712,69 @@ const AdminInstructorSales = () => {
                     </div>
                   </div>
                 </th>
+                <th scope="col" className="px-6 py-4 text-center text-xs font-medium text-gray-300 uppercase tracking-wider">
+                  Hiệu suất
+                </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-700">
+            <tbody className="divide-y divide-gray-700/50">
               {currentItems.length > 0 ? (
                 currentItems.map((instructor, index) => (
-                  <tr 
+                  <motion.tr 
                     key={`instructor-sale-${index}`} 
-                    className={`transition duration-150 ease-in-out hover:bg-gray-700 ${index % 2 === 0 ? 'bg-gray-800' : 'bg-gray-750'}`}
+                    className="transition duration-150 ease-in-out hover:bg-gray-700/30 bg-gray-800/30"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.05 }}
                   >
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
-                        <div className="flex-shrink-0 h-10 w-10 flex items-center justify-center rounded-full bg-gradient-to-br from-indigo-600 to-purple-600 text-white text-lg font-medium shadow-lg">
-                          {instructor.firstName?.charAt(0) || ''}
-                          {instructor.lastName?.charAt(0) || ''}
+                        <div className="flex-shrink-0 h-12 w-12 flex items-center justify-center rounded-full bg-gradient-to-br from-indigo-600 to-purple-600 text-white text-lg font-medium shadow-lg">
+                          {instructor.firstName?.charAt(0) || ''}{instructor.lastName?.charAt(0) || ''}
                         </div>
                         <div className="ml-4">
                           <div className="text-sm font-medium text-gray-200">{instructor.firstName} {instructor.lastName}</div>
+                          <div className="text-sm text-gray-400">ID: {instructor.id || 'N/A'}</div>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-300">{instructor.studentCount}</div>
+                      <div className="flex items-center">
+                        <Users className="h-4 w-4 text-blue-400 mr-2" />
+                        <span className="text-sm text-gray-300 font-medium">{instructor.studentCount || 0}</span>
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-300">{instructor.courseCount}</div>
+                      <div className="flex items-center">
+                        <BookOpen className="h-4 w-4 text-green-400 mr-2" />
+                        <span className="text-sm text-gray-300 font-medium">{instructor.courseCount || 0}</span>
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-200">{formatCurrency(instructor.totalRevenue)}</div>
+                      <div className="text-sm font-medium text-emerald-400">{formatCurrency(instructor.totalRevenue || 0)}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-300">{formatCurrency(instructor.revenuePerCourse)}</div>
+                      <div className="text-sm text-purple-400 font-medium">{formatCurrency(instructor.revenuePerCourse || 0)}</div>
                     </td>
-                  </tr>
+                    <td className="px-6 py-4 whitespace-nowrap text-center">
+                      {getPerformanceBadge(instructor)}
+                    </td>
+                  </motion.tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan="5" className="px-6 py-10 text-center">
+                  <td colSpan="6" className="px-6 py-16 text-center">
                     <div className="flex flex-col items-center">
-                      <svg className="h-12 w-12 text-gray-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      <span className="text-gray-400 text-lg">Không tìm thấy dữ liệu nào</span>
-                      <p className="text-gray-500 text-sm mt-1">Kiểm tra lại các bộ lọc hoặc tải lại trang</p>
+                      <BarChart2 className="h-16 w-16 text-gray-500 mb-4" />
+                      <span className="text-gray-400 text-lg font-medium">Không tìm thấy dữ liệu nào</span>
+                      <p className="text-gray-500 text-sm mt-2">
+                        {searchTerm 
+                          ? `Không có kết quả cho "${searchTerm}"` 
+                          : "Kiểm tra lại các bộ lọc hoặc tải lại trang"}
+                      </p>
                       <button 
                         onClick={resetAllFilters}
-                        className="mt-4 px-4 py-2 bg-purple-700 text-white rounded-md hover:bg-purple-600 transition duration-200 text-sm font-medium flex items-center"
+                        className="mt-4 px-4 py-2 bg-purple-700 text-white rounded-lg hover:bg-purple-600 transition duration-200 text-sm font-medium flex items-center"
                       >
                         <RefreshCw size={16} className="mr-2" />
                         Đặt lại bộ lọc
@@ -830,7 +788,7 @@ const AdminInstructorSales = () => {
         </div>
         
         {/* Pagination */}
-        {filteredSales.length > 0 && (
+        {totalFilteredPages > 1 && (
           <div className="flex flex-col md:flex-row justify-between items-center mt-6 space-y-4 md:space-y-0">
             <div className="text-sm text-gray-400">
               <span>Hiển thị </span>
@@ -843,109 +801,50 @@ const AdminInstructorSales = () => {
               {searchTerm && <span className="font-medium text-gray-300"> cho tìm kiếm "{searchTerm}"</span>}
             </div>
 
-            <div className="inline-flex rounded-md shadow-sm">
+            <div className="flex items-center space-x-2">
               <button
                 onClick={() => handlePageChange(Math.max(currentPage - 1, 1))}
                 disabled={currentPage === 1}
-                className="px-4 py-2 text-sm font-medium text-gray-300 bg-gray-700 border border-gray-600 rounded-l-md hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-gray-700"
+                className="px-4 py-2 text-sm font-medium text-gray-300 bg-gray-800/80 border border-gray-600/50 rounded-l-lg hover:bg-gray-700/80 disabled:opacity-50 disabled:cursor-not-allowed transition-all backdrop-blur-sm"
               >
-                Trước
+                <ChevronLeft size={16} />
               </button>
               
               {(() => {
                 const pages = [];
+                const maxVisiblePages = 5;
+                let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+                let endPage = Math.min(totalFilteredPages, startPage + maxVisiblePages - 1);
                 
-                if (totalPages <= 7) {
-                  // Hiển thị tất cả các trang nếu tổng số trang <= 7
-                  for (let i = 1; i <= totalPages; i++) {
-                    pages.push(
-                      <button
-                        key={i}
-                        onClick={() => handlePageChange(i)}
-                        className={`px-4 py-2 text-sm font-medium border ${
-                          currentPage === i 
-                            ? "bg-purple-700 text-white border-purple-600" 
-                            : "text-gray-300 bg-gray-700 border-gray-600 hover:bg-gray-600"
-                        }`}
-                      >
-                        {i}
-                      </button>
-                    );
-                  }
-                } else {
-                  // Hiển thị logic phân trang phức tạp hơn
-                  let startPage = Math.max(1, currentPage - 2);
-                  let endPage = Math.min(totalPages, startPage + 4);
-                  
-                  if (endPage - startPage < 4) {
-                    startPage = Math.max(1, endPage - 4);
-                  }
-                  
-                  // Trang đầu
-                  if (startPage > 1) {
-                    pages.push(
-                      <button
-                        key={1}
-                        onClick={() => handlePageChange(1)}
-                        className="px-4 py-2 text-sm font-medium text-gray-300 bg-gray-700 border border-gray-600 hover:bg-gray-600"
-                      >
-                        1
-                      </button>
-                    );
-                    
-                    if (startPage > 2) {
-                      pages.push(
-                        <span key="dots-start" className="px-4 py-2 text-gray-400 border border-gray-600 bg-gray-700">...</span>
-                      );
-                    }
-                  }
-                  
-                  // Các trang ở giữa
-                  for (let i = startPage; i <= endPage; i++) {
-                    pages.push(
-                      <button
-                        key={i}
-                        onClick={() => handlePageChange(i)}
-                        className={`px-4 py-2 text-sm font-medium border ${
-                          currentPage === i 
-                            ? "bg-purple-700 text-white border-purple-600" 
-                            : "text-gray-300 bg-gray-700 border-gray-600 hover:bg-gray-600"
-                        }`}
-                      >
-                        {i}
-                      </button>
-                    );
-                  }
-                  
-                  // Trang cuối
-                  if (endPage < totalPages) {
-                    if (endPage < totalPages - 1) {
-                      pages.push(
-                        <span key="dots-end" className="px-4 py-2 text-gray-400 border border-gray-600 bg-gray-700">...</span>
-                      );
-                    }
-                    
-                    pages.push(
-                      <button
-                        key={totalPages}
-                        onClick={() => handlePageChange(totalPages)}
-                        className="px-4 py-2 text-sm font-medium text-gray-300 bg-gray-700 border border-gray-600 hover:bg-gray-600"
-                      >
-                        {totalPages}
-                      </button>
-                    );
-                  }
+                if (endPage - startPage + 1 < maxVisiblePages) {
+                  startPage = Math.max(1, endPage - maxVisiblePages + 1);
+                }
+                
+                for (let i = startPage; i <= endPage; i++) {
+                  pages.push(
+                    <button
+                      key={i}
+                      onClick={() => handlePageChange(i)}
+                      className={`px-4 py-2 text-sm font-medium border transition-all ${
+                        currentPage === i 
+                          ? "bg-gradient-to-r from-purple-600 to-indigo-600 text-white border-purple-500 shadow-lg" 
+                          : "text-gray-300 bg-gray-800/80 border-gray-600/50 hover:bg-gray-700/80 backdrop-blur-sm"
+                      }`}
+                    >
+                      {i}
+                    </button>
+                  );
                 }
                 
                 return pages;
               })()}
               
               <button
-                onClick={() => handlePageChange(Math.min(currentPage + 1, totalPages))}
-                disabled={currentPage === totalPages || totalPages === 0}
-                className="px-4 py-2 text-sm font-medium text-gray-300 bg-gray-700 border border-gray-600 rounded-r-md hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-gray-700"
+                onClick={() => handlePageChange(Math.min(currentPage + 1, totalFilteredPages))}
+                disabled={currentPage === totalFilteredPages}
+                className="px-4 py-2 text-sm font-medium text-gray-300 bg-gray-800/80 border border-gray-600/50 rounded-r-lg hover:bg-gray-700/80 disabled:opacity-50 disabled:cursor-not-allowed transition-all backdrop-blur-sm"
               >
-                Tiếp
+                <ChevronRight size={16} />
               </button>
             </div>
           </div>
@@ -953,42 +852,17 @@ const AdminInstructorSales = () => {
       </div>
 
       {/* Toast Notification */}
-      {toast && (
-        <motion.div 
-          className={`fixed bottom-4 right-4 ${
-            toast.type === "success" ? "bg-green-700" : "bg-red-700"
-          } text-white p-4 rounded-lg shadow-xl z-50 max-w-md border ${
-            toast.type === "success" ? "border-green-600" : "border-red-600"
-          }`}
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 50 }}
-        >
-          <div className="flex items-center">
-            <div className="flex-shrink-0">
-              {toast.type === "success" ? (
-                <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
-              ) : (
-                <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                </svg>
-              )}
-            </div>
-            <div className="ml-3">
-              <p className="text-sm font-medium">{toast.message}</p>
-            </div>
-          </div>
-          <button
-            onClick={() => setToast(null)}
-            className="absolute top-2 right-2 text-white hover:text-gray-200"
-          >
-            <X size={16} />
-          </button>
-        </motion.div>
-      )}
+      <Toast toast={toast} onClose={() => setToast(null)} />
     </motion.div>
+  );
+};
+
+// Main component wrapper with error boundary
+const AdminInstructorSalesWithErrorBoundary = () => {
+  return (
+    <ErrorBoundary>
+      <AdminInstructorSales />
+    </ErrorBoundary>
   );
 };
 
