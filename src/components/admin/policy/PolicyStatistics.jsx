@@ -119,10 +119,11 @@ const PolicyStatistics = ({ policyId, policyName, onClose }) => {
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
-        className="bg-gray-800 rounded-xl p-6 max-w-6xl w-full max-h-[90vh] overflow-y-auto"
+        className="bg-gray-800 rounded-xl w-full max-w-6xl max-h-[90vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex justify-between items-center mb-6">
+        {/* Fixed Header */}
+        <div className="flex justify-between items-center p-6 border-b border-gray-700">
           <div>
             <h2 className="text-2xl font-bold text-white">Thống kê chính sách</h2>
             <p className="text-gray-400 mt-1">{policyName}</p>
@@ -134,6 +135,9 @@ const PolicyStatistics = ({ policyId, policyName, onClose }) => {
             <X size={24} />
           </button>
         </div>
+
+        {/* Scrollable Content */}
+        <div className="flex-1 overflow-y-auto p-6">
 
         {error ? (
           <div className="bg-red-900 bg-opacity-20 border border-red-700 rounded-lg p-4">
@@ -382,14 +386,18 @@ const PolicyStatistics = ({ policyId, policyName, onClose }) => {
             <p>Không có dữ liệu thống kê</p>
           </div>
         )}
+        </div>
 
-        <div className="flex justify-end mt-6">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors"
-          >
-            Đóng
-          </button>
+        {/* Fixed Footer */}
+        <div className="border-t border-gray-700 p-6 bg-gray-800 rounded-b-xl">
+          <div className="flex justify-end">
+            <button
+              onClick={onClose}
+              className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors"
+            >
+              Đóng
+            </button>
+          </div>
         </div>
       </motion.div>
     </motion.div>

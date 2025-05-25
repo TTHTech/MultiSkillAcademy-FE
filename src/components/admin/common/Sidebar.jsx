@@ -157,13 +157,13 @@ const MENU_GROUPS = [
         color: "#3b82f6",
         subItems: [
           {
-            name: "Tổng Quan Doanh Thu",
+            name: "Thanh Toán Doanh Thu",
             icon: DollarSign,
             href: "/admin/payments",
             color: "#3b82f6",
           },
           {
-            name: "Bảng Doanh Thu Admin",
+            name: "Tổng Quan Doanh Thu",
             icon: Users,
             href: "/admin/revenue-dashboard",
             color: "#3b82f6",
@@ -174,12 +174,12 @@ const MENU_GROUPS = [
             href: "/admin/instructor-revenue",
             color: "#2563eb",
           },
-          {
+          /**{
             name: "Báo Cáo Doanh Số Giảng Viên",
             icon: TrendingUp,
             href: "/admin/instructor-sales",
             color: "#1d4ed8",
-          },
+          },**/
           {
             name: "Chính Sách Doanh Thu",
             icon: FileText,

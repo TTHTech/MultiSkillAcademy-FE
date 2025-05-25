@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { motion } from "framer-motion";
-import ModalPortal from "./ModalPortal";
+import ModalPortal from "../payment/ModalPortal";
 
 const DeleteConfirmationModal = ({ isOpen, policy, onCancel, onConfirm }) => {
   // Prevent body scroll when modal is open

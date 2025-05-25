@@ -85,7 +85,7 @@ import PgaeNotifications from "./pages/student/notifications/PgaeNotifications.j
 import PageNotification from "./pages/instructor/Notification/PageNotification.jsx";
 import ReviewStatisticsPage from "./pages/admin/ReviewStatisticsPage.jsx";
 import CoursesStatisticsPage from "./pages/admin/CoursesStatisticsPage.jsx";
-import AdminPaymentContainer from "./components/admin/revenue/AdminPaymentContainer.jsx";
+import AdminPaymentContainer from "./components/admin/payment/AdminPaymentContainer.jsx";
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [role, setRole] = useState("");

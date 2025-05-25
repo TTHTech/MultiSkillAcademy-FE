@@ -14,20 +14,15 @@ import {
   Gift,
   Shield,
   TrendingUp,
-  Settings,
+  Settings
 } from "lucide-react";
-const toLocalInput = (d) => {
-  const parsed = new Date(d);
-  return isNaN(parsed) ? "" : parsed.toISOString().slice(0, 16);
-};
 
 const PolicyForm = ({ policy, onClose, onSave }) => {
-  // ---------- State ----------
   const [formData, setFormData] = useState({
-    name: "",
-    description: "",
-    policyType: "STANDARD",
-    category: "REGULAR",
+    name: '',
+    description: '',
+    policyType: 'STANDARD',
+    category: 'REGULAR',
     instructorReferredRate: { default: 0.9 },
     platformReferredRate: { default: 0.5 },
     ratingBonusThreshold: 4.5,
@@ -37,165 +32,187 @@ const PolicyForm = ({ policy, onClose, onSave }) => {
     minRevenueForBonus: 0,
     priority: 1,
     validFrom: new Date().toISOString().slice(0, 16),
-    validTo: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)
-      .toISOString()
-      .slice(0, 16),
-    active: false,
+    validTo: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().slice(0, 16),
+    active: false
   });
+
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [tieredRates, setTieredRates] = useState([
-    { min: 0, max: 10_000_000, rate: 0.5 },
+    { min: 0, max: 10000000, rate: 0.5 }
   ]);
 
   useEffect(() => {
-    if (!policy) return;
+    if (policy) {
+      setFormData({
+        ...policy,
+        validFrom: policy.validFrom ? new Date(policy.validFrom).toISOString().slice(0, 16) : formData.validFrom,
+        validTo: policy.validTo ? new Date(policy.validTo).toISOString().slice(0, 16) : formData.validTo,
+        instructorReferredRate: policy.instructorReferredRate || { default: 0.9 },
+        platformReferredRate: policy.platformReferredRate || { default: 0.5 }
+      });
 
-    setFormData((prev) => ({
-      ...prev,
-      ...policy,
-      validFrom: policy.validFrom
-        ? toLocalInput(policy.validFrom)
-        : prev.validFrom,
-      validTo: policy.validTo ? toLocalInput(policy.validTo) : prev.validTo,
-      instructorReferredRate: policy.instructorReferredRate || { default: 0.9 },
-      platformReferredRate: policy.platformReferredRate || { default: 0.5 },
-    }));
-
-    if (policy.policyType === "TIERED" && policy.platformReferredRate) {
-      const rates = Object.entries(policy.platformReferredRate)
-        .filter(([k]) => k !== "default")
-        .map(([range, rate]) => {
-          const [min, max] = range.split("-");
-          return {
-            min: parseFloat(min),
-            max: max === "infinity" ? Infinity : parseFloat(max),
-            rate,
-          };
-        })
-        .sort((a, b) => a.min - b.min);
-
-      if (rates.length) setTieredRates(rates);
+      // Parse tiered rates if policy type is TIERED
+      if (policy.policyType === 'TIERED' && policy.platformReferredRate) {
+        const rates = [];
+        Object.entries(policy.platformReferredRate).forEach(([key, value]) => {
+          if (key !== 'default') {
+            const [min, max] = key.split('-');
+            rates.push({
+              min: parseFloat(min),
+              max: max === 'infinity' ? Infinity : parseFloat(max),
+              rate: value
+            });
+          }
+        });
+        if (rates.length > 0) {
+          setTieredRates(rates.sort((a, b) => a.min - b.min));
+        }
+      }
     }
   }, [policy]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    const newValue =
-      type === "checkbox"
-        ? checked
-        : type === "number"
-        ? parseFloat(value) || 0
-        : value;
+    let newValue = type === 'checkbox' ? checked : value;
 
-    setFormData((prev) => ({ ...prev, [name]: newValue }));
+    if (type === 'number') {
+      newValue = parseFloat(value) || 0;
+    }
 
-    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: null }));
+    setFormData(prev => ({
+      ...prev,
+      [name]: newValue
+    }));
+
+    // Clear error for this field
+    if (errors[name]) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: null
+      }));
+    }
   };
 
   const handleRateChange = (type, key, value) => {
-    setFormData((prev) => ({
+    const numValue = parseFloat(value) || 0;
+    setFormData(prev => ({
       ...prev,
-      [type]: { ...prev[type], [key]: parseFloat(value) || 0 },
+      [type]: {
+        ...prev[type],
+        [key]: numValue
+      }
     }));
   };
 
   const addTieredRate = () => {
-    const last = tieredRates[tieredRates.length - 1];
+    const lastRate = tieredRates[tieredRates.length - 1];
     setTieredRates([
       ...tieredRates,
-      { min: last.max, max: last.max + 10_000_000, rate: 0.5 },
+      { min: lastRate.max, max: lastRate.max + 10000000, rate: 0.5 }
     ]);
   };
 
-  const updateTieredRate = (i, field, v) => {
-    const copy = [...tieredRates];
-    copy[i][field] = parseFloat(v) || (field === "rate" ? 0 : Infinity);
-    setTieredRates(copy);
+  const updateTieredRate = (index, field, value) => {
+    const newRates = [...tieredRates];
+    newRates[index][field] = field === 'rate' ? parseFloat(value) || 0 : parseFloat(value) || 0;
+    setTieredRates(newRates);
   };
 
-  const removeTieredRate = (i) =>
-    tieredRates.length > 1 &&
-    setTieredRates(tieredRates.filter((_, idx) => idx !== i));
+  const removeTieredRate = (index) => {
+    if (tieredRates.length > 1) {
+      setTieredRates(tieredRates.filter((_, i) => i !== index));
+    }
+  };
 
   const validate = () => {
-    const next = {};
-    if (!formData.name.trim()) next.name = "Tên chính sách là bắt buộc";
-    if (!formData.description.trim()) next.description = "Mô tả là bắt buộc";
+    const newErrors = {};
 
-    if (
-      formData.instructorReferredRate.default < 0 ||
-      formData.instructorReferredRate.default > 1
-    )
-      next.instructorRate = "Tỷ lệ phải từ 0 đến 1";
+    if (!formData.name.trim()) {
+      newErrors.name = 'Tên chính sách là bắt buộc';
+    }
 
-    if (formData.ratingBonusThreshold < 0 || formData.ratingBonusThreshold > 5)
-      next.ratingThreshold = "Ngưỡng đánh giá phải từ 0 đến 5";
+    if (!formData.description.trim()) {
+      newErrors.description = 'Mô tả là bắt buộc';
+    }
 
-    const start = new Date(formData.validFrom);
-    const end = new Date(formData.validTo);
-    if (isNaN(start) || isNaN(end)) next.validFrom = "Ngày/giờ không hợp lệ";
-    else if (start >= end) next.validTo = "Ngày kết thúc phải sau ngày bắt đầu";
+    if (formData.instructorReferredRate.default < 0 || formData.instructorReferredRate.default > 1) {
+      newErrors.instructorRate = 'Tỷ lệ phải từ 0 đến 1';
+    }
 
-    setErrors(next);
-    return !Object.keys(next).length;
+    if (formData.ratingBonusThreshold < 0 || formData.ratingBonusThreshold > 5) {
+      newErrors.ratingThreshold = 'Ngưỡng đánh giá phải từ 0 đến 5';
+    }
+
+    if (new Date(formData.validFrom) >= new Date(formData.validTo)) {
+      newErrors.validTo = 'Ngày kết thúc phải sau ngày bắt đầu';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async () => {
-    if (!validate()) return;
+
+    if (!validate()) {
+      return;
+    }
+
     setLoading(true);
 
     try {
+      // Build platform rates for TIERED policy
       let platformRates = formData.platformReferredRate;
-      if (formData.policyType === "TIERED") {
+      if (formData.policyType === 'TIERED') {
         platformRates = {};
-        tieredRates.forEach((t) => {
-          const key = `${t.min}-${t.max === Infinity ? "infinity" : t.max}`;
-          platformRates[key] = t.rate;
+        tieredRates.forEach((tier, index) => {
+          const key = `${tier.min}-${tier.max === Infinity ? 'infinity' : tier.max}`;
+          platformRates[key] = tier.rate;
         });
       }
 
-      const startISO = new Date(formData.validFrom);
-      const endISO = new Date(formData.validTo);
-
-      const payload = {
+      const dataToSave = {
         ...formData,
         platformReferredRate: platformRates,
-        validFrom: isNaN(startISO) ? null : startISO.toISOString(),
-        validTo: isNaN(endISO) ? null : endISO.toISOString(),
+        validFrom: new Date(formData.validFrom).toISOString(),
+        validTo: new Date(formData.validTo).toISOString()
       };
 
-      await onSave(payload);
-    } catch (err) {
-      console.error("Error saving policy:", err);
+      await onSave(dataToSave);
+    } catch (error) {
+      console.error('Error saving policy:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  // ---------- Helpers ----------
-  const formatCurrency = (v) => new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND", maximumFractionDigits: 0 }).format(v);
-  const fmt = formatCurrency;
-
+  const formatCurrency = (value) => {
+    return new Intl.NumberFormat('vi-VN', { 
+      style: 'currency', 
+      currency: 'VND',
+      maximumFractionDigits: 0
+    }).format(value);
+  };
 
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto"
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
       onClick={onClose}
     >
       <motion.div
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
-        className="bg-gray-800 rounded-xl p-6 w-full max-w-4xl my-8 mx-auto relative"
+        className="bg-gray-800 rounded-xl w-full max-w-4xl max-h-[90vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex justify-between items-center mb-6">
+        {/* Fixed Header */}
+        <div className="flex justify-between items-center p-6 border-b border-gray-700">
           <h2 className="text-2xl font-bold text-white">
-            {policy?.id ? "Chỉnh sửa chính sách" : "Tạo chính sách mới"}
+            {policy?.id ? 'Chỉnh sửa chính sách' : 'Tạo chính sách mới'}
           </h2>
           <button
             onClick={onClose}
@@ -205,7 +222,8 @@ const PolicyForm = ({ policy, onClose, onSave }) => {
           </button>
         </div>
 
-        <div className="space-y-6">
+        {/* Scrollable Content */}
+        <div className="flex-1 overflow-y-auto p-6 space-y-6">
           {/* Basic Information */}
           <div className="bg-gray-700 rounded-lg p-6 space-y-4">
             <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
@@ -224,7 +242,7 @@ const PolicyForm = ({ policy, onClose, onSave }) => {
                   value={formData.name}
                   onChange={handleChange}
                   className={`w-full px-3 py-2 bg-gray-600 border ${
-                    errors.name ? "border-red-500" : "border-gray-500"
+                    errors.name ? 'border-red-500' : 'border-gray-500'
                   } rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500`}
                   placeholder="VD: Chính sách Chuẩn 2025"
                 />
@@ -259,14 +277,12 @@ const PolicyForm = ({ policy, onClose, onSave }) => {
                 onChange={handleChange}
                 rows="3"
                 className={`w-full px-3 py-2 bg-gray-600 border ${
-                  errors.description ? "border-red-500" : "border-gray-500"
+                  errors.description ? 'border-red-500' : 'border-gray-500'
                 } rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500`}
                 placeholder="Mô tả chi tiết về chính sách..."
               />
               {errors.description && (
-                <p className="mt-1 text-sm text-red-400">
-                  {errors.description}
-                </p>
+                <p className="mt-1 text-sm text-red-400">{errors.description}</p>
               )}
             </div>
 
@@ -321,30 +337,22 @@ const PolicyForm = ({ policy, onClose, onSave }) => {
                 <input
                   type="number"
                   value={formData.instructorReferredRate.default * 100}
-                  onChange={(e) =>
-                    handleRateChange(
-                      "instructorReferredRate",
-                      "default",
-                      e.target.value / 100
-                    )
-                  }
+                  onChange={(e) => handleRateChange('instructorReferredRate', 'default', e.target.value / 100)}
                   min="0"
                   max="100"
                   step="1"
                   className={`w-32 px-3 py-2 bg-gray-600 border ${
-                    errors.instructorRate ? "border-red-500" : "border-gray-500"
+                    errors.instructorRate ? 'border-red-500' : 'border-gray-500'
                   } rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500`}
                 />
                 <span className="ml-2 text-gray-300">%</span>
               </div>
               {errors.instructorRate && (
-                <p className="mt-1 text-sm text-red-400">
-                  {errors.instructorRate}
-                </p>
+                <p className="mt-1 text-sm text-red-400">{errors.instructorRate}</p>
               )}
             </div>
 
-            {formData.policyType === "TIERED" ? (
+            {formData.policyType === 'TIERED' ? (
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
                   Tỷ lệ cho giảng viên (học viên từ nền tảng) - Theo bậc
@@ -355,23 +363,15 @@ const PolicyForm = ({ policy, onClose, onSave }) => {
                       <input
                         type="number"
                         value={tier.min}
-                        onChange={(e) =>
-                          updateTieredRate(index, "min", e.target.value)
-                        }
+                        onChange={(e) => updateTieredRate(index, 'min', e.target.value)}
                         className="w-32 px-3 py-2 bg-gray-600 border border-gray-500 rounded-md text-white"
                         placeholder="Từ"
                       />
                       <span className="text-gray-400">-</span>
                       <input
                         type="number"
-                        value={tier.max === Infinity ? "" : tier.max}
-                        onChange={(e) =>
-                          updateTieredRate(
-                            index,
-                            "max",
-                            e.target.value || Infinity
-                          )
-                        }
+                        value={tier.max === Infinity ? '' : tier.max}
+                        onChange={(e) => updateTieredRate(index, 'max', e.target.value || Infinity)}
                         className="w-32 px-3 py-2 bg-gray-600 border border-gray-500 rounded-md text-white"
                         placeholder="Đến"
                       />
@@ -379,9 +379,7 @@ const PolicyForm = ({ policy, onClose, onSave }) => {
                       <input
                         type="number"
                         value={tier.rate * 100}
-                        onChange={(e) =>
-                          updateTieredRate(index, "rate", e.target.value / 100)
-                        }
+                        onChange={(e) => updateTieredRate(index, 'rate', e.target.value / 100)}
                         min="0"
                         max="100"
                         step="1"
@@ -418,13 +416,7 @@ const PolicyForm = ({ policy, onClose, onSave }) => {
                   <input
                     type="number"
                     value={formData.platformReferredRate.default * 100}
-                    onChange={(e) =>
-                      handleRateChange(
-                        "platformReferredRate",
-                        "default",
-                        e.target.value / 100
-                      )
-                    }
+                    onChange={(e) => handleRateChange('platformReferredRate', 'default', e.target.value / 100)}
                     min="0"
                     max="100"
                     step="1"
@@ -459,17 +451,13 @@ const PolicyForm = ({ policy, onClose, onSave }) => {
                     max="5"
                     step="0.1"
                     className={`w-24 px-3 py-2 bg-gray-600 border ${
-                      errors.ratingThreshold
-                        ? "border-red-500"
-                        : "border-gray-500"
+                      errors.ratingThreshold ? 'border-red-500' : 'border-gray-500'
                     } rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500`}
                   />
                   <span className="ml-2 text-gray-300">/ 5.0</span>
                 </div>
                 {errors.ratingThreshold && (
-                  <p className="mt-1 text-sm text-red-400">
-                    {errors.ratingThreshold}
-                  </p>
+                  <p className="mt-1 text-sm text-red-400">{errors.ratingThreshold}</p>
                 )}
               </div>
 
@@ -482,12 +470,7 @@ const PolicyForm = ({ policy, onClose, onSave }) => {
                     type="number"
                     name="ratingBonusPercentage"
                     value={formData.ratingBonusPercentage * 100}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        ratingBonusPercentage: e.target.value / 100,
-                      }))
-                    }
+                    onChange={(e) => setFormData(prev => ({ ...prev, ratingBonusPercentage: (e.target.value / 100) }))}
                     min="0"
                     max="100"
                     step="1"
@@ -497,8 +480,7 @@ const PolicyForm = ({ policy, onClose, onSave }) => {
                 </div>
               </div>
 
-              {(formData.policyType === "EVENT" ||
-                formData.category !== "REGULAR") && (
+              {(formData.policyType === 'EVENT' || formData.category !== 'REGULAR') && (
                 <>
                   <div>
                     <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -509,12 +491,7 @@ const PolicyForm = ({ policy, onClose, onSave }) => {
                         type="number"
                         name="eventBonusPercentage"
                         value={formData.eventBonusPercentage * 100}
-                        onChange={(e) =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            eventBonusPercentage: e.target.value / 100,
-                          }))
-                        }
+                        onChange={(e) => setFormData(prev => ({ ...prev, eventBonusPercentage: (e.target.value / 100) }))}
                         min="0"
                         max="100"
                         step="1"
@@ -538,9 +515,7 @@ const PolicyForm = ({ policy, onClose, onSave }) => {
                       className="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
                     />
                     <p className="text-xs text-gray-400 mt-1">
-                      {formData.minRevenueForBonus > 0
-                        ? formatCurrency(formData.minRevenueForBonus)
-                        : "Không yêu cầu"}
+                      {formData.minRevenueForBonus > 0 ? formatCurrency(formData.minRevenueForBonus) : 'Không yêu cầu'}
                     </p>
                   </div>
                 </>
@@ -555,12 +530,7 @@ const PolicyForm = ({ policy, onClose, onSave }) => {
                     type="number"
                     name="maxRefundRate"
                     value={formData.maxRefundRate * 100}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        maxRefundRate: e.target.value / 100,
-                      }))
-                    }
+                    onChange={(e) => setFormData(prev => ({ ...prev, maxRefundRate: (e.target.value / 100) }))}
                     min="0"
                     max="100"
                     step="1"
@@ -603,7 +573,7 @@ const PolicyForm = ({ policy, onClose, onSave }) => {
                   value={formData.validTo}
                   onChange={handleChange}
                   className={`w-full px-3 py-2 bg-gray-600 border ${
-                    errors.validTo ? "border-red-500" : "border-gray-500"
+                    errors.validTo ? 'border-red-500' : 'border-gray-500'
                   } rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500`}
                 />
                 {errors.validTo && (
@@ -628,9 +598,11 @@ const PolicyForm = ({ policy, onClose, onSave }) => {
               </div>
             )}
           </div>
+        </div>
 
-          {/* Form Actions */}
-          <div className="flex justify-end gap-3 pt-4">
+        {/* Fixed Footer */}
+        <div className="border-t border-gray-700 p-6 bg-gray-800 rounded-b-xl">
+          <div className="flex justify-end gap-3">
             <button
               type="button"
               onClick={onClose}
@@ -645,31 +617,16 @@ const PolicyForm = ({ policy, onClose, onSave }) => {
             >
               {loading ? (
                 <>
-                  <svg
-                    className="animate-spin h-4 w-4 mr-2"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                      fill="none"
-                    />
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    />
+                  <svg className="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                   </svg>
                   Đang lưu...
                 </>
               ) : (
                 <>
                   <Save size={16} className="mr-2" />
-                  {policy?.id ? "Cập nhật" : "Tạo mới"}
+                  {policy?.id ? 'Cập nhật' : 'Tạo mới'}
                 </>
               )}
             </button>
