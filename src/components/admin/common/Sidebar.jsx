@@ -158,8 +158,8 @@ const MENU_GROUPS = [
         subItems: [
           {
             name: "Tổng Quan Doanh Thu",
-            icon: LineChart,
-            href: "/admin/revenue",
+            icon: DollarSign,
+            href: "/admin/payments",
             color: "#3b82f6",
           },
           {

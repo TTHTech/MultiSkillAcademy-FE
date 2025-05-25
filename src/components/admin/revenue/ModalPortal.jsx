@@ -1,33 +1,26 @@
-import React, { useEffect } from 'react';
-import ReactDOM from 'react-dom';
+import { useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 
-// Custom Modal Portal Component
 const ModalPortal = ({ children, isOpen }) => {
-  // Create modal root if it doesn't exist
+  const elRef = useRef(null);
+  
+  if (!elRef.current) {
+    elRef.current = document.createElement('div');
+  }
+  
   useEffect(() => {
-    let modalRoot = document.getElementById('modal-root');
-    if (!modalRoot) {
-      modalRoot = document.createElement('div');
-      modalRoot.id = 'modal-root';
-      document.body.appendChild(modalRoot);
+    const modalRoot = document.getElementById('modal-root') || document.body;
+    const el = elRef.current;
+    
+    if (isOpen && el) {
+      modalRoot.appendChild(el);
+      return () => {
+        modalRoot.removeChild(el);
+      };
     }
-
-    // Clean up on unmount
-    return () => {
-      // Only remove if no other modals are open
-      if (modalRoot.childNodes.length === 0) {
-        document.body.removeChild(modalRoot);
-      }
-    };
-  }, []);
-
-  if (!isOpen) return null;
-
-  // Use portal to render outside of component hierarchy
-  return ReactDOM.createPortal(
-    children,
-    document.getElementById('modal-root') || document.body
-  );
+  }, [isOpen]);
+  
+  return isOpen ? createPortal(children, elRef.current) : null;
 };
 
 export default ModalPortal;
