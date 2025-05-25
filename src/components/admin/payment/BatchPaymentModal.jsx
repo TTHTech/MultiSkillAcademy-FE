@@ -58,16 +58,42 @@ const BatchPaymentModal = ({
       setLoading(true);
       setError(null);
       
-      const response = await fetch(
-        `${baseUrl}/api/admin/instructor-revenues?month=${formData.month}&year=${formData.year}&paymentStatus=PENDING,PARTIAL&size=100`,
+      // Fetch instructor revenues
+      const revenueResponse = await fetch(
+        `${baseUrl}/api/admin/instructor-revenues?month=${formData.month}&year=${formData.year}&size=100`,
         { headers: getAuthHeaders() }
       );
 
-      if (!response.ok) throw new Error('Failed to fetch instructors');
+      if (!revenueResponse.ok) throw new Error('Failed to fetch instructors');
 
-      const data = await response.json();
-      const instructorsWithBalance = (data.content || []).filter(
-        instructor => instructor.remainingAmount && instructor.remainingAmount > 0
+      const revenueData = await revenueResponse.json();
+      
+      // Fetch existing payments for this period
+      const paymentResponse = await fetch(
+        `${baseUrl}/api/admin/payments?month=${formData.month}&year=${formData.year}&size=1000`,
+        { headers: getAuthHeaders() }
+      );
+      
+      let existingPayments = [];
+      if (paymentResponse.ok) {
+        const paymentData = await paymentResponse.json();
+        existingPayments = paymentData.content || [];
+      }
+      
+      // Get instructor IDs that already have pending/processing payments
+      const instructorsWithPendingPayments = new Set(
+        existingPayments
+          .filter(payment => payment.status === 'PENDING' || payment.status === 'PROCESSING')
+          .map(payment => payment.instructorId)
+      );
+      
+      // Filter instructors: must have remaining amount AND no pending payments
+      const instructorsWithBalance = (revenueData.content || []).filter(
+        instructor => {
+          const hasBalance = instructor.remainingAmount && instructor.remainingAmount > 0;
+          const hasNoPendingPayment = !instructorsWithPendingPayments.has(instructor.instructorId);
+          return hasBalance && hasNoPendingPayment;
+        }
       );
       
       setInstructors(instructorsWithBalance);
@@ -78,9 +104,16 @@ const BatchPaymentModal = ({
         (sum, instructor) => sum + (instructor.remainingAmount || 0), 0
       );
       
+      // Count excluded instructors (those with pending payments)
+      const totalWithBalance = (revenueData.content || []).filter(
+        instructor => instructor.remainingAmount && instructor.remainingAmount > 0
+      ).length;
+      const excludedCount = totalWithBalance - totalInstructors;
+      
       setSummary({
         totalInstructors,
         totalAmount,
+        excludedCount,
         selectedCount: selectAll ? totalInstructors : selectedInstructors.length,
         selectedAmount: selectAll ? totalAmount : instructorsWithBalance
           .filter(i => selectedInstructors.includes(i.instructorId))
@@ -132,7 +165,7 @@ const BatchPaymentModal = ({
         selectedAmount
       }));
     }
-  }, [selectedInstructors, selectAll]);
+  }, [selectedInstructors, selectAll, instructors]);
 
   // Handle submit
   const handleSubmit = (e) => {
@@ -140,6 +173,20 @@ const BatchPaymentModal = ({
     
     if (!selectAll && selectedInstructors.length === 0) {
       alert('Vui lòng chọn ít nhất một giảng viên');
+      return;
+    }
+    
+    // Final validation warning
+    const selectedCount = selectAll ? instructors.length : selectedInstructors.length;
+    const totalAmount = selectAll 
+      ? instructors.reduce((sum, i) => sum + (i.remainingAmount || 0), 0)
+      : instructors
+          .filter(i => selectedInstructors.includes(i.instructorId))
+          .reduce((sum, i) => sum + (i.remainingAmount || 0), 0);
+    
+    const confirmMessage = `Bạn có chắc muốn tạo thanh toán cho ${selectedCount} giảng viên với tổng số tiền ${formatCurrency(totalAmount)}?\n\nLưu ý: Hệ thống đã loại bỏ các giảng viên đã có thanh toán chờ xử lý để tránh trùng lặp.`;
+    
+    if (!window.confirm(confirmMessage)) {
       return;
     }
     
@@ -202,7 +249,7 @@ const BatchPaymentModal = ({
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-xl font-bold text-white flex items-center">
             <Users className="mr-2" />
-            Thanh toán hàng loạt
+            Tạo thanh toán hàng loạt
           </h3>
           <button
             onClick={onClose}
@@ -228,7 +275,7 @@ const BatchPaymentModal = ({
             </h4>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div>
-                <p className="text-gray-400 text-sm">Tổng giảng viên</p>
+                <p className="text-gray-400 text-sm">Có thể tạo thanh toán</p>
                 <p className="text-white font-bold text-lg">{summary.totalInstructors}</p>
               </div>
               <div>
@@ -244,6 +291,18 @@ const BatchPaymentModal = ({
                 <p className="text-yellow-400 font-bold text-lg">{formatCurrency(summary.selectedAmount)}</p>
               </div>
             </div>
+            
+            {/* Warning about excluded instructors */}
+            {summary.excludedCount > 0 && (
+              <div className="mt-4 p-3 bg-yellow-900/20 border border-yellow-500/30 rounded-lg">
+                <div className="flex items-center text-yellow-400">
+                  <AlertCircle className="mr-2" size={16} />
+                  <span className="text-sm font-medium">
+                    Đã loại bỏ {summary.excludedCount} giảng viên vì đã có thanh toán đang chờ xử lý hoặc đang được xử lý
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -324,7 +383,11 @@ const BatchPaymentModal = ({
                 <div className="p-4 text-center text-gray-400">Đang tải...</div>
               ) : instructors.length === 0 ? (
                 <div className="p-4 text-center text-gray-400">
-                  Không có giảng viên nào có số dư cần thanh toán
+                  <div className="mb-2">Không có giảng viên nào có thể tạo thanh toán</div>
+                  <div className="text-xs">
+                    • Không có dư nợ cần thanh toán, hoặc<br/>
+                    • Đã có thanh toán đang chờ xử lý
+                  </div>
                 </div>
               ) : (
                 <div className="divide-y divide-gray-600">
@@ -343,7 +406,12 @@ const BatchPaymentModal = ({
                         <p className="text-white">
                           {instructor.instructorFirstName} {instructor.instructorLastName}
                         </p>
-                        <p className="text-sm text-gray-400">{instructor.instructorEmail}</p>
+                        <div className="flex items-center space-x-2">
+                          <p className="text-sm text-gray-400">{instructor.instructorEmail}</p>
+                          <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-green-900/50 text-green-300 border border-green-500/30">
+                            ✓ Có thể thanh toán
+                          </span>
+                        </div>
                       </div>
                       <div className="text-right">
                         <p className="text-yellow-400 font-semibold">

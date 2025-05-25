@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { X, Plus, DollarSign, AlertCircle, CheckCircle, Clock, XCircle } from "lucide-react";
+import { X, Plus, DollarSign, AlertCircle, CheckCircle, Clock, XCircle, Search, Filter, RefreshCw } from "lucide-react";
 import PaymentList from "./PaymentList";
 import PaymentFormModal from "./PaymentFormModal";  
 import PaymentDetailModal from "./PaymentDetailModal";
@@ -92,16 +92,15 @@ const AdminPaymentContainer = () => {
   const [toast, setToast] = useState(null);
   
   // Modal states
-  const [showPaymentForm, setShowPaymentForm] = useState(false);
   const [showPaymentDetail, setShowPaymentDetail] = useState(false);
   const [showBatchPayment, setShowBatchPayment] = useState(false);
-  const [formMode, setFormMode] = useState("create"); // 'create' or 'edit'
   
   // Filter states
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [statusFilter, setStatusFilter] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+  const [searchInput, setSearchInput] = useState(""); // Separate state for search input
   
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
@@ -134,7 +133,17 @@ const AdminPaymentContainer = () => {
   useEffect(() => {
     fetchPayments();
     fetchPaymentSummary();
-  }, [selectedMonth, selectedYear, statusFilter, currentPage]);
+  }, [selectedMonth, selectedYear, statusFilter, currentPage, searchTerm]);
+
+  // Debounced search effect
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearchTerm(searchInput);
+      setCurrentPage(1); // Reset to first page when searching
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchInput]);
 
   // Error handling function
   const handleAuthError = () => {
@@ -156,12 +165,14 @@ const AdminPaymentContainer = () => {
 
       const queryParams = new URLSearchParams({
         page: currentPage - 1,
-        size: itemsPerPage,
-        month: selectedMonth,
-        year: selectedYear,
-        ...(statusFilter && { status: statusFilter }),
-        ...(searchTerm && { searchTerm })
+        size: itemsPerPage
       });
+
+      // Add filters
+      if (selectedMonth) queryParams.append('month', selectedMonth);
+      if (selectedYear) queryParams.append('year', selectedYear);
+      if (statusFilter) queryParams.append('status', statusFilter);
+      if (searchTerm) queryParams.append('searchTerm', searchTerm);
 
       const url = `${baseUrl}/api/admin/payments?${queryParams}`;
       const result = await safeFetch(url, {
@@ -182,8 +193,11 @@ const AdminPaymentContainer = () => {
         setPayments(data.content);
         setTotalPages(data.totalPages || 1);
         setTotalElements(data.totalElements || 0);
+        setCurrentPage(data.number + 1);
       } else {
         setPayments([]);
+        setTotalPages(1);
+        setTotalElements(0);
       }
     } catch (error) {
       console.error("Error fetching payments:", error);
@@ -206,38 +220,11 @@ const AdminPaymentContainer = () => {
       });
       
       if (result.ok && result.data) {
+        console.log("Payment summary data:", result.data);
         setPaymentSummary(result.data);
       }
     } catch (error) {
       console.error("Error fetching payment summary:", error);
-    }
-  };
-
-  // Create payment
-  const createPayment = async (paymentData) => {
-    try {
-      setLoading(true);
-      
-      const url = `${baseUrl}/api/admin/payments`;
-      const result = await safeFetch(url, {
-        method: "POST",
-        headers: getAuthHeaders(),
-        body: JSON.stringify(paymentData)
-      });
-      
-      if (!result.ok) {
-        throw new Error(result.data?.message || "Failed to create payment");
-      }
-
-      showToast("success", "Thanh toán đã được tạo thành công");
-      setShowPaymentForm(false);
-      fetchPayments();
-      fetchPaymentSummary();
-    } catch (error) {
-      console.error("Error creating payment:", error);
-      showToast("error", `Lỗi: ${error.message}`);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -315,13 +302,26 @@ const AdminPaymentContainer = () => {
       const response = result.data;
       if (response.success) {
         showToast("success", `Đã tạo ${response.createdCount} thanh toán thành công`);
+        
+        // Add detailed success message
+        if (response.errors && response.errors.length > 0) {
+          console.warn("Some payments had issues:", response.errors);
+          showToast("warning", `Tạo thành công ${response.createdCount} thanh toán. Một số lỗi: ${response.errors.slice(0, 2).join(", ")}`);
+        }
       } else {
-        showToast("warning", response.message || "Một số thanh toán không thể tạo");
+        const errorMessage = response.errors && response.errors.length > 0 
+          ? response.errors.join(', ') 
+          : "Một số thanh toán không thể tạo";
+        showToast("warning", errorMessage);
       }
       
       setShowBatchPayment(false);
-      fetchPayments();
-      fetchPaymentSummary();
+      
+      // Force refresh data to prevent duplicate creation
+      setTimeout(() => {
+        fetchPayments();
+        fetchPaymentSummary();
+      }, 500);
     } catch (error) {
       console.error("Error creating batch payments:", error);
       showToast("error", `Lỗi: ${error.message}`);
@@ -334,6 +334,42 @@ const AdminPaymentContainer = () => {
   const handlePaymentSelect = (payment) => {
     setSelectedPayment(payment);
     setShowPaymentDetail(true);
+  };
+
+  // Handle search
+  const handleSearchChange = (e) => {
+    setSearchInput(e.target.value);
+  };
+
+  // Clear search
+  const clearSearch = () => {
+    setSearchInput("");
+    setSearchTerm("");
+  };
+
+  // Handle filter change
+  const handleFilterChange = (filterType, value) => {
+    setCurrentPage(1); // Reset to first page when changing filters
+    
+    switch (filterType) {
+      case 'month':
+        setSelectedMonth(parseInt(value));
+        break;
+      case 'year':
+        setSelectedYear(parseInt(value));
+        break;
+      case 'status':
+        setStatusFilter(value);
+        break;
+      default:
+        break;
+    }
+  };
+
+  // Refresh data
+  const refreshData = () => {
+    fetchPayments();
+    fetchPaymentSummary();
   };
 
   // Format currency
@@ -383,34 +419,33 @@ const AdminPaymentContainer = () => {
 
   return (
     <motion.div
-      className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-700"
+      className="bg-gradient-to-br from-gray-900/80 to-gray-800/80 backdrop-blur-xl shadow-2xl rounded-2xl p-6 border border-gray-700/50"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.2 }}
     >
       {/* Header */}
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-bold text-white flex items-center">
-          <DollarSign className="mr-2" size={24} />
-          Quản lý thanh toán
-        </h2>
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4">
+        <div>
+          <h2 className="text-2xl font-bold text-white flex items-center">
+            <DollarSign className="mr-3 h-7 w-7 text-green-400" />
+            Quản lý thanh toán
+          </h2>
+          <p className="text-gray-400">Quản lý thanh toán cho giảng viên</p>
+        </div>
         
         <div className="flex space-x-3">
           <button
-            onClick={() => setShowBatchPayment(true)}
-            className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg flex items-center"
+            onClick={refreshData}
+            className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg flex items-center transition-all duration-200"
           >
-            <Plus size={20} className="mr-2" />
-            Thanh toán hàng loạt
+            <RefreshCw className="mr-2 h-4 w-4" />
+            Làm mới
           </button>
           
           <button
-            onClick={() => {
-              setSelectedPayment(null);
-              setFormMode("create");
-              setShowPaymentForm(true);
-            }}
-            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center"
+            onClick={() => setShowBatchPayment(true)}
+            className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-4 py-2 rounded-lg flex items-center transition-all duration-200 shadow-lg"
           >
             <Plus size={20} className="mr-2" />
             Tạo thanh toán
@@ -421,77 +456,119 @@ const AdminPaymentContainer = () => {
       {/* Summary Cards */}
       {paymentSummary && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <div className="bg-gray-700 p-4 rounded-lg">
-            <p className="text-gray-400 text-sm">Tổng thanh toán</p>
-            <p className="text-2xl font-bold text-white">
-              {paymentSummary.totalPaymentCount || 0}
-            </p>
+          <div className="bg-gradient-to-br from-blue-600/20 to-indigo-600/20 border border-blue-500/30 p-4 rounded-xl backdrop-blur-sm">
+            <div className="flex items-center">
+              <DollarSign className="h-8 w-8 text-blue-400 mr-3" />
+              <div>
+                <p className="text-blue-300 text-sm font-medium">Tổng giảng viên</p>
+                <p className="text-blue-400 font-bold text-xl">
+                  {paymentSummary.totalInstructors || 0}
+                </p>
+              </div>
+            </div>
           </div>
-          <div className="bg-gray-700 p-4 rounded-lg">
-            <p className="text-gray-400 text-sm">Tổng số tiền</p>
-            <p className="text-2xl font-bold text-green-400">
-              {formatCurrency(paymentSummary.totalPaymentAmount || 0)}
-            </p>
+          
+          <div className="bg-gradient-to-br from-emerald-600/20 to-green-600/20 border border-emerald-500/30 p-4 rounded-xl backdrop-blur-sm">
+            <div className="flex items-center">
+              <DollarSign className="h-8 w-8 text-emerald-400 mr-3" />
+              <div>
+                <p className="text-emerald-300 text-sm font-medium">Tổng thu nhập</p>
+                <p className="text-emerald-400 font-bold text-xl">
+                  {formatCurrency(paymentSummary.totalEarnings || 0)}
+                </p>
+              </div>
+            </div>
           </div>
-          <div className="bg-gray-700 p-4 rounded-lg">
-            <p className="text-gray-400 text-sm">Đang chờ xử lý</p>
-            <p className="text-2xl font-bold text-yellow-400">
-              {paymentSummary.paymentCountByStatus?.PENDING || 0}
-            </p>
+          
+          <div className="bg-gradient-to-br from-yellow-600/20 to-orange-600/20 border border-yellow-500/30 p-4 rounded-xl backdrop-blur-sm">
+            <div className="flex items-center">
+              <CheckCircle className="h-8 w-8 text-yellow-400 mr-3" />
+              <div>
+                <p className="text-yellow-300 text-sm font-medium">Đã thanh toán</p>
+                <p className="text-yellow-400 font-bold text-xl">
+                  {formatCurrency(paymentSummary.totalPaid || 0)}
+                </p>
+              </div>
+            </div>
           </div>
-          <div className="bg-gray-700 p-4 rounded-lg">
-            <p className="text-gray-400 text-sm">Hoàn thành</p>
-            <p className="text-2xl font-bold text-green-400">
-              {paymentSummary.paymentCountByStatus?.COMPLETED || 0}
-            </p>
+          
+          <div className="bg-gradient-to-br from-red-600/20 to-pink-600/20 border border-red-500/30 p-4 rounded-xl backdrop-blur-sm">
+            <div className="flex items-center">
+              <Clock className="h-8 w-8 text-red-400 mr-3" />
+              <div>
+                <p className="text-red-300 text-sm font-medium">Còn lại</p>
+                <p className="text-red-400 font-bold text-xl">
+                  {formatCurrency(paymentSummary.totalRemaining || 0)}
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       )}
 
       {/* Filters */}
-      <div className="flex flex-wrap gap-4 mb-6">
-        <select 
-          value={selectedMonth}
-          onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
-          className="bg-gray-700 text-white p-2 rounded-md"
-        >
-          {Array.from({length: 12}, (_, i) => i + 1).map(month => (
-            <option key={month} value={month}>
-              {getMonthName(month)}
-            </option>
-          ))}
-        </select>
-        
-        <select 
-          value={selectedYear}
-          onChange={(e) => setSelectedYear(parseInt(e.target.value))}
-          className="bg-gray-700 text-white p-2 rounded-md"
-        >
-          {Array.from({length: 6}, (_, i) => new Date().getFullYear() - 2 + i).map(year => (
-            <option key={year} value={year}>{year}</option>
-          ))}
-        </select>
-        
-        <select 
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          className="bg-gray-700 text-white p-2 rounded-md"
-        >
-          <option value="">Tất cả trạng thái</option>
-          <option value="PENDING">Chờ xử lý</option>
-          <option value="PROCESSING">Đang xử lý</option>
-          <option value="COMPLETED">Hoàn thành</option>
-          <option value="FAILED">Thất bại</option>
-          <option value="CANCELLED">Đã hủy</option>
-        </select>
-        
-        <input
-          type="text"
-          placeholder="Tìm kiếm..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="bg-gray-700 text-white p-2 rounded-md flex-1"
-        />
+      <div className="bg-gradient-to-r from-gray-800/60 to-gray-700/60 backdrop-blur-sm p-4 rounded-xl border border-gray-600/50 mb-6">
+        <div className="flex flex-col lg:flex-row gap-4">
+          {/* Search */}
+          <div className="flex-1">
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Tìm kiếm theo tên giảng viên, email, mã thanh toán..."
+                value={searchInput}
+                onChange={handleSearchChange}
+                className="w-full bg-gray-700/80 border border-gray-600/50 text-white placeholder-gray-400 rounded-lg pl-10 pr-10 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all backdrop-blur-sm"
+              />
+              <Search className="absolute left-3 top-3.5 text-gray-400" size={18} />
+              {searchInput && (
+                <button
+                  onClick={clearSearch}
+                  className="absolute right-3 top-3.5 text-gray-400 hover:text-white transition-colors"
+                >
+                  <X size={18} />
+                </button>
+              )}
+            </div>
+          </div>
+          
+          {/* Filters */}
+          <div className="flex gap-3">
+            <select 
+              value={selectedMonth}
+              onChange={(e) => handleFilterChange('month', e.target.value)}
+              className="bg-gray-700/80 border border-gray-600/50 text-white rounded-lg px-3 py-3 focus:ring-2 focus:ring-blue-500 transition-all backdrop-blur-sm"
+            >
+              {Array.from({length: 12}, (_, i) => i + 1).map(month => (
+                <option key={month} value={month}>
+                  {getMonthName(month)}
+                </option>
+              ))}
+            </select>
+            
+            <select 
+              value={selectedYear}
+              onChange={(e) => handleFilterChange('year', e.target.value)}
+              className="bg-gray-700/80 border border-gray-600/50 text-white rounded-lg px-3 py-3 focus:ring-2 focus:ring-blue-500 transition-all backdrop-blur-sm"
+            >
+              {Array.from({length: 6}, (_, i) => new Date().getFullYear() - 2 + i).map(year => (
+                <option key={year} value={year}>{year}</option>
+              ))}
+            </select>
+            
+            <select 
+              value={statusFilter}
+              onChange={(e) => handleFilterChange('status', e.target.value)}
+              className="bg-gray-700/80 border border-gray-600/50 text-white rounded-lg px-3 py-3 focus:ring-2 focus:ring-blue-500 transition-all backdrop-blur-sm"
+            >
+              <option value="">Tất cả trạng thái</option>
+              <option value="PENDING">Chờ xử lý</option>
+              <option value="PROCESSING">Đang xử lý</option>
+              <option value="COMPLETED">Hoàn thành</option>
+              <option value="FAILED">Thất bại</option>
+              <option value="CANCELLED">Đã hủy</option>
+            </select>
+          </div>
+        </div>
       </div>
 
       {/* Payment List */}
@@ -505,21 +582,10 @@ const AdminPaymentContainer = () => {
         onStatusUpdate={updatePaymentStatus}
         formatCurrency={formatCurrency}
         getStatusIcon={getStatusIcon}
+        loading={loading}
       />
 
       {/* Modals */}
-      {showPaymentForm && (
-        <PaymentFormModal
-          isOpen={showPaymentForm}
-          onClose={() => setShowPaymentForm(false)}
-          payment={selectedPayment}
-          formMode={formMode}
-          onSubmit={createPayment}
-          month={selectedMonth}
-          year={selectedYear}
-        />
-      )}
-
       {showPaymentDetail && selectedPayment && (
         <PaymentDetailModal
           isOpen={showPaymentDetail}
@@ -549,13 +615,15 @@ const AdminPaymentContainer = () => {
           toast.type === "error" ? "bg-red-500" :
           "bg-yellow-500"
         } text-white p-4 rounded-lg shadow-lg z-50 max-w-md`}>
-          <p>{toast.message}</p>
-          <button
-            onClick={() => setToast(null)}
-            className="absolute top-2 right-2 text-white"
-          >
-            <X size={16} />
-          </button>
+          <div className="flex items-center justify-between">
+            <p>{toast.message}</p>
+            <button
+              onClick={() => setToast(null)}
+              className="ml-4 text-white hover:text-gray-200"
+            >
+              <X size={16} />
+            </button>
+          </div>
         </div>
       )}
     </motion.div>
