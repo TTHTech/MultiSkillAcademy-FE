@@ -56,14 +56,30 @@ const PaymentDetailModal = ({
     return methodMap[method] || method;
   };
 
-  // Format date
-  const formatDate = (dateArray) => {
-    if (!dateArray || !Array.isArray(dateArray)) return '-';
+  // ✅ FIXED: Format date - supports both array and string formats
+  const formatDate = (dateString) => {
+    if (!dateString) return '-';
+    
     try {
-      const [year, month, day, hour = 0, minute = 0] = dateArray;
-      const date = new Date(year, month - 1, day, hour, minute);
-      return date.toLocaleDateString('vi-VN') + ' ' + date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+      // Handle both string and array formats
+      let date;
+      if (Array.isArray(dateString)) {
+        const [year, month, day, hour = 0, minute = 0, second = 0] = dateString;
+        date = new Date(year, month - 1, day, hour, minute, second);
+      } else {
+        date = new Date(dateString);
+      }
+      
+      if (isNaN(date.getTime())) return '-';
+      
+      return date.toLocaleDateString('vi-VN') + ' ' + 
+             date.toLocaleTimeString('vi-VN', { 
+               hour: '2-digit', 
+               minute: '2-digit',
+               second: '2-digit'
+             });
     } catch (error) {
+      console.error('Date formatting error:', error);
       return '-';
     }
   };

@@ -13,7 +13,10 @@ import {
   AlertCircle,
   Award,
   Target,
-  Zap
+  Zap,
+  Download,
+  FileText,
+  ChevronDown
 } from "lucide-react";
 import { 
   LineChart, Line, BarChart, Bar, PieChart, Pie, XAxis, YAxis, CartesianGrid, 
@@ -36,6 +39,10 @@ const AdminRevenueDashboard = () => {
   // States for filtering
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
+
+  // Export states
+  const [showExportMenu, setShowExportMenu] = useState(false);
+  const [exportLoading, setExportLoading] = useState(false);
 
   // Chart colors
   const COLORS = ['#4f46e5', '#06b6d4', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
@@ -68,6 +75,138 @@ const AdminRevenueDashboard = () => {
       Authorization: `Bearer ${token}`,
       'Accept': 'application/json'
     };
+  };
+
+  // Export functions
+  const handleExportMonthlyRevenue = async () => {
+    try {
+      setExportLoading(true);
+      const token = localStorage.getItem("token");
+      
+      const response = await fetch(
+        `${baseUrl}/api/admin/reports/export/monthly-revenue?month=${selectedMonth}&year=${selectedYear}`,
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          }
+        }
+      );
+
+      if (!response.ok) {
+        if (response.status === 401 || response.status === 403) {
+          handleAuthError();
+          return;
+        }
+        throw new Error(`Export failed: ${response.status}`);
+      }
+
+      // Download file
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `BaoCao_DoanhThu_${selectedMonth.toString().padStart(2, '0')}_${selectedYear}.xlsx`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      showToast("success", "Xuất báo cáo doanh thu tháng thành công!");
+      setShowExportMenu(false);
+    } catch (error) {
+      console.error("Export error:", error);
+      showToast("error", `Lỗi khi xuất báo cáo: ${error.message}`);
+    } finally {
+      setExportLoading(false);
+    }
+  };
+
+  const handleExportYearlySummary = async () => {
+    try {
+      setExportLoading(true);
+      const token = localStorage.getItem("token");
+      
+      const response = await fetch(
+        `${baseUrl}/api/admin/reports/export/yearly-summary?year=${selectedYear}`,
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          }
+        }
+      );
+
+      if (!response.ok) {
+        if (response.status === 401 || response.status === 403) {
+          handleAuthError();
+          return;
+        }
+        throw new Error(`Export failed: ${response.status}`);
+      }
+
+      // Download file
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `TongHop_DoanhThu_Nam_${selectedYear}.xlsx`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      showToast("success", "Xuất báo cáo tổng hợp năm thành công!");
+      setShowExportMenu(false);
+    } catch (error) {
+      console.error("Export error:", error);
+      showToast("error", `Lỗi khi xuất báo cáo: ${error.message}`);
+    } finally {
+      setExportLoading(false);
+    }
+  };
+
+  const handleExportInstructorHistory = async (instructorId) => {
+    try {
+      setExportLoading(true);
+      const token = localStorage.getItem("token");
+      
+      const response = await fetch(
+        `${baseUrl}/api/admin/reports/export/instructor-payment-history/${instructorId}?year=${selectedYear}`,
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          }
+        }
+      );
+
+      if (!response.ok) {
+        if (response.status === 401 || response.status === 403) {
+          handleAuthError();
+          return;
+        }
+        throw new Error(`Export failed: ${response.status}`);
+      }
+
+      // Download file
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `LichSu_ThanhToan_GV${instructorId}_${selectedYear}.xlsx`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      showToast("success", "Xuất lịch sử thanh toán thành công!");
+    } catch (error) {
+      console.error("Export error:", error);
+      showToast("error", `Lỗi khi xuất lịch sử: ${error.message}`);
+    } finally {
+      setExportLoading(false);
+    }
   };
 
   // Fetch dashboard summary data
@@ -370,6 +509,83 @@ const AdminRevenueDashboard = () => {
             <option value={2025}>2025</option>
           </select>
 
+          {/* Export Dropdown */}
+          <div className="relative">
+            <button
+              onClick={() => setShowExportMenu(!showExportMenu)}
+              disabled={exportLoading}
+              className="bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white px-4 py-2 rounded-lg flex items-center transition-all duration-200 shadow-lg disabled:opacity-50"
+            >
+              {exportLoading ? (
+                <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Download className="mr-2 h-4 w-4" />
+              )}
+              Export
+              <ChevronDown className="ml-2 h-4 w-4" />
+            </button>
+
+            <AnimatePresence>
+              {showExportMenu && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="absolute right-0 mt-2 w-64 bg-gray-800/95 backdrop-blur-sm border border-gray-600/50 rounded-lg shadow-xl z-50"
+                >
+                  <div className="p-2">
+                    <button
+                      onClick={handleExportMonthlyRevenue}
+                      disabled={exportLoading}
+                      className="w-full flex items-center px-3 py-2 text-sm text-gray-300 hover:bg-gray-700/50 rounded-md transition-colors"
+                    >
+                      <FileText className="mr-3 h-4 w-4" />
+                      <div className="text-left">
+                        <div className="font-medium">Báo cáo tháng</div>
+                        <div className="text-xs text-gray-400">
+                          {getMonthName(selectedMonth)} {selectedYear}
+                        </div>
+                      </div>
+                    </button>
+
+                    <button
+                      onClick={handleExportYearlySummary}
+                      disabled={exportLoading}
+                      className="w-full flex items-center px-3 py-2 text-sm text-gray-300 hover:bg-gray-700/50 rounded-md transition-colors"
+                    >
+                      <BarChart3 className="mr-3 h-4 w-4" />
+                      <div className="text-left">
+                        <div className="font-medium">Tổng hợp năm</div>
+                        <div className="text-xs text-gray-400">
+                          Toàn bộ năm {selectedYear}
+                        </div>
+                      </div>
+                    </button>
+
+                    <div className="border-t border-gray-600/50 my-2"></div>
+                    
+                    <button
+                      onClick={() => {
+                        setShowExportMenu(false);
+                        // Navigate to instructor payment history page
+                        window.location.href = '/admin/instructor-payment-history';
+                      }}
+                      className="w-full flex items-center px-3 py-2 text-sm text-gray-300 hover:bg-gray-700/50 rounded-md transition-colors"
+                    >
+                      <Users className="mr-3 h-4 w-4" />
+                      <div className="text-left">
+                        <div className="font-medium">Lịch sử thanh toán GV</div>
+                        <div className="text-xs text-gray-400">
+                          Xem tất cả giảng viên
+                        </div>
+                      </div>
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
           <button
             onClick={() => {
               fetchDashboardSummary();
@@ -623,6 +839,7 @@ const AdminRevenueDashboard = () => {
                 <th className="py-3 px-4 text-right">Phần chia</th>
                 <th className="py-3 px-4 text-right">Thưởng</th>
                 <th className="py-3 px-4 text-center">Trạng thái</th>
+                <th className="py-3 px-4 text-center">Hành động</th>
               </tr>
             </thead>
             <tbody>
@@ -682,11 +899,21 @@ const AdminRevenueDashboard = () => {
                          : 'Chưa trả'}
                       </span>
                     </td>
+                    <td className="py-3 px-4 text-center">
+                      <button
+                        onClick={() => handleExportInstructorHistory(instructor.instructorId)}
+                        disabled={exportLoading}
+                        className="text-blue-400 hover:text-blue-300 transition-colors disabled:opacity-50"
+                        title="Xuất lịch sử thanh toán"
+                      >
+                        <Download className="h-4 w-4" />
+                      </button>
+                    </td>
                   </motion.tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan="6" className="py-8 text-center text-gray-400">
+                  <td colSpan="7" className="py-8 text-center text-gray-400">
                     <div className="flex flex-col items-center">
                       <Users size={48} className="text-gray-500 mb-4" />
                       <p>Chưa có dữ liệu giảng viên cho tháng này.</p>

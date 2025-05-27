@@ -86,6 +86,8 @@ import PageNotification from "./pages/instructor/Notification/PageNotification.j
 import ReviewStatisticsPage from "./pages/admin/ReviewStatisticsPage.jsx";
 import CoursesStatisticsPage from "./pages/admin/CoursesStatisticsPage.jsx";
 import AdminPaymentContainer from "./components/admin/payment/AdminPaymentContainer.jsx";
+import InstructorPaymentHistory from "./components/admin/revenue/InstructorPaymentHistory.jsx";
+import AdminAuditTrailPage from "./components/admin/audit/AdminAuditTrailPage.jsx";
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [role, setRole] = useState("");
@@ -217,6 +219,8 @@ function App() {
                 <Route path="/admin/promotions-usage" element={<PagePromotionUsage />} />
                 <Route path="/admin/profile-admin" element={<PageAdminProfile />} />
                 <Route path="/admin/payments" element={<AdminPaymentContainer />} />
+                <Route path="/admin/instructor-payment-history" element={<InstructorPaymentHistory />} />
+                <Route path="/admin/audit-activity" element={<AdminAuditTrailPage />} />
               </>
             )}
             
