@@ -88,6 +88,11 @@ import CoursesStatisticsPage from "./pages/admin/CoursesStatisticsPage.jsx";
 import AdminPaymentContainer from "./components/admin/payment/AdminPaymentContainer.jsx";
 import InstructorPaymentHistory from "./components/admin/revenue/InstructorPaymentHistory.jsx";
 import AdminAuditTrailPage from "./components/admin/audit/AdminAuditTrailPage.jsx";
+
+import CombinedCoursesPage from "./pages/instructor/CombinedCoursesPage.jsx";
+import NewestCoursesPage from "./pages/student/topic/NewestCoursesPage.jsx";
+import HotCoursesPage from "./pages/student/topic/HotCoursesPage.jsx";
+
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [role, setRole] = useState("");
@@ -242,6 +247,8 @@ function App() {
                 <Route path="/student/reminder" element={<ReminderPage />} />
                 <Route path="/topic/:topicPath" element={<TopicCoursesPage />} />
                 <Route path="/student/notifications" element={<PgaeNotifications />} />
+                <Route path="/courses/newest" element={<NewestCoursesPage />} />
+                <Route path="/courses/hot" element={<HotCoursesPage />} />
               </>
             )}
             
@@ -250,7 +257,7 @@ function App() {
               <>
                 {/* <Route path="/instructor/user" element={<PageUser />} /> */}
                 <Route path="/instructor/dashboard" element={<PageDashboard />} />
-                <Route path="/instructor/courses" element={<PageCourses />} />
+                {/* <Route path="/instructor/courses" element={<PageCourses />} /> */}
                 <Route path="/instructor/addCourses" element={<PageAdd />} />
                 <Route path="/instructor/review" element={<PageReview />} />
                 <Route path="/instructor/students" element={<StudentList />} />
@@ -258,12 +265,13 @@ function App() {
                 <Route path="/instructor/tests" element={<Test />} />
                 <Route path="/instructor/scores" element={<PageViewScores />} />
                 <Route path="/instructor/questions" element={<PageQuestions />} />
-                <Route path="/instructor/search" element={<PageSearchCourse />} />
+                {/* <Route path="/instructor/search" element={<PageSearchCourse />} /> */}
                 <Route path="/instructor/courses/:id" element={<UpdateCourse />} />
                 <Route path="/instructor/chat" element={<InstructorChatPage />} />
                 <Route path="/instructor/user" element={<PageProfile />} />
                 <Route path="/instructor/discount" element={<PageDiscountInstructor />} />
                 <Route path="/instructor/notifications" element={<PageNotification />} />
+                <Route path="/instructor/courses" element={<CombinedCoursesPage />} />
               </>
             )}
           </Routes>
