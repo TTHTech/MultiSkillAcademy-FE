@@ -19,7 +19,15 @@ const DiscountsTable = () => {
   const [searchCode, setSearchCode] = useState("");
   const [searchStatus, setSearchStatus] = useState("");
   const userId = Number(localStorage.getItem("userId"));
-
+  const toDate = (input) => {
+    if (typeof input === "string") {
+      const normalized = input.replace(/\.(\d{3})\d+/, ".$1");
+      return new Date(normalized);
+    }
+    const [y, m, d, h = 0, min = 0, s = 0, micro = 0] = input.map(Number);
+    const ms = Math.round(micro / 1000);
+    return new Date(y, m - 1, d, h, min, s, ms);
+  };
   const getPaginationItems = () => {
     const pages = [];
     if (totalPages <= 7) {
@@ -179,15 +187,12 @@ const DiscountsTable = () => {
                         : `${discount.value} VND`}
                     </td>
                     <td className="py-3 px-4 border-r border-gray-300 text-center text-sm">
-                      {new Date(...discount.startDate).toLocaleDateString(
-                        "vi-VN"
-                      )}
+                      {toDate(discount.startDate).toLocaleDateString("vi-VN")}
                     </td>
                     <td className="py-3 px-4 border-r border-gray-300 text-center text-sm">
-                      {new Date(...discount.endDate).toLocaleDateString(
-                        "vi-VN"
-                      )}
+                      {toDate(discount.endDate).toLocaleDateString("vi-VN")}
                     </td>
+
                     <td className="py-3 px-4 border-r border-gray-300 text-center text-sm">
                       <span
                         className={`px-2 py-1 rounded text-xs font-medium ${
