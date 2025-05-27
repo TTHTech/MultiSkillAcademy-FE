@@ -66,7 +66,7 @@ import InstructorChatPage from "./pages/instructor/InstructorChatPage.jsx";
 import GoogleCallbackPage from "./pages/auth/GoogleCallbackPage";
 import GitHubCallbackPage from "./pages/auth/GitHubCallbackPage";
 import PageProfile from "./pages/instructor/PageProfile/PageProfile.jsx";
-import AdminRevenuePolicyTable from "./components/admin/revenue/AdminRevenuePolicyContainer.jsx";
+import AdminRevenuePolicyTable from "./components/admin/policy/AdminRevenuePolicyContainer.jsx";
 import AdminRevenueDashboard from "./components/admin/revenue/AdminRevenueDashboard.jsx";
 import PageCreateDiscounts from "./pages/admin/PageCreateDiscount.jsx"
 import PageDiscount from "./pages/admin/PageDiscount.jsx"
@@ -85,6 +85,9 @@ import PgaeNotifications from "./pages/student/notifications/PgaeNotifications.j
 import PageNotification from "./pages/instructor/Notification/PageNotification.jsx";
 import ReviewStatisticsPage from "./pages/admin/ReviewStatisticsPage.jsx";
 import CoursesStatisticsPage from "./pages/admin/CoursesStatisticsPage.jsx";
+import AdminPaymentContainer from "./components/admin/payment/AdminPaymentContainer.jsx";
+import InstructorPaymentHistory from "./components/admin/revenue/InstructorPaymentHistory.jsx";
+import AdminAuditTrailPage from "./components/admin/audit/AdminAuditTrailPage.jsx";
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [role, setRole] = useState("");
@@ -215,6 +218,9 @@ function App() {
                 <Route path="/admin/promotions" element={<PagePromotion />} />
                 <Route path="/admin/promotions-usage" element={<PagePromotionUsage />} />
                 <Route path="/admin/profile-admin" element={<PageAdminProfile />} />
+                <Route path="/admin/payments" element={<AdminPaymentContainer />} />
+                <Route path="/admin/instructor-payment-history" element={<InstructorPaymentHistory />} />
+                <Route path="/admin/audit-activity" element={<AdminAuditTrailPage />} />
               </>
             )}
             

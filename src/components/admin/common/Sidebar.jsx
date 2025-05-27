@@ -105,6 +105,12 @@ const MENU_GROUPS = [
             href: "/admin",
             color: "#4f46e5",
           },
+            {
+            name: "Hoạt Động",
+            icon: TrendingUp,
+            href: "/admin/audit-activity",
+            color: "#1d4ed8",
+          },
           /**{
             name: "Thống Kê Nhanh",
             icon: LineChart,
@@ -158,28 +164,24 @@ const MENU_GROUPS = [
         subItems: [
           {
             name: "Tổng Quan Doanh Thu",
-            icon: LineChart,
-            href: "/admin/revenue",
-            color: "#3b82f6",
-          },
-          {
-            name: "Bảng Doanh Thu Admin",
             icon: Users,
             href: "/admin/revenue-dashboard",
             color: "#3b82f6",
           },
+          {
+            name: "Thanh Toán Doanh Thu",
+            icon: DollarSign,
+            href: "/admin/payments",
+            color: "#3b82f6",
+          },
+          
           {
             name: "Doanh Thu Giảng Viên",
             icon: DollarSign,
             href: "/admin/instructor-revenue",
             color: "#2563eb",
           },
-          {
-            name: "Báo Cáo Doanh Số Giảng Viên",
-            icon: TrendingUp,
-            href: "/admin/instructor-sales",
-            color: "#1d4ed8",
-          },
+        
           {
             name: "Chính Sách Doanh Thu",
             icon: FileText,
@@ -189,7 +191,7 @@ const MENU_GROUPS = [
           {
             name: "Báo Cáo Thanh Toán",
             icon: Archive,
-            href: "/admin/revenue/payouts",
+            href: "/admin/instructor-payment-history",
             color: "#1d4ed8",
           },
         ],

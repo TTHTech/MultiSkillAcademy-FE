@@ -315,7 +315,9 @@ const ChatSidebar = ({ onUserSelect }) => {
     const bgColors = {
       ROLE_STUDENT: "bg-blue-500",
       ROLE_INSTRUCTOR: "bg-purple-500",
-      ADMIN: "bg-red-500"
+      ROLE_ADMIN: "bg-red-500",
+      ADMIN: "bg-red-500",
+      INSTRUCTOR: "bg-purple-500"
     };
     const bgColor = bgColors[user.role] || "bg-gray-500";
     
@@ -330,7 +332,9 @@ const ChatSidebar = ({ onUserSelect }) => {
   const displayRole = (role) => {
     if (role === "ROLE_STUDENT") return "Học viên";
     if (role === "ROLE_INSTRUCTOR") return "Giảng viên";
+    if (role === "ROLE_ADMIN") return "Quản trị viên";
     if (role === "ADMIN") return "Quản trị viên";
+    if (role === "INSTRUCTOR") return "Giảng viên";
     return role;
   };
 
@@ -400,14 +404,14 @@ const ChatSidebar = ({ onUserSelect }) => {
             Giảng viên
           </button>
           <button
-            onClick={() => setFilter("STUDENT")}
+            onClick={() => setFilter("ADMIN")}
             className={`px-3 py-1 text-sm rounded-full transition-colors ${
-              filter === "STUDENT"
+              filter === "ADMIN"
                 ? "bg-blue-500 text-white"
                 : "bg-gray-100 text-gray-900"
             }`}
           >
-            Học viên
+            Quản trị viên
           </button>
         </div>
       </div>
@@ -431,7 +435,7 @@ const ChatSidebar = ({ onUserSelect }) => {
                 type="text"
                 value={searchModalTerm}
                 onChange={(e) => handleSearchTermChange(e.target.value)}
-                placeholder="Tìm kiếm người dùng"
+                placeholder="Tìm kiếm giảng viên hoặc quản trị viên"
                 className="w-full bg-gray-100 text-gray-900 px-4 py-2 rounded-full pl-10 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <Search className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
@@ -448,11 +452,10 @@ const ChatSidebar = ({ onUserSelect }) => {
               >
                 Tất cả
               </button>
-             
               <button
-                onClick={() => handleSearchFilterChange("ROLE_INSTRUCTOR")}
+                onClick={() => handleSearchFilterChange("INSTRUCTOR")}
                 className={`px-3 py-1 text-sm rounded-full transition-colors ${
-                  searchFilter === "ROLE_INSTRUCTOR"
+                  searchFilter === "INSTRUCTOR"
                     ? "bg-blue-500 text-white"
                     : "bg-gray-100 text-gray-900"
                 }`}
@@ -460,14 +463,14 @@ const ChatSidebar = ({ onUserSelect }) => {
                 Giảng viên
               </button>
               <button
-                onClick={() => handleSearchFilterChange("ROLE_STUDENT")}
+                onClick={() => handleSearchFilterChange("ADMIN")}
                 className={`px-3 py-1 text-sm rounded-full transition-colors ${
-                  searchFilter === "ROLE_STUDENT"
+                  searchFilter === "ADMIN"
                     ? "bg-blue-500 text-white"
                     : "bg-gray-100 text-gray-900"
                 }`}
               >
-                Học viên
+                Quản trị viên
               </button>
             </div>
             
@@ -521,6 +524,12 @@ const ChatSidebar = ({ onUserSelect }) => {
         ) : filteredUsers.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-gray-500">
             <p>Không có người dùng nào</p>
+            <button 
+              onClick={handleOpenUserSearch}
+              className="mt-2 text-blue-500 hover:underline text-sm"
+            >
+              Tìm giảng viên hoặc quản trị viên
+            </button>
           </div>
         ) : (
           filteredUsers.map((user) => (
