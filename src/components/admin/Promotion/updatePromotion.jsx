@@ -19,6 +19,23 @@ const EditPromotion = ({ promotionId, onCancel, triggerRefresh }) => {
     stackableWithDiscount: true,
   });
   const [loading, setLoading] = useState(false);
+  const formatForInput = (date) => {
+    const pad = (n) => String(n).padStart(2, "0");
+    const yyyy = date.getFullYear();
+    const MM = pad(date.getMonth() + 1);
+    const dd = pad(date.getDate());
+    const hh = pad(date.getHours());
+    const mm = pad(date.getMinutes());
+    return `${yyyy}-${MM}-${dd}T${hh}:${mm}`;
+  };
+  const toDate = (isoStringOrArray) => {
+    if (typeof isoStringOrArray === "string") {
+      const normalized = isoStringOrArray.replace(/\.(\d{3})\d+/, ".$1");
+      return new Date(normalized);
+    }
+    const [y, m, d, h = 0, min = 0, s = 0] = isoStringOrArray.map(Number);
+    return new Date(y, m - 1, d, h, min, s);
+  };
 
   useEffect(() => {
     const fetchPromotion = async () => {
@@ -35,12 +52,8 @@ const EditPromotion = ({ promotionId, onCancel, triggerRefresh }) => {
           description: data.description || "",
           percentage: data.percentage?.toString() || "",
           maxPromotion: data.maxPromotion?.toString() || "",
-          startDate: data.startDate
-            ? new Date(...data.startDate).toISOString().slice(0, 16)
-            : "",
-          endDate: data.endDate
-            ? new Date(...data.endDate).toISOString().slice(0, 16)
-            : "",
+          startDate: data.startDate ? formatForInput(toDate(data.startDate)) : "",
+          endDate: data.endDate ? formatForInput(toDate(data.endDate)) : "",
           status: data.status,
           applicableCategories: data.applicableCategories || [],
           applicableCourses: data.applicableCourses || [],
