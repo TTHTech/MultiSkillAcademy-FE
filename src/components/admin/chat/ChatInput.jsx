@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 import EmojiPicker from 'emoji-picker-react';
 const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
-const ChatInput = ({ addMessage, setIsTyping, disabled }) => {
+const ChatInput = ({ chatId, addMessage, setIsTyping, disabled }) => {
   const [message, setMessage] = useState('');
   const [showAttachmentOptions, setShowAttachmentOptions] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -23,7 +23,7 @@ const ChatInput = ({ addMessage, setIsTyping, disabled }) => {
     }
   }, []);
 
-  // Đóng emoji picker khi click ra ngoài
+  // Close emoji picker when clicking outside
   useEffect(() => {
     function handleClickOutside(event) {
       if (emojiPickerRef.current && !emojiPickerRef.current.contains(event.target)) {
@@ -53,7 +53,7 @@ const ChatInput = ({ addMessage, setIsTyping, disabled }) => {
     const file = e.target.files[0];
     if (!file) return;
     
-    // Kiểm tra kích thước file (tối đa 20MB)
+    // Check file size (max 20MB)
     if (file.size > 20 * 1024 * 1024) {
       toast.error('Kích thước file không được vượt quá 20MB');
       return;
@@ -61,7 +61,7 @@ const ChatInput = ({ addMessage, setIsTyping, disabled }) => {
 
     setSelectedFile(file);
     
-    // Xác định loại file
+    // Determine file type
     if (file.type.startsWith('image/')) {
       setFileType('IMAGE');
       const reader = new FileReader();
@@ -86,7 +86,7 @@ const ChatInput = ({ addMessage, setIsTyping, disabled }) => {
 
   const handleAttachmentClick = (type) => {
     if (fileInputRef.current) {
-      // Thiết lập accept attribute dựa trên loại file được chọn
+      // Set accept attribute based on selected file type
       switch (type) {
         case 'IMAGE':
           fileInputRef.current.accept = 'image/*';
@@ -105,7 +105,7 @@ const ChatInput = ({ addMessage, setIsTyping, disabled }) => {
     setShowAttachmentOptions(false);
   };
 
-  // Xử lý khi người dùng chọn emoji
+  // Handle emoji selection
   const onEmojiClick = (emojiObject) => {
     setMessage(prevMessage => prevMessage + emojiObject.emoji);
     if (inputRef.current) {
@@ -113,10 +113,13 @@ const ChatInput = ({ addMessage, setIsTyping, disabled }) => {
     }
   };
 
+  // Upload file function for Admin
   const uploadFile = async (file) => {
     try {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("Vui lòng đăng nhập lại");
+      
+      if (!chatId) throw new Error("Không có ID cuộc trò chuyện");
       
       setIsUploading(true);
       setUploadProgress(0);
@@ -125,7 +128,11 @@ const ChatInput = ({ addMessage, setIsTyping, disabled }) => {
       formData.append('file', file);
       formData.append('type', fileType);
       
-      // Sử dụng XMLHttpRequest để tracking tiến trình upload
+      console.log("Uploading file to endpoint:", `${baseUrl}/api/admin/chat/${chatId}/upload`);
+      console.log("File type:", fileType);
+      console.log("File size:", file.size);
+      
+      // Use XMLHttpRequest to track upload progress
       return new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
         
@@ -138,9 +145,17 @@ const ChatInput = ({ addMessage, setIsTyping, disabled }) => {
         
         xhr.addEventListener('load', () => {
           if (xhr.status >= 200 && xhr.status < 300) {
-            const response = JSON.parse(xhr.responseText);
-            resolve(response);
+            try {
+              const response = JSON.parse(xhr.responseText);
+              resolve(response);
+            } catch (error) {
+              console.error("Error parsing upload response:", error);
+              console.log("Raw response:", xhr.responseText);
+              reject(new Error("Invalid response format"));
+            }
           } else {
+            console.error("Upload error status:", xhr.status);
+            console.error("Response text:", xhr.responseText);
             reject(new Error(`Upload failed: ${xhr.status}`));
           }
         });
@@ -149,7 +164,8 @@ const ChatInput = ({ addMessage, setIsTyping, disabled }) => {
           reject(new Error('Network error during upload'));
         });
         
-        xhr.open('POST', `${baseUrl}/api/admin/chat/upload`);
+        // Use admin API
+        xhr.open('POST', `${baseUrl}/api/admin/chat/${chatId}/upload`);
         xhr.setRequestHeader('Authorization', `Bearer ${token}`);
         xhr.send(formData);
       });
@@ -171,19 +187,20 @@ const ChatInput = ({ addMessage, setIsTyping, disabled }) => {
     }
   };
 
+  // Handle send message for Admin
   const handleSendMessage = async () => {
-    if (disabled) return;
+    if (disabled || !chatId) return;
     
     try {
-      // Nếu có file được chọn
+      // If a file is selected
       if (selectedFile) {
         setIsUploading(true);
         
-        // Upload file lên server
+        // Upload file to server
         const uploadResponse = await uploadFile(selectedFile);
         console.log('File uploaded successfully:', uploadResponse);
         
-        // Tạo nội dung tin nhắn dựa trên loại file
+        // Create message content based on file type
         let messageContent = message || '';
         if (fileType === 'IMAGE') {
           messageContent = message || '[Hình ảnh]';
@@ -193,8 +210,8 @@ const ChatInput = ({ addMessage, setIsTyping, disabled }) => {
           messageContent = message || `[Tập tin: ${selectedFile.name}]`;
         }
         
-        // Rút gọn URL nếu quá dài
-        let fileUrl = uploadResponse.fileDownloadUri;
+        // Shorten URL if too long
+        let fileUrl = uploadResponse.fileUrl;
         if (fileUrl && fileUrl.length > 200) {
           const urlParts = fileUrl.split('/');
           const fileName = urlParts[urlParts.length - 1];
@@ -202,22 +219,22 @@ const ChatInput = ({ addMessage, setIsTyping, disabled }) => {
           console.log("URL gốc quá dài, đã rút gọn thành:", fileUrl);
         }
         
-        // Gửi tin nhắn với file URL
+        // Send message with file URL
         await addMessage(messageContent, fileUrl, fileType);
         
         // Reset file selection
         resetFileSelection();
       } else if (message.trim()) {
-        // Gửi tin nhắn văn bản thông thường
-        await addMessage(message.trim());
+        // Send regular text message
+        await addMessage(message.trim(), null, 'TEXT');
       }
       
-      // Reset tin nhắn và typing status
+      // Reset message and typing status
       setMessage('');
       setIsTyping(false);
       setShowEmojiPicker(false);
       
-      // Focus lại input sau khi gửi
+      // Focus input after sending
       if (inputRef.current) {
         inputRef.current.focus();
       }
@@ -229,9 +246,44 @@ const ChatInput = ({ addMessage, setIsTyping, disabled }) => {
     }
   };
 
+  // Send typing status via WebSocket for Admin
+  const sendTypingStatus = (isTyping) => {
+    const token = localStorage.getItem("token");
+    if (!token || !chatId) return;
+    
+    try {
+      const stompClient = window.stompClient;
+      if (stompClient && stompClient.connected) {
+        const userId = localStorage.getItem("userId");
+        const username = localStorage.getItem("username") || "Admin";
+        
+        stompClient.publish({
+          destination: "/app/admin-chat.typing",
+          body: JSON.stringify({
+            chatId: chatId,
+            userId: userId,
+            username: username,
+            isTyping: isTyping
+          })
+        });
+      }
+    } catch (error) {
+      console.error("Error sending typing status:", error);
+    }
+  };
+
+  // Send typing status when user types
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      sendTypingStatus(message.length > 0);
+    }, 500);
+    
+    return () => clearTimeout(timeoutId);
+  }, [message, chatId]);
+
   return (
     <div className="border-t p-3 relative">
-      {/* Hiển thị file đã chọn */}
+      {/* Display selected file */}
       {selectedFile && (
         <div className="mb-2 p-2 bg-gray-100 rounded-md relative">
           <div className="flex items-center">
@@ -276,7 +328,7 @@ const ChatInput = ({ addMessage, setIsTyping, disabled }) => {
               setShowAttachmentOptions(!showAttachmentOptions);
               setShowEmojiPicker(false);
             }}
-            disabled={disabled}
+            disabled={disabled || !chatId}
           >
             <Paperclip className="w-5 h-5" />
           </button>
@@ -317,7 +369,7 @@ const ChatInput = ({ addMessage, setIsTyping, disabled }) => {
               setShowEmojiPicker(!showEmojiPicker);
               setShowAttachmentOptions(false);
             }}
-            disabled={disabled}
+            disabled={disabled || !chatId}
           >
             <Smile className="w-5 h-5" />
           </button>
@@ -351,21 +403,21 @@ const ChatInput = ({ addMessage, setIsTyping, disabled }) => {
         <input
           ref={inputRef}
           type="text"
-          placeholder={disabled ? "Chọn một người dùng để bắt đầu chat" : "Nhập tin nhắn..."}
+          placeholder={disabled || !chatId ? "Chọn một người dùng để bắt đầu chat" : "Nhập tin nhắn..."}
           className="flex-1 border rounded-full py-2 px-4 focus:outline-none focus:ring-2 focus:ring-emerald-500"
           value={message}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
-          disabled={disabled || isUploading}
+          disabled={disabled || !chatId || isUploading}
         />
         
         {/* Send button */}
         <button
           className={`p-2 rounded-full ${
-            !disabled && (message.trim() || selectedFile) ? 'bg-emerald-500 text-white' : 'bg-gray-200 text-gray-500'
+            !disabled && chatId && (message.trim() || selectedFile) ? 'bg-emerald-500 text-white' : 'bg-gray-200 text-gray-500'
           }`}
           onClick={handleSendMessage}
-          disabled={disabled || isUploading || (!message.trim() && !selectedFile)}
+          disabled={disabled || !chatId || isUploading || (!message.trim() && !selectedFile)}
         >
           <Send className="w-5 h-5" />
         </button>
