@@ -2,26 +2,37 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
-const DiscountUsageUI = ({discountId}) => {
+const DiscountUsageUI = ({ discountId }) => {
   const [discount, setDiscount] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const userId = Number(localStorage.getItem("userId"));
-  const formatDate = (dateArray) => {
-    if (!Array.isArray(dateArray)) return "N/A";
-    const [year, month, day, hour, minute, second] = dateArray;
-    const dateObj = new Date(year, month - 1, day, hour, minute, second);
-    return dateObj.toLocaleDateString("vi-VN");
+  const toDate = (input) => {
+    if (typeof input === "string") {
+      const normalized = input.replace(/\.(\d{3})\d+/, ".$1");
+      return new Date(normalized);
+    }
+    const [y, m, d, h = 0, min = 0, s = 0, micro = 0] = input.map(Number);
+    const ms = Math.round(micro / 1000);
+    return new Date(y, m - 1, d, h, min, s, ms);
+  };
+
+  const formatDate = (dateValue) => {
+    if (!dateValue) return "N/A";
+    return toDate(dateValue).toLocaleDateString("vi-VN");
   };
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     axios
-      .get(`${baseUrl}/api/instructor/discounts/discount-usage/${userId}/${discountId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
+      .get(
+        `${baseUrl}/api/instructor/discounts/discount-usage/${userId}/${discountId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
       .then((response) => {
         if (response.data && response.data.length > 0) {
           setDiscount(response.data[0]);
@@ -36,9 +47,12 @@ const DiscountUsageUI = ({discountId}) => {
       });
   }, [userId, discountId]);
 
-  if (loading) return <div className="text-center py-10">Đang tải dữ liệu...</div>;
-  if (error) return <div className="text-center text-red-500 py-10">{error}</div>;
-  if (!discount) return <div className="text-center py-10">Không có dữ liệu discount.</div>;
+  if (loading)
+    return <div className="text-center py-10">Đang tải dữ liệu...</div>;
+  if (error)
+    return <div className="text-center text-red-500 py-10">{error}</div>;
+  if (!discount)
+    return <div className="text-center py-10">Không có dữ liệu discount.</div>;
 
   return (
     <div className="max-w-4xl mx-auto p-6">
@@ -63,7 +77,8 @@ const DiscountUsageUI = ({discountId}) => {
               <strong>Usage Count:</strong> {discount.usageCount}
             </p>
             <p className="text-gray-700 text-sm">
-              <strong>Total Discount Amount:</strong> {discount.totalDiscountAmount}
+              <strong>Total Discount Amount:</strong>{" "}
+              {discount.totalDiscountAmount}
             </p>
             <p className="text-gray-700 text-sm">
               <strong>Start Date:</strong> {formatDate(discount.startDate)}
@@ -84,12 +99,16 @@ const DiscountUsageUI = ({discountId}) => {
               {discount.appliedCourseIds.map((course) => (
                 <li key={course.courseId}>
                   {course.title}{" "}
-                  <span className="text-sm text-gray-500">({course.courseId})</span>
+                  <span className="text-sm text-gray-500">
+                    ({course.courseId})
+                  </span>
                 </li>
               ))}
             </ul>
           ) : (
-            <p className="text-gray-600 text-sm">Không có khóa học được áp dụng.</p>
+            <p className="text-gray-600 text-sm">
+              Không có khóa học được áp dụng.
+            </p>
           )}
         </div>
 
@@ -98,7 +117,8 @@ const DiscountUsageUI = ({discountId}) => {
           <h2 className="text-xl font-semibold text-gray-800 border-b pb-2 mb-4">
             User Discount Usages
           </h2>
-          {discount.userDiscountUsages && discount.userDiscountUsages.length > 0 ? (
+          {discount.userDiscountUsages &&
+          discount.userDiscountUsages.length > 0 ? (
             <div className="overflow-x-auto">
               <table className="min-w-full bg-white">
                 <thead>
@@ -114,14 +134,20 @@ const DiscountUsageUI = ({discountId}) => {
                 <tbody>
                   {discount.userDiscountUsages.map((usage, idx) => (
                     <tr key={idx} className="text-sm text-gray-700">
-                      <td className="py-2 px-4 border text-center">{usage.userId}</td>
+                      <td className="py-2 px-4 border text-center">
+                        {usage.userId}
+                      </td>
                       <td className="py-2 px-4 border">{usage.username}</td>
                       <td className="py-2 px-4 border">{usage.email}</td>
                       <td className="py-2 px-4 border">
                         {usage.courseTitle}{" "}
-                        <span className="text-sm text-gray-500">({usage.courseId})</span>
+                        <span className="text-sm text-gray-500">
+                          ({usage.courseId})
+                        </span>
                       </td>
-                      <td className="py-2 px-4 border text-center">{usage.discountAmount}</td>
+                      <td className="py-2 px-4 border text-center">
+                        {usage.discountAmount}
+                      </td>
                       <td className="py-2 px-4 border text-center">
                         {formatDate(usage.usedAt)}
                       </td>
@@ -131,7 +157,9 @@ const DiscountUsageUI = ({discountId}) => {
               </table>
             </div>
           ) : (
-            <p className="text-gray-600 text-sm">Không có lượt sử dụng discount nào.</p>
+            <p className="text-gray-600 text-sm">
+              Không có lượt sử dụng discount nào.
+            </p>
           )}
         </div>
       </div>

@@ -93,6 +93,10 @@ const CourseHeader = ({
   lectureCount,
   certificateType = "Chứng chỉ hoàn thành",
 }) => {
+  const isBestseller = studentCount > 350;
+  const threeMonthsMs = 1000 * 60 * 60 * 24 * 90;
+  const isNew = Date.now() - new Date(lastUpdated).getTime() <= threeMonthsMs;
+
   return (
     <div className="relative mt-[65px]">
       <div className="absolute inset-0 bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 rounded-md opacity-95" />
@@ -100,12 +104,25 @@ const CourseHeader = ({
       <div className="relative px-8 py-12 rounded-md overflow-hidden">
         <div className="max-w-6xl mx-auto">
           <div className="flex gap-2 mb-6">
-            <span className="px-3 py-1 rounded-md bg-blue-500/20 text-blue-400 text-sm font-medium">
-              Bestseller
-            </span>
-            <span className="px-3 py-1 rounded-md bg-green-500/20 text-green-400 text-sm font-medium">
-              Đã cập nhật
-            </span>
+            {isBestseller && (
+              <Link to="/courses/hot">
+                <span className="px-3 py-1 rounded-md bg-blue-500/20 text-blue-400 text-sm font-medium hover:bg-blue-500/30 transition">
+                  Bestseller
+                </span>
+              </Link>
+            )}
+
+            {isNew ? (
+              <Link to="/courses/newest">
+                <span className="px-3 py-1 rounded-md bg-green-500/20 text-green-400 text-sm font-medium hover:bg-green-500/30 transition">
+                  Mới
+                </span>
+              </Link>
+            ) : (
+              <span className="px-3 py-1 rounded-md bg-indigo-500/20 text-indigo-400 text-sm font-medium">
+                Đã cập nhật
+              </span>
+            )}
           </div>
 
           <h1 className="text-4xl font-bold text-white mb-4 leading-tight">

@@ -18,6 +18,15 @@ const DiscountsTable = () => {
   };
   const [searchCode, setSearchCode] = useState("");
   const [searchStatus, setSearchStatus] = useState("");
+  const toDate = (input) => {
+    if (typeof input === "string") {
+      const normalized = input.replace(/\.(\d{3})\d+/, ".$1");
+      return new Date(normalized);
+    }
+    const [y, m, d, h = 0, min = 0, s = 0, micro = 0] = input.map(Number);
+    const ms = Math.round(micro / 1000);
+    return new Date(y, m - 1, d, h, min, s, ms);
+  };
 
   const getPaginationItems = () => {
     const pages = [];
@@ -46,12 +55,9 @@ const DiscountsTable = () => {
   useEffect(() => {
     const fetchDiscounts = async () => {
       try {
-        const response = await axios.get(
-          `${baseUrl}/api/admin/discounts`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+        const response = await axios.get(`${baseUrl}/api/admin/discounts`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         setDiscounts(response.data);
       } catch (err) {
         setError("Không thể tải danh sách mã giảm giá.");
@@ -137,7 +143,9 @@ const DiscountsTable = () => {
           {loading ? (
             <div className="flex justify-center items-center py-20">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-              <span className="ml-3 text-gray-300 text-lg">Đang tải dữ liệu...</span>
+              <span className="ml-3 text-gray-300 text-lg">
+                Đang tải dữ liệu...
+              </span>
             </div>
           ) : error ? (
             <div className="bg-red-900/20 border-l-4 border-red-500 p-4 rounded-lg">
@@ -178,7 +186,8 @@ const DiscountsTable = () => {
                   </thead>
                   <tbody className="bg-gray-800/50 divide-y divide-gray-700">
                     {currentDiscounts.map((discount, index) => {
-                      const serialNumber = (currentPage - 1) * pageSize + index + 1;
+                      const serialNumber =
+                        (currentPage - 1) * pageSize + index + 1;
                       return (
                         <tr
                           key={discount.discountId}
@@ -203,18 +212,24 @@ const DiscountsTable = () => {
                             </span>
                           </td>
                           <td className="py-4 px-6 text-sm text-gray-400 text-center">
-                            {new Date(...discount.startDate).toLocaleDateString("vi-VN", {
-                              day: "2-digit",
-                              month: "2-digit",
-                              year: "numeric"
-                            })}
+                            {toDate(discount.startDate).toLocaleDateString(
+                              "vi-VN",
+                              {
+                                day: "2-digit",
+                                month: "2-digit",
+                                year: "numeric",
+                              }
+                            )}
                           </td>
                           <td className="py-4 px-6 text-sm text-gray-400 text-center">
-                            {new Date(...discount.endDate).toLocaleDateString("vi-VN", {
-                              day: "2-digit",
-                              month: "2-digit",
-                              year: "numeric"
-                            })}
+                            {toDate(discount.endDate).toLocaleDateString(
+                              "vi-VN",
+                              {
+                                day: "2-digit",
+                                month: "2-digit",
+                                year: "numeric",
+                              }
+                            )}
                           </td>
                           <td className="py-4 px-6 text-center">
                             <span
@@ -224,17 +239,36 @@ const DiscountsTable = () => {
                                   : "bg-gray-700 text-gray-400 border border-gray-600"
                               }`}
                             >
-                              {discount.status === "ACTIVE" ? "Hoạt động" : "Ngừng"}
+                              {discount.status === "ACTIVE"
+                                ? "Hoạt động"
+                                : "Ngừng"}
                             </span>
                           </td>
                           <td className="py-4 px-6 text-center">
                             <button
-                              onClick={() => setEditingDiscountId(discount.discountId)}
+                              onClick={() =>
+                                setEditingDiscountId(discount.discountId)
+                              }
                               className="inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500 shadow-lg"
                             >
-                              <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                              <svg
+                                className="w-4 h-4 mr-1.5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                                />
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                                />
                               </svg>
                               Chi tiết
                             </button>
@@ -252,17 +286,24 @@ const DiscountsTable = () => {
                   {getPaginationItems().map((item, index) => (
                     <button
                       key={index}
-                      onClick={() => typeof item === "number" && handlePageChange(item)}
+                      onClick={() =>
+                        typeof item === "number" && handlePageChange(item)
+                      }
                       disabled={item === "..."}
                       className={`
-                        ${item === currentPage
-                          ? "bg-indigo-600 text-white shadow-lg shadow-indigo-600/30"
-                          : item === "..."
-                          ? "text-gray-600 cursor-default"
-                          : "bg-gray-700 text-gray-300 hover:bg-gray-600 border border-gray-600"
+                        ${
+                          item === currentPage
+                            ? "bg-indigo-600 text-white shadow-lg shadow-indigo-600/30"
+                            : item === "..."
+                            ? "text-gray-600 cursor-default"
+                            : "bg-gray-700 text-gray-300 hover:bg-gray-600 border border-gray-600"
                         }
                         px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200
-                        ${item !== "..." && item !== currentPage && "hover:border-gray-500"}
+                        ${
+                          item !== "..." &&
+                          item !== currentPage &&
+                          "hover:border-gray-500"
+                        }
                         focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500
                       `}
                     >
@@ -274,7 +315,9 @@ const DiscountsTable = () => {
 
               {/* Results Summary */}
               <div className="mt-4 text-center text-sm text-gray-500">
-                Hiển thị {startIndex + 1} - {Math.min(startIndex + pageSize, filteredDiscounts.length)} trong tổng số {filteredDiscounts.length} mã giảm giá
+                Hiển thị {startIndex + 1} -{" "}
+                {Math.min(startIndex + pageSize, filteredDiscounts.length)}{" "}
+                trong tổng số {filteredDiscounts.length} mã giảm giá
               </div>
             </>
           )}

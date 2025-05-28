@@ -8,16 +8,17 @@ const PromotionUsageSummaryList = ({ usages, onSelect }) => {
   const [pageUsed, setPageUsed] = useState(1);
   const [pageUnused, setPageUnused] = useState(1);
 
-  const toDate = arr => new Date(arr[0], arr[1] - 1, arr[2], arr[3], arr[4]);
+  const toDate = (isoString) => {
+    const normalized = isoString.replace(/\.(\d{3})\d+/, ".$1");
+    return new Date(normalized);
+  };
   const formatCurrency = amount =>
     amount != null ? `${new Intl.NumberFormat('vi-VN').format(amount)} VND` : '-';
 
-  // Filter by search
   const filtered = usages.filter(p =>
     p.promotionName.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Partition by active / inactive
   const now = new Date();
   const activeItems = filtered.filter(p => {
     const start = toDate(p.startDate);
@@ -26,7 +27,6 @@ const PromotionUsageSummaryList = ({ usages, onSelect }) => {
   });
   const inactiveItems = filtered.filter(p => !activeItems.includes(p));
 
-  // Within each, split used vs unused
   const splitGroups = items => ({
     used: items.filter(p => p.usageCount > 0),
     unused: items.filter(p => p.usageCount === 0)
@@ -35,7 +35,6 @@ const PromotionUsageSummaryList = ({ usages, onSelect }) => {
   const activeGroups = splitGroups(activeItems);
   const inactiveGroups = splitGroups(inactiveItems);
 
-  // Choose groups based on tab
   const groups = activeTab ? activeGroups : inactiveGroups;
 
   const genPages = length => {
@@ -84,7 +83,6 @@ const PromotionUsageSummaryList = ({ usages, onSelect }) => {
 
   return (
     <div className="p-6 bg-gray-800 rounded-lg shadow-lg text-white">
-      {/* Filter + Tabs */}
       <div className="flex flex-col md:flex-row justify-between items-center mb-6">
         <input
           type="text"

@@ -60,7 +60,7 @@ const PageSearchCourse = () => {
       <div className="flex justify-between items-center mb-5">
         <Sidebar open={open} setOpen={setOpen} />
         <div className="flex-1 ml-5">
-          <h2 className="text-3xl font-bold text-gray-800">Search Courses</h2>
+          <h2 className="text-3xl font-bold text-gray-800">Danh sách khóa học</h2>
         </div>
       </div>
       <div className="relative bg-gray-50 p-4 rounded-lg shadow-sm">
