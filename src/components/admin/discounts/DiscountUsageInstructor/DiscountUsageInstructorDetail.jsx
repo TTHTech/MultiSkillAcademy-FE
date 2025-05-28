@@ -4,7 +4,18 @@ import DiscountCreator from "../InforUserCreateDiscount";
 const DiscountUsageDetail = ({ discount, onClose }) => {
   const [coursesSearchTerm, setCoursesSearchTerm] = useState("");
   const [usagesSearchTerm, setUsagesSearchTerm] = useState("");
-
+  const toDate = (input) => {
+    if (typeof input === "string") {
+      const normalized = input.replace(/\.(\d{3})\d+/, ".$1");
+      return new Date(normalized);
+    }
+    if (Array.isArray(input)) {
+      const [y, m, d, h = 0, min = 0, s = 0, micro = 0] = input.map(Number);
+      const ms = Math.round(micro / 1000);
+      return new Date(y, m - 1, d, h, min, s, ms);
+    }
+    return new Date(input);
+  };
   const filteredCourses = discount.appliedCourseIds.filter((course) => {
     const lowerCaseSearch = coursesSearchTerm.toLowerCase();
     return (
@@ -61,11 +72,11 @@ const DiscountUsageDetail = ({ discount, onClose }) => {
             </div>
             <div className="text-sm text-gray-200">
               <span className="font-medium text-white">Start Date:</span>{" "}
-              {new Date(...discount.startDate).toLocaleDateString("vi-VN")}
+              {toDate(discount.startDate).toLocaleDateString("vi-VN")}
             </div>
             <div className="text-sm text-gray-200">
               <span className="font-medium text-white">End Date:</span>{" "}
-              {new Date(...discount.endDate).toLocaleDateString("vi-VN")}
+              {toDate(discount.endDate).toLocaleDateString("vi-VN")}
             </div>
           </div>
         </div>
@@ -166,7 +177,7 @@ const DiscountUsageDetail = ({ discount, onClose }) => {
                         {usage.discountAmount}
                       </td>
                       <td className="py-1 px-2 border border-gray-600 text-center">
-                        {new Date(...usage.usedAt).toLocaleDateString("vi-VN")}
+                        {toDate(usage.usedAt).toLocaleDateString("vi-VN")}
                       </td>
                     </tr>
                   ))}

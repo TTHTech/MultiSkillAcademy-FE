@@ -55,7 +55,6 @@ const TopDesignCoursesSection = () => {
 
         setCategoryName(categoryName);
         setCourses(enhancedCourses);
-
         // Check scroll buttons visibility after courses are loaded
         setTimeout(() => {
           checkScroll();

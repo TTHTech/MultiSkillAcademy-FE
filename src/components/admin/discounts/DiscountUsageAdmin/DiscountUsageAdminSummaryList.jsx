@@ -7,31 +7,37 @@ const DiscountUsageSummaryList = ({ discountUsages, onSelect }) => {
   const [statusFilter, setStatusFilter] = useState("all");
   const [currentPageWithData, setCurrentPageWithData] = useState(1);
   const [currentPageWithoutData, setCurrentPageWithoutData] = useState(1);
-  const filteredDiscounts = discountUsages.filter((d) => {
+
+  // Helper to parse both ISO strings and array date formats
+  const toDate = (input) => {
+    if (typeof input === "string") {
+      const normalized = input.replace(/\.(\d{3})\d+/, ".$1");
+      return new Date(normalized);
+    }
+    const [y, m, d, h = 0, min = 0, s = 0, micro = 0] = input.map(Number);
+    const ms = Math.round(micro / 1000);
+    return new Date(y, m - 1, d, h, min, s, ms);
+  };
+
+  // Compute isActive flag on each discount, then apply filters
+  const now = new Date();
+  const processedDiscounts = discountUsages.map((d) => ({
+    ...d,
+    isActive: toDate(d.startDate) <= now && toDate(d.endDate) >= now,
+  }));
+
+  const filteredDiscounts = processedDiscounts.filter((d) => {
     const codeMatch = d.discountCode
       .toLowerCase()
       .includes(searchTerm.toLowerCase());
-    const isActive =
-      new Date(
-        d.startDate[0],
-        d.startDate[1] - 1,
-        d.startDate[2],
-        d.startDate[3],
-        d.startDate[4]
-      ) <= new Date() &&
-      new Date(
-        d.endDate[0],
-        d.endDate[1] - 1,
-        d.endDate[2],
-        d.endDate[3],
-        d.endDate[4]
-      ) >= new Date();
+
     let statusMatch = true;
     if (statusFilter === "active") {
-      statusMatch = isActive;
+      statusMatch = d.isActive;
     } else if (statusFilter === "expired") {
-      statusMatch = !isActive;
+      statusMatch = !d.isActive;
     }
+
     return codeMatch && statusMatch;
   });
 
@@ -41,12 +47,14 @@ const DiscountUsageSummaryList = ({ discountUsages, onSelect }) => {
   const discountsWithoutData = filteredDiscounts.filter(
     (d) => d.usageCount === 0 && d.totalDiscountAmount === 0
   );
+
   const totalPagesWithData = Math.ceil(
     discountsWithData.length / ITEMS_PER_PAGE
   );
   const totalPagesWithoutData = Math.ceil(
     discountsWithoutData.length / ITEMS_PER_PAGE
   );
+
   const currentDiscountsWithData = discountsWithData.slice(
     (currentPageWithData - 1) * ITEMS_PER_PAGE,
     currentPageWithData * ITEMS_PER_PAGE
@@ -55,22 +63,15 @@ const DiscountUsageSummaryList = ({ discountUsages, onSelect }) => {
     (currentPageWithoutData - 1) * ITEMS_PER_PAGE,
     currentPageWithoutData * ITEMS_PER_PAGE
   );
+
   const generatePageNumbers = (currentPage, totalPages) => {
     const pages = [];
     if (totalPages === 0) return pages;
     pages.push(1);
-    if (currentPage - 1 > 1) {
-      pages.push(currentPage - 1);
-    }
-    if (currentPage !== 1 && currentPage !== totalPages) {
-      pages.push(currentPage);
-    }
-    if (currentPage + 1 < totalPages) {
-      pages.push(currentPage + 1);
-    }
-    if (totalPages > 1) {
-      pages.push(totalPages);
-    }
+    if (currentPage - 1 > 1) pages.push(currentPage - 1);
+    if (currentPage !== 1 && currentPage !== totalPages) pages.push(currentPage);
+    if (currentPage + 1 < totalPages) pages.push(currentPage + 1);
+    if (totalPages > 1) pages.push(totalPages);
     return Array.from(new Set(pages)).sort((a, b) => a - b);
   };
 
@@ -83,16 +84,9 @@ const DiscountUsageSummaryList = ({ discountUsages, onSelect }) => {
     totalPagesWithoutData
   );
 
-  const handlePageChangeWithData = (page) => {
-    setCurrentPageWithData(page);
-  };
-
-  const handlePageChangeWithoutData = (page) => {
-    setCurrentPageWithoutData(page);
-  };
-
   return (
     <div className="mb-6">
+      {/* Search and filter */}
       <div className="mb-4 flex space-x-2">
         <input
           type="text"
@@ -120,6 +114,7 @@ const DiscountUsageSummaryList = ({ discountUsages, onSelect }) => {
         </select>
       </div>
 
+      {/* Section: Discounts with usage */}
       <div className="mb-6">
         <h3 className="text-xl font-bold text-white mb-4">
           Discount đã được sử dụng
@@ -137,20 +132,7 @@ const DiscountUsageSummaryList = ({ discountUsages, onSelect }) => {
                     <div className="font-semibold text-white text-lg">
                       {d.discountName}
                     </div>
-                    {new Date(
-                      d.startDate[0],
-                      d.startDate[1] - 1,
-                      d.startDate[2],
-                      d.startDate[3],
-                      d.startDate[4]
-                    ) <= new Date() &&
-                    new Date(
-                      d.endDate[0],
-                      d.endDate[1] - 1,
-                      d.endDate[2],
-                      d.endDate[3],
-                      d.endDate[4]
-                    ) >= new Date() ? (
+                    {d.isActive ? (
                       <span className="bg-green-500 text-white px-2 py-1 text-xs font-bold rounded-full">
                         Còn hạn
                       </span>
@@ -195,7 +177,7 @@ const DiscountUsageSummaryList = ({ discountUsages, onSelect }) => {
                 {pageNumbersWithData.map((page) => (
                   <button
                     key={page}
-                    onClick={() => handlePageChangeWithData(page)}
+                    onClick={() => setCurrentPageWithData(page)}
                     className={`px-3 py-1 rounded-md ${
                       page === currentPageWithData
                         ? "bg-blue-500 text-white"
@@ -213,6 +195,7 @@ const DiscountUsageSummaryList = ({ discountUsages, onSelect }) => {
         )}
       </div>
 
+      {/* Section: Discounts without usage */}
       {discountsWithoutData.length > 0 && (
         <div>
           <h3 className="text-xl font-bold text-white mb-4">
@@ -229,20 +212,7 @@ const DiscountUsageSummaryList = ({ discountUsages, onSelect }) => {
                   <div className="font-semibold text-white text-lg">
                     {d.discountName}
                   </div>
-                  {new Date(
-                    d.startDate[0],
-                    d.startDate[1] - 1,
-                    d.startDate[2],
-                    d.startDate[3],
-                    d.startDate[4]
-                  ) <= new Date() &&
-                  new Date(
-                    d.endDate[0],
-                    d.endDate[1] - 1,
-                    d.endDate[2],
-                    d.endDate[3],
-                    d.endDate[4]
-                  ) >= new Date() ? (
+                  {d.isActive ? (
                     <span className="bg-green-500 text-white px-2 py-1 text-xs font-bold rounded-full">
                       Còn hạn
                     </span>
@@ -287,7 +257,7 @@ const DiscountUsageSummaryList = ({ discountUsages, onSelect }) => {
               {pageNumbersWithoutData.map((page) => (
                 <button
                   key={page}
-                  onClick={() => handlePageChangeWithoutData(page)}
+                  onClick={() => setCurrentPageWithoutData(page)}
                   className={`px-3 py-1 rounded-md ${
                     page === currentPageWithoutData
                       ? "bg-blue-500 text-white"

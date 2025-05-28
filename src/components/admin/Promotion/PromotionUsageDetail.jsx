@@ -4,8 +4,11 @@ const PromotionUsageDetail = ({ promotion, onClose }) => {
   const [courseSearch, setCourseSearch] = useState("");
   const [usageSearch, setUsageSearch] = useState("");
 
-  const toDate = arr =>
-    new Date(arr[0], arr[1] - 1, arr[2], arr[3], arr[4]);
+  const toDate = (isoString) => {
+    const normalized = isoString.replace(/\.(\d{3})\d+/, ".$1");
+    return new Date(normalized);
+  };
+
 
   const formatCurrency = amount =>
     amount != null

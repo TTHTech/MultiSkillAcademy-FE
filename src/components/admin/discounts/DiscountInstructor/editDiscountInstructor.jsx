@@ -67,12 +67,29 @@ const EditDiscount = ({ discountId, onCancel, triggerRefresh }) => {
       setDiscountData({ ...discountData, [name]: value });
     }
   };
+  const formatForInput = (date) => {
+    const pad = (n) => String(n).padStart(2, "0");
+    const yyyy = date.getFullYear();
+    const MM = pad(date.getMonth() + 1);
+    const dd = pad(date.getDate());
+    const hh = pad(date.getHours());
+    const mm = pad(date.getMinutes());
+    return `${yyyy}-${MM}-${dd}T${hh}:${mm}`;
+  };
+
+  const toDate = (input) => {
+    if (typeof input === "string") {
+      const normalized = input.replace(/\.(\d{3})\d+/, ".$1");
+      return new Date(normalized);
+    }
+    const [y, m, d, h = 0, min = 0, s = 0] = input.map(Number);
+    return new Date(y, m - 1, d, h, min, s);
+  };
+
   const getDateTimeLocalValue = (dateValue) => {
     if (!dateValue) return "";
-    if (Array.isArray(dateValue)) {
-      return new Date(...dateValue).toISOString().slice(0, 16);
-    }
-    return dateValue;
+    const dateObj = toDate(dateValue);
+    return formatForInput(dateObj);
   };
   const handleDelete = async () => {
     const token = localStorage.getItem("token");
