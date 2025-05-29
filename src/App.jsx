@@ -92,6 +92,9 @@ import AdminAuditTrailPage from "./components/admin/audit/AdminAuditTrailPage.js
 import CombinedCoursesPage from "./pages/instructor/CombinedCoursesPage.jsx";
 import NewestCoursesPage from "./pages/student/topic/NewestCoursesPage.jsx";
 import HotCoursesPage from "./pages/student/topic/HotCoursesPage.jsx";
+import PageReportSection from "./pages/admin/PageReportSection.jsx";
+import PageReportLecture from "./pages/admin/PageReportLecture.jsx";
+import PageReportCourse from "./pages/admin/PageReportCourse.jsx";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -219,6 +222,9 @@ function App() {
                 <Route path="/admin/discount-usage" element={<PageDiscountUsage />} />
                 <Route path="/admin/browsed-discounts" element={<PageBrowseDiscount />} />
                 <Route path="/admin/report/review-course" element={<PageReportReviewCourse/>} />
+                <Route path="/admin/report/course" element={<PageReportCourse/>} />
+                <Route path="/admin/report/section" element={<PageReportSection/>} />
+                <Route path="/admin/report/lecture" element={<PageReportLecture/>} />
                 <Route path="/admin/promotions/add" element={<PageCreatePromotion />} />
                 <Route path="/admin/promotions" element={<PagePromotion />} />
                 <Route path="/admin/promotions-usage" element={<PagePromotionUsage />} />

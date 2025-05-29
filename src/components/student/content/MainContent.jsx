@@ -16,10 +16,13 @@ import {
   FaVolumeUp,
   FaCompress,
   FaExpand,
+  FaFlag,
+  FaTimes,
 } from "react-icons/fa";
 import SupplementaryLectures from "./SupplementaryLectures";
-import { decodeId } from '../../../utils/hash';
+import { decodeId } from "../../../utils/hash";
 const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
+import axios from "axios";
 
 const CustomVideoPlayer = ({
   videoRef,
@@ -356,7 +359,40 @@ const MainContent = ({
       console.error("Error updating progress:", error);
     }
   };
+  const handleReport = async () => {
+    const userId = localStorage.getItem("userId");
+    const { value: reason } = await Swal.fire({
+      title: "Báo cáo khóa học",
+      input: "textarea",
+      inputLabel: "Lý do báo cáo khóa học",
+      inputPlaceholder: "Nhập lý do tại đây...",
+      showCancelButton: true,
+      confirmButtonText: "Gửi",
+      cancelButtonText: "Hủy",
+      preConfirm: (val) => {
+        if (!val) Swal.showValidationMessage("Bạn phải nhập lý do!");
+        return val;
+      },
+    });
+    if (!reason) return;
+    const token = localStorage.getItem("token");
 
+    try {
+      await axios.post(
+        `${baseUrl}/api/student/course/report`,
+        {
+          idUserReport: userId,
+          targetId: id,
+          reason,
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      await Swal.fire("Thành công", "Báo cáo đã được gửi!", "success");
+    } catch (err) {
+      console.error(err);
+      await Swal.fire("Lỗi", "Không gửi được báo cáo, thử lại sau.", "error");
+    }
+  };
   // Kiểm tra khi người dùng tua video
   const handleSeeking = () => {
     if (videoRef.current && selectedLecture) {
@@ -626,7 +662,7 @@ const MainContent = ({
           <button
             onClick={() => setSelectedTab(4)}
             className={`py-2 px-4 ${
-              selectedTab === 2
+              selectedTab === 4
                 ? "border-b-2 border-blue-500 font-semibold"
                 : "text-gray-600"
             }`}
@@ -634,7 +670,14 @@ const MainContent = ({
             Tài liệu học tập
           </button>
         </div>
-
+        <button
+          onClick={() => handleReport()}
+          className="mt-2 ml-2 flex items-center space-x-1 bg-red-600 hover:bg-red-700 text-white text-sm font-medium px-3 py-1.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+          aria-label="Báo cáo khóa học"
+        >
+          <FaFlag className="w-4 h-4" />
+          <span>Báo cáo khóa học</span>
+        </button>
         <div className="mt-2">
           {selectedTab === 0 && (
             <div>
