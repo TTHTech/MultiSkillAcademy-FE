@@ -96,86 +96,77 @@ export default function TableSectionReport({ reports = [], triggerRefresh }) {
       );
       if (!res.ok) throw new Error("Lấy dữ liệu thất bại");
       const data = await res.json();
-
-      // Format thời gian
       const reportTime = new Date(data.reportCreatedAt).toLocaleString(
         "vi-VN",
         { dateStyle: "short", timeStyle: "short" }
       );
 
-      // Format giá khóa học
       const priceFormatted = new Intl.NumberFormat("vi-VN", {
         style: "currency",
         currency: "VND",
       }).format(data.coursePrice);
 
-      // Build HTML popup
       const html = `
-        <div class="space-y-6 text-gray-800">
+          <div class="space-y-8 text-gray-800">
           <!-- Header -->
-          <div class="flex items-center space-x-3 border-b border-gray-200 pb-4">
+          <div class="flex items-center space-x-3 pb-2">
             <svg xmlns="http://www.w3.org/2000/svg"
-                class="w-6 h-6 text-indigo-600"
+                class="w-7 h-7 text-indigo-600"
                 fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M5.121 17.804A6.992 6.992 0 0112 15a6.992 6.992 0 016.879 2.804M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
             </svg>
-            <h2 class="text-2xl font-semibold">Chi tiết báo cáo chương học</h2>
+            <h2 class="text-3xl font-bold">Chi tiết báo cáo</h2>
           </div>
 
-          <!-- Thông tin nhanh -->
+          <!-- Image & Course Info -->
+          <div class="flex flex-col sm:flex-row items-center sm:items-start sm:space-x-8">
+            <img src="${data.courseImageURL}" alt="Course image"
+                class="w-32 h-32 object-cover rounded-xl shadow-md mb-4 sm:mb-0"/>
+            <div class="space-y-2">
+              <div class="flex items-center">
+                <span class="font-medium text-gray-600 w-32">Course ID:</span>
+                <span class="text-gray-900 ml-2">${data.courseId}</span>
+              </div>
+              <div class="flex items-center">
+                <span class="font-medium text-gray-600 w-32">Khóa học:</span>
+                <span class="text-gray-900 ml-2">${data.categoriesName}</span>
+              </div>
+              <div class="flex items-center">
+                <span class="font-medium text-gray-600 w-32">Trạng thái:</span>
+                <span class="text-gray-900 ml-2">${data.courseStatus}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Details -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div class="flex items-center">
               <span class="w-32 font-medium text-gray-600">Người báo cáo:</span>
-              <span class="text-gray-900 ml-2">
-                ${data.firstNameUserReport} ${data.lastNameUserReport}
-              </span>
-              <span class="ml-3 inline-block px-2 py-0.5 text-xs font-semibold text-blue-800 bg-blue-100 rounded-full">
-                ${data.reporterRole}
-              </span>
+              <span class="text-gray-900 ml-2">${data.firstNameUserReport} ${data.lastNameUserReport}</span>
             </div>
-
-            <div>
-              <p class="text-sm text-gray-600">Thời gian</p>
-              <p class="mt-1 text-gray-900">${reportTime}</p>
+            <div class="flex items-center">
+              <span class="w-32 font-medium text-gray-600">Thời gian:</span>
+              <span class="text-gray-900 ml-2">${reportTime}</span>
             </div>
-
-            <div>
-              <p class="text-sm text-gray-600">Khóa học</p>
-              <p class="mt-1 text-gray-900">
-                ${data.courseId} — ${data.categoriesName}
-              </p>
+            <div class="flex items-center">
+              <span class="w-32 font-medium text-gray-600">Giá:</span>
+              <span class="text-gray-900 ml-2">${priceFormatted}</span>
             </div>
-
-            <div>
-              <p class="text-sm text-gray-600">Giá</p>
-              <p class="mt-1 text-gray-900">${priceFormatted}</p>
+            <div class="flex items-center">
+              <span class="w-32 font-medium text-gray-600">Section ID:</span>
+              <span class="text-gray-900 ml-2">${data.section_id}</span>
             </div>
-
-            <div class="col-span-1 sm:col-span-2 flex items-center space-x-4">
-              <img src="${data.courseImageURL}" alt="Course image"
-                  class="w-24 h-24 object-cover rounded-md border"/>
-              <div>
-                <p class="text-sm text-gray-600">Trạng thái</p>
-                <p class="mt-1 text-gray-900">${data.courseStatus}</p>
-              </div>
-            </div>
-
-            <div>
-              <p class="text-sm text-gray-600">Section ID</p>
-              <p class="mt-1 text-gray-900">${data.section_id}</p>
-            </div>
-
-            <div>
-              <p class="text-sm text-gray-600">Tiêu đề Section</p>
-              <p class="mt-1 text-gray-900">${data.sectionTitle}</p>
+            <div class="flex items-center sm:col-span-2">
+              <span class="w-32 font-medium text-gray-600">Tiêu đề Section:</span>
+              <span class="text-gray-900 ml-2">${data.sectionTitle}</span>
             </div>
           </div>
 
           <!-- Lý do báo cáo -->
-          <div class="pt-4 border-t border-gray-200">
-            <p class="text-sm font-semibold text-gray-700 mb-2">Lý do báo cáo</p>
-            <div class="p-4 bg-gray-50 rounded-lg text-gray-800">
+          <div class="space-y-2">
+            <p class="text-lg font-semibold text-gray-700">Lý do báo cáo</p>
+            <div class="p-4 rounded-lg text-gray-800">
               ${data.reason}
             </div>
           </div>
@@ -210,107 +201,107 @@ export default function TableSectionReport({ reports = [], triggerRefresh }) {
 
   return (
     <div className="bg-gray-900 rounded-lg shadow-lg overflow-hidden">
-      <div className="overflow-x-auto shadow-lg border border-gray-700 rounded-lg">
-        <table className="w-full table-fixed">
-          <thead className="bg-gray-800">
-            <tr className="grid grid-cols-7 gap-4 px-5 py-4">
+      <div className="overflow-x-auto shadow-lg border border-gray-700 rounded-xl">
+        <table className="table-auto min-w-min divide-y divide-gray-700">
+          <thead className="bg-gray-900">
+            <tr>
               {[
-                { key: "seq", label: "STT" },
-                { key: "courseTitle", label: "Khóa học" },
-                { key: "sectionTitle", label: "Chương học" },
-                { key: "reporter", label: "Người báo cáo" },
-                { key: "reason", label: "Lý do" },
-                { key: "createdAt", label: "Ngày tạo" },
-                { key: "actions", label: "Thao tác" },
+                { key: "seq", label: "STT", width: "w-10" },
+                { key: "courseTitle", label: "Khóa học", width: "w-24" },
+                { key: "sectionTitle", label: "Chương học", width: "w-24" },
+                { key: "reporter", label: "Người", width: "w-20" },
+                { key: "reason", label: "Lý do", width: "w-32" },
+                { key: "createdAt", label: "Ngày", width: "w-20" },
+                {
+                  key: "actions",
+                  label: "Hành động",
+                  width: "w-16 text-right",
+                },
               ].map((col) => (
                 <th
                   key={col.key}
-                  className="text-left text-xs font-semibold uppercase text-gray-300 whitespace-nowrap"
+                  className={`px-4 py-3 text-xs font-semibold uppercase text-gray-400 ${col.width}`}
                 >
                   {col.label}
                 </th>
               ))}
             </tr>
           </thead>
-          <tbody>
-            {pageItems.length > 0 ? (
+          <tbody className="divide-y divide-gray-700">
+            {pageItems.length ? (
               pageItems.map((r, idx) => (
                 <tr
                   key={r.reportId}
-                  className={`grid grid-cols-7 gap-4 items-center px-5 py-4 transition-colors ${
-                    idx % 2 === 0 ? "bg-gray-800" : "bg-gray-750"
-                  } hover:bg-gray-700 rounded-lg mb-2`}
+                  className={`${
+                    idx % 2 === 0 ? "bg-gray-850" : "bg-gray-800"
+                  } hover:bg-gray-700 transition-colors`}
                 >
-                  <div
-                    className="text-gray-200 text-sm truncate"
-                    title={r._seq}
-                  >
+                  <td className="px-4 py-3 text-sm text-gray-200 truncate">
                     {r._seq}
-                  </div>
-
-                  <div
-                    className="text-gray-100 text-sm font-medium truncate whitespace-nowrap"
+                  </td>
+                  <td
+                    className="px-4 py-3 text-sm font-medium text-gray-100 truncate"
                     title={r.courseTitle}
                   >
                     {r.courseTitle}
-                  </div>
-
-                  <div
-                    className="text-gray-100 text-sm font-medium truncate whitespace-nowrap"
+                  </td>
+                  <td
+                    className="px-4 py-3 text-sm font-medium text-gray-100 truncate"
                     title={r.sectionTitle}
                   >
                     {r.sectionTitle}
-                  </div>
-
-                  <div
-                    className="text-gray-200 text-sm whitespace-nowrap truncate"
+                  </td>
+                  <td
+                    className="px-4 py-3 text-sm text-gray-200 truncate"
                     title={`${r.firstName} ${r.lastName}`}
                   >
                     {r.firstName} {r.lastName}
-                  </div>
-                  <div
-                    className="text-gray-300 text-sm truncate line-clamp-1"
+                  </td>
+                  <td
+                    className="px-4 py-3 text-sm text-gray-300 max-w-[30ch] truncate"
                     title={r.reason}
                   >
                     {r.reason}
-                  </div>
-                  <div
-                    className="text-gray-300 text-sm whitespace-nowrap truncate"
-                    title={new Date(r.createdAt).toLocaleDateString("vi-VN")}
-                  >
+                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-300 truncate">
                     {new Date(r.createdAt).toLocaleDateString("vi-VN")}
-                  </div>
-                  <div className="flex justify-end space-x-2">
+                  </td>
+                  <td className="px-4 py-3 text-sm flex justify-end space-x-2">
                     <button
                       onClick={() => handleView(r)}
                       disabled={detailLoading}
-                      className="p-2 bg-blue-600 rounded-md text-white text-sm hover:bg-blue-700 disabled:opacity-50 transition"
-                      title="Xem chi tiết"
+                      className="p-2 bg-blue-600 rounded-lg text-white hover:bg-blue-700 disabled:opacity-50 transition"
+                      title="Xem"
                     >
-                      <Eye className="w-5 h-5 text-white" />
+                      <Eye className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => handleApprove(r)}
                       disabled={isLoading}
-                      className="p-2 bg-green-600 rounded-md text-white text-sm hover:bg-green-700 disabled:opacity-50 transition"
+                      className="p-2 bg-green-600 rounded-lg text-white hover:bg-green-700 disabled:opacity-50 transition"
                       title="Phê duyệt"
                     >
-                      <CheckCircle className="w-5 h-5 text-white" />
+                      <CheckCircle className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => handleReject(r)}
                       disabled={isLoading}
-                      className="p-2 bg-red-600 rounded-md text-white text-sm hover:bg-red-700 disabled:opacity-50 transition"
+                      className="p-2 bg-red-600 rounded-lg text-white hover:bg-red-700 disabled:opacity-50 transition"
                       title="Từ chối"
                     >
-                      <XCircle className="w-5 h-5 text-white" />
+                      <XCircle className="w-4 h-4" />
                     </button>
-                  </div>
+                  </td>
                 </tr>
               ))
             ) : (
-              <tr className="px-5 py-8 text-center text-gray-500 text-sm">
-                <td colSpan={7}>Không có báo cáo nào</td>
+              <tr>
+                <td
+                  colSpan={7}
+                  className="py-6 text-center text-gray-500 text-sm"
+                >
+                  Không có báo cáo
+                </td>
               </tr>
             )}
           </tbody>

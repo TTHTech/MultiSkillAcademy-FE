@@ -146,11 +146,10 @@ export default function TableReport({
       const data = await res.json();
 
       // Format thời gian
-      const reportTime = new Date(data.reportCreatedAt * 1000).toLocaleString(
+      const reportTime = new Date(data.reportCreatedAt).toLocaleString(
         "vi-VN",
         { dateStyle: "short", timeStyle: "short" }
       );
-
       // Build HTML cho star rating
       const fullStars = "★".repeat(data.rating);
       const emptyStars = "☆".repeat(5 - data.rating);
