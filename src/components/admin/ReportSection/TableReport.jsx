@@ -200,113 +200,110 @@ export default function TableSectionReport({ reports = [], triggerRefresh }) {
   };
 
   return (
-    <div className="bg-gray-900 rounded-lg shadow-lg overflow-hidden">
-      <div className="overflow-x-auto shadow-lg border border-gray-700 rounded-xl">
-        <table className="table-auto min-w-min divide-y divide-gray-700">
-          <thead className="bg-gray-900">
-            <tr>
-              {[
-                { key: "seq", label: "STT", width: "w-10" },
-                { key: "courseTitle", label: "Khóa học", width: "w-24" },
-                { key: "sectionTitle", label: "Chương học", width: "w-24" },
-                { key: "reporter", label: "Người", width: "w-20" },
-                { key: "reason", label: "Lý do", width: "w-32" },
-                { key: "createdAt", label: "Ngày", width: "w-20" },
-                {
-                  key: "actions",
-                  label: "Hành động",
-                  width: "w-16 text-right",
-                },
-              ].map((col) => (
-                <th
-                  key={col.key}
-                  className={`px-4 py-3 text-xs font-semibold uppercase text-gray-400 ${col.width}`}
-                >
-                  {col.label}
-                </th>
-              ))}
+    <div className="bg-gray-900 rounded-xl shadow-xl p-4">
+  <div className="overflow-x-auto border border-gray-700 rounded-xl">
+    <table className="min-w-full table-auto divide-y divide-gray-700">
+      <thead className="bg-gray-900">
+        <tr>
+          {[
+            { key: "seq", label: "STT", width: "w-12" },
+            { key: "courseTitle", label: "Khóa học", width: "w-32" },
+            { key: "sectionTitle", label: "Chương học", width: "w-32" },
+            { key: "reporter", label: "Người báo cáo", width: "w-32" },
+            { key: "reason", label: "Lý do", width: "w-48" },
+            { key: "createdAt", label: "Ngày", width: "w-24" },
+            { key: "actions", label: "Hành động", width: "w-28 text-right" },
+          ].map((col) => (
+            <th
+              key={col.key}
+              className={`px-4 py-3 text-xs font-semibold text-left uppercase text-gray-400 ${col.width}`}
+            >
+              {col.label}
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody className="divide-y divide-gray-700">
+        {pageItems.length ? (
+          pageItems.map((r, idx) => (
+            <tr
+              key={r.reportId}
+              className={`${
+                idx % 2 === 0 ? "bg-gray-850" : "bg-gray-800"
+              } hover:bg-gray-700 transition-colors`}
+            >
+              <td className="px-4 py-3 text-sm text-gray-200">{r._seq}</td>
+              <td
+                className="px-4 py-3 text-sm font-medium text-gray-100 truncate"
+                title={r.courseTitle}
+              >
+                {r.courseTitle}
+              </td>
+              <td
+                className="px-4 py-3 text-sm font-medium text-gray-100 truncate"
+                title={r.sectionTitle}
+              >
+                {r.sectionTitle}
+              </td>
+              <td
+                className="px-4 py-3 text-sm text-gray-200 truncate"
+                title={`${r.firstName} ${r.lastName}`}
+              >
+                {r.firstName} {r.lastName}
+              </td>
+              <td
+                className="px-4 py-3 text-sm text-gray-300 truncate"
+                title={r.reason}
+              >
+                {r.reason}
+              </td>
+              <td className="px-4 py-3 text-sm text-gray-300">
+                {new Date(r.createdAt).toLocaleDateString("vi-VN")}
+              </td>
+              <td className="px-4 py-3 text-sm">
+                <div className="flex justify-end items-center gap-2">
+                  <button
+                    onClick={() => handleView(r)}
+                    disabled={detailLoading}
+                    className="p-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition disabled:opacity-50"
+                    title="Xem"
+                  >
+                    <Eye className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => handleApprove(r)}
+                    disabled={isLoading}
+                    className="p-2 rounded-lg bg-green-600 hover:bg-green-700 text-white transition disabled:opacity-50"
+                    title="Phê duyệt"
+                  >
+                    <CheckCircle className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => handleReject(r)}
+                    disabled={isLoading}
+                    className="p-2 rounded-lg bg-red-600 hover:bg-red-700 text-white transition disabled:opacity-50"
+                    title="Từ chối"
+                  >
+                    <XCircle className="w-4 h-4" />
+                  </button>
+                </div>
+              </td>
             </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-700">
-            {pageItems.length ? (
-              pageItems.map((r, idx) => (
-                <tr
-                  key={r.reportId}
-                  className={`${
-                    idx % 2 === 0 ? "bg-gray-850" : "bg-gray-800"
-                  } hover:bg-gray-700 transition-colors`}
-                >
-                  <td className="px-4 py-3 text-sm text-gray-200 truncate">
-                    {r._seq}
-                  </td>
-                  <td
-                    className="px-4 py-3 text-sm font-medium text-gray-100 truncate"
-                    title={r.courseTitle}
-                  >
-                    {r.courseTitle}
-                  </td>
-                  <td
-                    className="px-4 py-3 text-sm font-medium text-gray-100 truncate"
-                    title={r.sectionTitle}
-                  >
-                    {r.sectionTitle}
-                  </td>
-                  <td
-                    className="px-4 py-3 text-sm text-gray-200 truncate"
-                    title={`${r.firstName} ${r.lastName}`}
-                  >
-                    {r.firstName} {r.lastName}
-                  </td>
-                  <td
-                    className="px-4 py-3 text-sm text-gray-300 max-w-[30ch] truncate"
-                    title={r.reason}
-                  >
-                    {r.reason}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-300 truncate">
-                    {new Date(r.createdAt).toLocaleDateString("vi-VN")}
-                  </td>
-                  <td className="px-4 py-3 text-sm flex justify-end space-x-2">
-                    <button
-                      onClick={() => handleView(r)}
-                      disabled={detailLoading}
-                      className="p-2 bg-blue-600 rounded-lg text-white hover:bg-blue-700 disabled:opacity-50 transition"
-                      title="Xem"
-                    >
-                      <Eye className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => handleApprove(r)}
-                      disabled={isLoading}
-                      className="p-2 bg-green-600 rounded-lg text-white hover:bg-green-700 disabled:opacity-50 transition"
-                      title="Phê duyệt"
-                    >
-                      <CheckCircle className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => handleReject(r)}
-                      disabled={isLoading}
-                      className="p-2 bg-red-600 rounded-lg text-white hover:bg-red-700 disabled:opacity-50 transition"
-                      title="Từ chối"
-                    >
-                      <XCircle className="w-4 h-4" />
-                    </button>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td
-                  colSpan={7}
-                  className="py-6 text-center text-gray-500 text-sm"
-                >
-                  Không có báo cáo
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+          ))
+        ) : (
+          <tr>
+            <td
+              colSpan={7}
+              className="py-6 text-center text-gray-500 text-sm"
+            >
+              Không có báo cáo
+            </td>
+          </tr>
+        )}
+      </tbody>
+    </table>
+  </div>
+
 
       {reports.length > itemsPerPage && (
         <div className="bg-gray-800 px-6 py-4 flex items-center justify-between border-t border-gray-700">
