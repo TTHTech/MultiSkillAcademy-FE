@@ -36,7 +36,9 @@ import ResetPassPage from "./pages/auth/ResetPassPage";
 import SuccessPage from "./pages/student/cart/SuccessPage";
 import Logout from "./components/auth/Logout.jsx";
 import PageReview from "./pages/instructor/PageReview/PageReview";
-import PageSales from "./pages/instructor/PageSales/PageSales.jsx";
+import PageSales from "./pages/instructor/PageSaleCourse/PageSaleCourse.jsx";
+// import PageSales from "./pages/instructor/PageDashboard.jsx";
+
 import ProfilePage from "./pages/student/profile/ProfilePage.jsx";
 import QuizPage from "./pages/student/quiz/QuizPage";
 import ResultPage from "./pages/student/quiz/ResultPage";
