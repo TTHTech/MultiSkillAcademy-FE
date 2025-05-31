@@ -16,6 +16,7 @@ const ChatSidebar = ({ onUserSelect, refreshTrigger }) => {
   const [showUserSearchModal, setShowUserSearchModal] = useState(false);
   const [showCreateGroupModal, setShowCreateGroupModal] = useState(false);
   const [avatars, setAvatars] = useState({});
+  const [currentUserId, setCurrentUserId] = useState(null);
 
   // Group chat creation state
   const [groupName, setGroupName] = useState("");
@@ -24,6 +25,15 @@ const ChatSidebar = ({ onUserSelect, refreshTrigger }) => {
 
   const avatarsRef = useRef({});
   const fetchingAvatarsRef = useRef(new Set());
+
+  // Get current user ID on mount
+  useEffect(() => {
+    const userId = parseInt(localStorage.getItem("userId"));
+    if (userId) {
+      setCurrentUserId(userId);
+      console.log("Current user ID set to:", userId);
+    }
+  }, []);
 
   // Fetch user avatar
   const fetchUserAvatar = useCallback(async (userId) => {
@@ -199,9 +209,17 @@ const ChatSidebar = ({ onUserSelect, refreshTrigger }) => {
       }
 
       const chatData = await response.json();
-      console.log("Chat details loaded:", chatData.chatId);
+      console.log("Chat details loaded:", chatData);
+      
+      // For individual chat, find the correct user to pass
+      let selectedUser = null;
+      if (chat.chatType === 'INDIVIDUAL') {
+        const userId = getCurrentUserId();
+        selectedUser = chatData.participants?.find(p => p.userId !== userId);
+      }
       
       onUserSelect({ 
+        user: selectedUser,
         chat: chatData,
         isGroup: chat.chatType === 'GROUP'
       });
@@ -392,7 +410,11 @@ const ChatSidebar = ({ onUserSelect, refreshTrigger }) => {
       };
     } else {
       // For individual chat, find the other participant
-      const otherParticipant = chat.participants?.find(p => p.userId !== getCurrentUserId());
+      const userId = getCurrentUserId();
+      
+      // Find participant that is NOT the current user
+      const otherParticipant = chat.participants?.find(p => p.userId !== userId);
+      
       if (otherParticipant) {
         return {
           name: `${otherParticipant.firstName || ''} ${otherParticipant.lastName || ''}`.trim(),
@@ -403,6 +425,36 @@ const ChatSidebar = ({ onUserSelect, refreshTrigger }) => {
           role: otherParticipant.role
         };
       }
+      
+      // If no other participant found by ID, try to find non-admin participant
+      const nonAdminParticipant = chat.participants?.find(p => 
+        !p.role?.includes('ADMIN')
+      );
+      
+      if (nonAdminParticipant) {
+        return {
+          name: `${nonAdminParticipant.firstName || ''} ${nonAdminParticipant.lastName || ''}`.trim(),
+          avatar: avatars[nonAdminParticipant.userId],
+          subtitle: displayRole(nonAdminParticipant.role),
+          isGroup: false,
+          userId: nonAdminParticipant.userId,
+          role: nonAdminParticipant.role
+        };
+      }
+      
+      // Final fallback - just show first participant
+      const firstParticipant = chat.participants?.[0];
+      if (firstParticipant) {
+        return {
+          name: `${firstParticipant.firstName || ''} ${firstParticipant.lastName || ''}`.trim(),
+          avatar: avatars[firstParticipant.userId],
+          subtitle: displayRole(firstParticipant.role),
+          isGroup: false,
+          userId: firstParticipant.userId,
+          role: firstParticipant.role
+        };
+      }
+      
       return {
         name: 'Unknown User',
         avatar: null,
@@ -414,9 +466,7 @@ const ChatSidebar = ({ onUserSelect, refreshTrigger }) => {
 
   // Get current user ID (admin)
   const getCurrentUserId = () => {
-    // This should be retrieved from auth context or token
-    // For now, returning a placeholder
-    return 0;
+    return currentUserId || parseInt(localStorage.getItem("userId")) || 0;
   };
 
   // Avatar fallback
