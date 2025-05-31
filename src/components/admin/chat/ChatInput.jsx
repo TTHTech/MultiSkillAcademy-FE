@@ -121,6 +121,13 @@ const ChatInput = ({ chatId, addMessage, setIsTyping, disabled }) => {
       
       if (!chatId) throw new Error("Không có ID cuộc trò chuyện");
       
+      console.log("Starting file upload:", {
+        fileName: file.name,
+        fileSize: file.size,
+        fileType: fileType,
+        chatId: chatId
+      });
+      
       setIsUploading(true);
       setUploadProgress(0);
       
@@ -128,9 +135,8 @@ const ChatInput = ({ chatId, addMessage, setIsTyping, disabled }) => {
       formData.append('file', file);
       formData.append('type', fileType);
       
-      console.log("Uploading file to endpoint:", `${baseUrl}/api/admin/chat/${chatId}/upload`);
-      console.log("File type:", fileType);
-      console.log("File size:", file.size);
+      const uploadUrl = `${baseUrl}/api/admin/chat/${chatId}/upload`;
+      console.log("Uploading to:", uploadUrl);
       
       // Use XMLHttpRequest to track upload progress
       return new Promise((resolve, reject) => {
@@ -140,41 +146,66 @@ const ChatInput = ({ chatId, addMessage, setIsTyping, disabled }) => {
           if (event.lengthComputable) {
             const progress = Math.round((event.loaded / event.total) * 100);
             setUploadProgress(progress);
+            console.log(`Upload progress: ${progress}%`);
           }
         });
         
         xhr.addEventListener('load', () => {
+          console.log("Upload completed with status:", xhr.status);
+          
           if (xhr.status >= 200 && xhr.status < 300) {
             try {
               const response = JSON.parse(xhr.responseText);
+              console.log("Upload response:", response);
               resolve(response);
             } catch (error) {
               console.error("Error parsing upload response:", error);
               console.log("Raw response:", xhr.responseText);
-              reject(new Error("Invalid response format"));
+              reject(new Error("Invalid response format from server"));
             }
           } else {
-            console.error("Upload error status:", xhr.status);
-            console.error("Response text:", xhr.responseText);
-            reject(new Error(`Upload failed: ${xhr.status}`));
+            console.error("Upload failed with status:", xhr.status);
+            console.error("Error response:", xhr.responseText);
+            let errorMessage = `Upload failed (${xhr.status})`;
+            try {
+              const errorResponse = JSON.parse(xhr.responseText);
+              if (errorResponse.message) {
+                errorMessage = errorResponse.message;
+              }
+            } catch (e) {
+              // Use status text if can't parse error
+              if (xhr.responseText) {
+                errorMessage = xhr.responseText;
+              }
+            }
+            reject(new Error(errorMessage));
           }
         });
         
         xhr.addEventListener('error', () => {
+          console.error("Network error during upload");
           reject(new Error('Network error during upload'));
         });
         
-        // Use admin API
-        xhr.open('POST', `${baseUrl}/api/admin/chat/${chatId}/upload`);
+        xhr.addEventListener('timeout', () => {
+          console.error("Upload timeout");
+          reject(new Error('Upload timeout'));
+        });
+        
+        xhr.open('POST', uploadUrl);
         xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+        xhr.timeout = 30000; // 30 second timeout
+        
+        console.log("Starting XMLHttpRequest send...");
         xhr.send(formData);
       });
     } catch (error) {
-      console.error('Error uploading file:', error);
+      console.error('Error in uploadFile function:', error);
       toast.error(`Không thể tải file lên: ${error.message}`);
       throw error;
     } finally {
       setIsUploading(false);
+      setUploadProgress(0);
     }
   };
 
@@ -182,6 +213,7 @@ const ChatInput = ({ chatId, addMessage, setIsTyping, disabled }) => {
     setSelectedFile(null);
     setFilePreview(null);
     setFileType(null);
+    setUploadProgress(0);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -189,44 +221,67 @@ const ChatInput = ({ chatId, addMessage, setIsTyping, disabled }) => {
 
   // Handle send message for Admin
   const handleSendMessage = async () => {
-    if (disabled || !chatId) return;
+    if (disabled || !chatId) {
+      console.log("Cannot send message:", { disabled, chatId });
+      return;
+    }
     
     try {
+      console.log("Starting to send message...", { 
+        hasFile: !!selectedFile, 
+        messageLength: message.trim().length,
+        chatId 
+      });
+
       // If a file is selected
       if (selectedFile) {
         setIsUploading(true);
         
-        // Upload file to server
-        const uploadResponse = await uploadFile(selectedFile);
-        console.log('File uploaded successfully:', uploadResponse);
-        
-        // Create message content based on file type
-        let messageContent = message || '';
-        if (fileType === 'IMAGE') {
-          messageContent = message || '[Hình ảnh]';
-        } else if (fileType === 'VIDEO') {
-          messageContent = message || '[Video]';
-        } else {
-          messageContent = message || `[Tập tin: ${selectedFile.name}]`;
+        try {
+          // Upload file to server
+          const uploadResponse = await uploadFile(selectedFile);
+          console.log('File uploaded successfully:', uploadResponse);
+          
+          // Create message content based on file type
+          let messageContent = message.trim() || '';
+          if (!messageContent) {
+            if (fileType === 'IMAGE') {
+              messageContent = '[Hình ảnh]';
+            } else if (fileType === 'VIDEO') {
+              messageContent = '[Video]';
+            } else {
+              messageContent = `[Tập tin: ${selectedFile.name}]`;
+            }
+          }
+          
+          // Shorten URL if too long
+          let fileUrl = uploadResponse.fileUrl;
+          if (fileUrl && fileUrl.length > 200) {
+            const urlParts = fileUrl.split('/');
+            const fileName = urlParts[urlParts.length - 1];
+            fileUrl = `/api/admin/chat/files/${fileName}`;
+            console.log("URL gốc quá dài, đã rút gọn thành:", fileUrl);
+          }
+          
+          // Send message with file URL
+          await addMessage(messageContent, fileUrl, fileType);
+          
+          // Reset file selection
+          resetFileSelection();
+          
+        } catch (uploadError) {
+          console.error('File upload failed:', uploadError);
+          toast.error(`Không thể tải file lên: ${uploadError.message}`);
+          return; // Don't proceed if file upload fails
         }
         
-        // Shorten URL if too long
-        let fileUrl = uploadResponse.fileUrl;
-        if (fileUrl && fileUrl.length > 200) {
-          const urlParts = fileUrl.split('/');
-          const fileName = urlParts[urlParts.length - 1];
-          fileUrl = `/api/admin/chat/files/${fileName}`;
-          console.log("URL gốc quá dài, đã rút gọn thành:", fileUrl);
-        }
-        
-        // Send message with file URL
-        await addMessage(messageContent, fileUrl, fileType);
-        
-        // Reset file selection
-        resetFileSelection();
       } else if (message.trim()) {
+        console.log("Sending text message:", message.trim());
         // Send regular text message
         await addMessage(message.trim(), null, 'TEXT');
+      } else {
+        console.log("No message content to send");
+        return;
       }
       
       // Reset message and typing status
@@ -235,11 +290,14 @@ const ChatInput = ({ chatId, addMessage, setIsTyping, disabled }) => {
       setShowEmojiPicker(false);
       
       // Focus input after sending
-      if (inputRef.current) {
-        inputRef.current.focus();
-      }
+      setTimeout(() => {
+        if (inputRef.current) {
+          inputRef.current.focus();
+        }
+      }, 100);
+      
     } catch (error) {
-      console.error('Error sending message:', error);
+      console.error('Error in handleSendMessage:', error);
       toast.error(`Không thể gửi tin nhắn: ${error.message}`);
     } finally {
       setIsUploading(false);
@@ -282,36 +340,38 @@ const ChatInput = ({ chatId, addMessage, setIsTyping, disabled }) => {
   }, [message, chatId]);
 
   return (
-    <div className="border-t p-3 relative">
+    <div className="border-t p-3 relative bg-white">
       {/* Display selected file */}
       {selectedFile && (
-        <div className="mb-2 p-2 bg-gray-100 rounded-md relative">
+        <div className="mb-2 p-3 bg-gray-50 rounded-lg relative border">
           <div className="flex items-center">
             {filePreview && fileType === 'IMAGE' ? (
-              <img src={filePreview} alt="Preview" className="w-16 h-16 object-cover rounded-md mr-2" />
+              <img src={filePreview} alt="Preview" className="w-16 h-16 object-cover rounded-md mr-3" />
             ) : filePreview && fileType === 'VIDEO' ? (
-              <video src={filePreview} className="w-16 h-16 object-cover rounded-md mr-2" />
+              <video src={filePreview} className="w-16 h-16 object-cover rounded-md mr-3" />
             ) : (
-              <div className="w-16 h-16 bg-gray-200 rounded-md flex items-center justify-center mr-2">
+              <div className="w-16 h-16 bg-gray-200 rounded-md flex items-center justify-center mr-3">
                 <FileText className="w-8 h-8 text-gray-500" />
               </div>
             )}
             <div className="flex-1">
               <p className="text-sm font-medium truncate">{selectedFile.name}</p>
-              <p className="text-xs text-gray-500">{(selectedFile.size / 1024).toFixed(2)} KB</p>
+              <p className="text-xs text-gray-500">{(selectedFile.size / 1024 / 1024).toFixed(2)} MB</p>
               
               {isUploading && (
-                <div className="w-full bg-gray-200 rounded-full h-2.5 mt-1">
+                <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
                   <div 
-                    className="bg-emerald-500 h-2.5 rounded-full" 
+                    className="bg-emerald-500 h-2 rounded-full transition-all duration-300" 
                     style={{width: `${uploadProgress}%`}}>
                   </div>
+                  <div className="text-xs text-gray-500 mt-1">{uploadProgress}%</div>
                 </div>
               )}
             </div>
             <button 
-              className="p-1 hover:bg-gray-200 rounded-full"
+              className="p-1 hover:bg-gray-200 rounded-full transition-colors"
               onClick={resetFileSelection}
+              disabled={isUploading}
             >
               <X className="w-4 h-4 text-gray-500" />
             </button>
@@ -328,34 +388,34 @@ const ChatInput = ({ chatId, addMessage, setIsTyping, disabled }) => {
               setShowAttachmentOptions(!showAttachmentOptions);
               setShowEmojiPicker(false);
             }}
-            disabled={disabled || !chatId}
+            disabled={disabled || !chatId || isUploading}
           >
             <Paperclip className="w-5 h-5" />
           </button>
           
           {/* Attachment options */}
           {showAttachmentOptions && (
-            <div className="absolute bottom-full left-0 mb-2 bg-white shadow-lg rounded-lg p-2 z-10">
+            <div className="absolute bottom-full left-0 mb-2 bg-white shadow-lg rounded-lg p-2 z-10 border">
               <button 
                 className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded-md w-full text-left"
                 onClick={() => handleAttachmentClick('IMAGE')}
               >
                 <Image className="w-5 h-5 text-emerald-500" />
-                <span>Hình ảnh</span>
+                <span className="text-sm">Hình ảnh</span>
               </button>
               <button 
                 className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded-md w-full text-left"
                 onClick={() => handleAttachmentClick('VIDEO')}
               >
                 <Video className="w-5 h-5 text-blue-500" />
-                <span>Video</span>
+                <span className="text-sm">Video</span>
               </button>
               <button 
                 className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded-md w-full text-left"
                 onClick={() => handleAttachmentClick('FILE')}
               >
                 <FileText className="w-5 h-5 text-orange-500" />
-                <span>Tài liệu</span>
+                <span className="text-sm">Tài liệu</span>
               </button>
             </div>
           )}
@@ -369,7 +429,7 @@ const ChatInput = ({ chatId, addMessage, setIsTyping, disabled }) => {
               setShowEmojiPicker(!showEmojiPicker);
               setShowAttachmentOptions(false);
             }}
-            disabled={disabled || !chatId}
+            disabled={disabled || !chatId || isUploading}
           >
             <Smile className="w-5 h-5" />
           </button>
@@ -404,7 +464,7 @@ const ChatInput = ({ chatId, addMessage, setIsTyping, disabled }) => {
           ref={inputRef}
           type="text"
           placeholder={disabled || !chatId ? "Chọn một người dùng để bắt đầu chat" : "Nhập tin nhắn..."}
-          className="flex-1 border rounded-full py-2 px-4 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          className="flex-1 border rounded-full py-2 px-4 focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:bg-gray-100"
           value={message}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
@@ -413,8 +473,10 @@ const ChatInput = ({ chatId, addMessage, setIsTyping, disabled }) => {
         
         {/* Send button */}
         <button
-          className={`p-2 rounded-full ${
-            !disabled && chatId && (message.trim() || selectedFile) ? 'bg-emerald-500 text-white' : 'bg-gray-200 text-gray-500'
+          className={`p-2 rounded-full transition-colors ${
+            !disabled && chatId && (message.trim() || selectedFile) && !isUploading
+              ? 'bg-emerald-500 hover:bg-emerald-600 text-white' 
+              : 'bg-gray-200 text-gray-500 cursor-not-allowed'
           }`}
           onClick={handleSendMessage}
           disabled={disabled || !chatId || isUploading || (!message.trim() && !selectedFile)}
