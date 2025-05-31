@@ -141,7 +141,7 @@ const PageReview = () => {
   return (
     <div className="flex-1 overflow-auto relative z-10">
       <div className="container mx-auto">
-        <Header title="Course Reviews" />
+        <Header title="Đánh Giá Khóa Học" />
         <div className="p-6">
           <FilterReview filters={filters} setFilters={setFilters} />
           <TableReview

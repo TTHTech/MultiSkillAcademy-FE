@@ -13,7 +13,7 @@ const PageCreateDiscounts = () => {
   return (
     <div className="flex-1 overflow-auto relative z-10">
       <div className="container mx-auto px-4">
-        <Header title="Discount" />
+        <Header title="Mã Giảm Giá" />
         
         <div className="flex flex-col items-center">
           {/* Beautiful Tab Navigation */}

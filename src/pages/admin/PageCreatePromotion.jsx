@@ -5,7 +5,7 @@ const PageCreatePromotion = () => {
   return (
     <div className="flex-1 overflow-auto relative z-10">
       <div className="container mx-auto px-4">
-        <Header title="Create Promotion" />
+        <Header title="Tạo Khuyến Mãi" />
         <CreatePromotion />
       </div>
     </div>

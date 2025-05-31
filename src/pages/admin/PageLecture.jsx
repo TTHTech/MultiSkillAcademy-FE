@@ -151,7 +151,7 @@ const PageLecture = () => {
   return (
     <div className="flex-1 overflow-auto relative z-10">
       <div className="container mx-auto px-4">
-        <Header title="Lectures" />
+        <Header title="Quản Lý Bài Học" />
         <div className="p-6">
           <FilterLecture onFilter={handleFilter} />
           {loading ? (

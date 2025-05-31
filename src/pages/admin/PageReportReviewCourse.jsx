@@ -62,7 +62,7 @@ export default function ReportPage() {
   return (
     <div className="flex-1 overflow-auto relative z-10">
       <div className="container mx-auto">
-        <Header title="Report Reviews" />
+        <Header title="Báo Cáo Đánh Giá Khóa Học" />
         <div className="p-6">
           <FilterReport onFilter={handleFilter}/>
           <TableReport
