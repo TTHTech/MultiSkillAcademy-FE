@@ -179,7 +179,7 @@ export default function TableCourseReport({ reports = [], triggerRefresh }) {
                 STT
               </th>
               <th className="px-6 py-4 whitespace-nowrap text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">
-                Ảnh khóa học
+                Ảnh
               </th>
               <th className="px-6 py-4 whitespace-nowrap text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">
                 Tiêu đề

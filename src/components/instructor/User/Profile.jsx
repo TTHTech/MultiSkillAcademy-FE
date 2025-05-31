@@ -8,6 +8,8 @@ import {
   CurrencyDollarIcon,
   StarIcon,
   UserGroupIcon,
+  BookOpenIcon,
+  ChartBarIcon 
 } from "@heroicons/react/24/outline";
 const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
@@ -289,7 +291,7 @@ const ProfileEdit = () => {
             <div>
               <p className="text-gray-600 font-bold">Khóa Học</p>
               <div className="bg-gradient-to-br from-blue-50 to-blue-100 shadow-lg rounded-lg p-4 flex flex-col items-center">
-                <AcademicCapIcon className="w-8 h-8 text-blue-800 mb-2" />
+                <BookOpenIcon className="w-8 h-8 text-blue-800 mb-2" />
                 <h3 className="text-xl font-bold text-gray-800">
                   {courseData.totalCourses}
                 </h3>
@@ -298,17 +300,13 @@ const ProfileEdit = () => {
 
             {/* Sales */}
             <div>
-              <p className="text-gray-600 font-bold">Doanh Thu (VND)</p>
+              <p className="text-gray-600 font-bold">Doanh Số </p>
               <div className="bg-gradient-to-br from-green-50 to-green-100 shadow-lg rounded-lg p-4 flex flex-col items-center">
-                <CurrencyDollarIcon className="w-8 h-8 text-green-800 mb-2" />
+                <ChartBarIcon className="w-8 h-8 text-green-800 mb-2" />
                 <h3 className="text-xl font-bold text-gray-800">
-                  {salesData?.totalSales
-                    ? salesData.totalSales.toLocaleString("vi-VN", {
-                        style: "currency",
-                        currency: "VND",
-                        maximumFractionDigits: 0,
-                      })
-                    : "0 VND"}
+                  {salesData
+                    ? (salesData.totalEnrollments ?? 0).toLocaleString("vi-VN")
+                    : "0"}
                 </h3>
               </div>
             </div>
