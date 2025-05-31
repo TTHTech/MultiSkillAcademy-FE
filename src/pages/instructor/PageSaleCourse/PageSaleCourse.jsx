@@ -4,7 +4,7 @@ import ChartSales7Day from "./ChartSales7Day";
 import ChartOne from "./ChartOne";
 import { CalendarDaysIcon } from "lucide-react";
 import TableSalesCourse from "./TableSalesCourse";
-
+import InstructorRevenueTable from "./InstructorRevenueTable";
 const SalesDashboard = () => {
   const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
   const userId = Number(localStorage.getItem("userId"));
@@ -48,7 +48,7 @@ const SalesDashboard = () => {
           <div className="flex items-center gap-3">
             <CalendarDaysIcon className="h-8 w-8 text-indigo-600" />
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-              Danh số khóa học
+              Doanh số khóa học
             </h1>
           </div>
         </header>
@@ -64,7 +64,10 @@ const SalesDashboard = () => {
             </div>
           </div>
         </div>
-        <TableSalesCourse />
+        <div className="mt-8 space-y-4">
+          <InstructorRevenueTable />
+          <TableSalesCourse />
+        </div>
       </div>
     </div>
   );

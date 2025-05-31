@@ -167,7 +167,7 @@ const TableSalesCourse = () => {
                       {formatCurrency(c.price)}
                     </td>
                     <td className="px-4 py-3 text-blue-700 font-semibold">
-                      {formatCurrency(c.revenue)}
+                      {formatCurrency(c.priceRevenues)}
                     </td>
                   </tr>
                 ))}
