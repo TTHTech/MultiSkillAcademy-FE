@@ -55,7 +55,7 @@ export default function PageReportLecture() {
   return (
     <div className="flex-1 overflow-auto relative z-10">
       <div className="container mx-auto">
-        <Header title="Report Lectures" />
+        <Header title="Báo Cáo Bài Học" />
         <div className="p-6">
           <FilterReport onFilter={handleFilter} />
           <TableReport

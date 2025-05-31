@@ -189,7 +189,7 @@ const PageSection = () => {
   return (
     <div className="flex-1 overflow-auto relative z-10 bg-gray-900 min-h-screen">
       <div className="container mx-auto px-4 py-6">
-        <Header title="Quản lý Chương (Sections)" />
+        <Header title="Quản Lý Chương" />
         
         <div className="mt-6">
           <FilterSection onFilter={handleFilter} />
