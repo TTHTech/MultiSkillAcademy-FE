@@ -25,7 +25,7 @@ const Sidebar = ({ open, setOpen }) => {
       icon: AiOutlineUser,
     },
     {
-      name: "Doanh Thu",
+      name: "Doanh Số",
       link: "/instructor/sales",
       icon: FaCircleDollarToSlot,
     },
