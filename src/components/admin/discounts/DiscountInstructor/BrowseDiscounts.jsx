@@ -91,7 +91,7 @@ const BrowseDiscounts = () => {
       ) : (
         <>
           <h2 className="text-2xl font-bold mb-4 text-white">
-            Danh sách Discounts cần duyệt
+            Danh sách mã giảm giá cần duyệt
           </h2>
           <div className="w-full flex flex-col sm:flex-row items-center gap-4 mb-6 px-4">
             <input
