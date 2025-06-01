@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FileUp, MoreHorizontal } from 'lucide-react';
+import { FileUp, MoreHorizontal, Copy, Reply, Trash2 } from 'lucide-react';
 
 const ChatMessage = ({
   id,
@@ -13,26 +13,46 @@ const ChatMessage = ({
   fileUrl,
   senderId,
   avatars,
-  hoveredMessageId,
-  showMessageMenu,
-  onMessageHover,
-  onMessageLeave,
-  onShowMessageMenu,
   onEnlargeImage,
-  getCurrentTimeString
+  getCurrentTimeString,
+  onCopyMessage,
+  onDeleteMessage
 }) => {
   const userAvatar = avatars[senderId] || avatar;
   const [imgLoaded, setImgLoaded] = useState(false);
   const [imgError, setImgError] = useState(false);
-  const isHovered = hoveredMessageId === id;
-  const isMenuOpen = showMessageMenu === id;
+  const [showMenu, setShowMenu] = useState(false);
+
+  const handleMenuClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setShowMenu(!showMenu);
+  };
+
+  const handleCopy = () => {
+    onCopyMessage({ id, message });
+    setShowMenu(false);
+  };
+
+  const handleDelete = () => {
+    onDeleteMessage(id);
+    setShowMenu(false);
+  };
+
+  // Close menu when clicking outside
+  React.useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (showMenu && !e.target.closest('.message-menu-container')) {
+        setShowMenu(false);
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [showMenu]);
 
   return (
-    <div
-      className={`group flex ${isAdmin ? "justify-end" : "justify-start"} mb-4 relative`}
-      onMouseEnter={() => onMessageHover(id)}
-      onMouseLeave={onMessageLeave}
-    >
+    <div className={`group flex ${isAdmin ? "justify-end" : "justify-start"} mb-4`}>
       <div className={`flex ${isAdmin ? "flex-row-reverse" : "flex-row"} items-end max-w-[70%] relative`}>
         {!isAdmin && (
           <img
@@ -47,6 +67,7 @@ const ChatMessage = ({
         )}
 
         <div className="relative">
+          {/* Message Content */}
           {messageType === "IMAGE" ? (
             <div className={`rounded-2xl overflow-hidden ${isAdmin ? "ml-2" : ""} bg-gray-100`}>
               {!imgLoaded && !imgError && (
@@ -65,7 +86,7 @@ const ChatMessage = ({
                   className={`max-w-full h-auto max-h-64 rounded-2xl cursor-pointer ${imgLoaded ? "block" : "hidden"}`}
                   onClick={() => onEnlargeImage(fileUrl)}
                   onLoad={() => setImgLoaded(true)}
-                  onError={(e) => {
+                  onError={() => {
                     console.error("Image failed to load:", fileUrl);
                     setImgError(true);
                     setImgLoaded(false);
@@ -109,16 +130,50 @@ const ChatMessage = ({
             </div>
           )}
 
-          {/* Modern Hover Menu Button */}
-          {(isHovered || isMenuOpen) && isAdmin && (
-            <button
-              onClick={(e) => onShowMessageMenu(id, e)}
-              className={`absolute top-0 ${isAdmin ? "-left-10" : "-right-10"} bg-white shadow-lg rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-gray-50`}
-            >
-              <MoreHorizontal className="w-4 h-4 text-gray-600" />
-            </button>
+          {/* Hover Menu Button - Only for admin's own messages */}
+          {isAdmin && (
+            <div className={`absolute top-0 ${isAdmin ? "-left-10" : "-right-10"} opacity-0 group-hover:opacity-100 transition-opacity message-menu-container`}>
+              <button
+                onClick={handleMenuClick}
+                className="bg-white shadow-lg rounded-full p-1 hover:bg-gray-50"
+              >
+                <MoreHorizontal className="w-4 h-4 text-gray-600" />
+              </button>
+
+              {/* Inline Menu */}
+              {showMenu && (
+                <div className={`absolute ${isAdmin ? "right-0" : "left-0"} top-8 bg-white shadow-lg rounded-lg py-2 z-50 border min-w-[160px]`}>
+                  <button
+                    className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 w-full text-left text-sm"
+                    onClick={handleCopy}
+                  >
+                    <Copy className="w-4 h-4 mr-3" />
+                    Sao chép tin nhắn
+                  </button>
+
+                  <button
+                    className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 w-full text-left text-sm"
+                    onClick={() => {/* TODO: Implement reply */}}
+                  >
+                    <Reply className="w-4 h-4 mr-3" />
+                    Trả lời
+                  </button>
+
+                  <div className="border-t my-1"></div>
+
+                  <button
+                    className="flex items-center px-4 py-2 text-red-600 hover:bg-red-50 w-full text-left text-sm"
+                    onClick={handleDelete}
+                  >
+                    <Trash2 className="w-4 h-4 mr-3" />
+                    Xóa tin nhắn
+                  </button>
+                </div>
+              )}
+            </div>
           )}
 
+          {/* Timestamp */}
           <div className={`mt-1 ${isAdmin ? "text-right" : "text-left"}`}>
             <span className="text-xs text-gray-500">
               {timestamp || getCurrentTimeString()}

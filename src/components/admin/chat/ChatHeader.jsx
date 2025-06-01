@@ -1,5 +1,5 @@
 import React from 'react';
-import { Phone, Video, MoreVertical, Users } from 'lucide-react';
+import { Phone, Video, MoreVertical, Users, Settings } from 'lucide-react';
 
 const ChatHeader = ({ 
   selectedUser, 
@@ -7,7 +7,8 @@ const ChatHeader = ({
   chatData, 
   isTyping, 
   avatars,
-  getRoleText 
+  getRoleText,
+  onGroupManagementClick 
 }) => {
   const userAvatar = selectedUser && avatars[selectedUser.userId]
     ? avatars[selectedUser.userId]
@@ -52,6 +53,15 @@ const ChatHeader = ({
         </div>
       </div>
       <div className="flex items-center space-x-4">
+        {isGroup && (
+          <button 
+            onClick={onGroupManagementClick}
+            className="p-2 text-white hover:bg-emerald-600 rounded-full transition-colors"
+            title="Quản lý nhóm"
+          >
+            <Settings className="w-6 h-6" />
+          </button>
+        )}
         <button className="p-2 text-white hover:bg-emerald-600 rounded-full transition-colors">
           <Phone className="w-6 h-6" />
         </button>

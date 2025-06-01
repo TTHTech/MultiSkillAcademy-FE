@@ -11,7 +11,6 @@ const ChatInput = ({ chatId, addMessage, setIsTyping, disabled }) => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [filePreview, setFilePreview] = useState(null);
   const [fileType, setFileType] = useState(null);
-  const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
   const inputRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -113,107 +112,10 @@ const ChatInput = ({ chatId, addMessage, setIsTyping, disabled }) => {
     }
   };
 
-  // Upload file function for Admin
-  const uploadFile = async (file) => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) throw new Error("Vui lòng đăng nhập lại");
-      
-      if (!chatId) throw new Error("Không có ID cuộc trò chuyện");
-      
-      console.log("Starting file upload:", {
-        fileName: file.name,
-        fileSize: file.size,
-        fileType: fileType,
-        chatId: chatId
-      });
-      
-      setIsUploading(true);
-      setUploadProgress(0);
-      
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('type', fileType);
-      
-      const uploadUrl = `${baseUrl}/api/admin/chat/${chatId}/upload`;
-      console.log("Uploading to:", uploadUrl);
-      
-      // Use XMLHttpRequest to track upload progress
-      return new Promise((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-        
-        xhr.upload.addEventListener('progress', (event) => {
-          if (event.lengthComputable) {
-            const progress = Math.round((event.loaded / event.total) * 100);
-            setUploadProgress(progress);
-            console.log(`Upload progress: ${progress}%`);
-          }
-        });
-        
-        xhr.addEventListener('load', () => {
-          console.log("Upload completed with status:", xhr.status);
-          
-          if (xhr.status >= 200 && xhr.status < 300) {
-            try {
-              const response = JSON.parse(xhr.responseText);
-              console.log("Upload response:", response);
-              resolve(response);
-            } catch (error) {
-              console.error("Error parsing upload response:", error);
-              console.log("Raw response:", xhr.responseText);
-              reject(new Error("Invalid response format from server"));
-            }
-          } else {
-            console.error("Upload failed with status:", xhr.status);
-            console.error("Error response:", xhr.responseText);
-            let errorMessage = `Upload failed (${xhr.status})`;
-            try {
-              const errorResponse = JSON.parse(xhr.responseText);
-              if (errorResponse.message) {
-                errorMessage = errorResponse.message;
-              }
-            } catch (e) {
-              // Use status text if can't parse error
-              if (xhr.responseText) {
-                errorMessage = xhr.responseText;
-              }
-            }
-            reject(new Error(errorMessage));
-          }
-        });
-        
-        xhr.addEventListener('error', () => {
-          console.error("Network error during upload");
-          reject(new Error('Network error during upload'));
-        });
-        
-        xhr.addEventListener('timeout', () => {
-          console.error("Upload timeout");
-          reject(new Error('Upload timeout'));
-        });
-        
-        xhr.open('POST', uploadUrl);
-        xhr.setRequestHeader('Authorization', `Bearer ${token}`);
-        xhr.timeout = 30000; // 30 second timeout
-        
-        console.log("Starting XMLHttpRequest send...");
-        xhr.send(formData);
-      });
-    } catch (error) {
-      console.error('Error in uploadFile function:', error);
-      toast.error(`Không thể tải file lên: ${error.message}`);
-      throw error;
-    } finally {
-      setIsUploading(false);
-      setUploadProgress(0);
-    }
-  };
-
   const resetFileSelection = () => {
     setSelectedFile(null);
     setFilePreview(null);
     setFileType(null);
-    setUploadProgress(0);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -238,41 +140,16 @@ const ChatInput = ({ chatId, addMessage, setIsTyping, disabled }) => {
         setIsUploading(true);
         
         try {
-          // Upload file to server
-          const uploadResponse = await uploadFile(selectedFile);
-          console.log('File uploaded successfully:', uploadResponse);
-          
-          // Create message content based on file type
-          let messageContent = message.trim() || '';
-          if (!messageContent) {
-            if (fileType === 'IMAGE') {
-              messageContent = '[Hình ảnh]';
-            } else if (fileType === 'VIDEO') {
-              messageContent = '[Video]';
-            } else {
-              messageContent = `[Tập tin: ${selectedFile.name}]`;
-            }
-          }
-          
-          // Shorten URL if too long
-          let fileUrl = uploadResponse.fileUrl;
-          if (fileUrl && fileUrl.length > 200) {
-            const urlParts = fileUrl.split('/');
-            const fileName = urlParts[urlParts.length - 1];
-            fileUrl = `/api/admin/chat/files/${fileName}`;
-            console.log("URL gốc quá dài, đã rút gọn thành:", fileUrl);
-          }
-          
-          // Send message with file URL
-          await addMessage(messageContent, fileUrl, fileType);
+          // Send file directly using message/media endpoint
+          await addMessage(message.trim() || `[${selectedFile.name}]`, selectedFile, fileType);
           
           // Reset file selection
           resetFileSelection();
           
-        } catch (uploadError) {
-          console.error('File upload failed:', uploadError);
-          toast.error(`Không thể tải file lên: ${uploadError.message}`);
-          return; // Don't proceed if file upload fails
+        } catch (error) {
+          console.error('File send failed:', error);
+          toast.error(`Không thể gửi file: ${error.message}`);
+          return;
         }
         
       } else if (message.trim()) {
@@ -361,10 +238,10 @@ const ChatInput = ({ chatId, addMessage, setIsTyping, disabled }) => {
               {isUploading && (
                 <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
                   <div 
-                    className="bg-emerald-500 h-2 rounded-full transition-all duration-300" 
-                    style={{width: `${uploadProgress}%`}}>
+                    className="bg-emerald-500 h-2 rounded-full transition-all duration-300 animate-pulse" 
+                    style={{width: '100%'}}>
                   </div>
-                  <div className="text-xs text-gray-500 mt-1">{uploadProgress}%</div>
+                  <div className="text-xs text-gray-500 mt-1">Đang gửi...</div>
                 </div>
               )}
             </div>
