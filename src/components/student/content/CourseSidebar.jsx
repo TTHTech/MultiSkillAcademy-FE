@@ -16,6 +16,7 @@ import { Flag } from "lucide-react";
 import axios from "axios";
 const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 import { decodeId } from "../../../utils/hash";
+import { encodeId } from "../../../utils/hash";
 
 const CourseSidebar = ({
   course,
@@ -28,7 +29,9 @@ const CourseSidebar = ({
 }) => {
   const [openSections, setOpenSections] = useState({});
   const { courseHash } = useParams();
-  const id = decodeId(courseHash);
+  const courseId = decodeId(courseHash);
+  const userId = localStorage.getItem("userId");
+  const token = localStorage.getItem("token");
   useEffect(() => {
     if (selectedLecture) {
       const sectionIndex = course.sections.findIndex((section) =>
@@ -107,11 +110,26 @@ const CourseSidebar = ({
 
   const progressPercentage = (completedLectures / totalLectures) * 100;
 
-  const handleCertificateClick = () => {
-    const queryParams = new URLSearchParams({
-      courseName: course.title,
-    }).toString();
-    window.open(`/certificate?${queryParams}`, "_blank");
+  const handleCertificateClick = async () => {
+    try {
+      const response = await fetch(
+        `${baseUrl}/api/student/certificate/${userId}/${courseId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        window.open(`/certificate/${encodeId(courseId)}`);
+      }
+    } catch (error) {
+      console.error("Lỗi khi tạo chứng chỉ:", error);
+      alert("Không thể tạo chứng chỉ. Vui lòng thử lại.");
+    }
   };
 
   const toggleSection = (sectionIndex) => {
@@ -136,7 +154,6 @@ const CourseSidebar = ({
       },
     });
     if (!reason) return;
-    const token = localStorage.getItem("token");
     try {
       await axios.post(
         `${baseUrl}/api/student/section/report`,

@@ -13,6 +13,7 @@
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.6.0",
     "@heroicons/react": "^2.1.5",
+    "@pdf-lib/fontkit": "^1.1.1",
     "@stomp/stompjs": "^7.0.0",
     "@tailwindcss/line-clamp": "^0.4.4",
     "admin-dashboard": "file:",
@@ -34,6 +35,7 @@
     "lodash": "^4.17.21",
     "lucide-react": "^0.417.0",
     "moment": "^2.30.1",
+    "pdf-lib": "^1.17.1",
     "phosphor-react": "^1.4.1",
     "react": "^18.3.1",
     "react-apexcharts": "^1.5.0",
