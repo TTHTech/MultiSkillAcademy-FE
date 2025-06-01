@@ -1,13 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import { X, Edit3, UserPlus, UserMinus, Users, Search, Settings } from 'lucide-react';
-import { toast } from 'react-toastify';
+import React, { useState, useEffect } from "react";
+import {
+  X,
+  Edit3,
+  UserPlus,
+  UserMinus,
+  Users,
+  Search,
+  Settings,
+} from "lucide-react";
+import { toast } from "react-toastify";
 const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const GroupManagement = ({ chatData, onClose, onUpdate }) => {
-  const [activeTab, setActiveTab] = useState('info'); // info, participants, add
+  const [activeTab, setActiveTab] = useState("info"); // info, participants, add
   const [isEditingName, setIsEditingName] = useState(false);
-  const [newGroupName, setNewGroupName] = useState(chatData?.groupName || '');
-  const [searchTerm, setSearchTerm] = useState('');
+  const [newGroupName, setNewGroupName] = useState(chatData?.groupName || "");
+  const [searchTerm, setSearchTerm] = useState("");
   const [searchUsers, setSearchUsers] = useState([]);
   const [searchLoading, setSearchLoading] = useState(false);
   const [avatars, setAvatars] = useState({});
@@ -22,23 +30,26 @@ const GroupManagement = ({ chatData, onClose, onUpdate }) => {
   const fetchUserAvatar = async (userId) => {
     try {
       if (!userId || avatars[userId]) return;
-      
+
       const token = localStorage.getItem("token");
       if (!token) return;
 
-      const response = await fetch(`${baseUrl}/api/admin/chat/users/${userId}/avatar`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        `${baseUrl}/api/admin/chat/users/${userId}/avatar`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (!response.ok) return;
-      
+
       const data = await response.json();
       if (data.avatarUrl) {
-        setAvatars(prev => ({
+        setAvatars((prev) => ({
           ...prev,
-          [userId]: data.avatarUrl
+          [userId]: data.avatarUrl,
         }));
       }
     } catch (err) {
@@ -49,7 +60,7 @@ const GroupManagement = ({ chatData, onClose, onUpdate }) => {
   // Fetch avatars for all participants
   useEffect(() => {
     if (chatData?.participants) {
-      chatData.participants.forEach(p => {
+      chatData.participants.forEach((p) => {
         if (p.userId) fetchUserAvatar(p.userId);
       });
     }
@@ -74,17 +85,19 @@ const GroupManagement = ({ chatData, onClose, onUpdate }) => {
       if (!response.ok) {
         throw new Error("Cannot search users");
       }
-      
+
       const data = await response.json();
-      
+
       // Filter out existing participants
-      const existingIds = chatData?.participants?.map(p => p.userId) || [];
-      const filteredUsers = data.filter(user => !existingIds.includes(user.userId));
-      
+      const existingIds = chatData?.participants?.map((p) => p.userId) || [];
+      const filteredUsers = data.filter(
+        (user) => !existingIds.includes(user.userId)
+      );
+
       setSearchUsers(filteredUsers);
-      
+
       // Fetch avatars for search results
-      filteredUsers.forEach(user => fetchUserAvatar(user.userId));
+      filteredUsers.forEach((user) => fetchUserAvatar(user.userId));
     } catch (err) {
       console.error("Error searching users:", err);
       toast.error(err.message);
@@ -105,16 +118,19 @@ const GroupManagement = ({ chatData, onClose, onUpdate }) => {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("Please login again");
 
-      const response = await fetch(`${baseUrl}/api/admin/chat/${chatData.chatId}/group-info`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          groupName: newGroupName.trim()
-        })
-      });
+      const response = await fetch(
+        `${baseUrl}/api/admin/chat/${chatData.chatId}/group-info`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            groupName: newGroupName.trim(),
+          }),
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Cannot update group name");
@@ -122,7 +138,7 @@ const GroupManagement = ({ chatData, onClose, onUpdate }) => {
 
       toast.success("Group name updated successfully");
       setIsEditingName(false);
-      
+
       // Notify parent to refresh
       if (onUpdate) onUpdate();
     } catch (err) {
@@ -140,26 +156,29 @@ const GroupManagement = ({ chatData, onClose, onUpdate }) => {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("Please login again");
 
-      const response = await fetch(`${baseUrl}/api/admin/chat/${chatData.chatId}/participants/add`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          userIds: [userId]
-        })
-      });
+      const response = await fetch(
+        `${baseUrl}/api/admin/chat/${chatData.chatId}/participants/add`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            userIds: [userId],
+          }),
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Cannot add participant");
       }
 
       toast.success("Participant added successfully");
-      
+
       // Remove from search results
-      setSearchUsers(prev => prev.filter(u => u.userId !== userId));
-      
+      setSearchUsers((prev) => prev.filter((u) => u.userId !== userId));
+
       // Notify parent to refresh
       if (onUpdate) onUpdate();
     } catch (err) {
@@ -171,29 +190,70 @@ const GroupManagement = ({ chatData, onClose, onUpdate }) => {
   };
 
   // Remove participant from group
+  // Sửa lại hàm removeParticipantFromGroup
   const removeParticipantFromGroup = async (userId) => {
     try {
       if (!confirm("Are you sure you want to remove this participant?")) return;
-      
+
       setLoading(true);
       const token = localStorage.getItem("token");
       if (!token) throw new Error("Please login again");
 
-      const response = await fetch(`${baseUrl}/api/admin/chat/${chatData.chatId}/participants/${userId}`, {
-        method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${token}`
+      const response = await fetch(
+        `${baseUrl}/api/admin/chat/${chatData.chatId}/participants/${userId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
-      });
+      );
+
+      // Kiểm tra response chi tiết
+      const responseText = await response.text();
+      console.log("Remove participant response status:", response.status);
+      console.log("Remove participant response body:", responseText);
 
       if (!response.ok) {
-        throw new Error("Cannot remove participant");
+        try {
+          const errorData = JSON.parse(responseText);
+          throw new Error(
+            errorData.error || errorData.message || "Cannot remove participant"
+          );
+        } catch {
+          throw new Error(`Cannot remove participant (${response.status})`);
+        }
+      }
+
+      // Parse response để lấy updated chat data
+      try {
+        const updatedChat = JSON.parse(responseText);
+
+        // Cập nhật chatData với data mới từ server
+        if (updatedChat && updatedChat.participants) {
+          // Verify participant was actually removed
+          const stillExists = updatedChat.participants.some(
+            (p) => p.userId === userId
+          );
+          if (stillExists) {
+            throw new Error("Server did not remove participant");
+          }
+        }
+      } catch (parseError) {
+        console.warn("Could not parse response as JSON:", parseError);
       }
 
       toast.success("Participant removed successfully");
-      
-      // Notify parent to refresh
-      if (onUpdate) onUpdate();
+
+      // Force parent to refresh data from server
+      if (onUpdate) {
+        onUpdate();
+      }
+
+      // Also close modal to force refresh when reopened
+      setTimeout(() => {
+        onClose();
+      }, 500);
     } catch (err) {
       console.error("Error removing participant:", err);
       toast.error(err.message);
@@ -205,12 +265,12 @@ const GroupManagement = ({ chatData, onClose, onUpdate }) => {
   // Role display
   const getRoleText = (role) => {
     const roleMap = {
-      'ADMIN': 'Admin',
-      'ROLE_ADMIN': 'Admin',
-      'INSTRUCTOR': 'Instructor', 
-      'ROLE_INSTRUCTOR': 'Instructor',
-      'STUDENT': 'Student',
-      'ROLE_STUDENT': 'Student'
+      ADMIN: "Admin",
+      ROLE_ADMIN: "Admin",
+      INSTRUCTOR: "Instructor",
+      ROLE_INSTRUCTOR: "Instructor",
+      STUDENT: "Student",
+      ROLE_STUDENT: "Student",
     };
     return roleMap[role] || role;
   };
@@ -221,12 +281,14 @@ const GroupManagement = ({ chatData, onClose, onUpdate }) => {
     const bgColors = {
       STUDENT: "bg-blue-500",
       INSTRUCTOR: "bg-purple-500",
-      ADMIN: "bg-red-500"
+      ADMIN: "bg-red-500",
     };
     const bgColor = bgColors[role?.replace("ROLE_", "")] || "bg-gray-500";
-    
+
     return (
-      <div className={`w-full h-full rounded-full flex items-center justify-center ${bgColor} text-white font-bold`}>
+      <div
+        className={`w-full h-full rounded-full flex items-center justify-center ${bgColor} text-white font-bold`}
+      >
         {firstLetter}
       </div>
     );
@@ -243,10 +305,12 @@ const GroupManagement = ({ chatData, onClose, onUpdate }) => {
             </div>
             <div>
               <h3 className="font-bold text-lg">Group Management</h3>
-              <p className="text-sm text-gray-500">{chatData?.participants?.length || 0} participants</p>
+              <p className="text-sm text-gray-500">
+                {chatData?.participants?.length || 0} participants
+              </p>
             </div>
           </div>
-          <button 
+          <button
             onClick={onClose}
             className="p-2 hover:bg-gray-100 rounded-full transition-colors"
           >
@@ -257,34 +321,34 @@ const GroupManagement = ({ chatData, onClose, onUpdate }) => {
         {/* Tabs */}
         <div className="flex border-b">
           <button
-            onClick={() => setActiveTab('info')}
+            onClick={() => setActiveTab("info")}
             className={`flex-1 py-3 px-4 text-sm font-medium transition-colors ${
-              activeTab === 'info' 
-                ? 'text-emerald-600 border-b-2 border-emerald-600' 
-                : 'text-gray-500 hover:text-gray-700'
+              activeTab === "info"
+                ? "text-emerald-600 border-b-2 border-emerald-600"
+                : "text-gray-500 hover:text-gray-700"
             }`}
           >
             Group Info
           </button>
           <button
-            onClick={() => setActiveTab('participants')}
+            onClick={() => setActiveTab("participants")}
             className={`flex-1 py-3 px-4 text-sm font-medium transition-colors ${
-              activeTab === 'participants' 
-                ? 'text-emerald-600 border-b-2 border-emerald-600' 
-                : 'text-gray-500 hover:text-gray-700'
+              activeTab === "participants"
+                ? "text-emerald-600 border-b-2 border-emerald-600"
+                : "text-gray-500 hover:text-gray-700"
             }`}
           >
             Participants
           </button>
           <button
             onClick={() => {
-              setActiveTab('add');
-              searchUsersForGroup('');
+              setActiveTab("add");
+              searchUsersForGroup("");
             }}
             className={`flex-1 py-3 px-4 text-sm font-medium transition-colors ${
-              activeTab === 'add' 
-                ? 'text-emerald-600 border-b-2 border-emerald-600' 
-                : 'text-gray-500 hover:text-gray-700'
+              activeTab === "add"
+                ? "text-emerald-600 border-b-2 border-emerald-600"
+                : "text-gray-500 hover:text-gray-700"
             }`}
           >
             Add Members
@@ -293,11 +357,13 @@ const GroupManagement = ({ chatData, onClose, onUpdate }) => {
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-4">
-          {activeTab === 'info' && (
+          {activeTab === "info" && (
             <div className="space-y-6">
               {/* Group Name */}
               <div>
-                <label className="text-sm font-medium text-gray-700">Group Name</label>
+                <label className="text-sm font-medium text-gray-700">
+                  Group Name
+                </label>
                 {isEditingName ? (
                   <div className="flex items-center gap-2 mt-2">
                     <input
@@ -316,7 +382,7 @@ const GroupManagement = ({ chatData, onClose, onUpdate }) => {
                     </button>
                     <button
                       onClick={() => {
-                        setNewGroupName(chatData?.groupName || '');
+                        setNewGroupName(chatData?.groupName || "");
                         setIsEditingName(false);
                       }}
                       className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
@@ -326,7 +392,9 @@ const GroupManagement = ({ chatData, onClose, onUpdate }) => {
                   </div>
                 ) : (
                   <div className="flex items-center justify-between mt-2">
-                    <p className="text-lg">{chatData?.groupName || 'Group Chat'}</p>
+                    <p className="text-lg">
+                      {chatData?.groupName || "Group Chat"}
+                    </p>
                     <button
                       onClick={() => setIsEditingName(true)}
                       className="p-2 hover:bg-gray-100 rounded-full transition-colors"
@@ -341,26 +409,33 @@ const GroupManagement = ({ chatData, onClose, onUpdate }) => {
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-gray-50 p-4 rounded-lg">
                   <p className="text-sm text-gray-500">Total Participants</p>
-                  <p className="text-2xl font-bold text-gray-900">{chatData?.participants?.length || 0}</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {chatData?.participants?.length || 0}
+                  </p>
                 </div>
                 <div className="bg-gray-50 p-4 rounded-lg">
                   <p className="text-sm text-gray-500">Created</p>
                   <p className="text-sm font-medium text-gray-900">
-                    {chatData?.createdAt ? new Date(chatData.createdAt).toLocaleDateString() : 'Unknown'}
+                    {chatData?.createdAt
+                      ? new Date(chatData.createdAt).toLocaleDateString()
+                      : "Unknown"}
                   </p>
                 </div>
               </div>
             </div>
           )}
 
-          {activeTab === 'participants' && (
+          {activeTab === "participants" && (
             <div className="space-y-2">
               {chatData?.participants?.map((participant) => {
                 const isCurrentUser = participant.userId === getCurrentUserId();
                 const avatar = avatars[participant.userId];
-                
+
                 return (
-                  <div key={participant.userId} className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg">
+                  <div
+                    key={participant.userId}
+                    className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg"
+                  >
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10">
                         {avatar ? (
@@ -370,8 +445,8 @@ const GroupManagement = ({ chatData, onClose, onUpdate }) => {
                             className="w-10 h-10 rounded-full object-cover"
                           />
                         ) : (
-                          <AvatarFallback 
-                            name={participant.firstName} 
+                          <AvatarFallback
+                            name={participant.firstName}
                             role={participant.role}
                           />
                         )}
@@ -381,13 +456,17 @@ const GroupManagement = ({ chatData, onClose, onUpdate }) => {
                           {participant.firstName} {participant.lastName}
                           {isCurrentUser && " (You)"}
                         </p>
-                        <p className="text-sm text-gray-500">{getRoleText(participant.role)}</p>
+                        <p className="text-sm text-gray-500">
+                          {getRoleText(participant.role)}
+                        </p>
                       </div>
                     </div>
-                    
+
                     {!isCurrentUser && (
                       <button
-                        onClick={() => removeParticipantFromGroup(participant.userId)}
+                        onClick={() =>
+                          removeParticipantFromGroup(participant.userId)
+                        }
                         disabled={loading}
                         className="p-2 text-red-600 hover:bg-red-50 rounded-full transition-colors disabled:opacity-50"
                         title="Remove participant"
@@ -401,7 +480,7 @@ const GroupManagement = ({ chatData, onClose, onUpdate }) => {
             </div>
           )}
 
-          {activeTab === 'add' && (
+          {activeTab === "add" && (
             <div className="space-y-4">
               <div className="relative">
                 <input
@@ -424,11 +503,14 @@ const GroupManagement = ({ chatData, onClose, onUpdate }) => {
                   </div>
                 ) : searchUsers.length === 0 ? (
                   <div className="text-center py-8 text-gray-500">
-                    {searchTerm ? 'No users found' : 'Search for users to add'}
+                    {searchTerm ? "No users found" : "Search for users to add"}
                   </div>
                 ) : (
                   searchUsers.map((user) => (
-                    <div key={user.userId} className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg">
+                    <div
+                      key={user.userId}
+                      className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg"
+                    >
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10">
                           {avatars[user.userId] ? (
@@ -438,8 +520,8 @@ const GroupManagement = ({ chatData, onClose, onUpdate }) => {
                               className="w-10 h-10 rounded-full object-cover"
                             />
                           ) : (
-                            <AvatarFallback 
-                              name={user.firstName} 
+                            <AvatarFallback
+                              name={user.firstName}
                               role={user.role}
                             />
                           )}
@@ -448,10 +530,12 @@ const GroupManagement = ({ chatData, onClose, onUpdate }) => {
                           <p className="font-medium">
                             {user.firstName} {user.lastName}
                           </p>
-                          <p className="text-sm text-gray-500">{getRoleText(user.role)}</p>
+                          <p className="text-sm text-gray-500">
+                            {getRoleText(user.role)}
+                          </p>
                         </div>
                       </div>
-                      
+
                       <button
                         onClick={() => addParticipantToGroup(user.userId)}
                         disabled={loading}

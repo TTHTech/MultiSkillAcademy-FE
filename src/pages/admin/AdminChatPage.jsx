@@ -70,9 +70,12 @@ const AdminChatPage = () => {
                 selectedUser={selectedUser}
                 chatId={chatData.chatId}
                 chatData={chatData}
-                isGroup={isGroup}
+                isGroup={chatData.chatType === 'GROUP'}
                 onMessageSent={handleMessageSent}
-                onGroupManagementClick={() => setShowGroupManagement(true)}
+                onGroupManagementClick={() => {
+                  console.log('Group management clicked!');
+                  setShowGroupManagement(true);
+                }}
               />
             ) : (
               <div className="flex items-center justify-center h-full text-gray-400">

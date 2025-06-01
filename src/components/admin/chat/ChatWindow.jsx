@@ -5,7 +5,6 @@ import ChatInput from "./ChatInput";
 import ChatHeader from "./ChatHeader";
 import ChatMessage from "./ChatMessage";
 import EmptyChat from "./EmptyChat";
-import MessageMenu from "./MessageMenu";
 
 const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
@@ -15,13 +14,11 @@ const ChatWindow = ({
   chatData,
   onMessageSent,
   isGroup = false,
+  onGroupManagementClick,
 }) => {
   const [isTyping, setIsTyping] = useState(false);
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [hoveredMessageId, setHoveredMessageId] = useState(null);
-  const [showMessageMenu, setShowMessageMenu] = useState(null);
-  const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
   const messagesEndRef = useRef(null);
   const [enlargedImage, setEnlargedImage] = useState(null);
   const [avatars, setAvatars] = useState({});
@@ -37,14 +34,11 @@ const ChatWindow = ({
       if (!token) throw new Error("Vui lòng đăng nhập lại");
 
       console.log("Fetching chat details for chatId:", chatId);
-      const response = await fetch(
-        `${baseUrl}/api/admin/chat/${chatId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await fetch(`${baseUrl}/api/admin/chat/${chatId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       if (!response.ok) {
         if (response.status === 404) {
@@ -78,7 +72,9 @@ const ChatWindow = ({
           id: msg.messageId,
           message: messageContent,
           isAdmin: msg.senderId === parseInt(localStorage.getItem("userId")),
-          avatar: msg.senderAvatar || "https://th.bing.com/th/id/OIP.7fheetEuM-hyJg1sEyuqVwHaHa?rs=1&pid=ImgDetMain",
+          avatar:
+            msg.senderAvatar ||
+            "https://th.bing.com/th/id/OIP.7fheetEuM-hyJg1sEyuqVwHaHa?rs=1&pid=ImgDetMain",
           timestamp: serverTimestamp,
           createdAt: msg.createdAt,
           senderId: msg.senderId,
@@ -210,7 +206,9 @@ const ChatWindow = ({
     }
 
     if (fileUrl.includes("firebasestorage.googleapis.com")) {
-      const fullUrl = fileUrl.startsWith("https://") ? fileUrl : `https://${fileUrl}`;
+      const fullUrl = fileUrl.startsWith("https://")
+        ? fileUrl
+        : `https://${fileUrl}`;
       return fullUrl;
     }
 
@@ -220,7 +218,9 @@ const ChatWindow = ({
     }
 
     if (fileUrl && fileUrl.includes("image_")) {
-      const imageId = fileUrl.includes("/") ? fileUrl.split("/").pop() : fileUrl;
+      const imageId = fileUrl.includes("/")
+        ? fileUrl.split("/").pop()
+        : fileUrl;
       return `${baseUrl}/api/admin/chat/files/${imageId}`;
     }
 
@@ -276,50 +276,16 @@ const ChatWindow = ({
     scrollToBottom();
   }, [messages]);
 
-  // Message hover handlers
-  const handleMessageHover = (messageId) => {
-    setHoveredMessageId(messageId);
-  };
-
-  const handleMessageLeave = () => {
-    setTimeout(() => {
-      if (!showMessageMenu) {
-        setHoveredMessageId(null);
-      }
-    }, 200);
-  };
-
-  const handleShowMessageMenu = (messageId, event) => {
-    event.preventDefault();
-    event.stopPropagation();
-
-    const button = event.currentTarget;
-    const rect = button.getBoundingClientRect();
-    const container = button.closest('.relative');
-    const containerRect = container ? container.getBoundingClientRect() : { top: 0, left: 0 };
-    
-    // Tính toán vị trí relative to container
-    setMenuPosition({
-      top: rect.top - containerRect.top + rect.height + 5,
-      left: rect.left - containerRect.left - 150,
-    });
-    setShowMessageMenu(messageId);
-  };
-
-  const handleCloseMessageMenu = () => {
-    setShowMessageMenu(null);
-    setHoveredMessageId(null);
-  };
-
   // Message actions
   const handleCopyMessage = (message) => {
     if (message && message.message) {
       navigator.clipboard.writeText(message.message);
       toast.success("Đã sao chép tin nhắn");
     }
-    handleCloseMessageMenu();
   };
 
+  // Sửa lại hàm handleDeleteMessage
+  // Quay lại logic xóa đơn giản ban đầu
   const handleDeleteMessage = async (messageId) => {
     try {
       if (!chatData?.chatId) return;
@@ -341,17 +307,22 @@ const ChatWindow = ({
         throw new Error("Không thể xóa tin nhắn");
       }
 
+      // Xóa khỏi state local NGAY LẬP TỨC (như code cũ có thể đã làm)
       setMessages((prev) => prev.filter((m) => m.id !== messageId));
+
       toast.success("Đã xóa tin nhắn");
 
       if (onMessageSent) {
         onMessageSent();
       }
+
+      // Fetch lại messages sau một khoảng delay ngắn để đảm bảo consistency
+      setTimeout(() => {
+        fetchMessages(chatData.chatId);
+      }, 500);
     } catch (err) {
       console.error("Error deleting message:", err);
       toast.error(err.message);
-    } finally {
-      handleCloseMessageMenu();
     }
   };
 
@@ -398,8 +369,12 @@ const ChatWindow = ({
       const newMessage = {
         id: sentMessage.messageId,
         message: sentMessage.content,
-        isAdmin: sentMessage.senderId === parseInt(localStorage.getItem("userId")),
-        avatar: sentMessage.senderAvatar || avatars[sentMessage.senderId] || "https://th.bing.com/th/id/OIP.7fheetEuM-hyJg1sEyuqVwHaHa?rs=1&pid=ImgDetMain",
+        isAdmin:
+          sentMessage.senderId === parseInt(localStorage.getItem("userId")),
+        avatar:
+          sentMessage.senderAvatar ||
+          avatars[sentMessage.senderId] ||
+          "https://th.bing.com/th/id/OIP.7fheetEuM-hyJg1sEyuqVwHaHa?rs=1&pid=ImgDetMain",
         timestamp: formatServerTimestamp(sentMessage.createdAt),
         createdAt: sentMessage.createdAt,
         senderId: sentMessage.senderId,
@@ -410,7 +385,7 @@ const ChatWindow = ({
 
       setMessages((prev) => [...prev, newMessage]);
       scrollToBottom();
-      
+
       if (onMessageSent) onMessageSent();
 
       return sentMessage;
@@ -449,12 +424,12 @@ const ChatWindow = ({
 
   const getRoleText = (role) => {
     const roleMap = {
-      'ADMIN': 'Quản trị viên',
-      'ROLE_ADMIN': 'Quản trị viên',
-      'INSTRUCTOR': 'Giảng viên',
-      'ROLE_INSTRUCTOR': 'Giảng viên',
-      'STUDENT': 'Học viên',
-      'ROLE_STUDENT': 'Học viên'
+      ADMIN: "Quản trị viên",
+      ROLE_ADMIN: "Quản trị viên",
+      INSTRUCTOR: "Giảng viên",
+      ROLE_INSTRUCTOR: "Giảng viên",
+      STUDENT: "Học viên",
+      ROLE_STUDENT: "Học viên",
     };
     return roleMap[role] || role;
   };
@@ -502,17 +477,14 @@ const ChatWindow = ({
       }
 
       groupedMessages.push(
-        <ChatMessage 
-          key={msg.id || index} 
+        <ChatMessage
+          key={msg.id || index}
           {...msg}
           avatars={avatars}
-          hoveredMessageId={hoveredMessageId}
-          showMessageMenu={showMessageMenu}
-          onMessageHover={handleMessageHover}
-          onMessageLeave={handleMessageLeave}
-          onShowMessageMenu={handleShowMessageMenu}
           onEnlargeImage={enlargeImage}
           getCurrentTimeString={getCurrentTimeString}
+          onCopyMessage={handleCopyMessage}
+          onDeleteMessage={handleDeleteMessage}
         />
       );
     });
@@ -522,13 +494,14 @@ const ChatWindow = ({
 
   return (
     <div className="flex flex-col h-full bg-white relative overflow-hidden">
-      <ChatHeader 
+      <ChatHeader
         selectedUser={selectedUser}
         isGroup={isGroup}
         chatData={chatData}
         isTyping={isTyping}
         avatars={avatars}
         getRoleText={getRoleText}
+        onGroupManagementClick={onGroupManagementClick}
       />
 
       {/* Messages Container with relative positioning */}
@@ -544,7 +517,7 @@ const ChatWindow = ({
               <div ref={messagesEndRef} />
             </>
           ) : (
-            <EmptyChat 
+            <EmptyChat
               selectedUser={selectedUser}
               isGroup={isGroup}
               chatData={chatData}
@@ -553,19 +526,6 @@ const ChatWindow = ({
             />
           )}
         </div>
-
-        {/* Message Menu - Inside the relative container */}
-        {showMessageMenu && (
-          <MessageMenu 
-            showMessageMenu={showMessageMenu}
-            messageId={showMessageMenu}
-            message={messages.find((m) => m.id === showMessageMenu)}
-            menuPosition={menuPosition}
-            onClose={handleCloseMessageMenu}
-            onCopyMessage={handleCopyMessage}
-            onDeleteMessage={handleDeleteMessage}
-          />
-        )}
       </div>
 
       {/* Chat Input */}
@@ -576,7 +536,7 @@ const ChatWindow = ({
           setIsTyping(isTyping);
           sendTypingStatus(isTyping);
         }}
-        disabled={!selectedUser || !chatData}
+        disabled={!chatData || !chatData.chatId}
       />
 
       {/* Enlarged Image Modal - Outside main container */}
@@ -602,7 +562,8 @@ const ChatWindow = ({
               onClick={(e) => e.stopPropagation()}
               onError={(e) => {
                 e.target.onerror = null;
-                e.target.src = "https://via.placeholder.com/800x600?text=Image+not+available";
+                e.target.src =
+                  "https://via.placeholder.com/800x600?text=Image+not+available";
               }}
             />
           </div>
