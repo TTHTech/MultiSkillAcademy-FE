@@ -179,9 +179,9 @@ const InstructorRevenueTable = () => {
   return (
     <div className="p-6 min-h-[300px]">
       <div className="max-w-7xl mx-auto bg-white shadow-lg rounded-lg p-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between px-6 py-4 mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-gray-800">
-            Báo cáo Doanh thu Giảng viên
+            Báo cáo doanh thu giảng viên theo tháng
           </h2>
           <button
             onClick={exportToExcel}

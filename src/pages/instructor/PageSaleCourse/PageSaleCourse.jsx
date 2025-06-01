@@ -4,7 +4,6 @@ import ChartSales7Day from "./ChartSales7Day";
 import ChartOne from "./ChartOne";
 import { CalendarDaysIcon } from "lucide-react";
 import TableSalesCourse from "./TableSalesCourse";
-import InstructorRevenueTable from "./InstructorRevenueTable";
 const SalesDashboard = () => {
   const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
   const userId = Number(localStorage.getItem("userId"));
@@ -65,7 +64,6 @@ const SalesDashboard = () => {
           </div>
         </div>
         <div className="mt-8 space-y-4">
-          <InstructorRevenueTable />
           <TableSalesCourse />
         </div>
       </div>
