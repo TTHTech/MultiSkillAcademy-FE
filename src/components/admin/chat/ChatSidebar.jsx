@@ -5,13 +5,11 @@ const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const ChatSidebar = ({ onUserSelect, refreshTrigger }) => {
   const [chatList, setChatList] = useState([]);
-  const [searchUsers, setSearchUsers] = useState([]);
+  const [allUsers, setAllUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchLoading, setSearchLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [searchModalTerm, setSearchModalTerm] = useState("");
   const [filter, setFilter] = useState("ALL");
-  const [searchFilter, setSearchFilter] = useState("ALL");
   const [activeChatId, setActiveChatId] = useState(null);
   const [showUserSearchModal, setShowUserSearchModal] = useState(false);
   const [showCreateGroupModal, setShowCreateGroupModal] = useState(false);
@@ -22,6 +20,7 @@ const ChatSidebar = ({ onUserSelect, refreshTrigger }) => {
   const [groupName, setGroupName] = useState("");
   const [selectedParticipants, setSelectedParticipants] = useState([]);
   const [groupCreationStep, setGroupCreationStep] = useState(1);
+  const [participantFilter, setParticipantFilter] = useState("ALL");
 
   const avatarsRef = useRef({});
   const fetchingAvatarsRef = useRef(new Set());
@@ -110,7 +109,7 @@ const ChatSidebar = ({ onUserSelect, refreshTrigger }) => {
       const token = localStorage.getItem("token");
       
       if (!token) {
-        throw new Error("Please login again");
+        throw new Error("Vui lòng đăng nhập lại");
       }
 
       console.log("Fetching all chats...");
@@ -121,7 +120,7 @@ const ChatSidebar = ({ onUserSelect, refreshTrigger }) => {
       });
 
       if (!response.ok) {
-        throw new Error("Cannot load chat list");
+        throw new Error("Không thể tải danh sách trò chuyện");
       }
       
       const data = await response.json();
@@ -139,55 +138,43 @@ const ChatSidebar = ({ onUserSelect, refreshTrigger }) => {
     }
   }, [fetchAvatarsForParticipants]);
 
-  // Initial fetch and refresh trigger
-  useEffect(() => {
-    console.log("ChatSidebar useEffect triggered, refreshTrigger:", refreshTrigger);
-    fetchChats();
-  }, [refreshTrigger, fetchChats]);
-
-  // Search users
-  const searchAllUsers = async (keyword = "", role = "ALL") => {
+  // Fetch all users for frontend search
+  const fetchAllUsers = async () => {
     try {
       setSearchLoading(true);
       const token = localStorage.getItem("token");
       
       if (!token) {
-        throw new Error("Please login again");
+        throw new Error("Vui lòng đăng nhập lại");
       }
 
-      const url = new URL(`${baseUrl}/api/admin/chat/search/users`);
-      if (keyword) url.searchParams.append("keyword", keyword);
-
-      const response = await fetch(url.toString(), {
+      const response = await fetch(`${baseUrl}/api/admin/chat/search/users`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
 
       if (!response.ok) {
-        throw new Error("Cannot search users");
+        throw new Error("Không thể tải danh sách người dùng");
       }
       
       const data = await response.json();
-      
-      // Filter by role if needed
-      let filteredData = data;
-      if (role && role !== "ALL") {
-        filteredData = data.filter(user => {
-          const userRole = user.role.replace("ROLE_", "");
-          return userRole === role;
-        });
-      }
-      
-      setSearchUsers(filteredData);
-      fetchAvatarsForParticipants(filteredData);
+      setAllUsers(data);
+      fetchAvatarsForParticipants(data);
     } catch (err) {
-      console.error("Error searching users:", err);
+      console.error("Error fetching users:", err);
       toast.error(err.message);
     } finally {
       setSearchLoading(false);
     }
   };
+
+  // Initial fetch
+  useEffect(() => {
+    console.log("ChatSidebar useEffect triggered, refreshTrigger:", refreshTrigger);
+    fetchChats();
+    fetchAllUsers();
+  }, [refreshTrigger, fetchChats]);
 
   // Handle chat selection
   const handleChatSelect = async (chat) => {
@@ -196,7 +183,7 @@ const ChatSidebar = ({ onUserSelect, refreshTrigger }) => {
       
       // Get full chat details
       const token = localStorage.getItem("token");
-      if (!token) throw new Error("Please login again");
+      if (!token) throw new Error("Vui lòng đăng nhập lại");
 
       const response = await fetch(`${baseUrl}/api/admin/chat/${chat.chatId}`, {
         headers: {
@@ -205,7 +192,7 @@ const ChatSidebar = ({ onUserSelect, refreshTrigger }) => {
       });
 
       if (!response.ok) {
-        throw new Error("Cannot load chat details");
+        throw new Error("Không thể tải chi tiết trò chuyện");
       }
 
       const chatData = await response.json();
@@ -234,11 +221,11 @@ const ChatSidebar = ({ onUserSelect, refreshTrigger }) => {
   const createIndividualChat = async (user) => {
     try {
       const token = localStorage.getItem("token");
-      if (!token) throw new Error("Please login again");
+      if (!token) throw new Error("Vui lòng đăng nhập lại");
       
       const request = {
         participantId: user.userId,
-        initialMessage: "Hello! This is Admin."
+        initialMessage: "Xin chào! Đây là Admin."
       };
       
       console.log("Creating individual chat with:", request);
@@ -254,7 +241,7 @@ const ChatSidebar = ({ onUserSelect, refreshTrigger }) => {
       if (!response.ok) {
         const errorText = await response.text();
         console.error("Create chat error:", errorText);
-        throw new Error("Cannot create chat");
+        throw new Error("Không thể tạo cuộc trò chuyện");
       }
       
       const chatData = await response.json();
@@ -267,7 +254,7 @@ const ChatSidebar = ({ onUserSelect, refreshTrigger }) => {
       });
       
       setShowUserSearchModal(false);
-      toast.success("Chat created successfully!");
+      toast.success("Tạo cuộc trò chuyện thành công!");
       
       // Refresh chat list
       setTimeout(() => {
@@ -284,22 +271,22 @@ const ChatSidebar = ({ onUserSelect, refreshTrigger }) => {
   const createGroupChat = async () => {
     try {
       if (!groupName.trim()) {
-        toast.error("Please enter group name");
+        toast.error("Vui lòng nhập tên nhóm");
         return;
       }
       
       if (selectedParticipants.length < 2) {
-        toast.error("Group chat needs at least 2 participants");
+        toast.error("Nhóm cần ít nhất 2 thành viên");
         return;
       }
 
       const token = localStorage.getItem("token");
-      if (!token) throw new Error("Please login again");
+      if (!token) throw new Error("Vui lòng đăng nhập lại");
       
       const request = {
         groupName: groupName.trim(),
         participantIds: selectedParticipants.map(p => p.userId),
-        initialMessage: `Welcome everyone! Group "${groupName}" has been created by Admin.`
+        initialMessage: `Chào mừng mọi người! Nhóm "${groupName}" đã được tạo bởi Admin.`
       };
       
       console.log("Creating group chat:", request);
@@ -315,7 +302,7 @@ const ChatSidebar = ({ onUserSelect, refreshTrigger }) => {
       if (!response.ok) {
         const errorText = await response.text();
         console.error("Create group chat error:", errorText);
-        throw new Error("Cannot create group chat");
+        throw new Error("Không thể tạo nhóm chat");
       }
       
       const chatData = await response.json();
@@ -326,6 +313,7 @@ const ChatSidebar = ({ onUserSelect, refreshTrigger }) => {
       setSelectedParticipants([]);
       setGroupCreationStep(1);
       setShowCreateGroupModal(false);
+      setParticipantFilter("ALL");
       
       // Select the new group chat
       onUserSelect({ 
@@ -333,7 +321,7 @@ const ChatSidebar = ({ onUserSelect, refreshTrigger }) => {
         isGroup: true
       });
       
-      toast.success("Group chat created successfully!");
+      toast.success("Tạo nhóm chat thành công!");
       
       // Refresh chat list
       setTimeout(() => {
@@ -358,22 +346,18 @@ const ChatSidebar = ({ onUserSelect, refreshTrigger }) => {
     });
   };
 
-  // Handle search term change
-  const handleSearchTermChange = (term) => {
-    setSearchModalTerm(term);
-    searchAllUsers(term, searchFilter);
-  };
-
-  // Handle search filter change
-  const handleSearchFilterChange = (filterValue) => {
-    setSearchFilter(filterValue);
-    searchAllUsers(searchModalTerm, filterValue);
-  };
-
-  // Filter chats
+  // Filter chats based on search term and type
   const getFilteredChats = () => {
     return chatList.filter((chat) => {
-      // Search in group name or participant names
+      // Type filter
+      if (filter !== "ALL") {
+        if (filter === "GROUP" && chat.chatType !== "GROUP") return false;
+        if (filter === "INDIVIDUAL" && chat.chatType !== "INDIVIDUAL") return false;
+      }
+
+      // Search filter
+      if (!searchTerm) return true;
+      
       const searchLower = searchTerm.toLowerCase();
       
       if (chat.chatType === 'GROUP' && chat.groupName) {
@@ -385,17 +369,33 @@ const ChatSidebar = ({ onUserSelect, refreshTrigger }) => {
       // Search in participant names
       const participantMatch = chat.participants?.some(p => 
         p.firstName?.toLowerCase().includes(searchLower) ||
-        p.lastName?.toLowerCase().includes(searchLower)
+        p.lastName?.toLowerCase().includes(searchLower) ||
+        `${p.firstName} ${p.lastName}`.toLowerCase().includes(searchLower)
       );
       
-      if (!participantMatch) return false;
+      return participantMatch;
+    });
+  };
+
+  // Filter users for search modal
+  const getFilteredUsers = (searchKey = "", roleFilter = "ALL") => {
+    return allUsers.filter(user => {
+      // Role filter
+      if (roleFilter !== "ALL") {
+        const userRole = user.role.replace("ROLE_", "");
+        if (userRole !== roleFilter) return false;
+      }
+
+      // Search filter
+      if (!searchKey) return true;
       
-      // Apply type filter
-      if (filter === "ALL") return true;
-      if (filter === "GROUP") return chat.chatType === "GROUP";
-      if (filter === "INDIVIDUAL") return chat.chatType === "INDIVIDUAL";
-      
-      return true;
+      const searchLower = searchKey.toLowerCase();
+      return (
+        user.firstName?.toLowerCase().includes(searchLower) ||
+        user.lastName?.toLowerCase().includes(searchLower) ||
+        `${user.firstName} ${user.lastName}`.toLowerCase().includes(searchLower) ||
+        user.username?.toLowerCase().includes(searchLower)
+      );
     });
   };
 
@@ -403,9 +403,9 @@ const ChatSidebar = ({ onUserSelect, refreshTrigger }) => {
   const getChatDisplayInfo = (chat) => {
     if (chat.chatType === 'GROUP') {
       return {
-        name: chat.groupName || 'Group Chat',
+        name: chat.groupName || 'Nhóm Chat',
         avatar: null,
-        subtitle: `${chat.participantCount || chat.participants?.length || 0} participants`,
+        subtitle: `${chat.participantCount || chat.participants?.length || 0} thành viên`,
         isGroup: true
       };
     } else {
@@ -426,37 +426,8 @@ const ChatSidebar = ({ onUserSelect, refreshTrigger }) => {
         };
       }
       
-      // If no other participant found by ID, try to find non-admin participant
-      const nonAdminParticipant = chat.participants?.find(p => 
-        !p.role?.includes('ADMIN')
-      );
-      
-      if (nonAdminParticipant) {
-        return {
-          name: `${nonAdminParticipant.firstName || ''} ${nonAdminParticipant.lastName || ''}`.trim(),
-          avatar: avatars[nonAdminParticipant.userId],
-          subtitle: displayRole(nonAdminParticipant.role),
-          isGroup: false,
-          userId: nonAdminParticipant.userId,
-          role: nonAdminParticipant.role
-        };
-      }
-      
-      // Final fallback - just show first participant
-      const firstParticipant = chat.participants?.[0];
-      if (firstParticipant) {
-        return {
-          name: `${firstParticipant.firstName || ''} ${firstParticipant.lastName || ''}`.trim(),
-          avatar: avatars[firstParticipant.userId],
-          subtitle: displayRole(firstParticipant.role),
-          isGroup: false,
-          userId: firstParticipant.userId,
-          role: firstParticipant.role
-        };
-      }
-      
       return {
-        name: 'Unknown User',
+        name: 'Người dùng không xác định',
         avatar: null,
         subtitle: '',
         isGroup: false
@@ -496,12 +467,12 @@ const ChatSidebar = ({ onUserSelect, refreshTrigger }) => {
   const displayRole = (role) => {
     if (!role) return "";
     const roleMap = {
-      "ROLE_STUDENT": "Student",
-      "STUDENT": "Student",
-      "ROLE_INSTRUCTOR": "Instructor",
-      "INSTRUCTOR": "Instructor",
-      "ADMIN": "Admin",
-      "ROLE_ADMIN": "Admin"
+      "ROLE_STUDENT": "Học viên",
+      "STUDENT": "Học viên",
+      "ROLE_INSTRUCTOR": "Giảng viên",
+      "INSTRUCTOR": "Giảng viên",
+      "ADMIN": "Quản trị viên",
+      "ROLE_ADMIN": "Quản trị viên"
     };
     return roleMap[role] || role;
   };
@@ -520,16 +491,16 @@ const ChatSidebar = ({ onUserSelect, refreshTrigger }) => {
       const isYesterday = messageDate.toDateString() === yesterday.toDateString();
       
       if (isToday) {
-        return messageDate.toLocaleTimeString('en-US', {
+        return messageDate.toLocaleTimeString('vi-VN', {
           hour: '2-digit',
           minute: '2-digit'
         });
       } else if (isYesterday) {
-        return "Yesterday";
+        return "Hôm qua";
       } else {
-        return messageDate.toLocaleDateString('en-US', {
-          month: 'short',
-          day: 'numeric'
+        return messageDate.toLocaleDateString('vi-VN', {
+          day: 'numeric',
+          month: 'numeric'
         });
       }
     } catch (e) {
@@ -549,18 +520,15 @@ const ChatSidebar = ({ onUserSelect, refreshTrigger }) => {
             alt="Admin"
             className="w-10 h-10 rounded-full"
           />
-          <h2 className="text-xl font-bold">Admin Chat</h2>
+          <h2 className="text-xl font-bold">Trò chuyện Admin</h2>
         </div>
         <div className="flex items-center gap-2">
           <button 
             className="p-2 hover:bg-gray-100 rounded-full transition-colors"
             onClick={() => {
               setShowUserSearchModal(true);
-              setSearchModalTerm("");
-              setSearchFilter("ALL");
-              searchAllUsers("", "ALL");
             }}
-            title="New Chat"
+            title="Trò chuyện mới"
           >
             <UserPlus className="w-5 h-5 text-gray-600" />
           </button>
@@ -571,16 +539,16 @@ const ChatSidebar = ({ onUserSelect, refreshTrigger }) => {
               setGroupName("");
               setSelectedParticipants([]);
               setGroupCreationStep(1);
-              searchAllUsers("", "ALL");
+              setParticipantFilter("ALL");
             }}
-            title="Create Group"
+            title="Tạo nhóm"
           >
             <Users className="w-5 h-5 text-gray-600" />
           </button>
           <button 
             className="p-2 hover:bg-gray-100 rounded-full transition-colors"
             onClick={fetchChats}
-            title="Refresh"
+            title="Làm mới"
             disabled={loading}
           >
             <RefreshCw className={`w-5 h-5 text-gray-600 ${loading ? 'animate-spin' : ''}`} />
@@ -595,7 +563,7 @@ const ChatSidebar = ({ onUserSelect, refreshTrigger }) => {
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search chats..."
+            placeholder="Tìm kiếm cuộc trò chuyện..."
             className="w-full bg-gray-100 text-gray-900 px-4 py-2 rounded-full pl-10 focus:outline-none focus:ring-2 focus:ring-emerald-500"
           />
           <Search className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
@@ -610,7 +578,7 @@ const ChatSidebar = ({ onUserSelect, refreshTrigger }) => {
                 : "bg-gray-100 text-gray-700 hover:bg-gray-200"
             }`}
           >
-            All
+            Tất cả
           </button>
           <button
             onClick={() => setFilter("INDIVIDUAL")}
@@ -620,7 +588,7 @@ const ChatSidebar = ({ onUserSelect, refreshTrigger }) => {
                 : "bg-gray-100 text-gray-700 hover:bg-gray-200"
             }`}
           >
-            Individual
+            Cá nhân
           </button>
           <button
             onClick={() => setFilter("GROUP")}
@@ -630,7 +598,7 @@ const ChatSidebar = ({ onUserSelect, refreshTrigger }) => {
                 : "bg-gray-100 text-gray-700 hover:bg-gray-200"
             }`}
           >
-            Groups
+            Nhóm
           </button>
         </div>
       </div>
@@ -644,8 +612,8 @@ const ChatSidebar = ({ onUserSelect, refreshTrigger }) => {
         ) : filteredChats.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-gray-500 p-4">
             <MessageSquare className="w-16 h-16 mb-4 text-gray-300" />
-            <p className="text-lg font-medium">No chats yet</p>
-            <p className="text-sm text-center mt-2">Start a new conversation or create a group</p>
+            <p className="text-lg font-medium">Chưa có cuộc trò chuyện nào</p>
+            <p className="text-sm text-center mt-2">Bắt đầu một cuộc trò chuyện mới hoặc tạo nhóm</p>
           </div>
         ) : (
           filteredChats.map((chat) => {
@@ -710,7 +678,7 @@ const ChatSidebar = ({ onUserSelect, refreshTrigger }) => {
       {showCreateGroupModal && (
         <div className="absolute inset-0 bg-white z-50 flex flex-col">
           <div className="p-4 flex justify-between items-center border-b">
-            <h3 className="font-bold text-lg">Create Group Chat</h3>
+            <h3 className="font-bold text-lg">Tạo Nhóm Chat</h3>
             <button 
               onClick={() => setShowCreateGroupModal(false)}
               className="p-2 hover:bg-gray-100 rounded-full transition-colors"
@@ -725,13 +693,13 @@ const ChatSidebar = ({ onUserSelect, refreshTrigger }) => {
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Group Name
+                    Tên nhóm
                   </label>
                   <input
                     type="text"
                     value={groupName}
                     onChange={(e) => setGroupName(e.target.value)}
-                    placeholder="Enter group name"
+                    placeholder="Nhập tên nhóm"
                     className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                     autoFocus
                   />
@@ -745,7 +713,7 @@ const ChatSidebar = ({ onUserSelect, refreshTrigger }) => {
                   disabled={!groupName.trim()}
                   className="w-full bg-emerald-500 hover:bg-emerald-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg transition-colors"
                 >
-                  Next
+                  Tiếp theo
                 </button>
               </div>
             ) : (
@@ -754,13 +722,13 @@ const ChatSidebar = ({ onUserSelect, refreshTrigger }) => {
                 <div>
                   <div className="flex justify-between items-center mb-4">
                     <span className="text-sm font-medium text-gray-700">
-                      Select Participants ({selectedParticipants.length})
+                      Chọn thành viên ({selectedParticipants.length})
                     </span>
                     <button
                       onClick={() => setGroupCreationStep(1)}
                       className="text-sm text-emerald-600 hover:text-emerald-700"
                     >
-                      Back
+                      Quay lại
                     </button>
                   </div>
                   
@@ -783,12 +751,44 @@ const ChatSidebar = ({ onUserSelect, refreshTrigger }) => {
                   <div className="relative mb-4">
                     <input
                       type="text"
-                      value={searchModalTerm}
-                      onChange={(e) => handleSearchTermChange(e.target.value)}
-                      placeholder="Search users..."
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      placeholder="Tìm kiếm người dùng..."
                       className="w-full bg-gray-100 text-gray-900 px-4 py-2 rounded-full pl-10 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                     />
                     <Search className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
+                  </div>
+
+                  <div className="flex items-center gap-2 mb-4">
+                    <button
+                      onClick={() => setParticipantFilter("ALL")}
+                      className={`px-3 py-1 text-sm rounded-full transition-colors ${
+                        participantFilter === "ALL"
+                          ? "bg-emerald-500 text-white"
+                          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                      }`}
+                    >
+                      Tất cả
+                    </button>
+                    <button
+                      onClick={() => setParticipantFilter("STUDENT")}
+                      className={`px-3 py-1 text-sm rounded-full transition-colors ${
+                        participantFilter === "STUDENT"
+                          ? "bg-emerald-500 text-white"
+                          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                      }`}
+                    >
+                      Học viên
+                    </button>
+                    <button
+                      onClick={() => setParticipantFilter("INSTRUCTOR")}
+                      className={`px-3 py-1 text-sm rounded-full transition-colors ${
+                        participantFilter === "INSTRUCTOR"
+                          ? "bg-emerald-500 text-white"
+                          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                      }`}
+                    >
+                      Giảng viên
+                    </button>
                   </div>
                 </div>
                 
@@ -797,12 +797,8 @@ const ChatSidebar = ({ onUserSelect, refreshTrigger }) => {
                     <div className="flex justify-center items-center py-8">
                       <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-emerald-500"></div>
                     </div>
-                  ) : searchUsers.length === 0 ? (
-                    <div className="text-center py-4 text-gray-500">
-                      No users found
-                    </div>
                   ) : (
-                    searchUsers.map((user) => {
+                    getFilteredUsers(searchTerm, participantFilter).map((user) => {
                       const isSelected = selectedParticipants.some(p => p.userId === user.userId);
                       return (
                         <div
@@ -853,7 +849,7 @@ const ChatSidebar = ({ onUserSelect, refreshTrigger }) => {
                   disabled={selectedParticipants.length < 2}
                   className="w-full bg-emerald-500 hover:bg-emerald-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg transition-colors"
                 >
-                  Create Group ({selectedParticipants.length} participants)
+                  Tạo nhóm ({selectedParticipants.length} thành viên)
                 </button>
               </div>
             )}
@@ -865,7 +861,7 @@ const ChatSidebar = ({ onUserSelect, refreshTrigger }) => {
       {showUserSearchModal && (
         <div className="absolute inset-0 bg-white z-50 flex flex-col">
           <div className="p-4 flex justify-between items-center border-b">
-            <h3 className="font-bold text-lg">New Chat</h3>
+            <h3 className="font-bold text-lg">Trò chuyện mới</h3>
             <button 
               onClick={() => setShowUserSearchModal(false)}
               className="p-2 hover:bg-gray-100 rounded-full transition-colors"
@@ -879,9 +875,8 @@ const ChatSidebar = ({ onUserSelect, refreshTrigger }) => {
               <div className="relative">
                 <input
                   type="text"
-                  value={searchModalTerm}
-                  onChange={(e) => handleSearchTermChange(e.target.value)}
-                  placeholder="Search users..."
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Tìm kiếm người dùng..."
                   className="w-full bg-gray-100 text-gray-900 px-4 py-2 rounded-full pl-10 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                   autoFocus
                 />
@@ -890,34 +885,34 @@ const ChatSidebar = ({ onUserSelect, refreshTrigger }) => {
               
               <div className="flex items-center gap-2">
                 <button
-                  onClick={() => handleSearchFilterChange("ALL")}
+                  onClick={() => setParticipantFilter("ALL")}
                   className={`px-3 py-1 text-sm rounded-full transition-colors ${
-                    searchFilter === "ALL"
+                    participantFilter === "ALL"
                       ? "bg-emerald-500 text-white"
                       : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                   }`}
                 >
-                  All
+                  Tất cả
                 </button>
                 <button
-                  onClick={() => handleSearchFilterChange("INSTRUCTOR")}
+                  onClick={() => setParticipantFilter("INSTRUCTOR")}
                   className={`px-3 py-1 text-sm rounded-full transition-colors ${
-                    searchFilter === "INSTRUCTOR"
+                    participantFilter === "INSTRUCTOR"
                       ? "bg-emerald-500 text-white"
                       : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                   }`}
                 >
-                  Instructors
+                  Giảng viên
                 </button>
                 <button
-                  onClick={() => handleSearchFilterChange("STUDENT")}
+                  onClick={() => setParticipantFilter("STUDENT")}
                   className={`px-3 py-1 text-sm rounded-full transition-colors ${
-                    searchFilter === "STUDENT"
+                    participantFilter === "STUDENT"
                       ? "bg-emerald-500 text-white"
                       : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                   }`}
                 >
-                  Students
+                  Học viên
                 </button>
               </div>
             </div>
@@ -927,13 +922,9 @@ const ChatSidebar = ({ onUserSelect, refreshTrigger }) => {
                 <div className="flex justify-center items-center py-8">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500"></div>
                 </div>
-              ) : searchUsers.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
-                  No users found
-                </div>
               ) : (
                 <div className="space-y-2">
-                  {searchUsers.map((user) => (
+                  {getFilteredUsers(searchTerm, participantFilter).map((user) => (
                     <div
                       key={user.userId}
                       className="flex items-center gap-3 p-3 hover:bg-gray-50 cursor-pointer rounded-lg transition-colors"

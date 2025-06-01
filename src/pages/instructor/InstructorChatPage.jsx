@@ -1,42 +1,118 @@
-import React, { useState } from 'react';
-import ChatHeader from '../../components/admin/chat/ChatHeader';
-import ChatSidebar from '../../components/instructor/chat/ChatSidebar.jsx';
-import ChatWindow from '../../components/instructor/chat/ChatWindow.jsx';
-import Sidebar from "../../components/instructor/Sidebar/Sidebar";
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import ChatSidebar from '../../components/instructor/chat/ChatSidebar';
+import ChatWindow from '../../components/instructor/chat/ChatWindow';
+import GroupManagement from '../../components/instructor/chat/GroupManagement';
+import Sidebar from '../../components/instructor/Sidebar/Sidebar';
 
 const InstructorChatPage = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [chatData, setChatData] = useState(null);
+  const [isGroup, setIsGroup] = useState(false);
+  const [showGroupManagement, setShowGroupManagement] = useState(false);
+  const [refreshSidebar, setRefreshSidebar] = useState(0);
   const [open, setOpen] = useState(true);
+  const navigate = useNavigate();
+
+  // Debug role và login status
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const role = localStorage.getItem('role');
+    
+    console.log('InstructorChatPage - Auth Check:', {
+      token: !!token,
+      role: role,
+      isInstructor: role === 'ROLE_INSTRUCTOR'
+    });
+
+    // Redirect nếu không phải instructor
+    if (!token || role !== 'ROLE_INSTRUCTOR') {
+      navigate('/login');
+    }
+  }, [navigate]);
 
   const handleUserSelect = ({ user, chat }) => {
+    console.log('User selected:', { user, chat });
+    
     setSelectedUser(user);
     setChatData(chat);
+    setIsGroup(chat?.chatType === 'GROUP');
+    setShowGroupManagement(false);
+  };
+
+  const handleMessageSent = () => {
+    // Refresh sidebar khi có tin nhắn mới
+    setRefreshSidebar(prev => prev + 1);
+  };
+
+  const handleGroupUpdate = () => {
+    // Refresh sidebar và close modal
+    setRefreshSidebar(prev => prev + 1);
+    setShowGroupManagement(false);
   };
 
   return (
-    <div className="relative flex">
+    <div className="relative flex h-screen">
       <div className={`fixed inset-y-0 left-0 transition-all duration-300 ${open ? 'w-72' : 'w-16'} bg-white shadow-lg z-20`}>
         <Sidebar open={open} setOpen={setOpen} />
       </div>
 
       <section
-        className={`flex-1 transition-margin duration-300 ml-${open ? '72' : '16'} m-3 text-xl text-gray-900 font-semibold bg-gradient-to-b from-gray-100 to-blue-100 shadow-lg rounded-lg min-h-screen`}
+        className={`flex-1 transition-margin duration-300 ml-${open ? '72' : '16'} bg-gray-100 min-h-screen`}
       >
-        <div className="flex h-full bg-gray-100 relative">
-          <div className="flex-none relative z-30">
-            <ChatSidebar onUserSelect={handleUserSelect} />
+        <div className="flex h-full overflow-hidden">
+          {/* Chat Sidebar */}
+          <div className="flex-none relative z-10">
+            <ChatSidebar 
+              onUserSelect={handleUserSelect}
+              refreshTrigger={refreshSidebar}
+            />
           </div>
-          <div className="flex-1 flex flex-col bg-gray-900">
-            <div className="flex-1 overflow-hidden">
-              <ChatWindow 
-                selectedUser={selectedUser}
-                chatId={chatData?.chatId}
-                chatData={chatData}
-              />
+          
+          {/* Chat Window */}
+          <div className="flex-1 flex flex-col">
+            <div className="flex-1 overflow-hidden bg-white">
+              {chatData ? (
+                <ChatWindow 
+                  selectedUser={selectedUser}
+                  chatId={chatData.chatId}
+                  chatData={chatData}
+                  isGroup={chatData.chatType === 'GROUP'}
+                  onMessageSent={handleMessageSent}
+                  onGroupManagementClick={() => {
+                    console.log('Group management clicked!');
+                    setShowGroupManagement(true);
+                  }}
+                />
+              ) : (
+                <div className="flex items-center justify-center h-full text-gray-400">
+                  <div className="text-center">
+                    <img
+                      src="https://www.svgrepo.com/show/192262/chat.svg"
+                      alt="Empty Chat"
+                      className="w-32 h-32 mb-4 mx-auto opacity-50"
+                    />
+                    <h3 className="text-xl font-semibold text-gray-300 mb-2">
+                      Chưa có cuộc trò chuyện nào
+                    </h3>
+                    <p className="text-sm text-gray-500">
+                      Chọn một người dùng từ danh sách bên trái để bắt đầu chat
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
+
+        {/* Group Management Modal */}
+        {showGroupManagement && chatData && isGroup && (
+          <GroupManagement
+            chatData={chatData}
+            onClose={() => setShowGroupManagement(false)}
+            onUpdate={handleGroupUpdate}
+          />
+        )}
       </section>
     </div>
   );
