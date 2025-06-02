@@ -98,6 +98,7 @@ import HotCoursesPage from "./pages/student/topic/HotCoursesPage.jsx";
 import PageReportSection from "./pages/admin/PageReportSection.jsx";
 import PageReportLecture from "./pages/admin/PageReportLecture.jsx";
 import PageReportCourse from "./pages/admin/PageReportCourse.jsx";
+import PageCertificate from "./pages/student/certificate/PageCertificate.jsx";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -258,6 +259,7 @@ function App() {
                 <Route path="/student/notifications" element={<PgaeNotifications />} />
                 <Route path="/courses/newest" element={<NewestCoursesPage />} />
                 <Route path="/courses/hot" element={<HotCoursesPage />} />
+                <Route path="/student/list-certificate" element={<PageCertificate />} />
               </>
             )}
             
