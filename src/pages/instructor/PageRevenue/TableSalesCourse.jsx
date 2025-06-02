@@ -84,7 +84,7 @@ const TableSalesCourse = () => {
     <div className="p-6">
       <div className="bg-white shadow-lg rounded-2xl p-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-4">
-          <h2 className="text-2xl font-bold">Thống kê Doanh số Khóa học</h2>
+          <h2 className="text-2xl font-bold">Thống kê doanh thu từng khóa học</h2>
           <div className="flex gap-2">
             <input
               type="text"
@@ -130,15 +130,9 @@ const TableSalesCourse = () => {
                   <th className="px-4 py-3">Khóa học</th>
                   <th
                     className="px-4 py-3 cursor-pointer"
-                    onClick={() => toggleSort("enrollments")}
+                    onClick={() => toggleSort("revenue")}
                   >
-                    Lượt đăng ký {sortField === "enrollments" && (sortOrder === "asc" ? "↑" : "↓")}
-                  </th>
-                  <th
-                    className="px-4 py-3 cursor-pointer"
-                    onClick={() => toggleSort("price")}
-                  >
-                    Giá {sortField === "price" && (sortOrder === "asc" ? "↑" : "↓")}
+                    Doanh thu {sortField === "revenue" && (sortOrder === "asc" ? "↑" : "↓")}
                   </th>
                 </tr>
               </thead>
@@ -156,9 +150,8 @@ const TableSalesCourse = () => {
                       />
                     </td>
                     <td className="px-4 py-3 font-medium">{c.title}</td>
-                    <td className="px-4 py-3">{c.enrollments}</td>
-                    <td className="px-4 py-3 text-green-700">
-                      {formatCurrency(c.price)}
+                    <td className="px-4 py-3 text-blue-700 font-semibold">
+                      {formatCurrency(c.priceRevenues)}
                     </td>
                   </tr>
                 ))}

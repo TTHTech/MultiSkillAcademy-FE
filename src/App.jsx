@@ -23,6 +23,7 @@ import CourseDetailPage from "./pages/student/CoursesDetail/CourseDetailPage";
 import CategoryStudentPage from "./pages/student/category/CategoryStudentPage";
 // import PageUser from "./pages/instructor/PageUser";
 import PageDashboard from "./pages/instructor/PageDashboard";
+import PageRevenue from "./pages/instructor/PageRevenue/PageRevenue.jsx";
 import PageCourses from "./pages/instructor/PageCourses/PageCourses";
 import PagneCourseDetail from "./pages/instructor/PageCourses/PageCourseDetail";
 import PageAdd from "./pages/instructor/PageCourses/PageCoursesAdd";
@@ -189,7 +190,7 @@ function App() {
             {/* Đường dẫn quan trọng - luôn available, không phụ thuộc vào điều kiện */}
             <Route path="/student/home" element={<StudentHomePage />} />
             <Route path="/student/quiz/:id" element={<QuizPage />} />
-            <Route path="/certificate" element={<CertificateGenerator />} />
+            <Route path="/certificate/:courseHash" element={<CertificateGenerator />} />
 
             {/* Admin Routes */}
             {isLoggedIn && role === "ROLE_ADMIN" && (
@@ -280,6 +281,7 @@ function App() {
                 <Route path="/instructor/discount" element={<PageDiscountInstructor />} />
                 <Route path="/instructor/notifications" element={<PageNotification />} />
                 <Route path="/instructor/courses" element={<CombinedCoursesPage />} />
+                <Route path="/instructor/revenue" element={<PageRevenue />} />
               </>
             )}
           </Routes>

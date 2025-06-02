@@ -15,6 +15,8 @@ import { BiBookAdd } from "react-icons/bi";
 import { GiBookshelf } from "react-icons/gi";
 import { FaTags } from "react-icons/fa";
 import { FaBell } from "react-icons/fa";
+import { FaShoppingCart } from "react-icons/fa";
+import { FaMoneyBillWave } from "react-icons/fa";
 
 const Sidebar = ({ open, setOpen }) => {
   const location = useLocation();
@@ -28,6 +30,11 @@ const Sidebar = ({ open, setOpen }) => {
       name: "Doanh Số",
       link: "/instructor/sales",
       icon: FaCircleDollarToSlot,
+    },
+    {
+      name: "Doanh Thu",
+      link: "/instructor/revenue",
+      icon: FaMoneyBillWave,
     },
     // { name: "Dashboard", link: "/instructor/dashboard", icon: MdOutlineDashboard },
     // { name: "Danh Sách Khóa Học", link: "/instructor/courses", icon: ImBook },
