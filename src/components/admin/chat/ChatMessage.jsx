@@ -16,7 +16,8 @@ const ChatMessage = ({
   onEnlargeImage,
   getCurrentTimeString,
   onCopyMessage,
-  onDeleteMessage
+  onDeleteMessage,
+  isGroup = false
 }) => {
   const userAvatar = avatars[senderId] || avatar;
   const [imgLoaded, setImgLoaded] = useState(false);
@@ -67,6 +68,13 @@ const ChatMessage = ({
         )}
 
         <div className="relative">
+          {/* Hiển thị tên người gửi phía trên tin nhắn cho những người không phải admin trong group chat */}
+          {isGroup && !isAdmin && senderName && (
+            <div className="text-xs text-gray-500 mb-1 ml-1">
+              {senderName}
+            </div>
+          )}
+
           {/* Message Content */}
           {messageType === "IMAGE" ? (
             <div className={`rounded-2xl overflow-hidden ${isAdmin ? "ml-2" : ""} bg-gray-100`}>
@@ -118,8 +126,8 @@ const ChatMessage = ({
                 <FileUp className="w-4 h-4 mr-2" />
                 <span className="flex flex-col">
                   <span>{message || "Tập tin đính kèm"}</span>
-                  <span className="text-xs mt-1 text-gray-300 break-all">
-                    {fileUrl}
+                  <span className={`text-xs mt-1 break-all ${isAdmin ? "text-emerald-100" : "text-gray-500"}`}>
+                    {fileUrl.split('/').pop()}
                   </span>
                 </span>
               </a>
