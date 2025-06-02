@@ -476,6 +476,7 @@ const ChatWindow = ({
         }
       }
 
+      // Trong hàm renderMessagesWithDateSeparators() của ChatWindow
       groupedMessages.push(
         <ChatMessage
           key={msg.id || index}
@@ -485,6 +486,7 @@ const ChatWindow = ({
           getCurrentTimeString={getCurrentTimeString}
           onCopyMessage={handleCopyMessage}
           onDeleteMessage={handleDeleteMessage}
+          isGroup={isGroup} // Thêm dòng này
         />
       );
     });

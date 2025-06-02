@@ -71,7 +71,8 @@ const ChatWindow = ({
         return {
           id: msg.messageId,
           message: messageContent,
-          isInstructor: msg.senderId === parseInt(localStorage.getItem("userId")),
+          isInstructor:
+            msg.senderId === parseInt(localStorage.getItem("userId")),
           avatar:
             msg.senderAvatar ||
             "https://ui-avatars.com/api/?name=I&background=8B5CF6&color=ffffff&size=128&bold=true",
@@ -475,6 +476,7 @@ const ChatWindow = ({
         }
       }
 
+      // Trong hàm renderMessagesWithDateSeparators() của ChatWindow
       groupedMessages.push(
         <ChatMessage
           key={msg.id || index}
@@ -485,6 +487,7 @@ const ChatWindow = ({
           getCurrentTimeString={getCurrentTimeString}
           onCopyMessage={handleCopyMessage}
           onDeleteMessage={handleDeleteMessage}
+          isGroup={isGroup} // Thêm dòng này
         />
       );
     });
