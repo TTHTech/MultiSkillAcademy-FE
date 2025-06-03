@@ -12,7 +12,8 @@ import {
   Globe, 
   UserCircle, 
   Settings, 
-  LogOut 
+  LogOut,
+  Award 
 } from 'lucide-react';
 const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
@@ -204,6 +205,13 @@ const ProfileMenu = () => {
               to="/student/list-my-course" 
               icon={BookOpen} 
               label="Học tập" 
+            />
+            {/* Certificate Section */}
+            <MenuItem 
+              to="/student/list-certificate" 
+              icon={Award } 
+              label="Chứng chỉ của tôi" 
+              onClick={() => navigate("/student/list-certificate")}
             />
             
             {/* Cart Section */}
