@@ -4,10 +4,9 @@ import { MdOutlineDashboard } from "react-icons/md";
 import { ImBook } from "react-icons/im";
 import { AiOutlineUser } from "react-icons/ai";
 import { PiStudentFill } from "react-icons/pi";
-import { FaSignOutAlt } from "react-icons/fa";
+import { FaSignOutAlt, FaFileSignature } from "react-icons/fa";
 import { BsFillQuestionSquareFill, BsChatDots } from "react-icons/bs";
 import { Link, useLocation } from "react-router-dom";
-import { LuFileSignature } from "react-icons/lu";
 import { MdOutlineReviews } from "react-icons/md";
 import { FaCircleDollarToSlot } from "react-icons/fa6";
 import { GrScorecard } from "react-icons/gr";
@@ -59,7 +58,7 @@ const Sidebar = ({ open, setOpen }) => {
       link: "/instructor/review",
       icon: MdOutlineReviews,
     },
-    { name: "Bài Kiểm Tra", link: "/instructor/tests", icon: LuFileSignature },
+    { name: "Bài Kiểm Tra", link: "/instructor/tests", icon: FaFileSignature },
     { name: "Điểm Số Học Viên", link: "/instructor/scores", icon: GrScorecard },
     {
       name: "Hỏi Đáp Của Khóa Học",
