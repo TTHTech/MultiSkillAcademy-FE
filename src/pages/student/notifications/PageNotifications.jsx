@@ -1,7 +1,7 @@
 import NavBar from "../../../components/student/common/NavBar";
 import Footer from "../../../components/student/common/Footer";
 import Notifications from "../../../components/student/notifications/Notifications"
-const PgaeNotifications = () => {
+const PageNotifications = () => {
   return (
     <div className="w-full h-full min-h-screen bg-white overflow-y-auto">
       <NavBar />
@@ -16,4 +16,4 @@ const PgaeNotifications = () => {
   );
 };
 
-export default PgaeNotifications;
+export default PageNotifications;
