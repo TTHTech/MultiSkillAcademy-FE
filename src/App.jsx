@@ -23,6 +23,7 @@ import CourseDetailPage from "./pages/student/CoursesDetail/CourseDetailPage";
 import CategoryStudentPage from "./pages/student/category/CategoryStudentPage";
 // import PageUser from "./pages/instructor/PageUser";
 import PageDashboard from "./pages/instructor/PageDashboard";
+import PageRevenue from "./pages/instructor/PageRevenue/PageRevenue.jsx";
 import PageCourses from "./pages/instructor/PageCourses/PageCourses";
 import PagneCourseDetail from "./pages/instructor/PageCourses/PageCourseDetail";
 import PageAdd from "./pages/instructor/PageCourses/PageCoursesAdd";
@@ -36,7 +37,9 @@ import ResetPassPage from "./pages/auth/ResetPassPage";
 import SuccessPage from "./pages/student/cart/SuccessPage";
 import Logout from "./components/auth/Logout.jsx";
 import PageReview from "./pages/instructor/PageReview/PageReview";
-import PageSales from "./pages/instructor/PageSales/PageSales.jsx";
+import PageSales from "./pages/instructor/PageSaleCourse/PageSaleCourse.jsx";
+// import PageSales from "./pages/instructor/PageDashboard.jsx";
+
 import ProfilePage from "./pages/student/profile/ProfilePage.jsx";
 import QuizPage from "./pages/student/quiz/QuizPage";
 import ResultPage from "./pages/student/quiz/ResultPage";
@@ -50,7 +53,7 @@ import ForgotPassForm from "./components/auth/ForgotPassForm.jsx";
 import ResetPassForm from "./components/auth/ResetPassForm.jsx";
 import PageQuestions from "./pages/instructor/PageQuestions/PageQuestions.jsx";
 import NotificationList from "./components/student/notification/NotificationList.jsx";
-import ChatPage from "./pages/student/chat/ChatPage.jsx";
+import StudentChatPage from "./pages/student/chat/StudentChatPage.jsx";
 import NotificationPage from "./pages/admin/NotificationPage";
 import AddNotificationPage from "./pages/admin/AddNotificationPage";
 import AdminChatPage from "./pages/admin/AdminChatPage";
@@ -81,13 +84,22 @@ import PagePromotion from "./pages/admin/PagePromotion.jsx"
 import PagePromotionUsage from "./pages/admin/PagePromotionUsage.jsx"
 import TopicCoursesPage from "./pages/student/topic/TopicCoursesPage.jsx";
 import PageAdminProfile from "./pages/admin/PageAdminProfile.jsx"
-import PgaeNotifications from "./pages/student/notifications/PgaeNotifications.jsx";
+import PgaeNotifications from "./pages/student/notifications/PageNotifications.jsx";
 import PageNotification from "./pages/instructor/Notification/PageNotification.jsx";
 import ReviewStatisticsPage from "./pages/admin/ReviewStatisticsPage.jsx";
 import CoursesStatisticsPage from "./pages/admin/CoursesStatisticsPage.jsx";
 import AdminPaymentContainer from "./components/admin/payment/AdminPaymentContainer.jsx";
 import InstructorPaymentHistory from "./components/admin/revenue/InstructorPaymentHistory.jsx";
 import AdminAuditTrailPage from "./components/admin/audit/AdminAuditTrailPage.jsx";
+
+import CombinedCoursesPage from "./pages/instructor/CombinedCoursesPage.jsx";
+import NewestCoursesPage from "./pages/student/topic/NewestCoursesPage.jsx";
+import HotCoursesPage from "./pages/student/topic/HotCoursesPage.jsx";
+import PageReportSection from "./pages/admin/PageReportSection.jsx";
+import PageReportLecture from "./pages/admin/PageReportLecture.jsx";
+import PageReportCourse from "./pages/admin/PageReportCourse.jsx";
+import PageCertificate from "./pages/student/certificate/PageCertificate.jsx";
+
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [role, setRole] = useState("");
@@ -179,7 +191,7 @@ function App() {
             {/* Đường dẫn quan trọng - luôn available, không phụ thuộc vào điều kiện */}
             <Route path="/student/home" element={<StudentHomePage />} />
             <Route path="/student/quiz/:id" element={<QuizPage />} />
-            <Route path="/certificate" element={<CertificateGenerator />} />
+            <Route path="/certificate/:courseHash" element={<CertificateGenerator />} />
 
             {/* Admin Routes */}
             {isLoggedIn && role === "ROLE_ADMIN" && (
@@ -214,6 +226,9 @@ function App() {
                 <Route path="/admin/discount-usage" element={<PageDiscountUsage />} />
                 <Route path="/admin/browsed-discounts" element={<PageBrowseDiscount />} />
                 <Route path="/admin/report/review-course" element={<PageReportReviewCourse/>} />
+                <Route path="/admin/report/course" element={<PageReportCourse/>} />
+                <Route path="/admin/report/section" element={<PageReportSection/>} />
+                <Route path="/admin/report/lecture" element={<PageReportLecture/>} />
                 <Route path="/admin/promotions/add" element={<PageCreatePromotion />} />
                 <Route path="/admin/promotions" element={<PagePromotion />} />
                 <Route path="/admin/promotions-usage" element={<PagePromotionUsage />} />
@@ -234,7 +249,7 @@ function App() {
                 <Route path="/category/:categoryId" element={<CategoryStudentPage />} />
                 <Route path="/student/study/:progressHash/:courseHash" element={<CourseViewerPage />} />
                 <Route path="/student/wishlist" element={<Wishlist />} />
-                <Route path="/student/chat" element={<ChatPage />} />
+                <Route path="/student/chat" element={<StudentChatPage />} />
                 <Route path="/student/Success" element={<SuccessPage />} />
                 <Route path="/student/payment/success" element={<SuccessPage />} />
                 <Route path="/student/result" element={<ResultPage />} />
@@ -242,6 +257,9 @@ function App() {
                 <Route path="/student/reminder" element={<ReminderPage />} />
                 <Route path="/topic/:topicPath" element={<TopicCoursesPage />} />
                 <Route path="/student/notifications" element={<PgaeNotifications />} />
+                <Route path="/courses/newest" element={<NewestCoursesPage />} />
+                <Route path="/courses/hot" element={<HotCoursesPage />} />
+                <Route path="/student/list-certificate" element={<PageCertificate />} />
               </>
             )}
             
@@ -250,7 +268,7 @@ function App() {
               <>
                 {/* <Route path="/instructor/user" element={<PageUser />} /> */}
                 <Route path="/instructor/dashboard" element={<PageDashboard />} />
-                <Route path="/instructor/courses" element={<PageCourses />} />
+                {/* <Route path="/instructor/courses" element={<PageCourses />} /> */}
                 <Route path="/instructor/addCourses" element={<PageAdd />} />
                 <Route path="/instructor/review" element={<PageReview />} />
                 <Route path="/instructor/students" element={<StudentList />} />
@@ -258,12 +276,14 @@ function App() {
                 <Route path="/instructor/tests" element={<Test />} />
                 <Route path="/instructor/scores" element={<PageViewScores />} />
                 <Route path="/instructor/questions" element={<PageQuestions />} />
-                <Route path="/instructor/search" element={<PageSearchCourse />} />
+                {/* <Route path="/instructor/search" element={<PageSearchCourse />} /> */}
                 <Route path="/instructor/courses/:id" element={<UpdateCourse />} />
                 <Route path="/instructor/chat" element={<InstructorChatPage />} />
                 <Route path="/instructor/user" element={<PageProfile />} />
                 <Route path="/instructor/discount" element={<PageDiscountInstructor />} />
                 <Route path="/instructor/notifications" element={<PageNotification />} />
+                <Route path="/instructor/courses" element={<CombinedCoursesPage />} />
+                <Route path="/instructor/revenue" element={<PageRevenue />} />
               </>
             )}
           </Routes>

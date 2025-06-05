@@ -18,27 +18,29 @@ import RecommendedCoursesComponent from "../../../components/student/home/Recomm
 import TopDevelopmentCoursesSection from "../../../components/student/home/TopDevelopmentCoursesSection"; // Import mới
 import TopBusinessCoursesSection from "../../../components/student/home/TopBusinessCoursesSection"; // Import mới
 import TopFinanceCoursesSection from "../../../components/student/home/TopFinanceCoursesSection"; // Import mới
+import TopCoursesWithPromotion from "../../../components/student/home/TopCoursesWithPromotion"; // Import mới
+
 const StudentHomePage = () => {
   return (
     <div className="w-full h-full min-h-screen bg-[#F5F6F8] overflow-y-auto">
-
       <NavBar />
       <WelcomeSection />
       <HeroSection />
-      
+
       <RecommendedCoursesComponent />
       <SuggestedCoursesSection />
-     
-      <TopDevelopmentCoursesSection/>
-      <TopBusinessCoursesSection/>
+      <TopCoursesWithPromotion />
+
+      <TopDevelopmentCoursesSection />
+      <TopBusinessCoursesSection />
       {/* Thêm component TopWebCoursesSection mới */}
-      <TopMusicCoursesSection/>
+      <TopMusicCoursesSection />
       <TopMarketingCoursesSection />
-      <TopDesignCoursesSection/>
-     < RecommendedTopics/>
-      <TopTechnologyCoursesSection/>
-     <TopPythonCoursesSection /> 
-     <TopFinanceCoursesSection/>
+      <TopDesignCoursesSection />
+      <RecommendedTopics />
+      <TopTechnologyCoursesSection />
+      <TopPythonCoursesSection />
+      <TopFinanceCoursesSection />
       <Footer />
     </div>
   );

@@ -54,6 +54,7 @@ import {
   PlusCircle as PlusCircleIcon,
   CheckCircle,
   Lock,
+  PlayCircle,
 } from "lucide-react";
 import { ChalkboardTeacher } from "phosphor-react";
 
@@ -350,12 +351,24 @@ const MENU_GROUPS = [
             href: "/admin/report/review-course",
             color: "#f97316",
           },
-          // {
-          //   name: "Báo Cáo Khóa Học",
-          //   icon: Ticket,
-          //   href: "/admin/report/course",
-          //   color: "#10b981",
-          // },
+          {
+            name: "Báo Cáo Khóa Học",
+            icon: BookOpen,
+            href: "/admin/report/course",
+            color: "#3b82f6",
+          },
+          {
+            name: "Báo Cáo Chương Học",
+            icon: Layers,
+            href: "/admin/report/section",
+            color: "#ef4444",
+          },
+          {
+            name: "Báo Cáo Bài Học",
+            icon: PlayCircle,
+            href: "/admin/report/lecture",
+            color: "#10b981",
+          },
         ],
       },
     ],

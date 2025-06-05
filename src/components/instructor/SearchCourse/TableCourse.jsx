@@ -38,7 +38,7 @@ const TableCourse = ({ courses }) => {
   return (
     <div className="p-6 bg-gray-100">
       <h1 className="text-2xl font-bold text-gray-800 mb-4 border-b-2 border-gray-300 pb-2">
-        Danh sách khóa học
+        Bảng danh sách khóa học
       </h1>
 
       <button

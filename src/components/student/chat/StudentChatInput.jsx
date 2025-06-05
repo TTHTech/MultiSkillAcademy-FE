@@ -4,14 +4,13 @@ import { toast } from 'react-toastify';
 import EmojiPicker from 'emoji-picker-react';
 const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
-const ChatInput = ({ addMessage, setIsTyping, disabled, chatId }) => {
+const StudentChatInput = ({ chatId, addMessage, setIsTyping, disabled }) => {
   const [message, setMessage] = useState('');
   const [showAttachmentOptions, setShowAttachmentOptions] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [filePreview, setFilePreview] = useState(null);
   const [fileType, setFileType] = useState(null);
-  const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
   const inputRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -23,7 +22,7 @@ const ChatInput = ({ addMessage, setIsTyping, disabled, chatId }) => {
     }
   }, []);
 
-  // Đóng emoji picker khi click ra ngoài
+  // Close emoji picker when clicking outside
   useEffect(() => {
     function handleClickOutside(event) {
       if (emojiPickerRef.current && !emojiPickerRef.current.contains(event.target)) {
@@ -53,7 +52,7 @@ const ChatInput = ({ addMessage, setIsTyping, disabled, chatId }) => {
     const file = e.target.files[0];
     if (!file) return;
     
-    // Kiểm tra kích thước file (tối đa 20MB)
+    // Check file size (max 20MB)
     if (file.size > 20 * 1024 * 1024) {
       toast.error('Kích thước file không được vượt quá 20MB');
       return;
@@ -61,7 +60,7 @@ const ChatInput = ({ addMessage, setIsTyping, disabled, chatId }) => {
 
     setSelectedFile(file);
     
-    // Xác định loại file
+    // Determine file type
     if (file.type.startsWith('image/')) {
       setFileType('IMAGE');
       const reader = new FileReader();
@@ -86,7 +85,7 @@ const ChatInput = ({ addMessage, setIsTyping, disabled, chatId }) => {
 
   const handleAttachmentClick = (type) => {
     if (fileInputRef.current) {
-      // Thiết lập accept attribute dựa trên loại file được chọn
+      // Set accept attribute based on selected file type
       switch (type) {
         case 'IMAGE':
           fileInputRef.current.accept = 'image/*';
@@ -105,76 +104,11 @@ const ChatInput = ({ addMessage, setIsTyping, disabled, chatId }) => {
     setShowAttachmentOptions(false);
   };
 
-  // Xử lý khi người dùng chọn emoji
+  // Handle emoji selection
   const onEmojiClick = (emojiObject) => {
     setMessage(prevMessage => prevMessage + emojiObject.emoji);
     if (inputRef.current) {
       inputRef.current.focus();
-    }
-  };
-
-  const uploadFile = async (file) => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) throw new Error("Vui lòng đăng nhập lại");
-      
-      // Kiểm tra chatId tồn tại
-      if (!chatId) {
-        console.error("Thiếu chatId khi upload file");
-        throw new Error("Không thể tải lên file: thiếu chatId");
-      }
-      
-      setIsUploading(true);
-      setUploadProgress(0);
-      
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('type', fileType);
-      
-      // Sử dụng XMLHttpRequest để tracking tiến trình upload
-      return new Promise((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-        
-        xhr.upload.addEventListener('progress', (event) => {
-          if (event.lengthComputable) {
-            const progress = Math.round((event.loaded / event.total) * 100);
-            setUploadProgress(progress);
-          }
-        });
-        
-        // Trong ChatInput.jsx, hàm uploadFile:
-xhr.addEventListener('load', () => {
-  if (xhr.status >= 200 && xhr.status < 300) {
-    try {
-      const response = JSON.parse(xhr.responseText);
-      console.log("Upload successful, full response:", response);
-      resolve(response);
-    } catch (error) {
-      console.error("Error parsing JSON:", error);
-      console.log("Raw response:", xhr.responseText);
-      reject(new Error("Invalid response format"));
-    }
-  } else {
-    console.error("Upload failed with status:", xhr.status);
-    reject(new Error(`Upload failed: ${xhr.status}`));
-  }
-});
-        
-        xhr.addEventListener('error', () => {
-          reject(new Error('Network error during upload'));
-        });
-        
-        // Sử dụng chatId trong URL để phù hợp với API backend
-        xhr.open('POST', `${baseUrl}/api/student/chat/${chatId}/upload`);
-        xhr.setRequestHeader('Authorization', `Bearer ${token}`);
-        xhr.send(formData);
-      });
-    } catch (error) {
-      console.error('Error uploading file:', error);
-      toast.error(`Không thể tải file lên: ${error.message}`);
-      throw error;
-    } finally {
-      setIsUploading(false);
     }
   };
 
@@ -187,99 +121,134 @@ xhr.addEventListener('load', () => {
     }
   };
 
+  // Handle send message for Student
   const handleSendMessage = async () => {
-    if (disabled) return;
+    if (disabled || !chatId) {
+      console.log("Cannot send message:", { disabled, chatId });
+      return;
+    }
     
     try {
-      // Nếu có file được chọn
+      console.log("Starting to send message...", { 
+        hasFile: !!selectedFile, 
+        messageLength: message.trim().length,
+        chatId 
+      });
+
+      // If a file is selected
       if (selectedFile) {
         setIsUploading(true);
         
-        // Upload file lên server
-        const uploadResponse = await uploadFile(selectedFile);
-        console.log('File uploaded successfully:', uploadResponse);
-        
-        // Tạo nội dung tin nhắn dựa trên loại file
-        let messageContent = message || '';
-        if (fileType === 'IMAGE') {
-          messageContent = message || '[Hình ảnh]';
-        } else if (fileType === 'VIDEO') {
-          messageContent = message || '[Video]';
-        } else {
-          messageContent = message || `[Tập tin: ${selectedFile.name}]`;
+        try {
+          // Send file directly using message/media endpoint
+          await addMessage(message.trim() || `[${selectedFile.name}]`, selectedFile, fileType);
+          
+          // Reset file selection
+          resetFileSelection();
+          
+        } catch (error) {
+          console.error('File send failed:', error);
+          toast.error(`Không thể gửi file: ${error.message}`);
+          return;
         }
         
-        // Rút gọn URL nếu quá dài
-        let fileUrl = uploadResponse.fileDownloadUri || uploadResponse.fileUrl;
-
-// Thêm log để kiểm tra cấu trúc response
-console.log('Full upload response:', JSON.stringify(uploadResponse));
-if (fileUrl && fileUrl.length > 200) {
-  const urlParts = fileUrl.split('/');
-  const fileName = urlParts[urlParts.length - 1];
-  // Sử dụng đúng định dạng URL mà server mong đợi
-  fileUrl = `/api/student/chat/files/${fileName}`;
-  console.log("URL rút gọn:", fileUrl);
-}
-        
-        // Gửi tin nhắn với file URL
-        await addMessage(messageContent, fileUrl, fileType);
-        
-        // Reset file selection
-        resetFileSelection();
       } else if (message.trim()) {
-        // Gửi tin nhắn văn bản thông thường
-        await addMessage(message.trim());
+        console.log("Sending text message:", message.trim());
+        // Send regular text message
+        await addMessage(message.trim(), null, 'TEXT');
+      } else {
+        console.log("No message content to send");
+        return;
       }
       
-      // Reset tin nhắn và typing status
+      // Reset message and typing status
       setMessage('');
       setIsTyping(false);
       setShowEmojiPicker(false);
       
-      // Focus lại input sau khi gửi
-      if (inputRef.current) {
-        inputRef.current.focus();
-      }
+      // Focus input after sending
+      setTimeout(() => {
+        if (inputRef.current) {
+          inputRef.current.focus();
+        }
+      }, 100);
+      
     } catch (error) {
-      console.error('Error sending message:', error);
+      console.error('Error in handleSendMessage:', error);
       toast.error(`Không thể gửi tin nhắn: ${error.message}`);
     } finally {
       setIsUploading(false);
     }
   };
 
+  // Send typing status via WebSocket for Student
+  const sendTypingStatus = (isTyping) => {
+    const token = localStorage.getItem("token");
+    if (!token || !chatId) return;
+    
+    try {
+      const stompClient = window.stompClient;
+      if (stompClient && stompClient.connected) {
+        const userId = localStorage.getItem("userId");
+        const username = localStorage.getItem("username") || "Student";
+        
+        stompClient.publish({
+          destination: "/app/student/chat.typing",
+          body: JSON.stringify({
+            chatId: chatId,
+            userId: userId,
+            username: username,
+            isTyping: isTyping
+          })
+        });
+      }
+    } catch (error) {
+      console.error("Error sending typing status:", error);
+    }
+  };
+
+  // Send typing status when user types
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      sendTypingStatus(message.length > 0);
+    }, 500);
+    
+    return () => clearTimeout(timeoutId);
+  }, [message, chatId]);
+
   return (
-    <div className="border-t p-3 relative">
-      {/* Hiển thị file đã chọn */}
+    <div className="border-t p-3 relative bg-white">
+      {/* Display selected file */}
       {selectedFile && (
-        <div className="mb-2 p-2 bg-gray-100 rounded-md relative">
+        <div className="mb-2 p-3 bg-gray-50 rounded-lg relative border">
           <div className="flex items-center">
             {filePreview && fileType === 'IMAGE' ? (
-              <img src={filePreview} alt="Preview" className="w-16 h-16 object-cover rounded-md mr-2" />
+              <img src={filePreview} alt="Preview" className="w-16 h-16 object-cover rounded-md mr-3" />
             ) : filePreview && fileType === 'VIDEO' ? (
-              <video src={filePreview} className="w-16 h-16 object-cover rounded-md mr-2" />
+              <video src={filePreview} className="w-16 h-16 object-cover rounded-md mr-3" />
             ) : (
-              <div className="w-16 h-16 bg-gray-200 rounded-md flex items-center justify-center mr-2">
+              <div className="w-16 h-16 bg-gray-200 rounded-md flex items-center justify-center mr-3">
                 <FileText className="w-8 h-8 text-gray-500" />
               </div>
             )}
             <div className="flex-1">
               <p className="text-sm font-medium truncate">{selectedFile.name}</p>
-              <p className="text-xs text-gray-500">{(selectedFile.size / 1024).toFixed(2)} KB</p>
+              <p className="text-xs text-gray-500">{(selectedFile.size / 1024 / 1024).toFixed(2)} MB</p>
               
               {isUploading && (
-                <div className="w-full bg-gray-200 rounded-full h-2.5 mt-1">
+                <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
                   <div 
-                    className="bg-emerald-500 h-2.5 rounded-full" 
-                    style={{width: `${uploadProgress}%`}}>
+                    className="bg-blue-500 h-2 rounded-full transition-all duration-300 animate-pulse" 
+                    style={{width: '100%'}}>
                   </div>
+                  <div className="text-xs text-gray-500 mt-1">Đang gửi...</div>
                 </div>
               )}
             </div>
             <button 
-              className="p-1 hover:bg-gray-200 rounded-full"
+              className="p-1 hover:bg-gray-200 rounded-full transition-colors"
               onClick={resetFileSelection}
+              disabled={isUploading}
             >
               <X className="w-4 h-4 text-gray-500" />
             </button>
@@ -296,34 +265,34 @@ if (fileUrl && fileUrl.length > 200) {
               setShowAttachmentOptions(!showAttachmentOptions);
               setShowEmojiPicker(false);
             }}
-            disabled={disabled}
+            disabled={disabled || !chatId || isUploading}
           >
             <Paperclip className="w-5 h-5" />
           </button>
           
           {/* Attachment options */}
           {showAttachmentOptions && (
-            <div className="absolute bottom-full left-0 mb-2 bg-white shadow-lg rounded-lg p-2 z-10">
+            <div className="absolute bottom-full left-0 mb-2 bg-white shadow-lg rounded-lg p-2 z-10 border">
               <button 
                 className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded-md w-full text-left"
                 onClick={() => handleAttachmentClick('IMAGE')}
               >
-                <Image className="w-5 h-5 text-emerald-500" />
-                <span>Hình ảnh</span>
+                <Image className="w-5 h-5 text-blue-500" />
+                <span className="text-sm">Hình ảnh</span>
               </button>
               <button 
                 className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded-md w-full text-left"
                 onClick={() => handleAttachmentClick('VIDEO')}
               >
-                <Video className="w-5 h-5 text-blue-500" />
-                <span>Video</span>
+                <Video className="w-5 h-5 text-green-500" />
+                <span className="text-sm">Video</span>
               </button>
               <button 
                 className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded-md w-full text-left"
                 onClick={() => handleAttachmentClick('FILE')}
               >
                 <FileText className="w-5 h-5 text-orange-500" />
-                <span>Tài liệu</span>
+                <span className="text-sm">Tài liệu</span>
               </button>
             </div>
           )}
@@ -337,7 +306,7 @@ if (fileUrl && fileUrl.length > 200) {
               setShowEmojiPicker(!showEmojiPicker);
               setShowAttachmentOptions(false);
             }}
-            disabled={disabled}
+            disabled={disabled || !chatId || isUploading}
           >
             <Smile className="w-5 h-5" />
           </button>
@@ -371,21 +340,23 @@ if (fileUrl && fileUrl.length > 200) {
         <input
           ref={inputRef}
           type="text"
-          placeholder={disabled ? "Chọn một người dùng để bắt đầu chat" : "Nhập tin nhắn..."}
-          className="flex-1 border rounded-full py-2 px-4 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          placeholder={disabled || !chatId ? "Chọn một người dùng để bắt đầu chat" : "Nhập tin nhắn..."}
+          className="flex-1 border rounded-full py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
           value={message}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
-          disabled={disabled || isUploading}
+          disabled={disabled || !chatId || isUploading}
         />
         
         {/* Send button */}
         <button
-          className={`p-2 rounded-full ${
-            !disabled && (message.trim() || selectedFile) ? 'bg-emerald-500 text-white' : 'bg-gray-200 text-gray-500'
+          className={`p-2 rounded-full transition-colors ${
+            !disabled && chatId && (message.trim() || selectedFile) && !isUploading
+              ? 'bg-blue-500 hover:bg-blue-600 text-white' 
+              : 'bg-gray-200 text-gray-500 cursor-not-allowed'
           }`}
           onClick={handleSendMessage}
-          disabled={disabled || isUploading || (!message.trim() && !selectedFile)}
+          disabled={disabled || !chatId || isUploading || (!message.trim() && !selectedFile)}
         >
           <Send className="w-5 h-5" />
         </button>
@@ -394,4 +365,4 @@ if (fileUrl && fileUrl.length > 200) {
   );
 };
 
-export default ChatInput;
+export default StudentChatInput;

@@ -18,6 +18,10 @@ const BrowseDiscounts = () => {
   };
   const [searchCode, setSearchCode] = useState("");
   const [searchStatus, setSearchStatus] = useState("");
+  const toDate = (isoString) => {
+    const normalized = isoString.replace(/\.(\d{3})\d+/, ".$1");
+    return new Date(normalized);
+  };
 
   const getPaginationItems = () => {
     const pages = [];
@@ -87,7 +91,7 @@ const BrowseDiscounts = () => {
       ) : (
         <>
           <h2 className="text-2xl font-bold mb-4 text-white">
-            Danh sách Discounts cần duyệt
+            Danh sách mã giảm giá cần duyệt
           </h2>
           <div className="w-full flex flex-col sm:flex-row items-center gap-4 mb-6 px-4">
             <input
@@ -153,12 +157,12 @@ const BrowseDiscounts = () => {
                             : `${discount.value} VND`}
                         </td>
                         <td className="py-3 px-4 border-r border-gray-600 text-center">
-                          {new Date(...discount.startDate).toLocaleDateString(
+                          {toDate(discount.startDate).toLocaleDateString(
                             "vi-VN"
                           )}
                         </td>
                         <td className="py-3 px-4 border-r border-gray-600 text-center">
-                          {new Date(...discount.endDate).toLocaleDateString(
+                          {toDate(discount.endDate).toLocaleDateString(
                             "vi-VN"
                           )}
                         </td>

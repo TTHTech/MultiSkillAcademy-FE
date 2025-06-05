@@ -25,22 +25,7 @@ const ChartOption = ({ data }) => {
   return (
     <div className="col-span-12 xl:col-span-4 rounded-lg border border-gray-200 bg-white p-6 shadow-lg dark:border-gray-700 dark:bg-gray-800">
       <div className="mb-4 flex items-center justify-between">
-        <h4 className="text-xl font-semibold text-gray-800 dark:text-white">
-          Select Chart
-        </h4>
         <div className="relative inline-block">
-          <select
-            name="chart-type"
-            id="chart-type"
-            className="block appearance-none bg-transparent py-1 pl-3 pr-8 text-sm font-medium text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-300"
-            onChange={(e) => setSelectedChart(e.target.value)}
-            value={selectedChart}
-          >
-            <option value="sales" className="dark:bg-gray-800">Total Sales</option>
-            <option value="students" className="dark:bg-gray-800">Total Students</option>
-            <option value="views" className="dark:bg-gray-800">Total Views</option>
-            <option value="courses" className="dark:bg-gray-800">Total Courses</option>
-          </select>
           <span className="absolute top-1/2 right-3 transform -translate-y-1/2">
             <svg
               width="10"
@@ -63,7 +48,6 @@ const ChartOption = ({ data }) => {
           </span>
         </div>
       </div>
-
       <div>
         {renderChart()}
       </div>

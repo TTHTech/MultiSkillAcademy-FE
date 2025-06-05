@@ -5,7 +5,7 @@ const PageBrowseDiscount = () => {
   return (
     <div className="flex-1 overflow-auto relative z-10">
       <div className="container mx-auto px-4">
-        <Header title="Browse Discount" />
+        <Header title="Duyệt mã giảm giá" />
         <BrowseDiscounts />
       </div>
     </div>

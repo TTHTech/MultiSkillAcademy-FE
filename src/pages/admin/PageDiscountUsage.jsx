@@ -13,7 +13,7 @@ const PageDiscountUsage = () => {
   return (
     <div className="flex-1 overflow-auto relative z-10">
       <div className="container mx-auto px-4">
-        <Header title="Discount Usage" />
+        <Header title="Mã Giảm Giá Đã Sử Dụng" />
         <div className="flex flex-col items-center p-6 min-h-screen">
           <div className="flex space-x-6 mb-6 text-2xl font-bold">
             <button

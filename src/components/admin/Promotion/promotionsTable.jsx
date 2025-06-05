@@ -15,6 +15,10 @@ const PromotionsTable = () => {
   const triggerRefresh = () => setRefresh((prev) => !prev);
   const [searchName, setSearchName] = useState("");
   const [searchStatus, setSearchStatus] = useState("");
+  const toDate = (isoString) => {
+    const normalized = isoString.replace(/\.(\d{3})\d+/, ".$1");
+    return new Date(normalized);
+  };
 
   const getPaginationItems = () => {
     const totalPages = Math.ceil(filteredPromotions.length / pageSize);
@@ -36,10 +40,9 @@ const PromotionsTable = () => {
   useEffect(() => {
     const fetchPromotions = async () => {
       try {
-        const res = await axios.get(
-          `${baseUrl}/api/admin/promotion`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+        const res = await axios.get(`${baseUrl}/api/admin/promotion`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         setPromotions(res.data);
       } catch {
         setError("Không thể tải danh sách Promotions.");
@@ -157,10 +160,10 @@ const PromotionsTable = () => {
                             : "-"}
                         </td>{" "}
                         <td className="py-3 px-4 border-r border-gray-600 text-center">
-                          {new Date(...promo.startDate).toLocaleString("vi-VN")}
+                          {toDate(promo.startDate).toLocaleDateString("vi-VN")}
                         </td>
                         <td className="py-3 px-4 border-r border-gray-600 text-center">
-                          {new Date(...promo.endDate).toLocaleString("vi-VN")}
+                          {toDate(promo.endDate).toLocaleDateString("vi-VN")}
                         </td>
                         <td className="py-3 px-4 border-r border-gray-600 text-center">
                           <span

@@ -10,8 +10,6 @@ const PageCourses = () => {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  // Unified pagination state
   const [pageNumbers, setPageNumbers] = useState({
     pending: 1,
     approved: 1,

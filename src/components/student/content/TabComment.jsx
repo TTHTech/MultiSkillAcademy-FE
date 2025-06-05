@@ -151,7 +151,7 @@ const TabComment = ({ courseId }) => {
         `${baseUrl}/api/student/reviews/report`,
         {
           idUserReport: userId,
-          review_id: review.review_id,
+          targetId: review.review_id,
           reason,
         },
         { headers: { Authorization: `Bearer ${token}` } }
