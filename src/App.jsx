@@ -53,7 +53,7 @@ import ForgotPassForm from "./components/auth/ForgotPassForm.jsx";
 import ResetPassForm from "./components/auth/ResetPassForm.jsx";
 import PageQuestions from "./pages/instructor/PageQuestions/PageQuestions.jsx";
 import NotificationList from "./components/student/notification/NotificationList.jsx";
-import ChatPage from "./pages/student/chat/ChatPage.jsx";
+import StudentChatPage from "./pages/student/chat/StudentChatPage.jsx";
 import NotificationPage from "./pages/admin/NotificationPage";
 import AddNotificationPage from "./pages/admin/AddNotificationPage";
 import AdminChatPage from "./pages/admin/AdminChatPage";
@@ -84,7 +84,7 @@ import PagePromotion from "./pages/admin/PagePromotion.jsx"
 import PagePromotionUsage from "./pages/admin/PagePromotionUsage.jsx"
 import TopicCoursesPage from "./pages/student/topic/TopicCoursesPage.jsx";
 import PageAdminProfile from "./pages/admin/PageAdminProfile.jsx"
-import PgaeNotifications from "./pages/student/notifications/PgaeNotifications.jsx";
+import PgaeNotifications from "./pages/student/notifications/PageNotifications.jsx";
 import PageNotification from "./pages/instructor/Notification/PageNotification.jsx";
 import ReviewStatisticsPage from "./pages/admin/ReviewStatisticsPage.jsx";
 import CoursesStatisticsPage from "./pages/admin/CoursesStatisticsPage.jsx";
@@ -249,7 +249,7 @@ function App() {
                 <Route path="/category/:categoryId" element={<CategoryStudentPage />} />
                 <Route path="/student/study/:progressHash/:courseHash" element={<CourseViewerPage />} />
                 <Route path="/student/wishlist" element={<Wishlist />} />
-                <Route path="/student/chat" element={<ChatPage />} />
+                <Route path="/student/chat" element={<StudentChatPage />} />
                 <Route path="/student/Success" element={<SuccessPage />} />
                 <Route path="/student/payment/success" element={<SuccessPage />} />
                 <Route path="/student/result" element={<ResultPage />} />
