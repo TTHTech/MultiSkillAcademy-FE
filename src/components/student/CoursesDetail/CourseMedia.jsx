@@ -25,7 +25,7 @@ import {
   Users,
   Trophy,
 } from "lucide-react";
-import { decodeId } from '../../../utils/hash';
+import { decodeId } from "../../../utils/hash";
 const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const getResourceIcon = (description) => {
@@ -99,13 +99,25 @@ const CourseMedia = ({
   const discountAmount = Math.min((price * discount) / 100);
   const discountedPrice = Math.floor(price - discountAmount);
   let daysLeft = null;
+  let endDateObj = null;
   if (Array.isArray(enddate) && enddate.length >= 3) {
     const [year, month, day, hour = 0, minute = 0] = enddate;
-    const endDateObj = new Date(year, month - 1, day, hour, minute);
+    endDateObj = new Date(year, month - 1, day, hour, minute);
+  } else if (typeof enddate === "string" || enddate instanceof Date) {
+    endDateObj = new Date(enddate);
+  }
+
+  if (endDateObj) {
     const now = new Date();
-    const diffTime = endDateObj.setHours(0, 0, 0, 0) - now.setHours(0, 0, 0, 0);
+    endDateObj.setHours(0, 0, 0, 0);
+    now.setHours(0, 0, 0, 0);
+
+    const diffTime = endDateObj.getTime() - now.getTime();
     daysLeft = Math.max(Math.floor(diffTime / (1000 * 60 * 60 * 24)), 0);
   }
+
+  console.log(daysLeft);
+  console.log(enddate);
 
   const userId = Number(localStorage.getItem("userId"));
   const { courseHash } = useParams();
@@ -129,9 +141,7 @@ const CourseMedia = ({
           lecturesResponse,
           activeCourse,
         ] = await Promise.all([
-          axios.get(
-            `${baseUrl}/api/student/cart/check/${userId}/${courseId}`
-          ),
+          axios.get(`${baseUrl}/api/student/cart/check/${userId}/${courseId}`),
           axios.get(
             `${baseUrl}/api/student/wishlist/check/${userId}/${courseId}`
           ),
@@ -139,9 +149,7 @@ const CourseMedia = ({
             `${baseUrl}/api/student/enrollments/check/${userId}/${courseId}`
           ),
           axios.get(`${baseUrl}/api/student/lectures/${courseId}`),
-          axios.get(
-            `${baseUrl}/api/student/courses/${courseId}/status`
-          ),
+          axios.get(`${baseUrl}/api/student/courses/${courseId}/status`),
         ]);
         setCheckCart(cartResponse.data);
         setCheckFavorite(favoriteResponse.data);
