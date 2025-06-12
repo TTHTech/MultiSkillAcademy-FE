@@ -99,7 +99,7 @@ import PageReportSection from "./pages/admin/PageReportSection.jsx";
 import PageReportLecture from "./pages/admin/PageReportLecture.jsx";
 import PageReportCourse from "./pages/admin/PageReportCourse.jsx";
 import PageCertificate from "./pages/student/certificate/PageCertificate.jsx";
-
+import ImageGallery from "./ImageGallery.jsx";
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [role, setRole] = useState("");
@@ -284,6 +284,7 @@ function App() {
                 <Route path="/instructor/notifications" element={<PageNotification />} />
                 <Route path="/instructor/courses" element={<CombinedCoursesPage />} />
                 <Route path="/instructor/revenue" element={<PageRevenue />} />
+                <Route path="/instructor/imageAll" element={<ImageGallery />} />
               </>
             )}
           </Routes>
