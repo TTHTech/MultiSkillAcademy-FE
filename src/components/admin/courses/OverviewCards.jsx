@@ -1,5 +1,11 @@
 import { motion } from "framer-motion";
-import { BookOpen, Hourglass, CheckCircle, XCircle, AlertCircle } from "lucide-react";
+import {
+  BookOpen,
+  Hourglass,
+  CheckCircle,
+  XCircle,
+  AlertCircle,
+} from "lucide-react";
 import { useState, useEffect } from "react";
 import axios from "axios";
 const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
@@ -19,7 +25,7 @@ const SkeletonCard = () => (
 
 // Enhanced error component
 const ErrorMessage = ({ message }) => (
-  <motion.div 
+  <motion.div
     initial={{ opacity: 0, y: -20 }}
     animate={{ opacity: 1, y: 0 }}
     className="bg-red-900 bg-opacity-20 border border-red-500 text-red-300 p-4 rounded-lg mb-8 flex items-center"
@@ -41,7 +47,7 @@ const StatCard = ({ name, icon: Icon, value, color, description }) => {
       whileHover={{ boxShadow: `0 0 20px ${color}30` }}
     >
       <div className="flex items-center justify-between mb-4">
-        <div 
+        <div
           className="p-3 rounded-full bg-opacity-20"
           style={{ backgroundColor: `${color}30` }}
         >
@@ -51,14 +57,12 @@ const StatCard = ({ name, icon: Icon, value, color, description }) => {
           {name}
         </div>
       </div>
-      
+
       <div className="space-y-1">
         <p className="text-3xl font-bold" style={{ color }}>
           {value}
         </p>
-        {description && (
-          <p className="text-sm text-gray-400">{description}</p>
-        )}
+        {description && <p className="text-sm text-gray-400">{description}</p>}
       </div>
     </motion.div>
   );
@@ -75,45 +79,42 @@ const OverviewCards = () => {
     show: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.1
-      }
-    }
+        staggerChildren: 0.1,
+      },
+    },
   };
 
   // Fetch stats from API
   useEffect(() => {
     const fetchStats = async () => {
       const token = localStorage.getItem("token");
-      
+
       if (!token) {
         setError("No authentication token found. Please login first.");
         setLoading(false);
         return;
       }
-      
+
       try {
-        const response = await axios.get(
-          `${baseUrl}/api/admin/courses/stats`, 
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        
+        const response = await axios.get(`${baseUrl}/api/admin/courses/stats`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
         setCourseStats({
           totalCourses: response.data.totalCourses ?? 0,
           pendingCourses: response.data.pendingCourses ?? 0,
           activeCourses: response.data.activeCourses ?? 0,
           inactiveCourses: response.data.inactiveCourses ?? 0,
         });
-        
+
         setLoading(false);
       } catch (err) {
         console.error("Failed to fetch course statistics:", err);
         setError(
-          err.response?.data?.message || 
-          "Failed to load course statistics. Please try again later."
+          err.response?.data?.message ||
+            "Failed to load course statistics. Please try again later."
         );
         setLoading(false);
       }
@@ -146,32 +147,35 @@ const OverviewCards = () => {
       animate="show"
     >
       <StatCard
-        name="Total Courses"
+        name="Tổng số Khóa học"
         icon={BookOpen}
         value={courseStats.totalCourses.toLocaleString()}
         color="#6366F1"
-        description="All courses on platform"
+        description="Tất cả khóa học trên nền tảng"
       />
+
       <StatCard
-        name="Pending Review"
+        name="Chờ duyệt"
         icon={Hourglass}
         value={courseStats.pendingCourses.toLocaleString()}
         color="#F59E0B"
-        description="Awaiting approval"
+        description="Đang chờ phê duyệt"
       />
+
       <StatCard
-        name="Active Courses"
+        name="Khóa học đang hoạt động"
         icon={CheckCircle}
         value={courseStats.activeCourses.toLocaleString()}
         color="#10B981"
-        description="Published and live"
+        description="Đã xuất bản và đang hiển thị"
       />
+
       <StatCard
-        name="Inactive Courses"
+        name="Khóa học không hoạt động"
         icon={XCircle}
         value={courseStats.inactiveCourses.toLocaleString()}
         color="#EF4444"
-        description="Unpublished or disabled"
+        description="Chưa xuất bản hoặc đã vô hiệu hóa"
       />
     </motion.div>
   );

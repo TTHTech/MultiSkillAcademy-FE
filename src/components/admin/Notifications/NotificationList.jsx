@@ -2,25 +2,17 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Bell, 
-  Settings, 
   Filter,
-  CheckCircle,
-  AlertTriangle,
   Clock,
   ChevronLeft,
   ChevronRight,
-  Mail,
   Inbox,
   X,
   Search,
   RefreshCw,
-  MoreHorizontal,
   Calendar,
   MessageSquare,
-  Download,
-  Trash2,
-  Eye,
-  EyeOff,
+  AlertTriangle,
   AlertCircle,
   Users
 } from "lucide-react";
@@ -52,42 +44,17 @@ const NotificationHeader = ({ notificationCount, showFilters, setShowFilters, se
           <button 
             onClick={onRefresh}
             className="p-2 hover:bg-[#252a3b] rounded-lg transition-colors duration-200"
+            title="Làm mới"
           >
             <RefreshCw className="w-5 h-5 text-gray-400 hover:text-gray-300" />
           </button>
           <button 
             onClick={() => setShowFilters(!showFilters)}
             className={`p-2 ${showFilters ? 'bg-purple-900/40 text-purple-400' : 'hover:bg-[#252a3b] text-gray-400 hover:text-gray-300'} rounded-lg transition-colors duration-200`}
+            title="Bộ lọc"
           >
             <Filter className="w-5 h-5" />
           </button>
-          <div className="relative group">
-            <button className="p-2 hover:bg-[#252a3b] rounded-lg transition-colors duration-200">
-              <MoreHorizontal className="w-5 h-5 text-gray-400 hover:text-gray-300" />
-            </button>
-            <div className="absolute right-0 mt-2 w-48 bg-[#1E2432] border border-gray-700 rounded-lg shadow-xl z-10 hidden group-hover:block">
-              <ul className="py-1">
-                <li>
-                  <button className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-[#252a3b] flex items-center">
-                    <Download className="w-4 h-4 mr-2" />
-                    Xuất thông báo
-                  </button>
-                </li>
-                <li>
-                  <button className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-[#252a3b] flex items-center">
-                    <Settings className="w-4 h-4 mr-2" />
-                    Cài đặt thông báo
-                  </button>
-                </li>
-                <li>
-                  <button className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-[#252a3b] flex items-center">
-                    <Trash2 className="w-4 h-4 mr-2" />
-                    Xóa tất cả
-                  </button>
-                </li>
-              </ul>
-            </div>
-          </div>
         </div>
       </div>
       <div className="relative">
@@ -113,7 +80,7 @@ const NotificationHeader = ({ notificationCount, showFilters, setShowFilters, se
 };
 
 // ============= NotificationFilters Component =============
-const NotificationFilters = ({ showFilters, dateRange, setDateRange, filterStatus, setFilterStatus, targetType, setTargetType }) => {
+const NotificationFilters = ({ showFilters, dateRange, setDateRange }) => {
   return (
     <AnimatePresence>
       {showFilters && (
@@ -126,72 +93,37 @@ const NotificationFilters = ({ showFilters, dateRange, setDateRange, filterStatu
         >
           <div className="p-4 bg-[#252a3b] border border-gray-700 rounded-lg mt-4">
             <h3 className="text-sm font-medium text-gray-300 mb-3">Bộ lọc nâng cao</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-xs text-gray-400 mb-1">Khoảng thời gian</label>
-                <div className="flex space-x-2">
-                  <div className="relative flex-1">
-                    <input
-                      type="date"
-                      value={dateRange.from}
-                      onChange={(e) => setDateRange({...dateRange, from: e.target.value})}
-                      className="w-full h-9 pl-8 bg-[#1E2432] border border-gray-700 rounded-lg text-gray-200 text-sm focus:outline-none focus:ring-1 focus:ring-purple-500"
-                    />
-                    <Calendar className="absolute left-2 top-2 w-4 h-4 text-gray-500" />
-                  </div>
-                  <span className="text-gray-400 flex items-center">—</span>
-                  <div className="relative flex-1">
-                    <input
-                      type="date"
-                      value={dateRange.to}
-                      onChange={(e) => setDateRange({...dateRange, to: e.target.value})}
-                      className="w-full h-9 pl-8 bg-[#1E2432] border border-gray-700 rounded-lg text-gray-200 text-sm focus:outline-none focus:ring-1 focus:ring-purple-500"
-                    />
-                    <Calendar className="absolute left-2 top-2 w-4 h-4 text-gray-500" />
-                  </div>
+            <div>
+              <label className="block text-xs text-gray-400 mb-1">Khoảng thời gian</label>
+              <div className="flex space-x-2">
+                <div className="relative flex-1">
+                  <input
+                    type="date"
+                    value={dateRange.from}
+                    onChange={(e) => setDateRange({...dateRange, from: e.target.value})}
+                    className="w-full h-9 pl-8 bg-[#1E2432] border border-gray-700 rounded-lg text-gray-200 text-sm focus:outline-none focus:ring-1 focus:ring-purple-500"
+                  />
+                  <Calendar className="absolute left-2 top-2 w-4 h-4 text-gray-500" />
                 </div>
-              </div>
-              <div>
-                <label className="block text-xs text-gray-400 mb-1">Trạng thái</label>
-                <select
-                  value={filterStatus}
-                  onChange={(e) => setFilterStatus(e.target.value)}
-                  className="w-full h-9 px-2 bg-[#1E2432] border border-gray-700 rounded-lg text-gray-200 text-sm focus:outline-none focus:ring-1 focus:ring-purple-500"
-                >
-                  <option value="all">Tất cả trạng thái</option>
-                  <option value="read">Đã đọc</option>
-                  <option value="unread">Chưa đọc</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-xs text-gray-400 mb-1">Đối tượng</label>
-                <select
-                  value={targetType}
-                  onChange={(e) => setTargetType(e.target.value)}
-                  className="w-full h-9 px-2 bg-[#1E2432] border border-gray-700 rounded-lg text-gray-200 text-sm focus:outline-none focus:ring-1 focus:ring-purple-500"
-                >
-                  <option value="all">Tất cả đối tượng</option>
-                  <option value="STUDENT">Học viên</option>
-                  <option value="INSTRUCTOR">Giảng viên</option>
-                </select>
+                <span className="text-gray-400 flex items-center">—</span>
+                <div className="relative flex-1">
+                  <input
+                    type="date"
+                    value={dateRange.to}
+                    onChange={(e) => setDateRange({...dateRange, to: e.target.value})}
+                    className="w-full h-9 pl-8 bg-[#1E2432] border border-gray-700 rounded-lg text-gray-200 text-sm focus:outline-none focus:ring-1 focus:ring-purple-500"
+                  />
+                  <Calendar className="absolute left-2 top-2 w-4 h-4 text-gray-500" />
+                </div>
               </div>
             </div>
             
-            <div className="mt-4 flex justify-end space-x-3">
+            <div className="mt-4 flex justify-end">
               <button
-                onClick={() => {
-                  setDateRange({ from: '', to: '' });
-                  setFilterStatus('all');
-                  setTargetType('all');
-                }}
+                onClick={() => setDateRange({ from: '', to: '' })}
                 className="px-4 py-2 text-xs text-gray-300 border border-gray-700 rounded-lg hover:bg-[#1E2432] transition-colors duration-200"
               >
                 Đặt lại
-              </button>
-              <button
-                className="px-4 py-2 text-xs bg-purple-700 text-white rounded-lg hover:bg-purple-600 transition-colors duration-200"
-              >
-                Áp dụng bộ lọc
               </button>
             </div>
           </div>
@@ -236,21 +168,19 @@ const NotificationItem = ({
   title,
   message,
   time,
-  targetType, // Sử dụng targetType trực tiếp từ API
-  isRead = false,
-  onDelete,
-  onMarkAsRead
+  targetType,
+  onDelete
 }) => {
   const getTypeIcon = () => {
     switch (targetType) {
       case 'STUDENT':
-        return <MessageSquare className={`w-5 h-5 ${isRead ? 'text-blue-400' : 'text-blue-500'}`} />;
+        return <MessageSquare className="w-5 h-5 text-blue-500" />;
       case 'INSTRUCTOR':
-        return <AlertTriangle className={`w-5 h-5 ${isRead ? 'text-amber-400' : 'text-amber-500'}`} />;
+        return <AlertTriangle className="w-5 h-5 text-amber-500" />;
       case 'ALL':
-        return <Bell className={`w-5 h-5 ${isRead ? 'text-purple-400' : 'text-purple-500'}`} />;
+        return <Bell className="w-5 h-5 text-purple-500" />;
       default:
-        return <Bell className={`w-5 h-5 ${isRead ? 'text-gray-400' : 'text-gray-300'}`} />;
+        return <Bell className="w-5 h-5 text-gray-300" />;
     }
   };
 
@@ -298,68 +228,95 @@ const NotificationItem = ({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2 }}
       className={`
-        ${isRead ? 'bg-[#1E2432]' : 'bg-[#1E2432]/80'} 
+        bg-[#1E2432]/80 
         hover:bg-[#252a3b] 
         rounded-lg border-l-4 ${getPriorityColor()}
         p-4 mb-3 transition-all duration-200
       `}
     >
       <div className="flex items-start space-x-4">
-        {/* Icon */}
         <div className="flex-shrink-0 mt-1">
           {getTypeIcon()}
         </div>
 
-        {/* Content */}
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between">
             <div className="flex items-center space-x-2">
               <h4 className="text-base font-medium text-white truncate">
                 {title}
-                {!isRead && <span className="inline-block w-2 h-2 bg-blue-500 rounded-full ml-2"></span>}
               </h4>
               {getTargetLabel()}
             </div>
-            <div className="flex items-center space-x-2">
-              <button 
-                onClick={() => onMarkAsRead(id, !isRead)}
-                className="p-1.5 hover:bg-white/10 rounded-lg transition-colors"
-                title={isRead ? "Đánh dấu chưa đọc" : "Đánh dấu đã đọc"}
-              >
-                {isRead ? (
-                  <EyeOff className="w-4 h-4 text-gray-400 hover:text-blue-400" />
-                ) : (
-                  <Eye className="w-4 h-4 text-gray-400 hover:text-blue-400" />
-                )}
-              </button>
-              <button 
-                onClick={() => onDelete(id)}
-                className="p-1.5 hover:bg-white/10 rounded-lg transition-colors"
-                title="Xóa thông báo"
-              >
-                <X className="w-4 h-4 text-gray-400 hover:text-red-400" />
-              </button>
-            </div>
+            <button 
+              onClick={() => onDelete(id)}
+              className="p-1.5 hover:bg-white/10 rounded-lg transition-colors"
+              title="Xóa thông báo"
+            >
+              <X className="w-4 h-4 text-gray-400 hover:text-red-400" />
+            </button>
           </div>
 
           <p className="mt-1 text-sm text-gray-300 line-clamp-2">{message}</p>
 
-          <div className="mt-3 flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <span className="flex items-center text-xs text-gray-400">
-                <Clock className="w-3 h-3 mr-1" />
-                {time}
-              </span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <button className="text-xs text-gray-400 hover:text-gray-300 transition-colors">
-                Xem chi tiết
-              </button>
-            </div>
+          <div className="mt-3 flex items-center">
+            <span className="flex items-center text-xs text-gray-400">
+              <Clock className="w-3 h-3 mr-1" />
+              {time}
+            </span>
           </div>
         </div>
       </div>
     </motion.div>
+  );
+};
+
+// ============= DeleteConfirmModal Component =============
+const DeleteConfirmModal = ({ isOpen, onClose, onConfirm, isDeleting = false, title = "Xác nhận xóa" }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={onClose}>
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        className="bg-[#1E2432] rounded-lg p-6 max-w-sm w-full mx-4 border border-gray-700"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center space-x-3 mb-4">
+          <div className="w-10 h-10 bg-red-900/20 rounded-full flex items-center justify-center">
+            <AlertCircle className="w-6 h-6 text-red-500" />
+          </div>
+          <h3 className="text-lg font-semibold text-white">{title}</h3>
+        </div>
+        <p className="text-gray-300 mb-6">
+          Bạn có chắc chắn muốn xóa thông báo này? Hành động này không thể hoàn tác.
+        </p>
+        <div className="flex justify-end space-x-3">
+          <button
+            onClick={onClose}
+            disabled={isDeleting}
+            className="px-4 py-2 text-sm text-gray-300 border border-gray-700 rounded-lg hover:bg-[#252a3b] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Hủy
+          </button>
+          <button
+            onClick={onConfirm}
+            disabled={isDeleting}
+            className="px-4 py-2 text-sm bg-red-700 text-white rounded-lg hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+          >
+            {isDeleting ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin mr-2"></div>
+                Đang xóa...
+              </>
+            ) : (
+              'Xóa'
+            )}
+          </button>
+        </div>
+      </motion.div>
+    </div>
   );
 };
 
@@ -536,8 +493,10 @@ const NotificationList = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [dateRange, setDateRange] = useState({ from: '', to: '' });
-  const [filterStatus, setFilterStatus] = useState('all'); // 'all', 'read', 'unread'
-  const [targetTypeFilter, setTargetTypeFilter] = useState('all');
+  
+  // Delete confirmation modal
+  const [deleteModal, setDeleteModal] = useState({ isOpen: false, id: null });
+  const [isDeleting, setIsDeleting] = useState(false);
   
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -550,7 +509,7 @@ const NotificationList = () => {
   // Reset to first page when filter changes
   useEffect(() => {
     setCurrentPage(1);
-  }, [activeFilter, searchTerm, dateRange, filterStatus, targetTypeFilter]);
+  }, [activeFilter, searchTerm, dateRange]);
 
   const fetchNotifications = async () => {
     try {
@@ -574,15 +533,7 @@ const NotificationList = () => {
       }
 
       const data = await response.json();
-      
-      // Thêm thuộc tính cho demo
-      const enhancedData = data.map(notification => ({
-        ...notification,
-        isRead: Math.random() > 0.3, // Demo: 30% thông báo chưa đọc
-      }));
-      
-      setNotifications(enhancedData);
-      console.log(enhancedData)
+      setNotifications(data);
       setLoading(false);
     } catch (err) {
       setError(err.message);
@@ -596,39 +547,37 @@ const NotificationList = () => {
     toast.success("Đã làm mới danh sách thông báo");
   };
 
-  const handleMarkAsRead = (id, isRead) => {
-    setNotifications(prevNotifications => 
-      prevNotifications.map(notification => 
-        notification.id === id ? { ...notification, isRead } : notification
-      )
-    );
-    
-    toast.success(isRead ? "Đã đánh dấu là đã đọc" : "Đã đánh dấu là chưa đọc");
-    
-    // API call would go here in a real implementation
-    // updateNotificationStatus(id, isRead);
-  };
+  const handleDeleteNotification = async (id) => {
+    setIsDeleting(true);
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(`${baseUrl}/api/admin/notifications/${id}`, {
+        method: 'DELETE',
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        }
+      });
 
-  const handleMarkAllAsRead = () => {
-    setNotifications(prevNotifications => 
-      prevNotifications.map(notification => ({ ...notification, isRead: true }))
-    );
-    
-    toast.success("Đã đánh dấu tất cả là đã đọc");
-    
-    // API call would go here in a real implementation
-    // updateAllNotificationsStatus(true);
-  };
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || "Không thể xóa thông báo");
+      }
 
-  const handleDeleteNotification = (id) => {
-    setNotifications(prevNotifications => 
-      prevNotifications.filter(notification => notification.id !== id)
-    );
-    
-    toast.success("Đã xóa thông báo");
-    
-    // API call would go here in a real implementation
-    // deleteNotification(id);
+      // Chỉ xóa khỏi state khi API thành công
+      setNotifications(prevNotifications => 
+        prevNotifications.filter(notification => notification.id !== id)
+      );
+      
+      toast.success("Đã xóa thông báo thành công");
+      setDeleteModal({ isOpen: false, id: null });
+    } catch (err) {
+      console.error("Error deleting notification:", err);
+      toast.error(err.message || "Có lỗi xảy ra khi xóa thông báo");
+      setDeleteModal({ isOpen: false, id: null });
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   const formatTime = (dateInput) => {
@@ -674,8 +623,6 @@ const NotificationList = () => {
     setActiveFilter('all');
     setSearchTerm('');
     setDateRange({ from: '', to: '' });
-    setFilterStatus('all');
-    setTargetTypeFilter('all');
     setShowFilters(false);
   };
 
@@ -713,13 +660,6 @@ const NotificationList = () => {
         if (notificationDate > toDate) return false;
       }
       
-      // Filter by read status
-      if (filterStatus === 'read' && !notification.isRead) return false;
-      if (filterStatus === 'unread' && notification.isRead) return false;
-      
-      // Filter by target type
-      if (targetTypeFilter !== 'all' && notification.targetType !== targetTypeFilter) return false;
-      
       return true;
     });
   };
@@ -730,9 +670,7 @@ const NotificationList = () => {
   const paginatedNotifications = filteredNotifications.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
   // Check if any filters are active
-  const isFilterActive = searchTerm || dateRange.from || dateRange.to || 
-                         filterStatus !== 'all' || targetTypeFilter !== 'all' || 
-                         activeFilter !== 'all';
+  const isFilterActive = searchTerm || dateRange.from || dateRange.to || activeFilter !== 'all';
 
   // Render loading state
   if (loading) {
@@ -742,11 +680,6 @@ const NotificationList = () => {
           <div className="animate-pulse">
             <div className="h-8 bg-gray-700 rounded w-1/3 mb-4"></div>
             <div className="h-4 bg-gray-700 rounded w-1/4 mb-6"></div>
-            <div className="flex space-x-2">
-              <div className="h-10 bg-gray-700 rounded w-1/3"></div>
-              <div className="h-10 bg-gray-700 rounded w-1/3"></div>
-              <div className="h-10 bg-gray-700 rounded w-1/3"></div>
-            </div>
           </div>
         </div>
         <LoadingSpinner />
@@ -774,115 +707,79 @@ const NotificationList = () => {
   }
 
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-      className="bg-[#1E2432] rounded-lg shadow-2xl overflow-hidden"
-    >
-      {/* Header Section */}
-      <div className="p-6 border-b border-gray-700">
-        <NotificationHeader 
-          notificationCount={notifications.filter(n => !n.isRead).length}
-          showFilters={showFilters}
-          setShowFilters={setShowFilters}
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-          onRefresh={handleRefresh}
-          onMarkAllRead={handleMarkAllAsRead}
-        />
-        <NotificationStats 
-          stats={stats}
-          activeFilter={activeFilter}
-          setActiveFilter={setActiveFilter}
-        />
-        <NotificationFilters 
-          showFilters={showFilters}
-          dateRange={dateRange}
-          setDateRange={setDateRange}
-          filterStatus={filterStatus}
-          setFilterStatus={setFilterStatus}
-          targetType={targetTypeFilter}
-          setTargetType={setTargetTypeFilter}
-        />
-      </div>
+    <>
+      <motion.div 
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        className="bg-[#1E2432] rounded-lg shadow-2xl overflow-hidden"
+      >
+        {/* Header Section */}
+        <div className="p-6 border-b border-gray-700">
+          <NotificationHeader 
+            notificationCount={notifications.length}
+            showFilters={showFilters}
+            setShowFilters={setShowFilters}
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+            onRefresh={handleRefresh}
+          />
+          <NotificationStats 
+            stats={stats}
+            activeFilter={activeFilter}
+            setActiveFilter={setActiveFilter}
+          />
+          <NotificationFilters 
+            showFilters={showFilters}
+            dateRange={dateRange}
+            setDateRange={setDateRange}
+          />
+        </div>
 
-      {/* Notifications Container */}
-      <div className="divide-y divide-gray-700/30">
-        {paginatedNotifications.length > 0 ? (
-          <div className="p-6 space-y-1">
-            {paginatedNotifications.map(notification => (
-              <NotificationItem
-                key={notification.id}
-                id={notification.id}
-                title={notification.title}
-                message={notification.message}
-                time={formatTime(notification.createdAt)}
-                targetType={notification.targetType}
-                isRead={notification.isRead}
-                onDelete={handleDeleteNotification}
-                onMarkAsRead={handleMarkAsRead}
-              />
-            ))}
-          </div>
-        ) : (
-          <EmptyState 
-            filterActive={isFilterActive} 
-            onClearFilter={handleClearFilters} 
+        {/* Notifications Container */}
+        <div className="divide-y divide-gray-700/30">
+          {paginatedNotifications.length > 0 ? (
+            <div className="p-6 space-y-1">
+              {paginatedNotifications.map(notification => (
+                <NotificationItem
+                  key={notification.id}
+                  id={notification.id}
+                  title={notification.title}
+                  message={notification.message}
+                  time={formatTime(notification.createdAt)}
+                  targetType={notification.targetType}
+                  onDelete={(id) => setDeleteModal({ isOpen: true, id })}
+                />
+              ))}
+            </div>
+          ) : (
+            <EmptyState 
+              filterActive={isFilterActive} 
+              onClearFilter={handleClearFilters} 
+            />
+          )}
+        </div>
+
+        {/* Pagination */}
+        {filteredNotifications.length > ITEMS_PER_PAGE && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+            itemsPerPage={ITEMS_PER_PAGE}
+            totalItems={filteredNotifications.length}
           />
         )}
-      </div>
+      </motion.div>
 
-      {/* Pagination */}
-      {filteredNotifications.length > ITEMS_PER_PAGE && (
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={setCurrentPage}
-          itemsPerPage={ITEMS_PER_PAGE}
-          totalItems={filteredNotifications.length}
-        />
-      )}
-      
-      {/* Tooltip styles */}
-      <style jsx global>{`
-        .tooltip-trigger {
-          position: relative;
-        }
-        .tooltip {
-          visibility: hidden;
-          position: absolute;
-          top: 100%;
-          left: 50%;
-          transform: translateX(-50%);
-          background-color: #374151;
-          color: white;
-          text-align: center;
-          padding: 4px 8px;
-          border-radius: 4px;
-          z-index: 10;
-          white-space: nowrap;
-          font-size: 12px;
-          margin-top: 8px;
-          opacity: 0;
-          transition: opacity 0.2s;
-        }
-        .tooltip::before {
-          content: '';
-          position: absolute;
-          bottom: 100%;
-          left: 50%;
-          transform: translateX(-50%);
-          border-width: 5px;
-          border-style: solid;
-          border-color: transparent transparent #374151 transparent;
-        }
-        .tooltip-trigger:hover .tooltip {
-          visibility: visible;
-          opacity: 1;
-        }
-      `}</style>
-    </motion.div>
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmModal
+        isOpen={deleteModal.isOpen}
+        onClose={() => !isDeleting && setDeleteModal({ isOpen: false, id: null })}
+        onConfirm={() => handleDeleteNotification(deleteModal.id)}
+        isDeleting={isDeleting}
+      />
+    </>
   );
 };
 

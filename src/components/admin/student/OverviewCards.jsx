@@ -79,25 +79,25 @@ const OverviewCards = () => {
       transition={{ duration: 1 }}
     >
       <StatCard
-        name="Total Student"
+        name="Tổng số Học viên"
         icon={UsersIcon}
         value={userStats.totalUsers.toLocaleString()}
         color="#6366F1"
       />
       <StatCard
-        name="New Student Today"
+        name="Học viên mới hôm nay"
         icon={UserPlus}
         value={userStats.newUsersToday.toLocaleString()}
         color="#10B981"
       />
       <StatCard
-        name="Active Student"
+        name="Học viên đang hoạt động"
         icon={UserCheck}
         value={userStats.activeUsers.toLocaleString()}
         color="#F59E0B"
       />
       <StatCard
-        name="Inactive Student"
+        name="Học viên không hoạt động"
         icon={UserX}
         value={userStats.inactiveUsers.toLocaleString()}
         color="#EF4444"

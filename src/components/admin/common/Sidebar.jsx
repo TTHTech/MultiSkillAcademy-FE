@@ -233,24 +233,7 @@ const MENU_GROUPS = [
             href: "/admin/courses",
             color: "#8b5cf6",
           },
-          {
-            name: "Khóa Học Đã Duyệt",
-            icon: CheckCircle,
-            href: "/admin/courses/approved",
-            color: "#22c55e", // xanh lá
-          },
-          {
-            name: "Khóa Học Chờ Duyệt",
-            icon: Clock,
-            href: "/admin/courses/pending",
-            color: "#eab308", // vàng
-          },
-          {
-            name: "Khóa Học Bị Khóa",
-            icon: Lock,
-            href: "/admin/courses/locked",
-            color: "#ef4444", // đỏ
-          },
+        
           {
             name: "Đánh Giá Khóa Học",
             icon: MessageSquare,

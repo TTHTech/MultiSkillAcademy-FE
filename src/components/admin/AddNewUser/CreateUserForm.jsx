@@ -134,7 +134,7 @@ const CreateUserForm = () => {
 
       if (response.ok) {
         const data = await response.json();
-        const successMessage = `User ${data.firstName} ${data.lastName} created successfully`;
+        const successMessage = `Đã tạo người dùng ${data.firstName} ${data.lastName} thành công`;
         setSubmitStatus({ 
           success: true, 
           error: false, 
@@ -161,7 +161,7 @@ const CreateUserForm = () => {
         });
       } else {
         const errorData = await response.json();
-        const errorMessage = errorData.message || "Failed to create user";
+        const errorMessage = errorData.message || "Không thể tạo người dùng";
         setSubmitStatus({ 
           success: false, 
           error: true, 
@@ -173,9 +173,9 @@ const CreateUserForm = () => {
       setSubmitStatus({ 
         success: false, 
         error: true, 
-        message: error.message || "An error occurred" 
+        message: error.message || "Đã xảy ra lỗi" 
       });
-      toast.error(error.message || "An error occurred");
+      toast.error(error.message || "Đã xảy ra lỗi");
     } finally {
       setLoading(false);
     }
@@ -184,14 +184,14 @@ const CreateUserForm = () => {
   const handleCreateUser = () => {
     // Validate required fields
     if (!newUser.username || !newUser.email || !newUser.password) {
-      toast.error("Please fill in all required fields: Username, Email, Password");
+      toast.error("Vui lòng điền tất cả các trường bắt buộc: Tên đăng nhập, Email, Mật khẩu");
       return;
     }
     
     // Validate password match
     if (newUser.password !== newUser.confirmPassword) {
-      setPasswordError("Passwords do not match");
-      toast.error("Passwords do not match");
+      setPasswordError("Mật khẩu không khớp");
+      toast.error("Mật khẩu không khớp");
       return;
     }
 
@@ -263,7 +263,7 @@ const CreateUserForm = () => {
         <div className="w-1.5 h-8 bg-gradient-to-b from-blue-500 to-indigo-600 rounded-r mr-3" />
         <h2 className="text-xl font-semibold text-white tracking-tight flex items-center">
           <User className="mr-2 text-blue-400" size={24} />
-          Create New User
+          Tạo người dùng mới
         </h2>
       </div>
 
@@ -290,26 +290,26 @@ const CreateUserForm = () => {
         <div className="md:col-span-8 bg-gradient-subtle p-5 rounded-md border border-indigo-500/10">
           <h3 className="text-base font-medium text-indigo-300 border-b border-slate-700/50 pb-2 mb-4 flex items-center">
             <Users className="mr-2 text-indigo-400" size={18} />
-            Account Information
+            Thông tin tài khoản
           </h3>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4">
             <div>
-              {renderField("username", "Username", "text", <User size={18} />, "Enter username", "account")}
+              {renderField("username", "Tên đăng nhập", "text", <User size={18} />, "Nhập tên đăng nhập", "account")}
             </div>
             
             <div>
-              {renderField("email", "Email", "email", <Mail size={18} />, "Enter email address", "account")}
+              {renderField("email", "Email", "email", <Mail size={18} />, "Nhập địa chỉ email", "account")}
             </div>
 
             <div>
-              {renderField("password", "Password", "password", <Lock size={18} />, "Enter password", "security")}
+              {renderField("password", "Mật khẩu", "password", <Lock size={18} />, "Nhập mật khẩu", "security")}
             </div>
             
             <div>
               <div className="mb-4">
                 <label className="block text-sm font-medium text-slate-200 mb-1.5">
-                  Confirm Password <span className="text-rose-400">*</span>
+                  Xác nhận mật khẩu <span className="text-rose-400">*</span>
                 </label>
                 <div className="relative">
                   <div className="absolute left-3 top-2.5 text-amber-500">
@@ -320,7 +320,7 @@ const CreateUserForm = () => {
                     name="confirmPassword"
                     value={newUser.confirmPassword}
                     onChange={handleChange}
-                    placeholder="Confirm password"
+                    placeholder="Xác nhận mật khẩu"
                     className={`w-full p-2.5 pl-10 bg-slate-700/60 text-white rounded-md border ${
                       passwordError 
                         ? 'border-rose-500/70 focus:border-rose-500/80' 
@@ -339,7 +339,7 @@ const CreateUserForm = () => {
             <div>
               <div className="mb-4">
                 <label className="block text-sm font-medium text-slate-200 mb-1.5">
-                  Role
+                  Vai trò
                 </label>
                 <div className="relative">
                   <div className="absolute left-3 top-2.5 text-indigo-400">
@@ -351,8 +351,8 @@ const CreateUserForm = () => {
                     onChange={handleChange}
                     className="w-full p-2.5 pl-10 bg-slate-700/60 text-white rounded-md border border-slate-600/70 focus:border-indigo-500/70 focus:ring-1 focus:ring-indigo-500/30 transition-all appearance-none"
                   >
-                    <option value="ROLE_STUDENT">Student</option>
-                    <option value="ROLE_INSTRUCTOR">Instructor</option>
+                    <option value="ROLE_STUDENT">Học viên</option>
+                    <option value="ROLE_INSTRUCTOR">Giảng viên</option>
                   </select>
                 </div>
               </div>
@@ -361,7 +361,7 @@ const CreateUserForm = () => {
             <div>
               <div className="mb-4">
                 <label className="block text-sm font-medium text-slate-200 mb-1.5">
-                  Status
+                  Trạng thái
                 </label>
                 <div className="relative">
                   <div className="absolute left-3 top-2.5 text-green-400">
@@ -373,8 +373,8 @@ const CreateUserForm = () => {
                     onChange={handleChange}
                     className="w-full p-2.5 pl-10 bg-slate-700/60 text-white rounded-md border border-slate-600/70 focus:border-green-500/70 focus:ring-1 focus:ring-green-500/30 transition-all appearance-none"
                   >
-                    <option value="true">Active</option>
-                    <option value="false">Inactive</option>
+                    <option value="true">Hoạt động</option>
+                    <option value="false">Không hoạt động</option>
                   </select>
                 </div>
               </div>
@@ -389,7 +389,7 @@ const CreateUserForm = () => {
               {newUser.profileImagePreview ? (
                 <img
                   src={newUser.profileImagePreview}
-                  alt="Profile Preview"
+                  alt="Xem trước ảnh đại diện"
                   className="w-full h-full object-cover"
                 />
               ) : (
@@ -407,10 +407,10 @@ const CreateUserForm = () => {
             </label>
           </div>
           <p className="text-slate-300 text-sm text-center mt-2">
-            Profile Picture
+            Ảnh đại diện
           </p>
           <p className="text-slate-400 text-xs text-center">
-            Square image recommended
+            Khuyến nghị ảnh vuông
           </p>
         </div>
 
@@ -418,34 +418,34 @@ const CreateUserForm = () => {
         <div className="md:col-span-12 bg-gradient-subtle p-5 rounded-md border border-violet-500/10">
           <h3 className="text-base font-medium text-violet-300 border-b border-slate-700/50 pb-2 mb-4 flex items-center">
             <User className="mr-2 text-violet-400" size={18} />
-            Personal Information
+            Thông tin cá nhân
           </h3>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-x-4">
             <div>
-              {renderField("firstName", "First Name", "text", <User size={18} />, "Enter first name", "personal")}
+              {renderField("firstName", "Tên", "text", <User size={18} />, "Nhập tên", "personal")}
             </div>
             
             <div>
-              {renderField("lastName", "Last Name", "text", <User size={18} />, "Enter last name", "personal")}
+              {renderField("lastName", "Họ", "text", <User size={18} />, "Nhập họ", "personal")}
             </div>
             
             <div>
-              {renderField("dateOfBirth", "Date of Birth", "date", <Calendar size={18} />, "", "personal")}
+              {renderField("dateOfBirth", "Ngày sinh", "date", <Calendar size={18} />, "", "personal")}
             </div>
             
             <div>
-              {renderField("phoneNumber", "Phone Number", "text", <Phone size={18} />, "Enter phone number", "contact")}
+              {renderField("phoneNumber", "Số điện thoại", "text", <Phone size={18} />, "Nhập số điện thoại", "contact")}
             </div>
             
             <div className="md:col-span-2">
-              {renderField("address", "Address", "text", <MapPin size={18} />, "Enter address", "contact")}
+              {renderField("address", "Địa chỉ", "text", <MapPin size={18} />, "Nhập địa chỉ", "contact")}
             </div>
             
             <div className="md:col-span-3">
               <div className="mb-4">
                 <label className="block text-sm font-medium text-slate-200 mb-1.5">
-                  Bio
+                  Giới thiệu
                 </label>
                 <div className="relative">
                   <div className="absolute left-3 top-3 text-violet-400">
@@ -455,7 +455,7 @@ const CreateUserForm = () => {
                     name="bio"
                     value={newUser.bio}
                     onChange={handleChange}
-                    placeholder="Enter bio information"
+                    placeholder="Nhập thông tin giới thiệu"
                     rows="3"
                     className="w-full p-2.5 pl-10 bg-slate-700/60 text-white rounded-md border border-slate-600/70 focus:border-violet-500/70 focus:ring-1 focus:ring-violet-500/30 transition-all"
                   ></textarea>
@@ -476,12 +476,12 @@ const CreateUserForm = () => {
           {loading ? (
             <>
               <Loader size={20} className="animate-spin mr-2" />
-              Creating...
+              Đang tạo...
             </>
           ) : (
             <>
               <User className="mr-2" size={20} />
-              Create Account
+              Tạo tài khoản
             </>
           )}
         </button>
