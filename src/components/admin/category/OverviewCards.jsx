@@ -1,5 +1,12 @@
 import { motion } from "framer-motion";
-import { BookOpen, CheckCircle, XCircle, AlertCircle, Folder, BookMarked } from "lucide-react";
+import {
+  BookOpen,
+  CheckCircle,
+  XCircle,
+  AlertCircle,
+  Folder,
+  BookMarked,
+} from "lucide-react";
 import { useState, useEffect } from "react";
 import axios from "axios";
 const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
@@ -19,7 +26,7 @@ const SkeletonCard = () => (
 
 // Enhanced error component
 const ErrorMessage = ({ message }) => (
-  <motion.div 
+  <motion.div
     initial={{ opacity: 0, y: -20 }}
     animate={{ opacity: 1, y: 0 }}
     className="bg-red-900 bg-opacity-20 border border-red-500 text-red-300 p-4 rounded-lg mb-8 flex items-center"
@@ -43,7 +50,9 @@ const StatCard = ({ name, icon: Icon, value, color, description }) => {
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-sm font-medium text-gray-200">{name}</h3>
-          <p className="mt-1 text-3xl font-bold" style={{ color }}>{value}</p>
+          <p className="mt-1 text-3xl font-bold" style={{ color }}>
+            {value}
+          </p>
           {description && (
             <p className="text-xs text-gray-400 mt-1">{description}</p>
           )}
@@ -72,22 +81,22 @@ const OverviewCards = () => {
     show: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.1
-      }
-    }
+        staggerChildren: 0.1,
+      },
+    },
   };
 
   // Fetch stats from API
   useEffect(() => {
     const fetchData = async () => {
       const token = localStorage.getItem("token");
-      
+
       if (!token) {
         setError("No authentication token found. Please login first.");
         setLoading(false);
         return;
       }
-      
+
       try {
         // Fetch both API endpoints in parallel
         const [categoryResponse, courseResponse] = await Promise.all([
@@ -98,25 +107,25 @@ const OverviewCards = () => {
             headers: { Authorization: `Bearer ${token}` },
           }),
         ]);
-        
+
         // Update category statistics
         setCategoryStats({
           totalCategories: categoryResponse.data.totalCategories ?? 0,
           activeCategories: categoryResponse.data.activeCategories ?? 0,
           inactiveCategories: categoryResponse.data.inactiveCategories ?? 0,
         });
-        
+
         // Update course statistics
         setCourseStats({
           totalCourses: courseResponse.data.totalCourses ?? 0,
         });
-        
+
         setLoading(false);
       } catch (err) {
         console.error("Failed to fetch statistics:", err);
         setError(
-          err.response?.data?.message || 
-          "Failed to load statistics. Please try again later."
+          err.response?.data?.message ||
+            "Failed to load statistics. Please try again later."
         );
         setLoading(false);
       }
@@ -149,32 +158,35 @@ const OverviewCards = () => {
       animate="show"
     >
       <StatCard
-        name="Total Categories"
+        name="Tổng số Danh mục"
         icon={Folder}
         value={categoryStats.totalCategories.toLocaleString()}
         color="#6366F1"
-        description="All categories on platform"
+        description="Tất cả danh mục trên nền tảng"
       />
+
       <StatCard
-        name="Active Categories"
+        name="Danh mục đang hoạt động"
         icon={CheckCircle}
         value={categoryStats.activeCategories.toLocaleString()}
         color="#10B981"
-        description="Published and visible"
+        description="Đã xuất bản và hiển thị"
       />
+
       <StatCard
-        name="Inactive Categories"
+        name="Danh mục không hoạt động"
         icon={XCircle}
         value={categoryStats.inactiveCategories.toLocaleString()}
         color="#EF4444"
-        description="Hidden from users"
+        description="Ẩn khỏi người dùng"
       />
+
       <StatCard
-        name="Total Courses"
+        name="Tổng số Khóa học"
         icon={BookMarked}
         value={courseStats.totalCourses.toLocaleString()}
         color="#8B5CF6"
-        description="Across all categories"
+        description="Trong tất cả danh mục"
       />
     </motion.div>
   );

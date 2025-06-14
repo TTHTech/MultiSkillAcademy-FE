@@ -67,14 +67,14 @@ const CategoryTable = () => {
     status: "Active",
   });
   const [isLoading, setIsLoading] = useState(true);
-  const [loadingMessage, setLoadingMessage] = useState("Loading categories...");
+  const [loadingMessage, setLoadingMessage] = useState("Đang tải danh mục...");
 
   const fetchCategories = async () => {
     setIsLoading(true);
     try {
       const token = localStorage.getItem("token");
       if (!token) {
-        console.error("No token found");
+        console.error("Không tìm thấy token");
         return;
       }
 
@@ -89,8 +89,8 @@ const CategoryTable = () => {
 
       setCategories(response.data);
     } catch (error) {
-      console.error("Error fetching categories:", error);
-      toast.error("Failed to load categories");
+      console.error("Lỗi khi tải danh mục:", error);
+      toast.error("Không thể tải danh mục");
     } finally {
       setIsLoading(false);
     }
@@ -134,18 +134,18 @@ const CategoryTable = () => {
 
   const handleAddCategorySubmit = async () => {
     if (!newCategory.name.trim() || !newCategory.description.trim()) {
-      toast.error("Name and description are required!");
+      toast.error("Tên và mô tả là bắt buộc!");
       return;
     }
 
-    setLoadingMessage("Adding category...");
+    setLoadingMessage("Đang thêm danh mục...");
     setIsLoading(true);
 
     try {
       const token = localStorage.getItem("token");
       if (!token) {
-        console.error("No token found");
-        toast.error("Authentication failed. Please log in again.");
+        console.error("Không tìm thấy token");
+        toast.error("Xác thực thất bại. Vui lòng đăng nhập lại.");
         return;
       }
 
@@ -162,14 +162,14 @@ const CategoryTable = () => {
       setCategories([response.data, ...categories]);
       setShowAddCategoryForm(false);
       setNewCategory({ name: "", description: "", status: "Active" });
-      toast.success("Category added successfully!");
+      toast.success("Thêm danh mục thành công!");
     } catch (error) {
-      console.error("Error adding category:", error);
+      console.error("Lỗi khi thêm danh mục:", error);
 
       if (error.response && error.response.status === 400) {
-        toast.error("Invalid input. Please check your data.");
+        toast.error("Dữ liệu không hợp lệ. Vui lòng kiểm tra lại.");
       } else {
-        toast.error("Error adding category. Please try again.");
+        toast.error("Lỗi khi thêm danh mục. Vui lòng thử lại.");
       }
     } finally {
       setIsLoading(false);
@@ -181,22 +181,22 @@ const CategoryTable = () => {
       !editingCategory?.name?.trim() ||
       !editingCategory?.description?.trim()
     ) {
-      toast.error("Name and description are required!");
+      toast.error("Tên và mô tả là bắt buộc!");
       return;
     }
 
-    setLoadingMessage("Updating category...");
+    setLoadingMessage("Đang cập nhật danh mục...");
     setIsLoading(true);
 
     try {
       const token = localStorage.getItem("token");
       if (!token) {
-        console.error("No token found");
+        console.error("Không tìm thấy token");
         return;
       }
 
       if (!editingCategory?.categoryId) {
-        console.error("Category ID is missing!");
+        console.error("Thiếu ID danh mục!");
         return;
       }
 
@@ -218,21 +218,21 @@ const CategoryTable = () => {
         )
       );
       setEditingCategory(null);
-      toast.success("Category updated successfully!");
+      toast.success("Cập nhật danh mục thành công!");
     } catch (error) {
-      console.error("Error updating category:", error);
-      toast.error("Error updating category!");
+      console.error("Lỗi khi cập nhật danh mục:", error);
+      toast.error("Lỗi khi cập nhật danh mục!");
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleDeleteCategory = async (categoryId) => {
-    setLoadingMessage("Deleting category...");
+    setLoadingMessage("Đang xóa danh mục...");
     setIsLoading(true);
 
     const confirmation = window.confirm(
-      "Are you sure you want to delete this category?"
+      "Bạn có chắc chắn muốn xóa danh mục này không?"
     );
     if (!confirmation) {
       setIsLoading(false);
@@ -242,7 +242,7 @@ const CategoryTable = () => {
     try {
       const token = localStorage.getItem("token");
       if (!token) {
-        console.error("No token found");
+        console.error("Không tìm thấy token");
         return;
       }
 
@@ -259,10 +259,10 @@ const CategoryTable = () => {
         categories.filter((category) => category.categoryId !== categoryId)
       );
       if (editingCategory?.categoryId === categoryId) setEditingCategory(null);
-      toast.success("Category deleted successfully!");
+      toast.success("Xóa danh mục thành công!");
     } catch (error) {
-      console.error("Error deleting category:", error);
-      toast.error("Error deleting category. Please try again.");
+      console.error("Lỗi khi xóa danh mục:", error);
+      toast.error("Lỗi khi xóa danh mục. Vui lòng thử lại.");
     } finally {
       setIsLoading(false);
     }
@@ -310,13 +310,13 @@ const CategoryTable = () => {
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center">
             <div className="w-1.5 h-8 bg-blue-500 rounded-r mr-3" />
-            <h2 className="text-xl font-semibold text-white">Categories Management</h2>
+            <h2 className="text-xl font-semibold text-white">Quản lý danh mục</h2>
           </div>
           <div className="flex items-center">
             <div className="relative w-64">
               <input
                 type="text"
-                placeholder="Search categories..."
+                placeholder="Tìm kiếm danh mục..."
                 className="w-full bg-slate-800/80 text-slate-200 placeholder-slate-400 rounded-md pl-9 pr-3 py-2 border border-slate-700/70 focus:outline-none focus:ring-1 focus:ring-blue-500/40 focus:border-blue-500/40 transition-all"
                 onChange={handleSearch}
                 value={searchTerm}
@@ -337,12 +337,12 @@ const CategoryTable = () => {
           <div className="bg-slate-800/50 rounded-md p-5 backdrop-blur-sm border border-slate-700/30 animate-fadeIn">
             <div className="flex items-center mb-5">
               <div className="w-1.5 h-8 bg-blue-500 rounded-r mr-3" />
-              <h3 className="text-lg font-semibold text-white">Category Details</h3>
+              <h3 className="text-lg font-semibold text-white">Chi tiết danh mục</h3>
             </div>
 
             <div className="space-y-5">
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-1.5">Name:</label>
+                <label className="block text-sm font-medium text-slate-300 mb-1.5">Tên:</label>
                 <input
                   type="text"
                   name="name"
@@ -358,7 +358,7 @@ const CategoryTable = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-1.5">Description:</label>
+                <label className="block text-sm font-medium text-slate-300 mb-1.5">Mô tả:</label>
                 <textarea
                   name="description"
                   value={editingCategory.description}
@@ -373,7 +373,7 @@ const CategoryTable = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-1.5">Status:</label>
+                <label className="block text-sm font-medium text-slate-300 mb-1.5">Trạng thái:</label>
                 <select
                   name="status"
                   value={editingCategory.status}
@@ -385,8 +385,8 @@ const CategoryTable = () => {
                     }))
                   }
                 >
-                  <option value="Active">Active</option>
-                  <option value="Inactive">Inactive</option>
+                  <option value="Active">Hoạt động</option>
+                  <option value="Inactive">Không hoạt động</option>
                 </select>
               </div>
             </div>
@@ -397,14 +397,14 @@ const CategoryTable = () => {
                 onClick={handleUpdateCategorySubmit}
               >
                 <Edit size={16} />
-                <span>Update Category</span>
+                <span>Cập nhật danh mục</span>
               </button>
               <button
                 className="flex-1 bg-slate-700 hover:bg-slate-600 text-white px-4 py-2.5 rounded-md transition-all font-medium text-sm transform hover:scale-101 flex items-center justify-center gap-2"
                 onClick={handleCancelAction}
               >
                 <X size={16} />
-                <span>Cancel</span>
+                <span>Hủy</span>
               </button>
             </div>
           </div>
@@ -433,7 +433,7 @@ const CategoryTable = () => {
                         ) : (
                           <AlertTriangle className="mr-1.5" size={14} />
                         )}
-                        {category.status}
+                        {category.status === "Active" ? "Hoạt động" : "Không hoạt động"}
                       </span>
                     </div>
 
@@ -443,14 +443,14 @@ const CategoryTable = () => {
                         onClick={() => handleViewCategory(category)}
                       >
                         <Edit size={16} />
-                        <span>Edit</span>
+                        <span>Sửa</span>
                       </button>
                       <button
                         className="px-3 py-2 bg-red-600/80 hover:bg-red-500 text-white rounded-md transition-all duration-200 text-sm flex items-center gap-1.5 shadow-sm"
                         onClick={() => handleDeleteCategory(category.categoryId)}
                       >
                         <Trash2 size={16} />
-                        <span>Delete</span>
+                        <span>Xóa</span>
                       </button>
                     </div>
                   </div>
@@ -458,7 +458,7 @@ const CategoryTable = () => {
               ) : (
                 <div className="text-center py-10 bg-slate-800/20 rounded-md border border-slate-700/20">
                   <p className="text-slate-300 text-sm">
-                    {searchTerm ? "No categories match your search criteria." : "No categories available."}
+                    {searchTerm ? "Không tìm thấy danh mục phù hợp với từ khóa tìm kiếm." : "Không có danh mục nào."}
                   </p>
                 </div>
               )}
@@ -473,7 +473,7 @@ const CategoryTable = () => {
                   disabled={currentPage === 1}
                 >
                   <ChevronLeft size={16} />
-                  <span className="text-sm">Previous</span>
+                  <span className="text-sm">Trước</span>
                 </button>
 
                 <div className="flex items-center">
@@ -546,7 +546,7 @@ const CategoryTable = () => {
                   onClick={() => handlePageChange(Math.min(currentPage + 1, totalPages))}
                   disabled={currentPage === totalPages}
                 >
-                  <span className="text-sm">Next</span>
+                  <span className="text-sm">Sau</span>
                   <ChevronRight size={16} />
                 </button>
               </div>
@@ -561,7 +561,7 @@ const CategoryTable = () => {
               <div className="flex justify-between items-center mb-5">
                 <div className="flex items-center">
                   <div className="w-1.5 h-8 bg-blue-500 rounded-r mr-3" />
-                  <h3 className="text-lg font-semibold text-white">Add New Category</h3>
+                  <h3 className="text-lg font-semibold text-white">Thêm danh mục mới</h3>
                 </div>
                 <button
                   className="p-1.5 bg-slate-700 hover:bg-slate-600 text-white rounded-md transition-all"
@@ -573,7 +573,7 @@ const CategoryTable = () => {
 
               <div className="space-y-5">
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-1.5">Name:</label>
+                  <label className="block text-sm font-medium text-slate-300 mb-1.5">Tên:</label>
                   <input
                     type="text"
                     name="name"
@@ -584,7 +584,7 @@ const CategoryTable = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-1.5">Description:</label>
+                  <label className="block text-sm font-medium text-slate-300 mb-1.5">Mô tả:</label>
                   <textarea
                     name="description"
                     value={newCategory.description}
@@ -594,15 +594,15 @@ const CategoryTable = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-1.5">Status:</label>
+                  <label className="block text-sm font-medium text-slate-300 mb-1.5">Trạng thái:</label>
                   <select
                     name="status"
                     value={newCategory.status}
                     className="w-full p-2.5 bg-slate-700/50 text-white rounded-md border border-slate-600/50 focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition-all"
                     onChange={handleAddCategoryChange}
                   >
-                    <option value="Active">Active</option>
-                    <option value="Inactive">Inactive</option>
+                    <option value="Active">Hoạt động</option>
+                    <option value="Inactive">Không hoạt động</option>
                   </select>
                 </div>
               </div>
@@ -613,13 +613,13 @@ const CategoryTable = () => {
                   onClick={handleAddCategorySubmit}
                 >
                   <Plus size={16} />
-                  <span>Add Category</span>
+                  <span>Thêm danh mục</span>
                 </button>
                 <button
                   className="flex-1 bg-slate-700 hover:bg-slate-600 text-white px-4 py-2.5 rounded-md transition-all font-medium text-sm transform hover:scale-101"
                   onClick={handleCancelAction}
                 >
-                  Cancel
+                  Hủy
                 </button>
               </div>
             </div>

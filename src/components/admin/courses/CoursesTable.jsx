@@ -68,7 +68,7 @@ const ImageGallery = ({ images }) => (
           <div className="w-full h-full overflow-hidden">
             <img
               src={image}
-              alt={`Course Image ${index + 1}`}
+              alt={`Hình khóa học ${index + 1}`}
               className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-103"
             />
           </div>
@@ -107,7 +107,7 @@ const SearchBar = ({ searchTerm, onSearch }) => (
   <div className="relative w-64">
     <input
       type="text"
-      placeholder="Search courses..."
+      placeholder="Tìm kiếm khóa học..."
       className="w-full bg-slate-800/80 text-slate-200 placeholder-slate-400 rounded-md pl-9 pr-3 py-2 border border-slate-700/70 focus:outline-none focus:ring-1 focus:ring-slate-500/40 focus:border-slate-600 transition-all"
       onChange={onSearch}
       value={searchTerm}
@@ -117,124 +117,193 @@ const SearchBar = ({ searchTerm, onSearch }) => (
 );
 
 // CourseTable Component with refined UI
-const CourseTable = ({ courses, onView }) => (
-  <div className="overflow-hidden rounded-md border border-slate-700/40 backdrop-blur-sm">
-    <table className="w-full text-left text-slate-200">
-      <thead>
-        <tr className="bg-gradient-to-r from-slate-800/90 to-slate-800/70">
-          <th className="py-3 px-4 font-medium text-slate-400 text-xs uppercase tracking-wider">ID</th>
-          <th className="py-3 px-4 font-medium text-slate-400 text-xs uppercase tracking-wider">Name</th>
-          <th className="py-3 px-4 font-medium text-slate-400 text-xs uppercase tracking-wider">Duration</th>
-          <th className="py-3 px-4 font-medium text-slate-400 text-xs uppercase tracking-wider">Category</th>
-          <th className="py-3 px-4 font-medium text-slate-400 text-xs uppercase tracking-wider">Price</th>
-          <th className="py-3 px-4 font-medium text-slate-400 text-xs uppercase tracking-wider">Status</th>
-          <th className="py-3 px-4 font-medium text-slate-400 text-xs uppercase tracking-wider">Actions</th>
-        </tr>
-      </thead>
-      <tbody className="divide-y divide-slate-700/30">
-        {courses.map((course, index) => (
-          <tr 
-            key={course.id} 
-            className="bg-slate-800/20 hover:bg-slate-700/30 transition-colors duration-200"
-          >
-            <td className="py-3 px-4 font-mono text-slate-500 text-sm">{index + 1}</td>
-            <td className="py-3 px-4 font-medium text-sm">{course.title}</td>
-            <td className="py-3 px-4 text-slate-300 text-sm">{course.duration}</td>
-            <td className="py-3 px-4">
-              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-slate-600/30 text-slate-300 border border-slate-600/30">
-                {course.categoryName}
-              </span>
-            </td>
-            <td className="py-3 px-4 font-medium text-teal-300 text-sm">${course.price}</td>
-            <td className="py-3 px-4">
-              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-900/20 text-amber-300 border border-amber-800/30">
-                {course.status}
-              </span>
-            </td>
-            <td className="py-3 px-4">
-              <button
-                onClick={() => onView(course)}
-                className="inline-flex items-center px-3 py-1.5 rounded-md bg-slate-600/90 hover:bg-slate-500 text-white transition-all duration-200 font-medium text-xs"
-              >
-                View Details
-              </button>
-            </td>
+const CourseTable = ({ courses, onView }) => {
+  // Hàm chuyển đổi trạng thái từ tiếng Anh sang tiếng Việt
+  const getVietnameseStatus = (status) => {
+    const statusMap = {
+      'Pending': 'Chờ duyệt',
+      'Active': 'Đã duyệt', 
+      'Declined': 'Đã từ chối',
+      'Draft': 'Bản nháp',
+      'Inactive': 'Không hoạt động'
+    };
+    return statusMap[status] || status;
+  };
+
+  // Hàm lấy class cho trạng thái
+  const getStatusClass = (status) => {
+    const statusClasses = {
+      'Pending': 'bg-amber-900/20 text-amber-300 border-amber-800/30',
+      'Active': 'bg-green-900/20 text-green-300 border-green-800/30',
+      'Declined': 'bg-red-900/20 text-red-300 border-red-800/30',
+      'Draft': 'bg-gray-900/20 text-gray-300 border-gray-800/30',
+      'Inactive': 'bg-slate-900/20 text-slate-300 border-slate-800/30'
+    };
+    return statusClasses[status] || 'bg-amber-900/20 text-amber-300 border-amber-800/30';
+  };
+
+  // Hàm định dạng giá tiền VND
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat('vi-VN', {
+      style: 'currency',
+      currency: 'VND'
+    }).format(price);
+  };
+
+  return (
+    <div className="overflow-hidden rounded-md border border-slate-700/40 backdrop-blur-sm">
+      <table className="w-full text-left text-slate-200">
+        <thead>
+          <tr className="bg-gradient-to-r from-slate-800/90 to-slate-800/70">
+            <th className="py-3 px-4 font-medium text-slate-400 text-xs uppercase tracking-wider">STT</th>
+            <th className="py-3 px-4 font-medium text-slate-400 text-xs uppercase tracking-wider">Tên khóa học</th>
+            <th className="py-3 px-4 font-medium text-slate-400 text-xs uppercase tracking-wider">Thời lượng</th>
+            <th className="py-3 px-4 font-medium text-slate-400 text-xs uppercase tracking-wider">Danh mục</th>
+            <th className="py-3 px-4 font-medium text-slate-400 text-xs uppercase tracking-wider">Giá</th>
+            <th className="py-3 px-4 font-medium text-slate-400 text-xs uppercase tracking-wider">Trạng thái</th>
+            <th className="py-3 px-4 font-medium text-slate-400 text-xs uppercase tracking-wider">Thao tác</th>
           </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
-);
+        </thead>
+        <tbody className="divide-y divide-slate-700/30">
+          {courses.map((course, index) => (
+            <tr 
+              key={course.id} 
+              className="bg-slate-800/20 hover:bg-slate-700/30 transition-colors duration-200"
+            >
+              <td className="py-3 px-4 font-mono text-slate-500 text-sm">{index + 1}</td>
+              <td className="py-3 px-4 font-medium text-sm">{course.title}</td>
+              <td className="py-3 px-4 text-slate-300 text-sm">{course.duration}</td>
+              <td className="py-3 px-4">
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-slate-600/30 text-slate-300 border border-slate-600/30">
+                  {course.categoryName}
+                </span>
+              </td>
+              <td className="py-3 px-4 font-medium text-teal-300 text-sm">{formatPrice(course.price)}</td>
+              <td className="py-3 px-4">
+                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${getStatusClass(course.status)}`}>
+                  {getVietnameseStatus(course.status)}
+                </span>
+              </td>
+              <td className="py-3 px-4">
+                <button
+                  onClick={() => onView(course)}
+                  className="inline-flex items-center px-3 py-1.5 rounded-md bg-slate-600/90 hover:bg-slate-500 text-white transition-all duration-200 font-medium text-xs"
+                >
+                  Xem chi tiết
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
 
 // CourseInfo Component with refined styling
-const CourseInfo = ({ course }) => (
-  <div className="bg-slate-800/30 rounded-md p-5 mb-6 backdrop-blur-sm border border-slate-700/30">
-    <div className="flex items-center mb-5">
-      <div className="w-1 h-6 bg-slate-500 rounded-r mr-3" />
-      <h3 className="text-lg font-medium text-slate-200">Course Details</h3>
+const CourseInfo = ({ course }) => {
+  // Hàm định dạng giá tiền VND
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat('vi-VN', {
+      style: 'currency',
+      currency: 'VND'
+    }).format(price);
+  };
+
+  // Hàm chuyển đổi cấp độ sang tiếng Việt
+  const getVietnameseLevel = (level) => {
+    const levelMap = {
+      'Beginner': 'Người mới bắt đầu',
+      'Intermediate': 'Trung cấp',
+      'Advanced': 'Nâng cao',
+      'Expert': 'Chuyên gia',
+      'All Levels': 'Tất cả cấp độ'
+    };
+    return levelMap[level] || level;
+  };
+
+  // Hàm chuyển đổi ngôn ngữ
+  const getVietnameseLanguage = (language) => {
+    const languageMap = {
+      'Vietnamese': 'Tiếng Việt',
+      'English': 'Tiếng Anh',
+      'French': 'Tiếng Pháp',
+      'Chinese': 'Tiếng Trung',
+      'Japanese': 'Tiếng Nhật',
+      'Korean': 'Tiếng Hàn'
+    };
+    return languageMap[language] || language;
+  };
+
+  return (
+    <div className="bg-slate-800/30 rounded-md p-5 mb-6 backdrop-blur-sm border border-slate-700/30">
+      <div className="flex items-center mb-5">
+        <div className="w-1 h-6 bg-slate-500 rounded-r mr-3" />
+        <h3 className="text-lg font-medium text-slate-200">Chi tiết khóa học</h3>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        {/* Left Column - Basic Info */}
+        <div className="space-y-5">
+          <DetailField 
+            label="Tên khóa học" 
+            value={course.title} 
+            className="border-l-2 border-slate-500"
+          />
+          <DetailField 
+            label="Giảng viên" 
+            value={`${course.instructorFirstName} ${course.instructorLastName}`}
+            className="border-l-2 border-teal-700"
+          />
+          <DetailField 
+            label="Danh mục" 
+            value={course.categoryName}
+            className="border-l-2 border-slate-600"
+          />
+          <DetailField 
+            label="Giá" 
+            value={formatPrice(course.price)}
+            className="border-l-2 border-teal-800"
+          />
+        </div>
+
+        {/* Right Column - Additional Info */}
+        <div className="space-y-5">
+          <DetailField 
+            label="Thời lượng" 
+            value={course.duration}
+            className="border-l-2 border-slate-500"
+          />
+          <DetailField 
+            label="Ngôn ngữ" 
+            value={getVietnameseLanguage(course.language)}
+            className="border-l-2 border-slate-600"
+          />
+          <DetailField 
+            label="Đánh giá" 
+            value={`${course.rating}/5 ⭐`}
+            className="border-l-2 border-slate-500"
+          />
+          <DetailField 
+            label="Cấp độ" 
+            value={getVietnameseLevel(course.level)}
+            className="border-l-2 border-slate-600"
+          />
+        </div>
+
+        {/* Full Width Description */}
+        <div className="col-span-1 md:col-span-2">
+          <DetailField 
+            label="Mô tả" 
+            value={course.description} 
+            isTextArea 
+            className="border-l-2 border-slate-500"
+          />
+        </div>
+      </div>
     </div>
-
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-      {/* Left Column - Basic Info */}
-      <div className="space-y-5">
-        <DetailField 
-          label="Course Name" 
-          value={course.title} 
-          className="border-l-2 border-slate-500"
-        />
-        <DetailField 
-          label="Instructor" 
-          value={`${course.instructorFirstName} ${course.instructorLastName}`}
-          className="border-l-2 border-teal-700"
-        />
-        <DetailField 
-          label="Category" 
-          value={course.categoryName}
-          className="border-l-2 border-slate-600"
-        />
-        <DetailField 
-          label="Price" 
-          value={`$${course.price}`}
-          className="border-l-2 border-teal-800"
-        />
-      </div>
-
-      {/* Right Column - Additional Info */}
-      <div className="space-y-5">
-        <DetailField 
-          label="Duration" 
-          value={course.duration}
-          className="border-l-2 border-slate-500"
-        />
-        <DetailField 
-          label="Language" 
-          value={course.language}
-          className="border-l-2 border-slate-600"
-        />
-        <DetailField 
-          label="Rating" 
-          value={course.rating}
-          className="border-l-2 border-slate-500"
-        />
-        <DetailField 
-          label="Level" 
-          value={course.level}
-          className="border-l-2 border-slate-600"
-        />
-      </div>
-
-      {/* Full Width Description */}
-      <div className="col-span-1 md:col-span-2">
-        <DetailField 
-          label="Description" 
-          value={course.description} 
-          isTextArea 
-          className="border-l-2 border-slate-500"
-        />
-      </div>
-    </div>
-  </div>
-);
+  );
+};
 
 // MetadataSection Component with refined styling
 const MetadataSection = ({ label, items, icon: Icon }) => (
@@ -262,19 +331,19 @@ const CourseMetadata = ({ course }) => (
   <div className="bg-slate-800/30 rounded-md p-5 mb-6 backdrop-blur-sm border border-slate-700/30">
     <div className="flex items-center mb-5">
       <div className="w-1 h-6 bg-slate-500 rounded-r mr-3" />
-      <h3 className="text-lg font-medium text-slate-200">Course Information</h3>
+      <h3 className="text-lg font-medium text-slate-200">Thông tin khóa học</h3>
     </div>
 
     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
       {/* Left Column */}
       <div>
         <MetadataSection
-          label="Target Audience"
+          label="Đối tượng"
           items={course.targetAudience}
           icon={FaUserCircle}
         />
         <MetadataSection
-          label="Requirements"
+          label="Yêu cầu"
           items={course.requirements}
           icon={FaClipboardList}
         />
@@ -283,12 +352,12 @@ const CourseMetadata = ({ course }) => (
       {/* Right Column */}
       <div>
         <MetadataSection
-          label="Course Content"
+          label="Nội dung khóa học"
           items={course.courseContent}
           icon={FaBook}
         />
         <MetadataSection
-          label="Resources"
+          label="Tài nguyên"
           items={course.resourceDescription}
           icon={FaTools}
         />
@@ -305,21 +374,21 @@ const ActionButtons = ({ courseId, onAccept, onReject, onCancel }) => (
       onClick={() => onAccept(courseId)}
     >
       <FaCheck size={12} />
-      <span>Approve</span>
+      <span>Duyệt</span>
     </button>
     <button
       className="flex-1 bg-red-900 hover:bg-red-800 text-slate-200 px-4 py-2.5 rounded-md transition-all flex items-center justify-center gap-2 font-medium text-sm transform hover:scale-101"
       onClick={() => onReject(courseId)}
     >
       <FaTimes size={12} />
-      <span>Reject</span>
+      <span>Từ chối</span>
     </button>
     <button
       className="flex-1 bg-slate-700 hover:bg-slate-600 text-slate-200 px-4 py-2.5 rounded-md transition-all flex items-center justify-center gap-2 font-medium text-sm transform hover:scale-101"
       onClick={onCancel}
     >
       <FaArrowLeft size={12} />
-      <span>Back</span>
+      <span>Quay lại</span>
     </button>
   </div>
 );
@@ -337,7 +406,7 @@ const CourseDetailView = ({ course, onAccept, onReject, onCancel }) => {
         >
           <FaArrowLeft size={14} />
         </button>
-        <h3 className="text-xl font-medium text-slate-200">Course Review</h3>
+        <h3 className="text-xl font-medium text-slate-200">Xem xét khóa học</h3>
       </div>
     
       <ImageGallery images={course.imageUrls} />
@@ -472,7 +541,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
         disabled={currentPage === 1}
       >
         <FaChevronLeft size={12} />
-        <span className="text-sm">Previous</span>
+        <span className="text-sm">Trước</span>
       </button>
 
       <div className="flex items-center">{renderPageNumbers()}</div>
@@ -482,7 +551,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
         onClick={() => onPageChange(Math.min(currentPage + 1, totalPages))}
         disabled={currentPage === totalPages}
       >
-        <span className="text-sm">Next</span>
+        <span className="text-sm">Sau</span>
         <FaChevronRight size={12} />
       </button>
     </div>
@@ -524,7 +593,7 @@ const CoursesTable = () => {
       );
 
       if (!response.ok) {
-        throw new Error("Failed to fetch courses.");
+        throw new Error("Không thể tải khóa học.");
       }
 
       const data = await response.json();
@@ -560,7 +629,7 @@ const CoursesTable = () => {
 
   const updateCourseStatus = async (courseId, status) => {
     if (!courseId) {
-      console.error("Course ID is undefined");
+      console.error("ID khóa học không xác định");
       return;
     }
 
@@ -578,17 +647,17 @@ const CoursesTable = () => {
       );
 
       if (!response.ok) {
-        throw new Error(`Failed to ${status.toLowerCase()} course.`);
+        throw new Error(`Không thể ${status === 'Active' ? 'duyệt' : 'từ chối'} khóa học.`);
       }
 
-      toast.success(`Course ${status === 'Active' ? 'approved' : 'rejected'} successfully!`);
+      toast.success(`Khóa học đã được ${status === 'Active' ? 'duyệt' : 'từ chối'} thành công!`);
       setCourses((prevCourses) =>
         prevCourses.filter((course) => course.courseId !== courseId)
       );
       setEditingCourse(null);
     } catch (error) {
-      console.error(`Error updating course status:`, error);
-      toast.error(`Error: ${error.message}`);
+      console.error(`Lỗi khi cập nhật trạng thái khóa học:`, error);
+      toast.error(`Lỗi: ${error.message}`);
     }
   };
 
@@ -600,7 +669,7 @@ const CoursesTable = () => {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="flex flex-col items-center">
           <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-slate-400"></div>
-          <p className="mt-4 text-slate-400 text-sm">Loading courses...</p>
+          <p className="mt-4 text-slate-400 text-sm">Đang tải khóa học...</p>
         </div>
       </div>
     );
@@ -609,7 +678,7 @@ const CoursesTable = () => {
   if (error) {
     return (
       <div className="bg-red-900/10 border border-red-900/30 text-red-300 rounded-md p-4">
-        <h3 className="font-medium text-base mb-1">Error</h3>
+        <h3 className="font-medium text-base mb-1">Lỗi</h3>
         <p className="text-sm">{error}</p>
       </div>
     );
@@ -626,7 +695,7 @@ const CoursesTable = () => {
         <div className="flex items-center">
           <div className="w-1 h-6 bg-slate-500 rounded-r mr-3" />
           <h2 className="text-xl font-medium text-slate-200">
-            Pending Review
+            Khóa học chờ duyệt
           </h2>
         </div>
         <SearchBar 
@@ -659,7 +728,7 @@ const CoursesTable = () => {
           
           {filteredCourses.length === 0 && (
             <div className="text-center py-10 bg-slate-800/20 rounded-md mt-5 border border-slate-700/20">
-              <p className="text-slate-400 text-sm">No courses match your search criteria.</p>
+              <p className="text-slate-400 text-sm">Không tìm thấy khóa học phù hợp với từ khóa tìm kiếm.</p>
             </div>
           )}
         </>
