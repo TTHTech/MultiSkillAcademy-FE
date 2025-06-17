@@ -68,7 +68,7 @@ const DeleteConfirmationModal = ({ user, onConfirm, onCancel }) => (
       <div className="flex justify-between items-center mb-4">
         <div className="flex items-center">
           <div className="w-1 h-6 bg-red-500 rounded-r mr-3"></div>
-          <h3 className="text-lg font-semibold text-white">Confirm Deletion</h3>
+          <h3 className="text-lg font-semibold text-white">Xác nhận xóa</h3>
         </div>
         <button 
           onClick={onCancel}
@@ -81,9 +81,9 @@ const DeleteConfirmationModal = ({ user, onConfirm, onCancel }) => (
       <div className="mb-6">
         <AlertTriangle className="text-yellow-400 mx-auto mb-3" size={32} />
         <p className="text-slate-300 text-center">
-          Are you sure you want to delete the user <span className="font-semibold text-white">{user.firstName} {user.lastName}</span>?
+          Bạn có chắc chắn muốn xóa học viên <span className="font-semibold text-white">{user.firstName} {user.lastName}</span> không?
         </p>
-        <p className="mt-2 text-slate-400 text-sm text-center">This action cannot be undone.</p>
+        <p className="mt-2 text-slate-400 text-sm text-center">Hành động này không thể hoàn tác.</p>
       </div>
       
       <div className="flex gap-3">
@@ -91,13 +91,13 @@ const DeleteConfirmationModal = ({ user, onConfirm, onCancel }) => (
           onClick={onCancel}
           className="flex-1 bg-slate-700 hover:bg-slate-600 text-white px-4 py-2.5 rounded-md transition-all font-medium text-sm"
         >
-          Cancel
+          Hủy
         </button>
         <button
           onClick={onConfirm}
           className="flex-1 bg-red-600 hover:bg-red-500 text-white px-4 py-2.5 rounded-md transition-all font-medium text-sm"
         >
-          Delete User
+          Xóa học viên
         </button>
       </div>
     </motion.div>
@@ -148,7 +148,7 @@ const UsersTable = () => {
       try {
         const token = localStorage.getItem("token");
         if (!token) {
-          throw new Error("No token found, please login first.");
+          throw new Error("Không tìm thấy token, vui lòng đăng nhập lại.");
         }
 
         const response = await fetch(
@@ -162,7 +162,7 @@ const UsersTable = () => {
           }
         );
         if (!response.ok) {
-          throw new Error("Failed to fetch users");
+          throw new Error("Không thể tải danh sách học viên");
         }
         const data = await response.json();
         setUsers(data);
@@ -234,7 +234,7 @@ const UsersTable = () => {
       );
 
       if (!response.ok) {
-        throw new Error("Failed to delete user");
+        throw new Error("Không thể xóa học viên");
       }
 
       // Update user list after deletion
@@ -263,7 +263,7 @@ const UsersTable = () => {
       address: editingUser.address,
       bio: editingUser.bio,
       dateOfBirth: editingUser.dateOfBirth,
-      role: editingUser.role,
+      role: "Student", // Luôn giữ role là Student
       active: editingUser.active,
     };
 
@@ -288,7 +288,7 @@ const UsersTable = () => {
       );
 
       if (!response.ok) {
-        throw new Error("Failed to update user");
+        throw new Error("Không thể cập nhật học viên");
       }
 
       const updatedUser = await response.json();
@@ -300,7 +300,7 @@ const UsersTable = () => {
       setFilteredUsers(updatedUsers);
       setEditingUser(null);
     } catch (error) {
-      console.error("Error updating user:", error);
+      console.error("Lỗi khi cập nhật học viên:", error);
     }
   };
 
@@ -338,7 +338,7 @@ const UsersTable = () => {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="flex flex-col items-center">
           <Loader className="animate-spin text-blue-400 mb-4" size={28} />
-          <p className="text-slate-300 text-sm">Loading students data...</p>
+          <p className="text-slate-300 text-sm">Đang tải dữ liệu học viên...</p>
         </div>
       </div>
     );
@@ -350,7 +350,7 @@ const UsersTable = () => {
       <div className="bg-red-900/10 border border-red-900/30 text-red-300 rounded-md p-4 flex items-center">
         <AlertTriangle className="text-red-400 mr-3" size={20} />
         <div>
-          <h3 className="font-medium text-base mb-1">Error</h3>
+          <h3 className="font-medium text-base mb-1">Lỗi</h3>
           <p className="text-sm">{error}</p>
         </div>
       </div>
@@ -373,30 +373,32 @@ const UsersTable = () => {
         />
       )}
 
-      {/* Header with title and search */}
-      <div className="flex justify-between items-center mb-6">
-        <div className="flex items-center">
-          <div className="w-1.5 h-8 bg-blue-500 rounded-r mr-3" />
-          <h2 className="text-xl font-semibold text-white tracking-tight">Students Management</h2>
+      {/* Header with title and search - chỉ hiển thị khi không ở chế độ edit */}
+      {!editingUser && (
+        <div className="flex justify-between items-center mb-6">
+          <div className="flex items-center">
+            <div className="w-1.5 h-8 bg-blue-500 rounded-r mr-3" />
+            <h2 className="text-xl font-semibold text-white tracking-tight">Quản lý học viên</h2>
+          </div>
+          <div className="relative w-64">
+            <input
+              type="text"
+              placeholder="Tìm kiếm học viên..."
+              className="w-full bg-slate-800/80 text-slate-200 placeholder-slate-400 rounded-md pl-9 pr-3 py-2 border border-slate-700/70 focus:outline-none focus:ring-1 focus:ring-blue-500/40 focus:border-blue-500/40 transition-all"
+              value={searchTerm}
+              onChange={handleSearch}
+            />
+            <Search className="absolute left-3 top-2.5 text-slate-400" size={16} />
+          </div>
         </div>
-        <div className="relative w-64">
-          <input
-            type="text"
-            placeholder="Search students..."
-            className="w-full bg-slate-800/80 text-slate-200 placeholder-slate-400 rounded-md pl-9 pr-3 py-2 border border-slate-700/70 focus:outline-none focus:ring-1 focus:ring-blue-500/40 focus:border-blue-500/40 transition-all"
-            value={searchTerm}
-            onChange={handleSearch}
-          />
-          <Search className="absolute left-3 top-2.5 text-slate-400" size={16} />
-        </div>
-      </div>
+      )}
 
       {editingUser ? (
         // Edit user form
         <div className="bg-slate-800/40 rounded-md p-5 backdrop-blur-sm border border-slate-700/30 animate-fadeIn">
           <div className="flex items-center mb-5">
             <div className="w-1.5 h-8 bg-blue-500 rounded-r mr-3" />
-            <h3 className="text-lg font-semibold text-white">Edit Student Profile</h3>
+            <h3 className="text-lg font-semibold text-white">Chỉnh sửa thông tin học viên</h3>
           </div>
 
           {/* Profile image */}
@@ -425,7 +427,7 @@ const UsersTable = () => {
           {/* Form fields in a grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1.5">First Name</label>
+              <label className="block text-sm font-medium text-slate-300 mb-1.5">Tên</label>
               <input
                 type="text"
                 name="firstName"
@@ -436,7 +438,7 @@ const UsersTable = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1.5">Last Name</label>
+              <label className="block text-sm font-medium text-slate-300 mb-1.5">Họ</label>
               <input
                 type="text"
                 name="lastName"
@@ -458,7 +460,7 @@ const UsersTable = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1.5">Phone Number</label>
+              <label className="block text-sm font-medium text-slate-300 mb-1.5">Số điện thoại</label>
               <input
                 type="text"
                 name="phoneNumber"
@@ -469,7 +471,7 @@ const UsersTable = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1.5">Date of Birth</label>
+              <label className="block text-sm font-medium text-slate-300 mb-1.5">Ngày sinh</label>
               <input
                 type="date"
                 name="dateOfBirth"
@@ -486,33 +488,32 @@ const UsersTable = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1.5">Role</label>
+              <label className="block text-sm font-medium text-slate-300 mb-1.5">Vai trò</label>
               <select
                 name="role"
-                value={editingUser.role || 'Student'}
-                onChange={handleChange}
-                className="w-full p-2.5 bg-slate-700/50 text-white rounded-md border border-slate-600/50 focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition-all"
+                value="Student"
+                disabled
+                className="w-full p-2.5 bg-slate-700/30 text-slate-400 rounded-md border border-slate-600/50 cursor-not-allowed"
               >
-                <option value="Student">Student</option>
-                <option value="Instructor">Instructor</option>
+                <option value="Student">Học viên</option>
               </select>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1.5">Status</label>
+              <label className="block text-sm font-medium text-slate-300 mb-1.5">Trạng thái</label>
               <select
                 name="active"
                 value={editingUser.active ? "true" : "false"}
                 onChange={handleChange}
                 className="w-full p-2.5 bg-slate-700/50 text-white rounded-md border border-slate-600/50 focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition-all"
               >
-                <option value="true">Active</option>
-                <option value="false">Inactive</option>
+                <option value="true">Hoạt động</option>
+                <option value="false">Không hoạt động</option>
               </select>
             </div>
 
             <div className="col-span-1 md:col-span-2">
-              <label className="block text-sm font-medium text-slate-300 mb-1.5">Address</label>
+              <label className="block text-sm font-medium text-slate-300 mb-1.5">Địa chỉ</label>
               <input
                 type="text"
                 name="address"
@@ -523,7 +524,7 @@ const UsersTable = () => {
             </div>
 
             <div className="col-span-1 md:col-span-2">
-              <label className="block text-sm font-medium text-slate-300 mb-1.5">Bio</label>
+              <label className="block text-sm font-medium text-slate-300 mb-1.5">Giới thiệu</label>
               <textarea
                 name="bio"
                 value={editingUser.bio || ''}
@@ -541,13 +542,13 @@ const UsersTable = () => {
               onClick={handleSave}
             >
               <Edit size={16} />
-              <span>Save Changes</span>
+              <span>Lưu thay đổi</span>
             </button>
             <button
               className="flex-1 bg-slate-700 hover:bg-slate-600 text-white px-4 py-2.5 rounded-md transition-all font-medium text-sm transform hover:scale-101"
               onClick={() => setEditingUser(null)}
             >
-              Cancel
+              Hủy
             </button>
           </div>
         </div>
@@ -558,13 +559,13 @@ const UsersTable = () => {
             <table className="w-full table-auto">
               <thead>
                 <tr className="bg-gradient-to-r from-slate-800/90 to-slate-800/70 border-b border-slate-700/40">
-                  <th className="p-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Avatar</th>
-                  <th className="p-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Name</th>
+                  <th className="p-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Ảnh đại diện</th>
+                  <th className="p-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Họ tên</th>
                   <th className="p-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Email</th>
-                  <th className="p-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Phone</th>
-                  <th className="p-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Address</th>
-                  <th className="p-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Status</th>
-                  <th className="p-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Actions</th>
+                  <th className="p-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Điện thoại</th>
+                  <th className="p-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Địa chỉ</th>
+                  <th className="p-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Trạng thái</th>
+                  <th className="p-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Thao tác</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-700/40">
@@ -625,8 +626,8 @@ const UsersTable = () => {
                           }`}
                         >
                           {user.active === true || user.active === 1
-                            ? "Active"
-                            : "Inactive"}
+                            ? "Hoạt động"
+                            : "Không hoạt động"}
                         </span>
                       </td>
                       
@@ -652,7 +653,7 @@ const UsersTable = () => {
                 ) : (
                   <tr>
                     <td colSpan="7" className="p-4 text-center text-slate-400">
-                      {searchTerm ? "No students match your search criteria." : "No students available."}
+                      {searchTerm ? "Không tìm thấy học viên phù hợp với từ khóa tìm kiếm." : "Không có học viên nào."}
                     </td>
                   </tr>
                 )}
@@ -669,7 +670,7 @@ const UsersTable = () => {
                 disabled={currentPage === 1}
               >
                 <ChevronLeft size={16} />
-                <span className="text-sm">Previous</span>
+                <span className="text-sm">Trước</span>
               </button>
 
               <div className="flex items-center">
@@ -742,7 +743,7 @@ const UsersTable = () => {
                 onClick={() => handlePageChange(Math.min(currentPage + 1, totalPages))}
                 disabled={currentPage === totalPages}
               >
-                <span className="text-sm">Next</span>
+                <span className="text-sm">Sau</span>
                 <ChevronRight size={16} />
               </button>
             </div>
