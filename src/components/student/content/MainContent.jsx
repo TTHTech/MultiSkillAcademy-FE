@@ -18,6 +18,7 @@ import {
   FaExpand,
   FaFlag,
   FaTimes,
+  FaLock,
 } from "react-icons/fa";
 import SupplementaryLectures from "./SupplementaryLectures";
 import { decodeId } from "../../../utils/hash";
@@ -237,33 +238,85 @@ const MainContent = ({
   isSidebarOpen,
   setIsHoveringButton,
   isHoveringButton,
+  course,
 }) => {
   const { courseHash } = useParams();
   const id = decodeId(courseHash);
   const [selectedTab, setSelectedTab] = useState(0);
-  const [progress, setProgress] = useState(0); // Tiến độ xem video (theo %)
-  const [lastWatchedTime, setLastWatchedTime] = useState(0); // Thời gian cuối cùng đã xem (giây)
+  const [progress, setProgress] = useState(0);
+  const [lastWatchedTime, setLastWatchedTime] = useState(0);
+  const [hasWatched, setHasWatched] = useState(false);
+  const [isLocked, setIsLocked] = useState(false);
   const videoRef = useRef(null);
+
+  // Check if lecture is locked
+  useEffect(() => {
+    if (selectedLecture && course) {
+      // Find which section this lecture belongs to
+      const section = course.sections.find(s => 
+        s.lectures.some(l => l.lecture_id === selectedLecture.lecture_id)
+      );
+      
+      if (section) {
+        const lectureIndex = section.lectures.findIndex(
+          l => l.lecture_id === selectedLecture.lecture_id
+        );
+        
+        // If this is the first lecture in section, it's always unlocked
+        if (lectureIndex === 0) {
+          setIsLocked(false);
+        } else {
+          // Check if previous lecture in same section is completed
+          const previousLecture = section.lectures[lectureIndex - 1];
+          setIsLocked(!previousLecture.watched);
+        }
+      }
+    }
+  }, [selectedLecture, course]);
 
   // Fetch tiến độ từ API khi chọn bài học mới
   useEffect(() => {
-    if (selectedLecture) {
+    if (selectedLecture && !isLocked) {
       const fetchProgress = async () => {
         try {
-          // Đặt lại video trước khi tải tiến độ mới
-          if (videoRef.current) {
-            videoRef.current.pause();
-            videoRef.current.currentTime = 0;
-          }
+          // Reset states
+          setProgress(0);
+          setLastWatchedTime(0);
+          setHasWatched(false);
 
           const token = localStorage.getItem("token");
-          // Kiểm tra token trước khi gọi API
           if (!token) {
             console.error("No authentication token found");
             return;
           }
 
-          const userId = localStorage.getItem("userId");
+          // Lấy progress từ localStorage trước
+          const savedProgress = restoreVideoProgress(selectedLecture.lecture_id);
+          if (savedProgress) {
+            setProgress(savedProgress.progress || 0);
+            setLastWatchedTime(savedProgress.lastWatchedTime || 0);
+            setHasWatched(savedProgress.progress >= 90);
+            
+            // QUAN TRỌNG: Set thời gian video ngay lập tức
+            if (videoRef.current && savedProgress.lastWatchedTime > 0) {
+              // Đợi video load metadata trước khi set currentTime
+              const setVideoTime = () => {
+                if (videoRef.current.readyState >= 1) {
+                  videoRef.current.currentTime = savedProgress.lastWatchedTime;
+                  console.log("Restored video time to:", savedProgress.lastWatchedTime);
+                } else {
+                  // Nếu chưa ready, đợi event loadedmetadata
+                  videoRef.current.addEventListener('loadedmetadata', () => {
+                    videoRef.current.currentTime = savedProgress.lastWatchedTime;
+                    console.log("Restored video time after metadata loaded:", savedProgress.lastWatchedTime);
+                  }, { once: true });
+                }
+              };
+              setVideoTime();
+            }
+          }
+
+          // Fetch từ API
           const response = await fetch(
             `${baseUrl}/api/student/lecture-progress/${id}/${selectedLecture.lecture_id}`,
             {
@@ -275,35 +328,36 @@ const MainContent = ({
             }
           );
 
-          if (!response.ok) {
-            // Xử lý khi response không OK
-            throw new Error(`HTTP error! Status: ${response.status}`);
-          }
+          if (response.ok) {
+            const contentType = response.headers.get("content-type");
+            if (contentType && contentType.includes("application/json")) {
+              const data = await response.json();
+              
+              // Chỉ update nếu API có data mới hơn localStorage
+              const apiTime = data.lastWatchedTime || 0;
+              const localTime = savedProgress?.lastWatchedTime || 0;
+              
+              if (apiTime > localTime) {
+                setProgress(data.progress || 0);
+                setLastWatchedTime(data.lastWatchedTime || 0);
+                setHasWatched(data.progress >= 90);
 
-          // Kiểm tra content-type
-          const contentType = response.headers.get("content-type");
-          if (!contentType || !contentType.includes("application/json")) {
-            throw new Error("Received non-JSON response from server");
-          }
-
-          const data = await response.json();
-          setProgress(data.progress || 0);
-          setLastWatchedTime(data.lastWatchedTime || 0);
-
-          // Đặt thời gian bắt đầu cho video
-          if (videoRef.current && data.lastWatchedTime) {
-            // Đảm bảo video đã tải xong
-            videoRef.current.onloadedmetadata = () => {
-              videoRef.current.currentTime = data.lastWatchedTime;
-            };
+                // Set video time từ API nếu lớn hơn
+                if (videoRef.current && apiTime > 0) {
+                  if (videoRef.current.readyState >= 1) {
+                    videoRef.current.currentTime = apiTime;
+                  } else {
+                    videoRef.current.addEventListener('loadedmetadata', () => {
+                      videoRef.current.currentTime = apiTime;
+                    }, { once: true });
+                  }
+                }
+              }
+            }
           }
         } catch (error) {
           console.error("Error fetching progress:", error);
-          // Tiếp tục xử lý video ngay cả khi API lỗi
-          setProgress(0);
-          setLastWatchedTime(0);
         } finally {
-          // Đảm bảo video được tải
           if (videoRef.current && selectedLecture.video_url) {
             videoRef.current.load();
           }
@@ -312,36 +366,54 @@ const MainContent = ({
 
       fetchProgress();
     }
-  }, [id, selectedLecture]);
+  }, [id, selectedLecture, isLocked]);
 
-  // Cập nhật tiến độ video khi đang phát
-  const handleTimeUpdate = () => {
-    if (videoRef.current && selectedLecture) {
-      const currentTime = videoRef.current.currentTime;
-      const duration = videoRef.current.duration;
-
-      if (duration && currentTime) {
-        const newProgress = Math.min((currentTime / duration) * 100, 100);
-        setProgress(newProgress);
-
-        if (currentTime > lastWatchedTime) {
-          setLastWatchedTime(currentTime);
-
-          // Gửi API để cập nhật tiến độ
-          updateProgressAPI(newProgress, currentTime);
-
-          // Đánh dấu là watched nếu đạt đủ tiến độ
-          if (newProgress >= 100) {
-            updateProgress(selectedLecture.lecture_id);
+  // Lưu progress khi chuyển video hoặc unmount
+  useEffect(() => {
+    return () => {
+      if (videoRef.current && selectedLecture && !isLocked) {
+        const currentTime = videoRef.current.currentTime;
+        const duration = videoRef.current.duration;
+        if (duration && currentTime) {
+          const progressPercent = (currentTime / duration) * 100;
+          saveVideoProgress(selectedLecture.lecture_id, currentTime, progressPercent);
+          // Gọi API một lần cuối
+          if (progressPercent > progress) {
+            updateProgressAPI(progressPercent, currentTime);
           }
         }
       }
-    }
-  };
-  // Gửi API để cập nhật tiến độ
+    };
+  }, [selectedLecture, isLocked]);
+
+  // Thêm useEffect để lưu progress khi component unmount hoặc khi user navigate away
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (videoRef.current && selectedLecture && !isLocked) {
+        const currentTime = videoRef.current.currentTime;
+        const duration = videoRef.current.duration;
+        if (duration && currentTime > 0) {
+          const progressPercent = (currentTime / duration) * 100;
+          saveVideoProgress(selectedLecture.lecture_id, currentTime, progressPercent);
+        }
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      handleBeforeUnload(); // Save khi component unmount
+    };
+  }, [selectedLecture, isLocked]);
+
+  // Update progress API
   const updateProgressAPI = async (newProgress, currentTime) => {
     try {
-      await fetch(`${baseUrl}/api/student/update-progress`, {
+      // Chỉ gọi API khi có thay đổi đáng kể
+      if (Math.abs(newProgress - progress) < 5 && newProgress < 90) return;
+
+      const response = await fetch(`${baseUrl}/api/student/update-progress`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -350,15 +422,196 @@ const MainContent = ({
         body: JSON.stringify({
           userId: Number(localStorage.getItem("userId")),
           courseId: id,
-          lectureId: selectedLecture.lecture_id,
-          progress: newProgress,
-          lastWatchedTime: currentTime,
+          lectureId: selectedLecture.lecture_id
         }),
       });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      // Lưu vào localStorage
+      saveVideoProgress(selectedLecture.lecture_id, currentTime, newProgress);
+
+      // Nếu đạt 90%, update watched status
+      if (newProgress >= 90 && !hasWatched) {
+        setHasWatched(true);
+        if (updateProgress) {
+          await updateProgress(selectedLecture.lecture_id);
+        }
+      }
     } catch (error) {
       console.error("Error updating progress:", error);
     }
   };
+
+  // Handle time update
+  const handleTimeUpdate = () => {
+    if (videoRef.current && selectedLecture && !isLocked) {
+      const currentTime = videoRef.current.currentTime;
+      const duration = videoRef.current.duration;
+
+      if (duration && currentTime) {
+        const newProgress = Math.min((currentTime / duration) * 100, 100);
+        setProgress(newProgress);
+
+        // Save to localStorage every 3 seconds
+        if (Math.floor(currentTime) % 3 === 0) {
+          saveVideoProgress(selectedLecture.lecture_id, currentTime, newProgress);
+        }
+
+        // Update API at milestones or every 30 seconds
+        const milestones = [25, 50, 75, 90, 100];
+        const reachedMilestone = milestones.find(m => 
+          newProgress >= m && progress < m
+        );
+
+        if (reachedMilestone || 
+            (currentTime > lastWatchedTime + 30) ||
+            (newProgress >= 100 && !hasWatched)) {
+          setLastWatchedTime(currentTime);
+          updateProgressAPI(newProgress, currentTime);
+        }
+      }
+    }
+  };
+
+  // Handle seeking - prevent skipping ahead
+  const handleSeeking = () => {
+    if (videoRef.current && selectedLecture && !isLocked) {
+      const currentTime = videoRef.current.currentTime;
+      const savedProgress = restoreVideoProgress(selectedLecture.lecture_id);
+      const savedTime = savedProgress ? savedProgress.lastWatchedTime : 0;
+      const duration = videoRef.current.duration;
+      const lastTime = Math.max(lastWatchedTime, savedTime);
+      const threshold = 5;
+
+      // Prevent seeking beyond watched time if not completed
+      if (!hasWatched && progress < 100) {
+        if (currentTime > lastTime + threshold) {
+          videoRef.current.currentTime = lastTime;
+          Swal.fire({
+            title: "Hãy cố lên!",
+            text: "Việc xem đầy đủ nội dung sẽ giúp bạn đạt kết quả tốt nhất!",
+            icon: "info",
+            timer: 2000,
+            showConfirmButton: false
+          });
+        } else if (
+          currentTime >= duration - threshold &&
+          lastTime < duration - threshold
+        ) {
+          videoRef.current.currentTime = lastTime;
+          Swal.fire({
+            title: "Cảnh báo",
+            text: "Bạn không thể tua đến cuối video khi chưa hoàn thành nội dung.",
+            icon: "warning",
+            timer: 2000,
+            showConfirmButton: false
+          });
+        } else {
+          setLastWatchedTime(Math.max(lastTime, currentTime));
+        }
+      }
+    }
+  };
+
+  // Handle video end
+  const handleVideoEnd = async () => {
+    if (!lectures || !selectedLecture || !course) return;
+
+    // Mark as 100% completed
+    await updateProgressAPI(100, videoRef.current.duration);
+    setHasWatched(true);
+
+    // Update parent component và refresh course data
+    if (updateProgress) {
+      await updateProgress(selectedLecture.lecture_id);
+    }
+
+    // Find next lecture
+    const allLectures = course.sections.flatMap(section => section.lectures);
+    const currentIndex = allLectures.findIndex(
+      lecture => lecture.lecture_id === selectedLecture.lecture_id
+    );
+    const nextLecture = allLectures[currentIndex + 1];
+
+    if (nextLecture) {
+      // Check if next lecture is in a new section
+      const currentSection = course.sections.find(s => 
+        s.lectures.some(l => l.lecture_id === selectedLecture.lecture_id)
+      );
+      const nextSection = course.sections.find(s => 
+        s.lectures.some(l => l.lecture_id === nextLecture.lecture_id)
+      );
+      
+      // If next lecture is first in new section, it's unlocked
+      const isFirstInSection = nextSection && 
+        nextSection.lectures[0].lecture_id === nextLecture.lecture_id;
+      
+      if (isFirstInSection || currentSection === nextSection) {
+        // Clear video progress của bài mới
+        localStorage.removeItem(`video_progress_${id}_${nextLecture.lecture_id}`);
+        
+        // Delay to ensure state updates
+        setTimeout(() => {
+          setSelectedLecture(nextLecture);
+        }, 500);
+      } else {
+        Swal.fire({
+          title: "Hoàn thành!",
+          text: "Bạn đã hoàn thành bài học này. Hãy tiếp tục với bài học tiếp theo.",
+          icon: "success",
+          confirmButtonText: "OK"
+        });
+      }
+    } else {
+      Swal.fire({
+        title: "Chúc mừng!",
+        text: "Bạn đã hoàn thành tất cả các bài học trong khóa học này.",
+        icon: "success",
+        confirmButtonText: "OK"
+      });
+    }
+  };
+
+  // Save video progress to localStorage
+  const saveVideoProgress = (lectureId, time, progressPercent) => {
+    const data = {
+      lastWatchedTime: time,
+      progress: progressPercent,
+      timestamp: new Date().getTime()
+    };
+    localStorage.setItem(
+      `video_progress_${id}_${lectureId}`,
+      JSON.stringify(data)
+    );
+  };
+
+  // Restore video progress from localStorage
+  const restoreVideoProgress = (lectureId) => {
+    try {
+      const saved = localStorage.getItem(`video_progress_${id}_${lectureId}`);
+      if (saved) {
+        return JSON.parse(saved);
+      }
+    } catch (error) {
+      console.error("Error restoring progress:", error);
+    }
+    return null;
+  };
+
+  // Save current lecture
+  const saveCurrentLecture = (lectureId) => {
+    localStorage.setItem("current_lecture_id", lectureId);
+  };
+
+  useEffect(() => {
+    if (selectedLecture) {
+      saveCurrentLecture(selectedLecture.lecture_id);
+    }
+  }, [selectedLecture]);
+
   const handleReport = async () => {
     const userId = localStorage.getItem("userId");
     const { value: reason } = await Swal.fire({
@@ -393,143 +646,46 @@ const MainContent = ({
       await Swal.fire("Lỗi", "Không gửi được báo cáo, thử lại sau.", "error");
     }
   };
-  // Kiểm tra khi người dùng tua video
-  const handleSeeking = () => {
-    if (videoRef.current && selectedLecture) {
-      const currentTime = videoRef.current.currentTime; // Thời gian hiện tại
-      const savedTime = restoreVideoProgress(selectedLecture.lecture_id) || 0; // Thời gian đã lưu
-      const duration = videoRef.current.duration; // Tổng thời lượng video
-      const lastTime = lastWatchedTime || savedTime; // Thời gian cuối cùng đã xem
-      const threshold = 5; // Ngưỡng sai lệch cho phép
-
-      // Trường hợp video chưa hoàn thành
-      if (progress < 100) {
-        // Chặn tua vượt qua lastWatchedTime
-        if (currentTime > lastTime + threshold) {
-          videoRef.current.currentTime = lastTime; // Quay lại vị trí đã xem
-          Swal.fire({
-            title: "Hãy cố lên!",
-            text: "Việc xem đầy đủ nội dung sẽ giúp bạn đạt kết quả tốt nhất và phát triển kỹ năng của mình!",
-            icon: "success",
-          });
-        }
-        // Chặn tua đến cuối video nếu chưa hoàn thành
-        else if (
-          currentTime >= duration - threshold &&
-          lastTime < duration - threshold
-        ) {
-          videoRef.current.currentTime = lastTime; // Quay lại vị trí đã xem
-          Swal.fire({
-            title: "Cảnh báo",
-            text: "Bạn không thể tua đến cuối video khi chưa hoàn thành nội dung.",
-            icon: "warning",
-          });
-        }
-        // Cho phép tua trong phạm vi từ 0 đến lastWatchedTime
-        else {
-          saveVideoProgress(selectedLecture.lecture_id, currentTime); // Lưu tiến trình
-          setLastWatchedTime(Math.max(lastTime, currentTime)); // Cập nhật lastWatchedTime
-        }
-      }
-    }
-  };
-
-  // Khi video kết thúc, tự động chuyển sang bài học tiếp theo
-  const handleVideoEnd = () => {
-    if (!lectures || !selectedLecture) return;
-
-    const currentIndex = lectures.findIndex(
-      (lecture) => lecture.lecture_id === selectedLecture.lecture_id
-    );
-
-    // Gọi API để đánh dấu là watched
-    updateProgress(selectedLecture.lecture_id);
-
-    // Tìm bài học tiếp theo
-    const nextLecture = lectures[currentIndex + 1];
-
-    // Nếu có bài học tiếp theo, chọn bài học đó
-    if (nextLecture) {
-      setSelectedLecture(nextLecture);
-    } else {
-      // Nếu không có bài học tiếp theo, thông báo hoàn thành khóa học
-      Swal.fire({
-        title: "Khóa học đã hoàn thành",
-        text: "Bạn đã hoàn thành tất cả các bài học. Vui lòng chọn bài học hoặc khóa học khác.",
-        icon: "success",
-      });
-    }
-  };
-  // Lưu thời gian xem vào localStorage
-  const saveVideoProgress = (lectureId, time) => {
-    localStorage.setItem(`video_progress_${id}_${lectureId}`, time);
-  };
-
-  // Khôi phục thời gian xem từ localStorage
-  const restoreVideoProgress = (lectureId) => {
-    const savedTime = localStorage.getItem(`video_progress_${id}_${lectureId}`);
-    return savedTime ? parseFloat(savedTime) : 0;
-  };
-  const saveCurrentLecture = (lectureId) => {
-    localStorage.setItem("current_lecture_id", lectureId);
-  };
-  const restoreCurrentLecture = () => {
-    return localStorage.getItem("current_lecture_id");
-  };
-  useEffect(() => {
-    if (selectedLecture) {
-      saveCurrentLecture(selectedLecture.lecture_id); // Lưu bài giảng hiện tại
-    }
-  }, [selectedLecture]);
-  useEffect(() => {
-    const savedLectureId = restoreCurrentLecture();
-
-    if (savedLectureId && lectures) {
-      const savedLecture = lectures.find(
-        (lecture) => lecture.lecture_id === parseInt(savedLectureId)
-      );
-
-      if (savedLecture) {
-        setSelectedLecture(savedLecture);
-      }
-    }
-  }, [lectures]);
-
-  // Hàm xử lý trạng thái video
-  const handleVideoState = (action, lectureId, time = 0) => {
-    switch (action) {
-      case "save":
-        saveVideoProgress(lectureId, time);
-        break;
-      case "restore":
-        return restoreVideoProgress(lectureId);
-      default:
-        console.error("Invalid action for handleVideoState");
-        break;
-    }
-  };
-  // Chuyển đổi giây sang dạng phút hoặc giây
-  const formatDuration = (duration) => {
-    if (!duration || isNaN(duration)) return "Đang tải..."; // Xử lý dữ liệu không hợp lệ
-    const minutes = Math.floor(duration / 60);
-    const seconds = duration % 60;
-
-    if (minutes > 0) {
-      return seconds > 0
-        ? `${minutes} phút ${seconds} giây`
-        : `${minutes} phút`;
-    }
-    return `${seconds} giây`;
-  };
 
   return (
     <div className="w-full h-full bg-white overflow-y-auto flex flex-col mt-[90px]">
       {selectedLecture ? (
         <div className="flex flex-col flex-grow">
           <div className="flex flex-col flex-grow relative">
-            {/* Video container with sidebar toggle button positioned absolutely within */}
+            {/* Video container */}
             <div className="w-full relative">
-              {selectedLecture.content_type.toLowerCase() === "video" &&
+              {isLocked ? (
+                // Locked content
+                <div className="w-full md:h-[500px] bg-gray-900 rounded-none overflow-hidden flex items-center justify-center">
+                  <div className="text-center text-white p-8">
+                    <FaLock className="text-6xl mb-4 mx-auto text-gray-400" />
+                    <h3 className="text-2xl font-bold mb-2">Bài học bị khóa</h3>
+                    <p className="text-gray-300 mb-4">
+                      Bạn cần hoàn thành bài học trước để mở khóa bài học này.
+                    </p>
+                    <button
+                      onClick={() => {
+                        // Find previous lecture
+                        const section = course.sections.find(s => 
+                          s.lectures.some(l => l.lecture_id === selectedLecture.lecture_id)
+                        );
+                        if (section) {
+                          const lectureIndex = section.lectures.findIndex(
+                            l => l.lecture_id === selectedLecture.lecture_id
+                          );
+                          if (lectureIndex > 0) {
+                            setSelectedLecture(section.lectures[lectureIndex - 1]);
+                          }
+                        }
+                      }}
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors"
+                    >
+                      Quay lại bài trước
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                selectedLecture.content_type.toLowerCase() === "video" &&
                 selectedLecture.video_url && (
                   <div className="w-full md:h-[500px] bg-black rounded-none overflow-hidden">
                     <CustomVideoPlayer
@@ -540,7 +696,7 @@ const MainContent = ({
                       handleVideoEnd={handleVideoEnd}
                     />
 
-                    {/* Sidebar toggle button - chỉ hiện trong container video */}
+                    {/* Sidebar toggle button */}
                     {!isSidebarOpen && (
                       <div
                         className="absolute right-0 top-1/2 transform -translate-y-1/2 group z-10"
@@ -580,10 +736,11 @@ const MainContent = ({
                       </div>
                     )}
                   </div>
-                )}
+                )
+              )}
             </div>
 
-            {selectedLecture.content_type.toLowerCase() === "pdf" &&
+            {!isLocked && selectedLecture.content_type.toLowerCase() === "pdf" &&
               selectedLecture.document_url && (
                 <iframe
                   src={selectedLecture.document_url}
@@ -605,7 +762,7 @@ const MainContent = ({
                 <FaChartLine className="mr-2 text-green-500" />
                 <span className="font-semibold text-gray-700">Tiến độ:</span>
                 <span className="ml-1 text-gray-800">
-                  {Math.round(progress)}%
+                  {isLocked ? "Bị khóa" : `${Math.round(progress)}%`}
                 </span>
               </p>
             </div>
@@ -687,7 +844,6 @@ const MainContent = ({
           )}
           {selectedTab === 1 && (
             <div>
-              {/* <h3 className="text-2xl font-semibold ml-8 mt-8">Hỏi Đáp</h3> */}
               <QuestionsAndAnswers courseId={id} />
             </div>
           )}

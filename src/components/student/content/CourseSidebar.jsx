@@ -1,369 +1,318 @@
-import React, { useState, useEffect, useRef } from "react";
-import { useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
+import PropTypes from "prop-types";
 import {
-  FaChevronDown,
+  FaBars,
+  FaAngleDown,
+  FaAngleUp,
+  FaPlay,
+  FaFile,
   FaCheckCircle,
-  FaRegCircle,
-  FaFileAlt,
-  FaTrophy,
-  FaGraduationCap,
-  FaLock,
+  FaCircle,
   FaTimes,
+  FaLock,
 } from "react-icons/fa";
-import { motion, AnimatePresence } from "framer-motion";
-import Swal from "sweetalert2";
-import { Flag } from "lucide-react";
-import axios from "axios";
-const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
-import { decodeId } from "../../../utils/hash";
-import { encodeId } from "../../../utils/hash";
 
 const CourseSidebar = ({
   course,
+  calculateCompletedLectures,
   handleLectureClick,
   selectedLecture,
-  calculateCompletedLectures,
   progressCourses,
   isOpen,
   onClose,
 }) => {
-  const [openSections, setOpenSections] = useState({});
-  const { courseHash } = useParams();
-  const courseId = decodeId(courseHash);
-  const userId = localStorage.getItem("userId");
-  const token = localStorage.getItem("token");
+  const [expandedSections, setExpandedSections] = useState({});
+
+  // Initialize expanded sections on mount - expand section with selected lecture
   useEffect(() => {
-    if (selectedLecture) {
-      const sectionIndex = course.sections.findIndex((section) =>
-        section.lectures.some(
-          (lecture) => lecture.lecture_id === selectedLecture.lecture_id
-        )
+    if (course && course.sections && selectedLecture) {
+      const sectionWithSelectedLecture = course.sections.find(section =>
+        section.lectures.some(lecture => lecture.lecture_id === selectedLecture.lecture_id)
       );
-      if (sectionIndex !== -1) {
-        setOpenSections((prev) => ({
+      
+      if (sectionWithSelectedLecture) {
+        setExpandedSections(prev => ({
           ...prev,
-          [sectionIndex]: true,
+          [sectionWithSelectedLecture.section_id]: true
         }));
       }
     }
-  }, [selectedLecture, course.sections]);
+  }, [course, selectedLecture]);
 
-  const handleLectureSelection = (lecture, isAvailable) => {
-    if (!isAvailable) {
-      Swal.fire({
-        title: "Chưa thể truy cập",
-        text: "Vui lòng hoàn thành bài học trước để mở khóa bài này.",
-        icon: "warning",
-        confirmButtonText: "Đã hiểu",
-        confirmButtonColor: "#3B82F6",
-      });
-      return;
-    }
-
-    // Lưu thông tin bài giảng đã chọn vào localStorage
-    localStorage.setItem("current_lecture_id", lecture.lecture_id);
-
-    // Gọi handleLectureClick để thông báo component cha
-    handleLectureClick(lecture);
-  };
-
-  if (!course) {
-    return null;
-  }
-
-  const { sections } = course;
-
-  const parseDuration = (duration) => {
-    if (typeof duration === "string") {
-      const minuteMatch = duration.match(/(\d+)\s*min/);
-      const secondMatch = duration.match(/(\d+)\s*sec/);
-      const minutes = minuteMatch ? parseInt(minuteMatch[1], 10) : 0;
-      const seconds = secondMatch ? parseInt(secondMatch[1], 10) : 0;
-      return minutes * 60 + seconds;
-    }
-    return 0;
-  };
-
-  const calculateSectionTime = (lectures) => {
-    const totalSeconds = lectures.reduce((sum, lecture) => {
-      return sum + parseDuration(lecture.duration);
-    }, 0);
-
-    const hours = Math.floor(totalSeconds / 3600);
-    const minutes = Math.floor((totalSeconds % 3600) / 60);
-    const seconds = totalSeconds % 60;
-
-    return `${hours > 0 ? `${hours}h ` : ""}${
-      minutes > 0 ? `${minutes}m ` : ""
-    }${seconds > 0 ? `${seconds}s` : ""}`.trim();
-  };
-
-  const totalLectures = sections.reduce(
-    (total, section) => total + section.lectures.length,
-    0
-  );
-
-  const completedLectures = sections.reduce(
-    (total, section) => total + calculateCompletedLectures(section.lectures),
-    0
-  );
-
-  const progressPercentage = (completedLectures / totalLectures) * 100;
-
-  const handleCertificateClick = async () => {
-    try {
-      const response = await fetch(
-        `${baseUrl}/api/student/certificate/${userId}/${courseId}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (response.ok) {
-        window.open(`/certificate/${encodeId(courseId)}`);
-      }
-    } catch (error) {
-      console.error("Lỗi khi tạo chứng chỉ:", error);
-      alert("Không thể tạo chứng chỉ. Vui lòng thử lại.");
-    }
-  };
-
-  const toggleSection = (sectionIndex) => {
-    setOpenSections((prev) => ({
-      ...prev,
-      [sectionIndex]: !prev[sectionIndex],
+  const toggleSection = (sectionId) => {
+    setExpandedSections((prevState) => ({
+      ...prevState,
+      [sectionId]: !prevState[sectionId],
     }));
   };
-  const handleReportSection = async (section) => {
-    const userId = localStorage.getItem("userId");
-    const { value: reason } = await Swal.fire({
-      title: "Báo cáo chương học",
-      input: "textarea",
-      inputLabel: "Lý do báo cáo chương học",
-      inputPlaceholder: "Nhập lý do tại đây...",
-      showCancelButton: true,
-      confirmButtonText: "Gửi",
-      cancelButtonText: "Hủy",
-      preConfirm: (val) => {
-        if (!val) Swal.showValidationMessage("Bạn phải nhập lý do!");
-        return val;
-      },
-    });
-    if (!reason) return;
-    try {
-      await axios.post(
-        `${baseUrl}/api/student/section/report`,
-        {
-          idUserReport: userId,
-          targetId: section.section_id,
-          reason,
-        },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      await Swal.fire("Thành công", "Báo cáo đã được gửi!", "success");
-    } catch (err) {
-      console.error(err);
-      await Swal.fire("Lỗi", "Không gửi được báo cáo, thử lại sau.", "error");
-    }
+
+  const formatDuration = (duration) => {
+    if (!duration) return "00:00";
+    const parts = duration.split(":");
+    if (parts.length === 2) return duration;
+    if (parts.length === 3) return `${parts[1]}:${parts[2]}`;
+    return duration;
   };
-  const handleReportLecture = async (lecture) => {
-    const userId = localStorage.getItem("userId");
-    const { value: reason } = await Swal.fire({
-      title: "Báo cáo bài học",
-      input: "textarea",
-      inputLabel: "Lý do báo cáo bài học",
-      inputPlaceholder: "Nhập lý do tại đây...",
-      showCancelButton: true,
-      confirmButtonText: "Gửi",
-      cancelButtonText: "Hủy",
-      preConfirm: (val) => {
-        if (!val) Swal.showValidationMessage("Bạn phải nhập lý do!");
-        return val;
-      },
-    });
-    if (!reason) return;
-    const token = localStorage.getItem("token");
-    try {
-      await axios.post(
-        `${baseUrl}/api/student/lecture/report`,
-        {
-          idUserReport: userId,
-          targetId: lecture.lecture_id,
-          reason,
-        },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      await Swal.fire("Thành công", "Báo cáo đã được gửi!", "success");
-    } catch (err) {
-      console.error(err);
-      await Swal.fire("Lỗi", "Không gửi được báo cáo, thử lại sau.", "error");
-    }
+
+  // Check if lecture is locked
+  const isLectureLocked = (lecture, section) => {
+    const lectureIndex = section.lectures.findIndex(
+      l => l.lecture_id === lecture.lecture_id
+    );
+    
+    // First lecture in section is always unlocked
+    if (lectureIndex === 0) return false;
+    
+    // Check if previous lecture is completed
+    const previousLecture = section.lectures[lectureIndex - 1];
+    return !previousLecture.watched;
   };
+
+  if (!course || !course.sections) {
+    return <div className="p-4">Loading course content...</div>;
+  }
+
+  // Calculate total progress
+  const totalLectures = course.sections.reduce(
+    (acc, section) => acc + section.lectures.length,
+    0
+  );
+  const completedLectures = course.sections.reduce(
+    (acc, section) => acc + section.lectures.filter(lecture => lecture.watched).length,
+    0
+  );
+  const progressPercentage = totalLectures > 0 
+    ? Math.round((completedLectures / totalLectures) * 100)
+    : 0;
+
   return (
-    <div className="h-full w-full">
-      {/* Header - sticky để luôn hiển thị khi cuộn */}
-      <div className="sticky top-0 z-20 bg-white flex items-center justify-between px-6 py-4 border-b border-gray-200">
-        <h2 className="text-lg font-semibold text-gray-900">
-          Nội dung khóa học
-        </h2>
-        <button
-          onClick={onClose}
-          className="text-gray-500 hover:text-gray-700 p-1"
-          aria-label="Đóng"
-        >
-          <FaTimes className="w-4 h-4" />
-        </button>
+    <div className="h-full flex flex-col bg-white">
+      {/* Header with close button */}
+      <div className="sticky top-0 bg-white z-10 border-b border-gray-200">
+        <div className="p-4">
+          <div className="flex justify-between items-center mb-3">
+            <h2 className="text-lg font-bold text-gray-800">Nội dung khóa học</h2>
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              aria-label="Đóng sidebar"
+            >
+              <FaTimes className="text-gray-600 text-lg" />
+            </button>
+          </div>
+          
+          {/* Progress bar */}
+          <div className="mb-2">
+            <div className="flex justify-between items-center mb-1">
+              <span className="text-sm text-gray-600">Tiến độ học tập</span>
+              <span className="text-sm font-semibold text-gray-800">
+                {completedLectures}/{totalLectures} bài ({progressPercentage}%)
+              </span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-2">
+              <div
+                className="bg-green-500 h-2 rounded-full transition-all duration-300"
+                style={{ width: `${progressPercentage}%` }}
+              />
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* Sections List - chỉ là phần có thể cuộn */}
-      <div>
-        {sections.map((section, sectionIndex) => {
-          const isOpen = openSections[sectionIndex];
-          const completedInSection = calculateCompletedLectures(
-            section.lectures
-          );
-          const totalTime = calculateSectionTime(section.lectures);
+      {/* Scrollable content */}
+      <div className="flex-1 overflow-y-auto">
+        {course.sections.map((section, sectionIndex) => {
+          const sectionCompleted = calculateCompletedLectures(section.lectures);
+          const sectionTotal = section.lectures.length;
+          const sectionProgress = sectionTotal > 0 
+            ? Math.round((sectionCompleted / sectionTotal) * 100)
+            : 0;
 
           return (
-            <div key={sectionIndex} className="border-b border-gray-200">
-              <button
-                onClick={() => toggleSection(sectionIndex)}
-                className="w-full px-6 py-5 flex items-start hover:bg-gray-50 transition-colors"
+            <div
+              key={`${section.section_id}-${sectionCompleted}`} // Add sectionCompleted to key for reactivity
+              className="border-b border-gray-200 last:border-b-0"
+            >
+              {/* Section Header */}
+              <div
+                onClick={() => toggleSection(section.section_id)}
+                className="px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors"
               >
-                <FaChevronDown
-                  className={`w-4 h-4 text-gray-500 mt-1 mr-4 transition-transform ${
-                    isOpen ? "rotate-180" : ""
-                  }`}
-                />
-                <div className="flex-1 text-left">
-                  <div className="flex items-center mb-1">
-                    <h3 className="text-base font-semibold text-gray-900">
-                      Phần {sectionIndex + 1}: {section.title}
+                <div className="flex justify-between items-center">
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-gray-800 text-sm">
+                      Chương {sectionIndex + 1}: {section.title}
                     </h3>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleReportSection(section);
-                      }}
-                      className="ml-2 p-2 text-red-500 hover:text-red-600 transition"
-                      title="Báo cáo"
-                    >
-                      <Flag size={22} />
-                    </button>
+                    <div className="flex items-center mt-1 text-xs text-gray-600">
+                      <span>
+                        {sectionCompleted}/{sectionTotal} bài
+                      </span>
+                      {sectionProgress > 0 && (
+                        <span className="ml-2 text-green-600">
+                          ({sectionProgress}%)
+                        </span>
+                      )}
+                    </div>
                   </div>
-                  <div className="text-sm text-gray-600">
-                    {completedInSection}/{section.lectures.length} | {totalTime}
+                  <div className="ml-2">
+                    {expandedSections[section.section_id] ? (
+                      <FaAngleUp className="text-gray-600" />
+                    ) : (
+                      <FaAngleDown className="text-gray-600" />
+                    )}
                   </div>
                 </div>
-              </button>
+                
+                {/* Section progress bar */}
+                {sectionProgress > 0 && (
+                  <div className="mt-2 w-full bg-gray-200 rounded-full h-1">
+                    <div
+                      className="bg-green-500 h-1 rounded-full transition-all duration-300"
+                      style={{ width: `${sectionProgress}%` }}
+                    />
+                  </div>
+                )}
+              </div>
 
-              <AnimatePresence>
-                {isOpen && (
-                  <motion.div
-                    initial={{ height: 0 }}
-                    animate={{ height: "auto" }}
-                    exit={{ height: 0 }}
-                    transition={{ duration: 0.2 }}
-                    className="overflow-hidden"
-                  >
-                    {section.lectures.map((lecture, index) => {
-                      const watched = lecture.watched || false;
-                      const isSelected =
-                        selectedLecture?.lecture_id === lecture.lecture_id;
-                      const isAvailable =
-                        index === 0 ||
-                        watched ||
-                        (index > 0 && section.lectures[index - 1]?.watched);
+              {/* Lectures List */}
+              {expandedSections[section.section_id] && (
+                <div className="bg-gray-50">
+                  {section.lectures.map((lecture, lectureIndex) => {
+                    const isSelected = selectedLecture?.lecture_id === lecture.lecture_id;
+                    const isWatched = lecture.watched;
+                    const isLocked = isLectureLocked(lecture, section);
 
-                      return (
-                        <button
-                          key={lecture.lecture_id}
-                          onClick={() =>
-                            handleLectureSelection(lecture, isAvailable)
+                    return (
+                      <div
+                        key={`${lecture.lecture_id}-${isWatched}-${isLocked}`} // Dynamic key for reactivity
+                        className={`
+                          px-4 py-3 cursor-pointer border-l-4 transition-all duration-200
+                          ${isSelected 
+                            ? "bg-blue-50 border-blue-500" 
+                            : "border-transparent hover:bg-gray-100"
                           }
-                          className={`w-full pl-14 pr-6 py-4 flex items-start text-left
-                            ${isSelected ? "bg-purple-50" : "hover:bg-gray-50"} 
-                            ${
-                              !isAvailable
-                                ? "opacity-60 cursor-not-allowed"
-                                : "cursor-pointer"
-                            }`}
-                          disabled={!isAvailable}
-                        >
-                          <div className="w-5 h-5 flex items-center justify-center mr-4 mt-0.5">
-                            {watched ? (
-                              <FaCheckCircle className="w-[18px] h-[18px] text-purple-600" />
-                            ) : !isAvailable ? (
-                              <FaLock className="w-[16px] h-[16px] text-gray-400" />
+                          ${isLocked ? "opacity-60 cursor-not-allowed" : ""}
+                        `}
+                        onClick={() => {
+                          if (!isLocked) {
+                            handleLectureClick(lecture);
+                          } else {
+                            // Show message when clicking locked lecture
+                            const swalFire = async () => {
+                              const Swal = (await import('sweetalert2')).default;
+                              Swal.fire({
+                                title: "Bài học bị khóa",
+                                text: "Bạn cần hoàn thành bài học trước để mở khóa bài này.",
+                                icon: "info",
+                                timer: 2000,
+                                showConfirmButton: false
+                              });
+                            };
+                            swalFire();
+                          }
+                        }}
+                      >
+                        <div className="flex items-start">
+                          {/* Icon and checkbox */}
+                          <div className="mr-3 mt-0.5">
+                            {isLocked ? (
+                              <FaLock className="text-gray-400 text-lg" />
+                            ) : isWatched ? (
+                              <FaCheckCircle className="text-green-500 text-lg" />
                             ) : (
-                              <div className="w-[18px] h-[18px] rounded-full border-2 border-gray-300"></div>
+                              <FaCircle className="text-gray-400 text-lg" />
                             )}
                           </div>
+
+                          {/* Content */}
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center mb-1">
-                              <p
-                                className={`text-base ${
-                                  isSelected
-                                    ? "text-purple-600 font-medium"
-                                    : "text-gray-700"
-                                } truncate`}
-                              >
-                                {lecture.title}
-                              </p>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleReportLecture(lecture);
-                                }}
-                                className="ml-2 p-2 text-red-500 hover:text-red-600 transition"
-                                title="Báo cáo"
-                              >
-                                <Flag size={16} />
-                              </button>
+                              {lecture.content_type === "video" ? (
+                                <FaPlay className="text-blue-500 text-xs mr-2 flex-shrink-0" />
+                              ) : (
+                                <FaFile className="text-orange-500 text-xs mr-2 flex-shrink-0" />
+                              )}
+                              <h4 className={`
+                                text-sm pr-2 flex-1
+                                ${isSelected ? "font-semibold text-blue-700" : "text-gray-800"}
+                                ${isWatched && !isLocked ? "line-through opacity-70" : ""}
+                              `}>
+                                Bài {lectureIndex + 1}: {lecture.title}
+                              </h4>
                             </div>
-                            <div className="flex items-center mt-1 text-sm text-gray-500">
-                              <FaFileAlt className="w-3 h-3 mr-2" />
-                              <span>{calculateSectionTime([lecture])}</span>
+                            
+                            <div className="flex items-center text-xs text-gray-600">
+                              <span>{formatDuration(lecture.duration)}</span>
+                              {isSelected && !isLocked && (
+                                <span className="ml-2 text-blue-600 font-medium">
+                                  Đang xem
+                                </span>
+                              )}
+                              {isLocked && (
+                                <span className="ml-2 text-gray-500">
+                                  <FaLock className="inline mr-1" size={10} />
+                                  Cần hoàn thành bài trước
+                                </span>
+                              )}
+                              {!isLocked && !isWatched && !isSelected && (
+                                <span className="ml-2 text-gray-500">
+                                  Chưa xem
+                                </span>
+                              )}
                             </div>
                           </div>
-                        </button>
-                      );
-                    })}
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           );
         })}
       </div>
 
-      {/* Certificate Button */}
-      {progressCourses >= 100 && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mt-8 px-4"
-        >
-          <motion.button
-            onClick={handleCertificateClick}
-            className="w-full bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 text-white px-6 py-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center space-x-3"
-            whileHover={{
-              scale: 1.02,
-              boxShadow: "0 20px 25px -5px rgb(59 130 246 / 0.1)",
-            }}
-            whileTap={{ scale: 0.98 }}
-          >
-            <FaTrophy className="text-yellow-300 animate-pulse" size={22} />
-            <span className="font-semibold tracking-wide">Nhận chứng chỉ</span>
-          </motion.button>
-        </motion.div>
-      )}
+      {/* Footer */}
+      <div className="sticky bottom-0 bg-white border-t border-gray-200 p-4">
+        <div className="text-center">
+          <div className="text-xs text-gray-600 mb-1">
+            Hoàn thành {completedLectures} / {totalLectures} bài học
+          </div>
+          {progressPercentage === 100 && (
+            <div className="text-sm font-semibold text-green-600">
+              🎉 Chúc mừng bạn đã hoàn thành khóa học!
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
+};
+
+CourseSidebar.propTypes = {
+  course: PropTypes.shape({
+    sections: PropTypes.arrayOf(
+      PropTypes.shape({
+        section_id: PropTypes.number.isRequired,
+        title: PropTypes.string.isRequired,
+        lectures: PropTypes.arrayOf(
+          PropTypes.shape({
+            lecture_id: PropTypes.number.isRequired,
+            title: PropTypes.string.isRequired,
+            content_type: PropTypes.string.isRequired,
+            duration: PropTypes.string,
+            watched: PropTypes.bool,
+          })
+        ).isRequired,
+      })
+    ).isRequired,
+  }).isRequired,
+  calculateCompletedLectures: PropTypes.func.isRequired,
+  handleLectureClick: PropTypes.func.isRequired,
+  selectedLecture: PropTypes.object,
+  progressCourses: PropTypes.number,
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
 };
 
 export default CourseSidebar;
