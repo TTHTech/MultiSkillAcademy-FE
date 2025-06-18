@@ -122,7 +122,7 @@ const TableReview = ({ reviews, onDeleteReview, triggerRefresh }) => {
     return (
       <div className="flex items-center gap-0.5">
         {stars}
-        <span className="ml-1 text-sm font-medium">{rating}</span>
+        <span className="ml-1 text-sm font-medium text-white">{rating}</span>
       </div>
     );
   };

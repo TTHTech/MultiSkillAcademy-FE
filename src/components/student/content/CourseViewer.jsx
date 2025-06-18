@@ -8,16 +8,16 @@ import { encodeId } from '../../../utils/hash';
 const baseUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 
 const CourseViewer = () => {
-  const [course, setCourse] = useState(null); // Dữ liệu khóa học
-  const [selectedSection, setSelectedSection] = useState(null); // Phần được chọn
-  const [selectedLecture, setSelectedLecture] = useState(null); // Bài học được chọn
-  const [isLoading, setIsLoading] = useState(true); // Trạng thái tải dữ liệu
-  const { courseHash, progressHash } = useParams(); // Lấy id và tiến độ từ URL
+  const [course, setCourse] = useState(null);
+  const [selectedSection, setSelectedSection] = useState(null);
+  const [selectedLecture, setSelectedLecture] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const { courseHash, progressHash } = useParams();
   const id = decodeId(courseHash);
   const progress = decodeId(progressHash);
 
   const navigate = useNavigate();
-  const userId = Number(localStorage.getItem("userId")); // Lấy userId từ localStorage
+  const userId = Number(localStorage.getItem("userId"));
   const videoRef = React.useRef(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isHoveringButton, setIsHoveringButton] = useState(false);
@@ -25,7 +25,7 @@ const CourseViewer = () => {
   // Fetch dữ liệu khóa học khi component được mount
   useEffect(() => {
     const fetchCourseData = async () => {
-      console.log(progress)
+      console.log("Fetching course data with progress:", progress);
       try {
         const response = await fetch(
           `${baseUrl}/api/student/study-courses/${id}/${userId}`,
@@ -39,38 +39,26 @@ const CourseViewer = () => {
         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
         const data = await response.json();
 
-        // Tính số bài học hoàn thành dựa trên tiến độ
-        const totalLectures = data.sections.reduce(
-          (count, section) => count + section.lectures.length,
-          0
-        );
-        const completedCount = Math.round((progress / 100) * totalLectures);
-
-        // Đánh dấu bài học đã hoàn thành hoặc chưa
-        let completedSoFar = 0;
+        // Process lectures để set watched status từ backend
         data.sections.forEach((section) => {
           section.lectures.forEach((lecture) => {
-            if (completedSoFar < completedCount) {
-              lecture.completed = true;
-              completedSoFar++;
-            } else {
-              lecture.completed = false;
-            }
+            // Backend đã gửi watched status, giữ nguyên
+            lecture.watched = lecture.watched || false;
           });
         });
 
-        setCourse(data); // Lưu dữ liệu khóa học vào state
+        setCourse(data);
       } catch (error) {
         console.error("Error fetching course data:", error);
       } finally {
-        setIsLoading(false); // Dừng trạng thái loading
+        setIsLoading(false);
       }
     };
 
     fetchCourseData();
   }, [id, userId, progress]);
 
-  // Thêm useEffect để tự động chọn video
+  // Tự động chọn video khi course data loaded
   useEffect(() => {
     if (course && !selectedLecture) {
       // Lấy lecture_id từ localStorage
@@ -89,7 +77,17 @@ const CourseViewer = () => {
         }
       }
       
-      // Nếu không có bài giảng đã lưu hoặc không tìm thấy, lấy bài đầu tiên
+      // Nếu không có bài giảng đã lưu, tìm bài đầu tiên chưa hoàn thành
+      for (const section of course.sections) {
+        for (const lecture of section.lectures) {
+          if (!lecture.watched) {
+            setSelectedLecture(lecture);
+            return;
+          }
+        }
+      }
+      
+      // Nếu tất cả đã hoàn thành, chọn bài đầu tiên
       if (course.sections.length > 0 && course.sections[0].lectures.length > 0) {
         setSelectedLecture(course.sections[0].lectures[0]);
       }
@@ -113,8 +111,8 @@ const CourseViewer = () => {
     if (!isLoading && course === null) handleConfirmation();
   }, [isLoading, course, id]);
 
-  // Cập nhật tiến độ qua API
-  const updateProgress = async (lectureId, progress) => {
+  // Sửa lại hàm updateProgress để refresh realtime
+  const updateProgress = async (lectureId, progressPercent = 100) => {
     try {
       const response = await fetch(`${baseUrl}/api/student/update-progress`, {
         method: "PUT",
@@ -126,14 +124,83 @@ const CourseViewer = () => {
           userId,
           courseId: id,
           lectureId,
-          progress, // Gửi tiến độ hiện tại
         }),
       });
-  
+
       if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-      console.log("Cập nhật tiến độ thành công!");
+      
+      console.log("Updated progress successfully for lecture:", lectureId);
+      
+      // Cập nhật state local ngay lập tức
+      setCourse((prevCourse) => {
+        if (!prevCourse) return prevCourse;
+        
+        const updatedCourse = { ...prevCourse };
+        updatedCourse.sections = updatedCourse.sections.map((section) => {
+          const updatedSection = { ...section };
+          updatedSection.lectures = section.lectures.map((lecture) => {
+            if (lecture.lecture_id === lectureId) {
+              return { ...lecture, watched: true };
+            }
+            return lecture;
+          });
+          return updatedSection;
+        });
+        
+        return updatedCourse;
+      });
+      
+      // Trigger re-render để update lock status
+      setSelectedLecture(prev => ({ ...prev }));
+      
     } catch (error) {
       console.error("Lỗi khi cập nhật tiến độ:", error);
+    }
+  };
+
+  // Thêm useEffect để check lock status khi course data thay đổi
+  useEffect(() => {
+    if (selectedLecture && course) {
+      // Trigger re-render MainContent để check lock status
+      setSelectedLecture(prev => ({ ...prev }));
+    }
+  }, [course]);
+
+  // Fetch updated course data
+  const fetchUpdatedCourseData = async () => {
+    try {
+      const response = await fetch(
+        `${baseUrl}/api/student/study-courses/${id}/${userId}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      
+      if (response.ok) {
+        const data = await response.json();
+        
+        // Keep current selected lecture
+        const currentLectureId = selectedLecture?.lecture_id;
+        
+        // Update course data
+        setCourse(data);
+        
+        // Restore selected lecture if it exists
+        if (currentLectureId) {
+          const allLectures = data.sections.flatMap(section => section.lectures);
+          const currentLecture = allLectures.find(
+            lecture => lecture.lecture_id === currentLectureId
+          );
+          if (currentLecture) {
+            setSelectedLecture(currentLecture);
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching updated course data:", error);
     }
   };
   
@@ -147,52 +214,40 @@ const CourseViewer = () => {
     
     console.log("Changing to lecture:", lecture.lecture_id, lecture.title);
     
-    // Set loading state if needed
-    // setIsLoading(true);
+    // Save current lecture ID
+    localStorage.setItem("current_lecture_id", lecture.lecture_id);
     
-    // Update selected lecture
-    setSelectedLecture(null); // Clear current lecture first
+    // Clear current lecture first to force re-render
+    setSelectedLecture(null);
     
-    // Use setTimeout to ensure React has time to process the state change
+    // Set new lecture after a small delay
     setTimeout(() => {
       setSelectedLecture(lecture);
-      // setIsLoading(false);
     }, 50);
   };
 
   // Xử lý khi người dùng thay đổi trạng thái checkbox
   const handleCheckboxChange = async (lecture) => {
-    if (lecture.completed) return; // Nếu đã hoàn thành, không làm gì
+    if (lecture.watched) return;
 
     const swalResult = await Swal.fire({
       title: "Xác nhận",
-      text: "Bạn có chắc chắn muốn cập nhật tiến độ tại bài học này không?",
+      text: "Bạn có chắc chắn muốn đánh dấu bài học này là đã hoàn thành?",
       icon: "question",
       showCancelButton: true,
       confirmButtonText: "Có",
       cancelButtonText: "Không",
     });
+    
     if (!swalResult.isConfirmed) return;
 
-    // Cập nhật trạng thái hoàn thành trong state cục bộ
-    setCourse((prevCourse) => {
-      const updatedSections = prevCourse.sections.map((section) => ({
-        ...section,
-        lectures: section.lectures.map((l) =>
-          l.lecture_id === lecture.lecture_id ? { ...l, completed: true } : l
-        ),
-      }));
-
-      return { ...prevCourse, sections: updatedSections };
-    });
-
-    // Gọi API để cập nhật tiến độ
+    // Cập nhật tiến độ
     await updateProgress(lecture.lecture_id);
   };
 
   // Tính số bài học đã hoàn thành trong một phần
   const calculateCompletedLectures = (lectures) =>
-    lectures.filter((lecture) => lecture.completed).length;
+    lectures.filter((lecture) => lecture.watched === true).length;
 
   const toggleSidebar = () => {
     setIsSidebarOpen(prev => !prev);
@@ -207,7 +262,7 @@ const CourseViewer = () => {
     );
   }
 
-  if (!course) return null; // Nếu không có dữ liệu khóa học, không hiển thị gì
+  if (!course) return null;
 
   return (
     <div className="flex flex-col h-full relative">
@@ -220,10 +275,13 @@ const CourseViewer = () => {
           updateProgress={updateProgress}
           toggleSidebar={toggleSidebar}
           isSidebarOpen={isSidebarOpen}
+          setIsHoveringButton={setIsHoveringButton}
+          isHoveringButton={isHoveringButton}
+          course={course} // Thêm dòng này
         />
       </div>
 
-      {/* Sidebar - Fixed position but will not overlap footer */}
+      {/* Sidebar - Fixed position */}
       {isSidebarOpen && (
         <div className="fixed top-[90px] right-0 w-[380px] bg-white border-l border-gray-200 shadow-xl z-30"
              style={{ 
@@ -242,51 +300,6 @@ const CourseViewer = () => {
           />
         </div>
       )}
-    </div>
-  );
-};
-
-// Component mới để xử lý việc tự động ẩn sidebar khi footer xuất hiện
-const StickyWithoutOverlap = ({ content, isOpen, onClose }) => {
-  const [sidebarHeight, setSidebarHeight] = useState("calc(100vh - 90px)");
-  const sidebarRef = useRef(null);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      if (!sidebarRef.current) return;
-      
-      const footerElement = document.querySelector("footer");
-      if (!footerElement) return;
-
-      const footerRect = footerElement.getBoundingClientRect();
-      const windowHeight = window.innerHeight;
-      
-      // Khi footer bắt đầu xuất hiện trong viewport
-      if (footerRect.top < windowHeight) {
-        // Tính toán chiều cao mới cho sidebar
-        const newHeight = footerRect.top - 90; // 90px là chiều cao của navbar
-        setSidebarHeight(`${newHeight}px`);
-      } else {
-        // Reset về chiều cao mặc định
-        setSidebarHeight("calc(100vh - 90px)");
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    handleScroll(); // Gọi ngay lúc đầu để set giá trị ban đầu
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, [isOpen]);
-
-  return (
-    <div 
-      ref={sidebarRef}
-      className="fixed top-[90px] right-0 w-[380px] bg-white border-l border-gray-200 shadow-xl overflow-auto z-30"
-      style={{ height: sidebarHeight, transition: "height 0.3s" }}
-    >
-      {content}
     </div>
   );
 };

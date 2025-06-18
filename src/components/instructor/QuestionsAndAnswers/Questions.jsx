@@ -168,12 +168,14 @@ const DetailQuestions = ({ courseId }) => {
       })
       .then((data) => {
         console.log(data);
+        triggerRefresh();
         return Swal.fire({
           title: "Confirmation",
           text: "Sửa đổi trạng thái câu trả lời thành công",
           icon: "success",
           confirmButtonText: "Yes",
         });
+        
       })
       .catch((error) => {
         console.error("There was a problem with the fetch operation:", error);
