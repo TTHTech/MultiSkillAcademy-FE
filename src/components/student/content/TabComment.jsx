@@ -112,9 +112,11 @@ const TabComment = ({ courseId }) => {
         `${baseUrl}/api/student/reviews/${courseId}`
       );
       setShowAddReview(false);
+      setReviewMessage("");
       setReviews(response.data); // Update reviews list
       setNewComment(""); // Reset the comment field
       setNewRating(5); // Reset the rating to default (5 stars)
+      Swal.fire("Thành công", "Thêm đánh giá thành công!", "success");
     } catch (error) {
       if (error.response && error.response.status === 400) {
         alert(error.response.data);
@@ -226,13 +228,15 @@ const TabComment = ({ courseId }) => {
           </div>
         </div>
       ) : (
-        <div className="mt-6 flex items-start p-4 bg-red-50 border-l-4 border-red-500 rounded-lg">
-          <AlertTriangle
-            size={24}
-            className="flex-shrink-0 text-red-500 mr-3"
-          />
-          <p className="text-red-700 font-medium">{reviewMessage}</p>
-        </div>
+        reviewMessage && (
+          <div className="mt-6 flex items-start p-4 bg-red-50 border-l-4 border-red-500 rounded-lg">
+            <AlertTriangle
+              size={24}
+              className="flex-shrink-0 text-red-500 mr-3"
+            />
+            <p className="text-red-700 font-medium">{reviewMessage}</p>
+          </div>
+        )
       )}
 
       {/* Filter, Sort, and Search Section */}

@@ -132,7 +132,7 @@ const TableLecture = ({ lectures, triggerRefresh }) => {
               <th scope="col" className="px-4 py-3.5 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                 <div className="flex items-center space-x-1 text-gray-300">
                   <Layers size={14} />
-                  <span>Section</span>
+                  <span>Chương học</span>
                 </div>
               </th>
               <th scope="col" className="px-4 py-3.5 text-left text-xs font-medium text-gray-300 uppercase tracking-wider hidden md:table-cell">

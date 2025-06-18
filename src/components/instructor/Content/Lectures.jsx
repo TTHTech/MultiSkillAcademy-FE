@@ -372,7 +372,7 @@ const Lectures = ({ lectures, sectionId, instructor, section, course, triggerRef
       setIsLoading(false);
       Swal.fire({
         icon: "success",
-        title: "Lecture Added",
+        title: "Thành công",
         text: result,
       });
       triggerRefresh();
@@ -456,7 +456,7 @@ const Lectures = ({ lectures, sectionId, instructor, section, course, triggerRef
       setIsLoading(false);
       Swal.fire({
         icon: "success",
-        title: "Lecture Added",
+        title: "Thành công",
         text: result,
       });
       triggerRefresh();

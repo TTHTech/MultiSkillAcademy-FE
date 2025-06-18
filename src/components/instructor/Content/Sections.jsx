@@ -243,6 +243,7 @@ const Sections = () => {
       const updated = [...sections, newSectionupdate];
       setSections(updated);
       setNewSection("");
+      triggerRefresh();
     } catch (err) {
       alert("Failed to add section: " + err.message);
     }
